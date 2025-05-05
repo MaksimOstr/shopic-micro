@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -9,65 +10,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/infrastructure/api-gateway" />
-        <option name="gradleHome" value="$USER_HOME$/Downloads/gradle-8.14-all/gradle-8.14" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/infrastructure/api-gateway" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/infrastructure/config-server" />
-        <option name="gradleHome" value="$USER_HOME$/Downloads/gradle-8.14-all/gradle-8.14" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/infrastructure/config-server" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/infrastructure/discovery-server" />
-        <option name="gradleHome" value="$USER_HOME$/Downloads/gradle-8.14-all/gradle-8.14" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/infrastructure/discovery-server" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/services/auth-service" />
-        <option name="gradleHome" value="$USER_HOME$/Downloads/gradle-8.14-all/gradle-8.14" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/services/auth-service" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/services/order-service" />
-        <option name="gradleHome" value="$USER_HOME$/Downloads/gradle-8.14-all/gradle-8.14" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/services/order-service" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/services/user-service" />
-        <option name="gradleHome" value="$USER_HOME$/Downloads/gradle-8.14-all/gradle-8.14" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/services/user-service" />
           </set>
         </option>

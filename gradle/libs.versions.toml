@@ -1,0 +1,25 @@
+[versions]
+spring-boot = "3.4.5"
+spring-dependency-management = "1.1.7"
+spring-cloud = "2024.0.1"
+
+
+[libraries]
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter"}
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web"}
+junit = { module = "org.junit.platform:junit-platform-launcher"}
+eureka-client = { module = "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client"}
+
+[plugins]
+spring-framework-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management"}
+
+[bundles]
+core = ["spring-boot-starter-test", "spring-boot-starter", "junit"]
+business-service = ["eureka-client", "spring-boot-starter-web"]
+
+
+
+
+

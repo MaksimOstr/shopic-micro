@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="1.6" />
+    <bytecodeTargetLevel target="24">
+      <module name="order-service" target="24" />
+      <module name="order-service.main" target="24" />
+      <module name="order-service.test" target="24" />
+      <module name="shopic.buildSrc" target="23" />
+      <module name="shopic.buildSrc.main" target="23" />
+      <module name="shopic.buildSrc.test" target="23" />
+      <module name="user-service" target="24" />
+      <module name="user-service.main" target="24" />
+      <module name="user-service.test" target="24" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -20,6 +30,24 @@
       <module name="order-service" options="-parameters" />
       <module name="order-service.main" options="-parameters" />
       <module name="order-service.test" options="-parameters" />
+      <module name="shopic.api-gateway" options="-parameters" />
+      <module name="shopic.api-gateway.main" options="-parameters" />
+      <module name="shopic.api-gateway.test" options="-parameters" />
+      <module name="shopic.auth-service" options="-parameters" />
+      <module name="shopic.auth-service.main" options="-parameters" />
+      <module name="shopic.auth-service.test" options="-parameters" />
+      <module name="shopic.config-server" options="-parameters" />
+      <module name="shopic.config-server.main" options="-parameters" />
+      <module name="shopic.config-server.test" options="-parameters" />
+      <module name="shopic.discovery-server" options="-parameters" />
+      <module name="shopic.discovery-server.main" options="-parameters" />
+      <module name="shopic.discovery-server.test" options="-parameters" />
+      <module name="shopic.order-service" options="-parameters" />
+      <module name="shopic.order-service.main" options="-parameters" />
+      <module name="shopic.order-service.test" options="-parameters" />
+      <module name="shopic.user-service" options="-parameters" />
+      <module name="shopic.user-service.main" options="-parameters" />
+      <module name="shopic.user-service.test" options="-parameters" />
       <module name="user-service" options="-parameters" />
       <module name="user-service.main" options="-parameters" />
       <module name="user-service.test" options="-parameters" />
