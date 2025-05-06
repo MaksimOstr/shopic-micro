@@ -1,0 +1,34 @@
+services:
+  auth-service-db:
+    image: postgres
+    restart: always
+    ports:
+      - "${AUTH_DB_PORT}:5432"
+    volumes:
+      - /postgres/auth-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
+
+  user-service-db:
+    image: postgres
+    restart: always
+    ports:
+      - "${USER_DB_PORT}:5432"
+    volumes:
+      - /postgres/user-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${USER_DB_NAME}
+
+
+  pg-admin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - '4040:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_PASSWORD}

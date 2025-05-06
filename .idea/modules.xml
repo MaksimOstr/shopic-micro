@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/auth-service/shopic.auth-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/auth-service/shopic.auth-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/order-service/shopic.order-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/order-service/shopic.order-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/user-service/shopic.user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/user-service/shopic.user-service.main.iml" />
+    </modules>
+  </component>
+</project>

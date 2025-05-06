@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+    annotationProcessor 'org.projectlombok:lombok'
     implementation libs.bundles.core
     implementation libs.bundles.business.service
 }

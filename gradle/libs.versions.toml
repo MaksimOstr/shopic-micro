@@ -10,6 +10,11 @@ spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter"}
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web"}
 junit = { module = "org.junit.platform:junit-platform-launcher"}
 eureka-client = { module = "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client"}
+config-server = { module = "org.springframework.cloud:spring-cloud-starter-config" }
+data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+postgreSQL-driver = { module = "org.postgresql:postgresql" }
+lombok = { module = "org.projectlombok:lombok" }
+liquidBase = { module = "org.liquibase:liquibase-core" }
 
 [plugins]
 spring-framework-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -17,7 +22,7 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 
 [bundles]
 core = ["spring-boot-starter-test", "spring-boot-starter", "junit"]
-business-service = ["eureka-client", "spring-boot-starter-web"]
+business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "data-jpa", "postgreSQL-driver", "lombok", "liquidBase"]
 
 
 
