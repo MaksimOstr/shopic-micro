@@ -1,2 +1,166 @@
 databaseChangeLog:
-  - 
+  - changeSet:
+      id: 1
+      author: Maksim
+      changes:
+        - createSequence:
+            sequenceName: users_seq
+            startValue: 1
+            incrementBy: 50
+
+        - createSequence:
+            sequenceName: profiles_seq
+            startValue: 1
+            incrementBy: 50
+
+        - createSequence:
+            sequenceName: roles_seq
+            startValue: 1
+            incrementBy: 50
+
+
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: users_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_blocked
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_verified
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: auth_provider
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: profiles
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: profiles_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    unique: true
+                    deleteCascade: true
+              - column:
+                  name: first_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: birth_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: avatar
+                  type: text
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: profiles
+            baseColumnNames: user_id
+            constraintName: fk_profile_user
+            referencedTableName: users
+            referencedColumnNames: id
+
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  defaultValueSequenceNext: roles_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: role_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+        - createTable:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    deleteCascade: true
+              - column:
+                  name: role_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    deleteCascade: true
+        - addPrimaryKey:
+            tableName: user_roles
+            columnNames: user_id, role_id
+            constraintName: pk_user_roles
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: user_id
+            constraintName: fk_user_roles_user
+            referencedTableName: users
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: role_id
+            constraintName: fk_user_roles_role
+            referencedTableName: roles
+            referencedColumnNames: id
+
+
+
