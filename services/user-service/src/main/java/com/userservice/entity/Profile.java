@@ -1,5 +1,6 @@
 package com.userservice.entity;
 
+import com.userservice.dto.CreateProfileDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,13 +37,4 @@ public class Profile {
 
     @Column(name = "avatar")
     private String avatar;
-
-    public Profile(User user, String firstName, String lastName, String phoneNumber, LocalDate birthDate) {
-        this.user = user;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
-        this.birthDate = birthDate;
-        this.avatar = null;
-    }
 }
