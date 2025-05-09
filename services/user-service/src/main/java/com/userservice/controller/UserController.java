@@ -19,10 +19,10 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> createUser(
+    public ResponseEntity<CreateUserResponseDto> createUser(
             @Valid @RequestBody CreateUserRequestDto body
     ) {
         CreateUserResponseDto response = userService.createLocalUser(body);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 }

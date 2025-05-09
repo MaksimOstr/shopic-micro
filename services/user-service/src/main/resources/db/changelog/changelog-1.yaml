@@ -7,17 +7,14 @@ databaseChangeLog:
             sequenceName: users_seq
             startValue: 1
             incrementBy: 50
-
         - createSequence:
             sequenceName: profiles_seq
             startValue: 1
             incrementBy: 50
-
         - createSequence:
             sequenceName: roles_seq
             startValue: 1
             incrementBy: 50
-
 
         - createTable:
             tableName: users
@@ -161,6 +158,26 @@ databaseChangeLog:
             constraintName: fk_user_roles_role
             referencedTableName: roles
             referencedColumnNames: id
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: role_name
+                  value: ROLE_USER
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: role_name
+                  value: ROLE_ADMIN
+
 
 
 

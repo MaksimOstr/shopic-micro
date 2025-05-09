@@ -3,6 +3,7 @@ spring-boot = "3.4.5"
 spring-dependency-management = "1.1.7"
 spring-cloud = "2024.0.1"
 mapstruct = "1.6.3"
+grpc-version = "0.8.0"
 
 
 [libraries]
@@ -19,14 +20,16 @@ liquidBase = { module = "org.liquibase:liquibase-core" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct"}
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 bean-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
+grpc = { module = "org.springframework.grpc:spring-grpc-spring-boot-starter" }
 
 [plugins]
 spring-framework-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management"}
 
 [bundles]
-core = ["spring-boot-starter-test", "spring-boot-starter", "junit"]
-business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "data-jpa", "postgreSQL-driver", "lombok", "liquidBase", "mapstruct", "bean-validation"]
+core = ["spring-boot-starter-test", "spring-boot-starter", "junit", "spring-devtools"]
+business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "data-jpa", "postgreSQL-driver", "lombok", "liquidBase", "mapstruct", "bean-validation", "grpc"]
 
 
 
