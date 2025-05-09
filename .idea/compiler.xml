@@ -8,7 +8,6 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.38/57f8f5e02e92a30fd21b80cbd426a4172b5f8e29/lombok-1.18.38.jar" />
         </processorPath>
-        <module name="shopic.order-service.main" />
         <module name="shopic.auth-service.main" />
       </profile>
       <profile name="Gradle Imported" enabled="true">
@@ -18,9 +17,10 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.6.3/52e345c907fbf173b376586c7f8b131d53fa5867/mapstruct-processor-1.6.3.jar" />
         </processorPath>
         <module name="shopic.user-service.main" />
+        <module name="shopic.order-service.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="24">
+    <bytecodeTargetLevel target="23">
       <module name="order-service" target="24" />
       <module name="order-service.main" target="24" />
       <module name="order-service.test" target="24" />

@@ -1,12 +1,10 @@
 package com.userservice.entity;
 
-import com.userservice.dto.CreateProfileDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "profiles")
@@ -31,9 +29,6 @@ public class Profile {
 
     @Column(name = "phone_number", nullable = false, length = 30)
     private String phoneNumber;
-
-    @Column(name = "birth_date", nullable = false)
-    private LocalDate birthDate;
 
     @Column(name = "avatar")
     private String avatar;

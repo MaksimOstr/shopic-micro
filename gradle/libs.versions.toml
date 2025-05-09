@@ -4,6 +4,7 @@ spring-dependency-management = "1.1.7"
 spring-cloud = "2024.0.1"
 mapstruct = "1.6.3"
 grpc-version = "0.8.0"
+protobuf = "0.9.5"
 
 
 [libraries]
@@ -25,6 +26,7 @@ grpc = { module = "org.springframework.grpc:spring-grpc-spring-boot-starter" }
 
 [plugins]
 spring-framework-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management"}
 
 [bundles]

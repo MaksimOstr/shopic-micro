@@ -8,7 +8,6 @@ group = 'com'
 version = '0.0.1-SNAPSHOT'
 
 
-
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(24)
@@ -20,8 +19,9 @@ repositories {
 }
 
 dependencies {
-    implementation libs.bundles.core
     annotationProcessor 'org.projectlombok:lombok'
+    implementation libs.bundles.core
+    implementation project(':proto')
     implementation libs.bundles.business.service
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'

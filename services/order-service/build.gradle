@@ -1,5 +1,3 @@
-import org.gradle.api.internal.provider.DefaultProvider
-
 plugins {
     id 'java'
     alias(libs.plugins.spring.framework.boot)
@@ -21,6 +19,7 @@ repositories {
 
 dependencies {
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor libs.mapstruct.processor
     implementation libs.bundles.core
     implementation libs.bundles.business.service
 }

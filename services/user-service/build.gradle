@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(':proto')
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor libs.mapstruct.processor
     implementation libs.bundles.core

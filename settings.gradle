@@ -20,3 +20,5 @@ project(':user-service').projectDir = new File('services/user-service')
 
 include ':order-service'
 project(':order-service').projectDir = new File('services/order-service')
+
+include 'proto'
