@@ -1,16 +1,13 @@
 package com.userservice.services;
 
-import com.google.common.util.concurrent.AbstractService;
 import com.shopic.grpc.userservice.CreateLocalUserRequest;
 import com.shopic.grpc.userservice.CreateUserResponse;
 import com.shopic.grpc.userservice.UserServiceGrpc;
 import com.userservice.dto.CreateProfileDto;
-import com.userservice.dto.request.CreateUserRequestDto;
-import com.userservice.dto.response.CreateUserResponseDto;
 import com.userservice.entity.Profile;
 import com.userservice.entity.Role;
 import com.userservice.entity.User;
-import com.userservice.exceptions.EntityAlreadyExists;
+import com.userservice.exceptions.EntityAlreadyExistsException;
 import com.userservice.mapper.UserMapper;
 import com.userservice.repositories.UserRepository;
 import io.grpc.stub.StreamObserver;
@@ -31,30 +28,26 @@ public class UserService extends UserServiceGrpc.UserServiceImplBase {
 
     @Override
     public void createLocalUser(CreateLocalUserRequest request, StreamObserver<CreateUserResponse> responseObserver) {
-        log.info("Auth service received request to create local user:");
-        if(isUserExists(request.getEmail())) {
-            throw new EntityAlreadyExists("User with such an email already exists");
-        }
+            log.info("Auth service received request to create local user:");
+            if(isUserExist(request.getEmail())) {
+                throw new EntityAlreadyExistsException("User with such an email already exists");
+            }
 
-        Role defaultRole = roleService.getDefaultUserRole();
-
-        User user = new User(
-                request.getEmail(),
-                request.getPassword(),
-                Set.of(defaultRole)
-        );
-        User savedUser = userRepository.save(user);
-        CreateProfileDto profileDto = userMapper.toCreateProfileDto(request.getProfile());
-        Profile profile = profileService.createProfile(profileDto , savedUser);
-        CreateUserResponse dto = userMapper.toGrpcCreateUserResponse(savedUser, profile);
-
-        responseObserver.onNext(dto);
-        responseObserver.onCompleted();
-
-
+            Role defaultRole = roleService.getDefaultUserRole();
+            User user = new User(
+                    request.getEmail(),
+                    request.getPassword(),
+                    Set.of(defaultRole)
+            );
+            User savedUser = userRepository.save(user);
+            CreateProfileDto profileDto = userMapper.toCreateProfileDto(request.getProfile());
+            Profile profile = profileService.createProfile(profileDto , savedUser);
+            CreateUserResponse dto = userMapper.toGrpcCreateUserResponse(savedUser, profile);
+            responseObserver.onNext(dto);
+            responseObserver.onCompleted();
     }
 
-    private boolean isUserExists(String email) {
+    private boolean isUserExist(String email) {
         return userRepository.existsByEmail(email);
     }
 }

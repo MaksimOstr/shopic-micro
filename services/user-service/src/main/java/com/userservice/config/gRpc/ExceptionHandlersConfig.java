@@ -1,0 +1,21 @@
+package com.userservice.config.gRpc;
+
+import com.userservice.exceptions.EntityAlreadyExistsException;
+import io.grpc.Status;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.grpc.server.exception.GrpcExceptionHandler;
+
+@Configuration(proxyBeanMethods = false)
+public class ExceptionHandlersConfig {
+
+    @Bean
+    GrpcExceptionHandler userServiceExceptionHandler() {
+        return exception -> switch (exception) {
+            case DataIntegrityViolationException e -> Status.ALREADY_EXISTS.withDescription(e.getMessage()).asException();
+            case EntityAlreadyExistsException e -> Status.ALREADY_EXISTS.withDescription(e.getMessage()).asException();
+            default -> null;
+        };
+    }
+}

@@ -35,6 +35,11 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${ORDER_DB_NAME}
 
+  kafka-service:
+    image: apache/kafka:latest
+    restart: always
+    ports:
+      - "9092:9092"
 
   pg-admin:
     image: dpage/pgadmin4

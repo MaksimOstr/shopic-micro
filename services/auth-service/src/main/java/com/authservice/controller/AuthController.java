@@ -1,8 +1,8 @@
 package com.authservice.controller;
 
 import com.authservice.dto.request.SignUpRequestDto;
+import com.authservice.dto.response.RegisterResponseDto;
 import com.authservice.services.AuthService;
-import com.shopic.grpc.userservice.CreateUserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +20,10 @@ public class AuthController {
 
     @PostMapping("/register")
 
-    public ResponseEntity<?> register(
+    public ResponseEntity<RegisterResponseDto> register(
             @Valid @RequestBody SignUpRequestDto body
     ) {
-        authService.register(body);
-        return ResponseEntity.ok().build();
+        RegisterResponseDto response = authService.register(body);
+        return ResponseEntity.ok(response);
     }
 }

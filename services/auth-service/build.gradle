@@ -19,9 +19,12 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor 'org.projectlombok:lombok'
-    implementation libs.bundles.core
     implementation project(':proto')
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+    implementation libs.bundles.business.service.additional
+    annotationProcessor libs.mapstruct.processor
+    implementation libs.bundles.core
     implementation libs.bundles.business.service
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'

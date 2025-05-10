@@ -31,7 +31,8 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 
 [bundles]
 core = ["spring-boot-starter-test", "spring-boot-starter", "junit", "spring-devtools"]
-business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "data-jpa", "postgreSQL-driver", "lombok", "liquidBase", "mapstruct", "bean-validation", "grpc"]
+business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "lombok", "mapstruct", "bean-validation"]
+business-service-additional = ["postgreSQL-driver", "liquidBase", "liquidBase", "data-jpa"]
 
 
 
