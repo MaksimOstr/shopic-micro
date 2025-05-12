@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package codeservice;
+
+option java_multiple_files = true;
+option java_package = "com.shopic.grpc.codeservice";
+
+
+message CreateCodeRequest {
+  int64 userId = 1;
+  CodeScopeEnum scope = 2;
+}
+
+message CreateCodeResponse {
+  string code = 1;
+}
+
+enum CodeScopeEnum {
+  EMAIL_VERIFICATION = 0;
+}
+
+service CodeService {
+  rpc createCode(CreateCodeRequest) returns (CreateCodeResponse);
+}

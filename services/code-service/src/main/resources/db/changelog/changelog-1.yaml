@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Maksim
+      changes:
+        - createSequence:
+            sequenceName: codes-seq
+            incrementBy: 50
+            cacheSize: 50
+            startValue: 1
+
+        - createTable:
+            tableName: codes
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: codes-seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: varchar(20)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: expires_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: scope
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+

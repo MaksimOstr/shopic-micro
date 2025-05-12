@@ -11,6 +11,7 @@ import com.shopic.grpc.userservice.UserServiceGrpc;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class AuthService {
     private final UserServiceGrpc.UserServiceBlockingStub userServiceGrpc;
     private final PasswordEncoder passwordEncoder;
     private final AuthMapper authMaper;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     public RegisterResponseDto register(SignUpRequestDto dto) {
 
@@ -39,6 +41,8 @@ public class AuthService {
 
         try {
             CreateUserResponse response = userServiceGrpc.createLocalUser(req);
+
+            kafkaTemplate.send("user-created", "1", "test");
 
             return authMaper.toRegisterResponseDto(response);
         } catch (StatusRuntimeException e) {
