@@ -31,6 +31,8 @@ public class Code {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "scope", nullable = false)
     private CodeScopeEnum scope;
 
     @Column(name = "expires_at", nullable = false)

@@ -4,7 +4,7 @@ databaseChangeLog:
       author: Maksim
       changes:
         - createSequence:
-            sequenceName: codes-seq
+            sequenceName: codes_seq
             incrementBy: 50
             cacheSize: 50
             startValue: 1
@@ -15,7 +15,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-                  defaultValueSequenceNext: codes-seq
+                  defaultValueSequenceNext: codes_seq
                   constraints:
                     primaryKey: true
                     nullable: false

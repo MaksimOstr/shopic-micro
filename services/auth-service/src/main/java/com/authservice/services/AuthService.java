@@ -1,9 +1,12 @@
 package com.authservice.services;
 
+import com.authservice.dto.event.UserCreatedEvent;
 import com.authservice.dto.request.SignUpRequestDto;
 import com.authservice.dto.response.RegisterResponseDto;
-import com.authservice.exceptions.RegisterException;
+import com.authservice.exceptions.EntityAlreadyExistsException;
 import com.authservice.mapper.AuthMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shopic.grpc.userservice.CreateLocalUserRequest;
 import com.shopic.grpc.userservice.CreateUserResponse;
 import com.shopic.grpc.userservice.ProfileRequest;
@@ -21,10 +24,11 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserServiceGrpc.UserServiceBlockingStub userServiceGrpc;
     private final PasswordEncoder passwordEncoder;
-    private final AuthMapper authMaper;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final AuthMapper authMapper;
+    private final KafkaTemplate<Object, String> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
-    public RegisterResponseDto register(SignUpRequestDto dto) {
+    public RegisterResponseDto register(SignUpRequestDto dto) throws JsonProcessingException {
 
         String encodedPassword = passwordEncoder.encode(dto.password());
         ProfileRequest profile = ProfileRequest.newBuilder()
@@ -41,14 +45,13 @@ public class AuthService {
 
         try {
             CreateUserResponse response = userServiceGrpc.createLocalUser(req);
+            UserCreatedEvent event = new UserCreatedEvent(response.getEmail(), response.getUserId());
 
-            kafkaTemplate.send("user-created", "1", "test");
+            kafkaTemplate.send("user-created", objectMapper.writeValueAsString(event));
 
-            return authMaper.toRegisterResponseDto(response);
+            return authMapper.toRegisterResponseDto(response);
         } catch (StatusRuntimeException e) {
-            log.error(e.getStatus().getDescription());
-            throw new RegisterException(e.getStatus().getDescription());
+            throw new EntityAlreadyExistsException(e.getStatus().getDescription());
         }
-
     }
 }

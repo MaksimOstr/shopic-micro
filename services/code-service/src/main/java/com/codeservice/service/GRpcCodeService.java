@@ -26,7 +26,7 @@ public class GRpcCodeService extends CodeServiceGrpc.CodeServiceImplBase {
 
     @Override
     public void createCode(CreateCodeRequest request, StreamObserver<CreateCodeResponse> responseObserver) {
-
+        log.info("CreateCode method was called: {}, {}", request.getUserId(), request.getScope());
         String generatedCode = codeGeneratorService.generateAlphanumericCode();
         CodeScopeEnum scope = CodeScopeEnum.valueOf(request.getScope().name());
 

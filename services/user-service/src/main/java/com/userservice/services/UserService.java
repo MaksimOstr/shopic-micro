@@ -26,11 +26,14 @@ public class UserService extends UserServiceGrpc.UserServiceImplBase {
     private final UserMapper userMapper;
     private final RoleService roleService;
 
+    private static final String USER_ALREADY_EXISTS = "User with such an email already exists";
+
     @Override
     public void createLocalUser(CreateLocalUserRequest request, StreamObserver<CreateUserResponse> responseObserver) {
             log.info("Auth service received request to create local user:");
             if(isUserExist(request.getEmail())) {
-                throw new EntityAlreadyExistsException("User with such an email already exists");
+                log.error(USER_ALREADY_EXISTS);
+                throw new EntityAlreadyExistsException(USER_ALREADY_EXISTS);
             }
 
             Role defaultRole = roleService.getDefaultUserRole();
