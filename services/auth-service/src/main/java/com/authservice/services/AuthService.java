@@ -11,12 +11,15 @@ import com.shopic.grpc.userservice.CreateLocalUserRequest;
 import com.shopic.grpc.userservice.CreateUserResponse;
 import com.shopic.grpc.userservice.ProfileRequest;
 import com.shopic.grpc.userservice.UserServiceGrpc;
+import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -29,7 +32,6 @@ public class AuthService {
     private final ObjectMapper objectMapper;
 
     public RegisterResponseDto register(SignUpRequestDto dto) throws JsonProcessingException {
-
         String encodedPassword = passwordEncoder.encode(dto.password());
         ProfileRequest profile = ProfileRequest.newBuilder()
                 .setLastName(dto.lastName())
@@ -46,12 +48,14 @@ public class AuthService {
         try {
             CreateUserResponse response = userServiceGrpc.createLocalUser(req);
             UserCreatedEvent event = new UserCreatedEvent(response.getEmail(), response.getUserId());
-
             kafkaTemplate.send("user-created", objectMapper.writeValueAsString(event));
 
             return authMapper.toRegisterResponseDto(response);
         } catch (StatusRuntimeException e) {
-            throw new EntityAlreadyExistsException(e.getStatus().getDescription());
+            if (Objects.requireNonNull(e.getStatus().getCode()) == Status.Code.ALREADY_EXISTS) {
+                throw new EntityAlreadyExistsException("User with email " + dto.email() + " already exists");
+            }
+            throw e;
         }
     }
 }

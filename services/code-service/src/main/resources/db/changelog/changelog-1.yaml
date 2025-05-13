@@ -47,3 +47,8 @@ databaseChangeLog:
                   constraints:
                     nullable: false
 
+        - addUniqueConstraint:
+            tableName: codes
+            columnNames: user_id, scope
+            constraintName: uc_user_id_scope
+

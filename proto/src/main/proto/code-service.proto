@@ -21,6 +21,17 @@ enum CodeScopeEnum {
   EMAIL_VERIFICATION = 0;
 }
 
+message ValidateCodeRequest {
+  string code = 1;
+  CodeScopeEnum scope = 2;
+}
+
+message ValidateCodeResponse {
+  int64 userId = 1;
+}
+
 service CodeService {
-  rpc createCode(CreateCodeRequest) returns (CreateCodeResponse);
+  rpc getCode(CreateCodeRequest) returns (CreateCodeResponse);
+
+  rpc validateCode(ValidateCodeRequest) returns (ValidateCodeResponse);
 }
