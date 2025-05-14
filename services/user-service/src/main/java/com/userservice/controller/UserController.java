@@ -1,7 +1,10 @@
 package com.userservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.userservice.dto.request.EmailVerifyRequestDto;
 import com.userservice.dto.request.VerifyUserRequestDto;
 import com.userservice.services.UserService;
+import com.userservice.services.UserVerificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,17 +16,21 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserVerificationService userVerificationService;
 
     @PatchMapping("/verify")
     public ResponseEntity<String> verifyUser(
             @RequestBody @Valid VerifyUserRequestDto body
     ) {
-        userService.verifyUser(body.code());
+        userVerificationService.verifyUser(body.code());
         return ResponseEntity.ok("User verified successfully");
     }
 
     @PostMapping("/request-email-verify")
-    public ResponseEntity<String> requestVerificationCode() {
-        return ResponseEntity.ok("Verification code sent");
+    public ResponseEntity<String> requestVerificationCode(
+            @RequestBody @Valid EmailVerifyRequestDto body
+    ) throws JsonProcessingException {
+        userVerificationService.requestVerifyEmail(body.email());
+        return ResponseEntity.ok("Verification code sent to: " + body.email());
     }
 }

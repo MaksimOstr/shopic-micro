@@ -2,8 +2,10 @@ package com.mailservice.listeners;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mailservice.dto.event.EmailVerifyRequestDto;
 import com.mailservice.dto.event.UserCreatedEvent;
 import com.mailservice.services.MailService;
+import com.mailservice.services.VerificationCodeSender;
 import com.shopic.grpc.codeservice.CodeScopeEnum;
 import com.shopic.grpc.codeservice.CodeServiceGrpc;
 import com.shopic.grpc.codeservice.CreateCodeRequest;
@@ -22,9 +24,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserCreatedEventListener {
 
-    private final MailService mailService;
+    private final VerificationCodeSender verificationCodeSender;
     private final ObjectMapper objectMapper;
-    private final CodeServiceGrpc.CodeServiceBlockingStub codeServiceGrpc;
+
+
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 1000))
     @KafkaListener(topics = "user-created", groupId = "mail-service")
@@ -32,19 +35,25 @@ public class UserCreatedEventListener {
         try {
             log.info("Received data: {}", data);
             UserCreatedEvent event = objectMapper.readValue(data,  UserCreatedEvent.class);
-            CreateCodeRequest request = CreateCodeRequest.newBuilder()
-                    .setScope(CodeScopeEnum.EMAIL_VERIFICATION)
-                    .setUserId(event.userId())
-                    .build();
-            CreateCodeResponse verificationCode = codeServiceGrpc.getCode(request);
-
-            String text = "Your verification code is: " + verificationCode.getCode();
-            String subject = "Email verification";
-
-            mailService.send(event.email(), subject, text);
+            verificationCodeSender.sendVerificationCode(event.email(), event.userId(), CodeScopeEnum.EMAIL_VERIFICATION);
             acknowledgment.acknowledge();
         } catch (JacksonException | MailException e) {
             log.error(e.getMessage());
         }
     }
+
+
+    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 1000))
+    @KafkaListener(topics = "email-verification-requested", groupId = "mail-service")
+    public void sendRetryEmailVerificationCode(String data, Acknowledgment acknowledgment) {
+        try {
+            log.info("Received data: {}", data);
+            EmailVerifyRequestDto event = objectMapper.readValue(data,  EmailVerifyRequestDto.class);
+            verificationCodeSender.sendVerificationCode(event.email(), event.userId(), CodeScopeEnum.EMAIL_VERIFICATION);
+            acknowledgment.acknowledge();
+        } catch (JacksonException | MailException e) {
+            log.error(e.getMessage());
+        }
+    }
+
 }

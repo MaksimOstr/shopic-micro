@@ -1,7 +1,9 @@
 package com.userservice.controller.advice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.userservice.dto.response.ErrorResponseDto;
 import com.userservice.exceptions.CodeVerificationException;
+import com.userservice.exceptions.EmailVerifyException;
 import com.userservice.exceptions.EntityDoesNotExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +17,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalControllerAdvice {
 
-    @ExceptionHandler(CodeVerificationException.class)
-    public ResponseEntity<ErrorResponseDto> handleCodeVerificationException(CodeVerificationException e) {
+    @ExceptionHandler({EmailVerifyException.class, CodeVerificationException.class})
+    public ResponseEntity<ErrorResponseDto> handleCodeVerificationException(RuntimeException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),
@@ -40,5 +42,14 @@ public class GlobalControllerAdvice {
             errors.put(error.getField(), error.getDefaultMessage());
         });
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity<ErrorResponseDto> handleJsonProcessingException(JsonProcessingException e) {
+        return ResponseEntity.badRequest().body(new ErrorResponseDto(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                e.getMessage()
+        ));
     }
 }
