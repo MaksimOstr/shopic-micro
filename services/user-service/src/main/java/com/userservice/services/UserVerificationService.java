@@ -65,6 +65,8 @@ public class UserVerificationService {
             throw new EntityDoesNotExistException("User not found");
         }
     }
+
+
     private EmailVerifyProjection getUserForEmailVerify(String email) {
         return userRepository.findUserForEmailVerify(email)
                 .orElseThrow(() -> new EntityDoesNotExistException("User not found"));

@@ -1,5 +1,6 @@
 package com.authservice.services;
 
+import com.authservice.config.security.model.CustomUserDetails;
 import com.authservice.dto.event.UserCreatedEvent;
 import com.authservice.dto.request.SignUpRequestDto;
 import com.authservice.dto.response.RegisterResponseDto;
@@ -13,9 +14,14 @@ import com.shopic.grpc.userservice.ProfileRequest;
 import com.shopic.grpc.userservice.UserServiceGrpc;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +36,8 @@ public class AuthService {
     private final AuthMapper authMapper;
     private final KafkaTemplate<Object, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
+    private final AuthenticationManager authenticationManager;
+    private final EntityManager entityManager;
 
     public RegisterResponseDto register(SignUpRequestDto dto) throws JsonProcessingException {
         String encodedPassword = passwordEncoder.encode(dto.password());
@@ -57,5 +65,15 @@ public class AuthService {
             }
             throw e;
         }
+    }
+
+    public void signIn(String email, String password) {
+        UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(email, password);
+        Authentication authenticatedUser = authenticationManager.authenticate(authReq);
+        CustomUserDetails customUserDetails = (CustomUserDetails) authenticatedUser.getPrincipal();
+
+        User user = entityManager.getReference(User.class, customUserDetails.getUserId());
+
+
     }
 }

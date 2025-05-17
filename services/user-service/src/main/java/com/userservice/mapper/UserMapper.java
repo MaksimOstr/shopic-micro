@@ -3,6 +3,7 @@ package com.userservice.mapper;
 import com.shopic.grpc.userservice.CreateLocalUserRequest;
 import com.shopic.grpc.userservice.CreateUserResponse;
 import com.shopic.grpc.userservice.ProfileRequest;
+import com.shopic.grpc.userservice.UserForAuthResponse;
 import com.userservice.dto.CreateProfileDto;
 import com.userservice.dto.request.CreateLocalUserRequestDto;
 import com.userservice.dto.response.CreateUserResponseDto;
@@ -21,4 +22,8 @@ public interface UserMapper {
     CreateLocalUserRequestDto toCreateLocalUserRequestDto(CreateLocalUserRequest request);
 
     CreateUserResponse toGrpcCreateUserResponse(CreateUserResponseDto responseDto);
+
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "roleNames", source = "roles")
+    UserForAuthResponse toGrpcUserForAuthResponse(User user);
 }

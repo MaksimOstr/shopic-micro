@@ -1,28 +1,19 @@
 package com.userservice.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shopic.grpc.codeservice.CodeScopeEnum;
-import com.shopic.grpc.codeservice.CodeServiceGrpc;
-import com.shopic.grpc.codeservice.ValidateCodeRequest;
-import com.shopic.grpc.codeservice.ValidateCodeResponse;
-import com.userservice.dto.event.EmailVerifyRequestDto;
 import com.userservice.dto.request.CreateLocalUserRequestDto;
 import com.userservice.dto.response.CreateUserResponseDto;
 import com.userservice.entity.Profile;
 import com.userservice.entity.Role;
 import com.userservice.entity.User;
-import com.userservice.exceptions.CodeVerificationException;
 import com.userservice.exceptions.EntityAlreadyExistsException;
 import com.userservice.exceptions.EntityDoesNotExistException;
 import com.userservice.mapper.UserMapper;
 import com.userservice.repositories.UserRepository;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -58,11 +49,12 @@ public class UserService {
         return userMapper.toCreateUserResponseDto(savedUser, profile);
     }
 
-
+    public User getUserForAuth(String email) {
+        return userRepository.getUserForAuth(email)
+                .orElseThrow(() -> new EntityDoesNotExistException("User was not found"));
+    }
 
     private boolean isUserExist(String email) {
         return userRepository.existsByEmail(email);
     }
-
-
 }

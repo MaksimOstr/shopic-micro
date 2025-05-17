@@ -1,4 +1,4 @@
-package com.authservice.config;
+package com.authservice.config.security;
 
 import com.authservice.services.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;

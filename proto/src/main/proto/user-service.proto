@@ -29,6 +29,21 @@ message CreateUserResponse {
   google.protobuf.Timestamp created_at = 7;
 }
 
+message UserForAuthRequest {
+  string email = 1;
+}
+
+message UserForAuthResponse {
+  int64 userId = 1;
+  string email = 2;
+  string password = 3;
+  repeated string role_names = 4;
+  bool is_verified = 5;
+  bool is_blocked = 6;
+}
+
 service UserService {
   rpc createLocalUser (CreateLocalUserRequest) returns (CreateUserResponse);
+
+  rpc getUserForAuth (UserForAuthRequest) returns (UserForAuthResponse);
 }
