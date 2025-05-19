@@ -38,9 +38,9 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
-                  name: is_blocked
+                  name: account_non_locked
                   type: boolean
-                  defaultValueBoolean: false
+                  defaultValueBoolean: true
                   constraints:
                     nullable: false
               - column:

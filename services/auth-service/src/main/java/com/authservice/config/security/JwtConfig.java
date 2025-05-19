@@ -32,17 +32,4 @@ public class JwtConfig {
 
         return new NimbusJwtEncoder(jwkSource);
     }
-
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-        byte[] secretBytes = Base64.getDecoder().decode(jwtSecret);
-        SecretKey key = new SecretKeySpec(secretBytes, nimbusAlgorithm);
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(key).build();
-        JwtIssuerValidator issuerValidator = new JwtIssuerValidator(jwtIssuer);
-
-        jwtDecoder.setJwtValidator(issuerValidator);
-
-        return jwtDecoder;
-    }
 }

@@ -12,8 +12,6 @@ import com.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -50,6 +48,7 @@ public class UserService {
     }
 
     public User getUserForAuth(String email) {
+        log.info("Auth service received request to get user for auth: {}", email);
         return userRepository.getUserForAuth(email)
                 .orElseThrow(() -> new EntityDoesNotExistException("User was not found"));
     }

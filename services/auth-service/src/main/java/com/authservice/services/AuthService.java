@@ -1,8 +1,10 @@
 package com.authservice.services;
 
 import com.authservice.config.security.model.CustomUserDetails;
+import com.authservice.dto.TokenPairDto;
 import com.authservice.dto.event.UserCreatedEvent;
-import com.authservice.dto.request.SignUpRequestDto;
+import com.authservice.dto.request.SignInRequestDto;
+import com.authservice.dto.request.RegisterRequestDto;
 import com.authservice.dto.response.RegisterResponseDto;
 import com.authservice.exceptions.EntityAlreadyExistsException;
 import com.authservice.mapper.AuthMapper;
@@ -14,18 +16,19 @@ import com.shopic.grpc.userservice.ProfileRequest;
 import com.shopic.grpc.userservice.UserServiceGrpc;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Set;
+
+import static com.authservice.utils.AuthUtils.mapUserRoles;
 
 @Slf4j
 @Service
@@ -37,9 +40,9 @@ public class AuthService {
     private final KafkaTemplate<Object, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
     private final AuthenticationManager authenticationManager;
-    private final EntityManager entityManager;
+    private final TokenService tokenService;
 
-    public RegisterResponseDto register(SignUpRequestDto dto) throws JsonProcessingException {
+    public RegisterResponseDto register(RegisterRequestDto dto) throws JsonProcessingException {
         String encodedPassword = passwordEncoder.encode(dto.password());
         ProfileRequest profile = ProfileRequest.newBuilder()
                 .setLastName(dto.lastName())
@@ -67,13 +70,14 @@ public class AuthService {
         }
     }
 
-    public void signIn(String email, String password) {
-        UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(email, password);
+    public TokenPairDto signIn(SignInRequestDto dto) {
+        Authentication authReq = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
         Authentication authenticatedUser = authenticationManager.authenticate(authReq);
         CustomUserDetails customUserDetails = (CustomUserDetails) authenticatedUser.getPrincipal();
 
-        User user = entityManager.getReference(User.class, customUserDetails.getUserId());
+        long userId = customUserDetails.getUserId();
+        Set<String> roles = mapUserRoles(customUserDetails.getAuthorities());
 
-
+        return tokenService.getTokenPair(userId, roles, dto.deviceId());
     }
 }

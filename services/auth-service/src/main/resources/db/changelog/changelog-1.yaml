@@ -20,6 +20,12 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
+                  name: device_id
+                  type: text
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
                   name: token
                   type: text
                   constraints:
@@ -41,3 +47,13 @@ databaseChangeLog:
                   defaultValueComputed: CURRENT_TIMESTAMP
                   constraints:
                     nullable: false
+
+        - addUniqueConstraint:
+            tableName: refresh_tokens
+            columnNames: token, device_id
+            constraintName: uc_token_device_id
+
+        - addUniqueConstraint:
+            tableName: refresh_tokens
+            columnNames: user_id, device_id
+            constraintName: uc_user_id_device_id

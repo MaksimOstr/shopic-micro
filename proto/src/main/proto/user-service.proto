@@ -39,7 +39,7 @@ message UserForAuthResponse {
   string password = 3;
   repeated string role_names = 4;
   bool is_verified = 5;
-  bool is_blocked = 6;
+  bool is_account_non_locked = 6;
 }
 
 service UserService {

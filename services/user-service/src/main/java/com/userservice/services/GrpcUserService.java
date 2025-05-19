@@ -3,6 +3,7 @@ package com.userservice.services;
 import com.shopic.grpc.userservice.*;
 import com.userservice.dto.request.CreateLocalUserRequestDto;
 import com.userservice.dto.response.CreateUserResponseDto;
+import com.userservice.entity.Role;
 import com.userservice.entity.User;
 import com.userservice.mapper.UserMapper;
 import io.grpc.stub.StreamObserver;
@@ -42,9 +43,15 @@ public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
         log.info("Auth service received request to get user for auth: {}", request.toString());
 
         User user = userService.getUserForAuth(request.getEmail());
-        UserForAuthResponse dto = userMapper.toGrpcUserForAuthResponse(user);
+        System.out.println("3333333333333333333333333333333333");
+        System.out.println(user.toString());
 
-        responseObserver.onNext(dto);
+
+        UserForAuthResponse response = userMapper.toAuthResponse(user);
+
+        log.info("Auth service returned user for auth: {}", response.toString());
+
+        responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 }

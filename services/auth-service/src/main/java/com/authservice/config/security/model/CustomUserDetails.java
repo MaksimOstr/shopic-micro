@@ -26,6 +26,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.isVerified = isVerified;
         this.userId = userId;
         this.authorities = mapToAuthorities(roleNames);
+        System.out.println(this.authorities);
     }
 
     @Override
@@ -59,6 +60,6 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     }
 
     private Collection<? extends GrantedAuthority> mapToAuthorities(List<String> roles) {
-            return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+            return roles.stream().map(SimpleGrantedAuthority::new).toList();
     }
 }

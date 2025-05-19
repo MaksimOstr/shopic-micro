@@ -27,8 +27,8 @@ public class User {
 
     private String password;
 
-    @Column(name = "is_blocked", nullable = false)
-    private boolean isBlocked = false;
+    @Column(name = "account_non_locked", nullable = false)
+    private Boolean isAccountNonLocked = true;
 
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified = false;
