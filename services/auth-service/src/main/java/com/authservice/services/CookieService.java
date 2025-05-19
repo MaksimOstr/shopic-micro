@@ -11,6 +11,7 @@ public class CookieService {
     private int refreshTokenTtl;
 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+    public static final String DEVICE_ID_COOKIE_NAME = "deviceId";
 
     public Cookie createRefreshTokenCookie(String refreshToken) {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
@@ -24,7 +25,7 @@ public class CookieService {
     }
 
     public Cookie createDeviceCookie(String deviceId) {
-        Cookie cookie = new Cookie("device", deviceId);
+        Cookie cookie = new Cookie(DEVICE_ID_COOKIE_NAME, deviceId);
 
         cookie.setMaxAge(31536000);
         cookie.setPath("/");

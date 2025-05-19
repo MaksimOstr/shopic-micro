@@ -12,10 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.authservice.services.CookieService.DEVICE_ID_COOKIE_NAME;
+import static com.authservice.services.CookieService.REFRESH_TOKEN_COOKIE_NAME;
 
 
 @RestController
@@ -47,6 +47,20 @@ public class AuthController {
 
         response.addCookie(refreshTokenCookie);
         response.addCookie(deviceIdCookie);
+
+        return ResponseEntity.ok(tokenPair.accessToken());
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<String> refreshTokens(
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
+            @CookieValue(value = DEVICE_ID_COOKIE_NAME) String deviceId,
+            HttpServletResponse response
+    ) {
+        TokenPairDto tokenPair = authService.refreshTokens(refreshToken, deviceId);
+        Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(tokenPair.refreshToken());
+
+        response.addCookie(refreshTokenCookie);
 
         return ResponseEntity.ok(tokenPair.accessToken());
     }

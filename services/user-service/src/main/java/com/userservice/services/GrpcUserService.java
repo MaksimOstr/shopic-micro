@@ -3,7 +3,6 @@ package com.userservice.services;
 import com.shopic.grpc.userservice.*;
 import com.userservice.dto.request.CreateLocalUserRequestDto;
 import com.userservice.dto.response.CreateUserResponseDto;
-import com.userservice.entity.Role;
 import com.userservice.entity.User;
 import com.userservice.mapper.UserMapper;
 import io.grpc.stub.StreamObserver;

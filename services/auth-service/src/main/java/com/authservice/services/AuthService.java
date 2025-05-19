@@ -80,4 +80,8 @@ public class AuthService {
 
         return tokenService.getTokenPair(userId, roles, dto.deviceId());
     }
+
+    public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
+        return tokenService.refreshTokens(refreshToken, deviceId);
+    }
 }
