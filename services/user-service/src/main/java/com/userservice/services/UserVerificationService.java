@@ -24,9 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserVerificationService {
     private final UserRepository userRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
     private final CodeServiceGrpc.CodeServiceBlockingStub codeServiceBlockingStub;
+    private final KafkaEventProducer kafkaEventProducer;
 
     @Transactional
     public void requestVerifyEmail(String email) throws JsonProcessingException {
@@ -37,9 +36,7 @@ public class UserVerificationService {
             throw new EmailVerifyException("Email verification request failed");
         }
 
-        EmailVerifyRequestDto event = new EmailVerifyRequestDto(user.getId(), email);
-
-        kafkaTemplate.send("email-verification-requested", objectMapper.writeValueAsString(event));
+        kafkaEventProducer.requestEmailVerification(user.getId(), email);
     }
 
     public void verifyUser(String code) {
@@ -71,5 +68,4 @@ public class UserVerificationService {
         return userRepository.findUserForEmailVerify(email)
                 .orElseThrow(() -> new EntityDoesNotExistException("User not found"));
     }
-
 }
