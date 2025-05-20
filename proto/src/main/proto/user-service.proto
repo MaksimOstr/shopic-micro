@@ -42,8 +42,18 @@ message UserForAuthResponse {
   bool is_account_non_locked = 6;
 }
 
+message UserRolesRequest {
+  int64 userId = 1;
+}
+
+message UserRolesResponse {
+  repeated string role_names = 4;
+}
+
 service UserService {
   rpc createLocalUser (CreateLocalUserRequest) returns (CreateUserResponse);
 
   rpc getUserForAuth (UserForAuthRequest) returns (UserForAuthResponse);
+
+  rpc getUserRoles (UserRolesRequest) returns (UserRolesResponse);
 }

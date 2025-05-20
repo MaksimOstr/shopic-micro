@@ -5,6 +5,8 @@ import com.authservice.dto.response.ErrorResponseDto;
 import com.authservice.exceptions.EntityAlreadyExistsException;
 import com.authservice.exceptions.TokenValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +29,7 @@ public class AuthControllerAdvice {
         ));
     }
 
+
     @ExceptionHandler(EntityAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleRegisterException(EntityAlreadyExistsException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
@@ -36,6 +39,7 @@ public class AuthControllerAdvice {
         ));
     }
 
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleNotValidMethodArguments(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
@@ -44,6 +48,7 @@ public class AuthControllerAdvice {
         });
         return ResponseEntity.badRequest().body(errors);
     }
+
 
     @ExceptionHandler(TokenValidationException.class)
     public ResponseEntity<ErrorResponseDto> handleTokenValidationException(TokenValidationException e) {

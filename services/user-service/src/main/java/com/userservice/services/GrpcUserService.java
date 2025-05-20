@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 
+import java.util.Set;
+
 
 @Slf4j
 @GrpcService
@@ -37,18 +39,31 @@ public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
         responseObserver.onCompleted();
     }
 
+
     @Override
     public void getUserForAuth(UserForAuthRequest request, StreamObserver<UserForAuthResponse> responseObserver) {
         log.info("Auth service received request to get user for auth: {}", request.toString());
 
         User user = userService.getUserForAuth(request.getEmail());
-        System.out.println("3333333333333333333333333333333333");
-        System.out.println(user.toString());
-
 
         UserForAuthResponse response = userMapper.toAuthResponse(user);
 
         log.info("Auth service returned user for auth: {}", response.toString());
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+
+    @Override
+    public void getUserRoles(UserRolesRequest request, StreamObserver<UserRolesResponse> responseObserver) {
+        log.info("Auth service received request to get user roles: {}", request.toString());
+
+        Set<String> roleNames = userService.getUserRoleNames(request.getUserId());
+
+        UserRolesResponse response = UserRolesResponse.newBuilder()
+                .addAllRoleNames(roleNames)
+                .build();
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
