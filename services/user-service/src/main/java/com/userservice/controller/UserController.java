@@ -1,6 +1,7 @@
 package com.userservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.userservice.dto.CustomPrincipal;
 import com.userservice.dto.request.EmailVerifyRequestDto;
 import com.userservice.dto.request.VerifyUserRequestDto;
 import com.userservice.services.UserService;
@@ -8,6 +9,7 @@ import com.userservice.services.UserVerificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -28,8 +30,10 @@ public class UserController {
 
     @PostMapping("/request-email-verify")
     public ResponseEntity<String> requestVerificationCode(
+            @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid EmailVerifyRequestDto body
     ) throws JsonProcessingException {
+        System.out.println(principal.getId());
         userVerificationService.requestVerifyEmail(body.email());
         return ResponseEntity.ok("Verification code sent to: " + body.email());
     }

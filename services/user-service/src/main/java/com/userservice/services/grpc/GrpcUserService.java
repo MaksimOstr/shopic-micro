@@ -1,10 +1,11 @@
-package com.userservice.services;
+package com.userservice.services.grpc;
 
 import com.shopic.grpc.userservice.*;
 import com.userservice.dto.request.CreateLocalUserRequestDto;
 import com.userservice.dto.response.CreateUserResponseDto;
 import com.userservice.entity.User;
 import com.userservice.mapper.UserMapper;
+import com.userservice.services.UserService;
 import io.grpc.stub.StreamObserver;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

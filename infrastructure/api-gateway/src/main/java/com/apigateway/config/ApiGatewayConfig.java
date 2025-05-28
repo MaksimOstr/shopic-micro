@@ -18,7 +18,8 @@ public class ApiGatewayConfig {
                 .path("/auth",  request -> {
                     request
                             .filter(lb("auth-service"))
-                            .POST("/register", http());
+                            .POST("/register", http())
+                            .POST("/sign-in", http());
                 })
                 .build();
     }

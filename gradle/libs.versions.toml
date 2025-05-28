@@ -9,16 +9,17 @@ protobuf = "0.9.5"
 
 [libraries]
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
-spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter"}
-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web"}
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 junit = { module = "org.junit.platform:junit-platform-launcher"}
-eureka-client = { module = "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client"}
+spring-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+eureka-client = { module = "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client" }
 config-server = { module = "org.springframework.cloud:spring-cloud-starter-config" }
 data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 postgreSQL-driver = { module = "org.postgresql:postgresql" }
 lombok = { module = "org.projectlombok:lombok" }
 liquidBase = { module = "org.liquibase:liquibase-core" }
-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct"}
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 bean-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
@@ -29,11 +30,11 @@ kafka-test = { module = "org.springframework.kafka:spring-kafka-test" }
 [plugins]
 spring-framework-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }
-spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management"}
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
 
 [bundles]
 core = ["spring-boot-starter-test", "spring-boot-starter", "junit", "spring-devtools"]
-business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc"]
+business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc", "spring-security"]
 business-service-additional = ["postgreSQL-driver", "liquidBase", "liquidBase", "data-jpa"]
 
 

@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     implementation project(':proto')
+    testImplementation 'org.springframework.security:spring-security-test'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor libs.mapstruct.processor
     implementation libs.bundles.core
