@@ -2,10 +2,8 @@ package com.authservice.services;
 
 import com.authservice.config.security.model.CustomUserDetails;
 import com.authservice.exceptions.EntityDoesNotExistException;
-import com.shopic.grpc.userservice.UserForAuthRequest;
+import com.authservice.services.grpc.UserGrpcService;
 import com.shopic.grpc.userservice.UserForAuthResponse;
-import com.shopic.grpc.userservice.UserServiceGrpc;
-import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

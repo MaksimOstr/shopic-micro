@@ -2,6 +2,7 @@ package com.authservice.services;
 
 import com.authservice.dto.TokenPairDto;
 import com.authservice.entity.RefreshToken;
+import com.authservice.services.grpc.UserGrpcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

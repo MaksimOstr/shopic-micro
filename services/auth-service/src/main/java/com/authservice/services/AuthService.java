@@ -6,6 +6,7 @@ import com.authservice.dto.request.SignInRequestDto;
 import com.authservice.dto.request.RegisterRequestDto;
 import com.authservice.dto.response.RegisterResponseDto;
 import com.authservice.mapper.AuthMapper;
+import com.authservice.services.grpc.UserGrpcService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shopic.grpc.userservice.CreateUserResponse;
 import lombok.RequiredArgsConstructor;

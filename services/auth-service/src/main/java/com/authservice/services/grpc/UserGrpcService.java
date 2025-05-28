@@ -1,4 +1,4 @@
-package com.authservice.services;
+package com.authservice.services.grpc;
 
 import com.authservice.dto.request.RegisterRequestDto;
 import com.authservice.exceptions.EntityAlreadyExistsException;
