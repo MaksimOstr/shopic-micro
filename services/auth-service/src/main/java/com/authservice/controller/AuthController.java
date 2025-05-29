@@ -6,13 +6,17 @@ import com.authservice.dto.request.RegisterRequestDto;
 import com.authservice.dto.response.RegisterResponseDto;
 import com.authservice.services.AuthService;
 import com.authservice.services.CookieService;
+import com.authservice.services.RotatingJwkManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.nimbusds.jose.jwk.JWKSet;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 import static com.authservice.services.CookieService.DEVICE_ID_COOKIE_NAME;
 import static com.authservice.services.CookieService.REFRESH_TOKEN_COOKIE_NAME;
@@ -25,6 +29,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final CookieService cookieService;
+    private final RotatingJwkManager rotatingJwkManager;
 
     @PostMapping("/register")
 
@@ -63,5 +68,12 @@ public class AuthController {
         response.addCookie(refreshTokenCookie);
 
         return ResponseEntity.ok(tokenPair.accessToken());
+    }
+
+    @GetMapping("/jwk-set")
+    public ResponseEntity<Map<String, Object>> getJwk() {
+        JWKSet jwkSet = rotatingJwkManager.getPublicJwkSet();
+
+        return ResponseEntity.ok(jwkSet.toJSONObject());
     }
 }

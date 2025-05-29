@@ -4,10 +4,12 @@ import com.apigateway.dto.response.ErrorResponseDto;
 import jakarta.servlet.ServletRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.HandlerFunction;
@@ -21,12 +23,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, ServerResponse> {
 
     private final JwtDecoder jwtDecoder;
 
+    private static final ErrorResponseDto errorResponse = new ErrorResponseDto(
+            HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+            HttpStatus.UNAUTHORIZED.value(),
+            "Session is not valid"
+    );
 
     @Value("${SIGNATURE_SECRET}")
     private String signatureSecret;
@@ -38,12 +46,7 @@ public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, S
     ) {
         String token = extractToken(request);
         if (token == null) {
-            return ServerResponse.status(HttpStatus.UNAUTHORIZED).body(
-                    new ErrorResponseDto(
-                            HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                            HttpStatus.UNAUTHORIZED.value(),
-                            "Unauthorized")
-            );
+            return ServerResponse.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
         try {
@@ -61,12 +64,8 @@ public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, S
 
             return next.handle(modified);
         } catch (Exception e) {
-            return ServerResponse.status(HttpStatus.UNAUTHORIZED).body(
-                    new ErrorResponseDto(
-                            HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                            HttpStatus.UNAUTHORIZED.value(),
-                            e.getMessage())
-            );
+            log.error("Failed to decode JWT token {}", e.getMessage());
+            return ServerResponse.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }
 

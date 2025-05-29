@@ -3,6 +3,7 @@ package com.apigateway.config.security;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 
 import javax.crypto.SecretKey;
@@ -23,9 +24,7 @@ public class JwtConfig {
 
     @Bean
     JwtDecoder jwtDecoder() {
-        byte[] secretBytes = Base64.getDecoder().decode(jwtSecret);
-        SecretKey key = new SecretKeySpec(secretBytes, nimbusAlgorithm);
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(key).build();
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri("http://localhost:50552/auth/jwk-set").jwsAlgorithm(SignatureAlgorithm.RS256).build();
         JwtIssuerValidator issuerValidator = new JwtIssuerValidator(jwtIssuer);
 
         jwtDecoder.setJwtValidator(issuerValidator);

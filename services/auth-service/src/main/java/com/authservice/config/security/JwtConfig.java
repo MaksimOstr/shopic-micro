@@ -1,35 +1,24 @@
 package com.authservice.config.security;
 
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.authservice.services.RotatingJwkManager;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.*;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
+import java.util.List;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
+@RequiredArgsConstructor
 public class JwtConfig {
-    @Value("${JWT_SECRET}")
-    private String jwtSecret;
-
-    @Value("${JWT_ISSUER}")
-    private String jwtIssuer;
-
-    @Value("${NIMBUS_ALG}")
-    private String nimbusAlgorithm;
+    private final RotatingJwkManager manager;
 
 
     @Bean
     JwtEncoder jwtEncoder() {
-        byte[] secretBytes = Base64.getDecoder().decode(jwtSecret);
-        SecretKey key = new SecretKeySpec(secretBytes, nimbusAlgorithm);
-        JWKSource<SecurityContext> jwkSource = new ImmutableSecret<>(key);
-
+        JWKSource<SecurityContext> jwkSource = (jwkSelector, context) -> List.of(manager.getActivePrivateKey());
         return new NimbusJwtEncoder(jwkSource);
     }
 }

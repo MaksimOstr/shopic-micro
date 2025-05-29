@@ -31,6 +31,7 @@ public class UserGrpcService {
         }
     }
 
+
     public CreateUserResponse createUser(RegisterRequestDto dto) {
         String encodedPassword = passwordEncoder.encode(dto.password());
         ProfileRequest profile = ProfileRequest.newBuilder()
