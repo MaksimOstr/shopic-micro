@@ -25,9 +25,11 @@ public class JwtTokenService {
 
     private final JwtEncoder jwtEncoder;
 
+
     public String getJwsToken(Collection<String> authorities, Long subjectId) {
         return generateToken(subjectId.toString(), authorities);
     }
+
 
     private String generateToken(String subject, Collection<String> authorities) {
         Instant issuedAt = Instant.now();
