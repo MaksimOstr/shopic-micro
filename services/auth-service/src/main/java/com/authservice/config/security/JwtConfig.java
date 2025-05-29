@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.*;
-
 import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
 public class JwtConfig {
+
     private final RotatingJwkManager manager;
 
 
