@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class CodeCleanupService {
     private final CodeRepository codeRepository;
 
+
     @Scheduled(fixedDelay = 900 * 1000)
     public void clearExpiredCodes() {
         log.info("Clearing expired codes");

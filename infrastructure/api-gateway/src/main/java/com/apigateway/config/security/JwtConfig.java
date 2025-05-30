@@ -1,5 +1,6 @@
 package com.apigateway.config.security;
 
+import com.nimbusds.jose.jwk.JWKSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +20,8 @@ public class JwtConfig {
 
     @Bean
     JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri("http://localhost:56205/auth/jwk-set").jwsAlgorithm(SignatureAlgorithm.RS256).build();
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri("lb://auth-service/auth/jwk-set").jwsAlgorithm(SignatureAlgorithm.RS256).build();
         JwtIssuerValidator issuerValidator = new JwtIssuerValidator(jwtIssuer);
-
         jwtDecoder.setJwtValidator(issuerValidator);
 
         return jwtDecoder;

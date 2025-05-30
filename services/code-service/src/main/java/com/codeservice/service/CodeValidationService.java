@@ -20,6 +20,7 @@ public class CodeValidationService {
 
     private static final String CODE_VALIDATION_FAILED = "Code validation failed";
 
+
     @Transactional
     public long validate(String code, CodeScopeEnum scope) {
         return codeRepository.findByCode(code)

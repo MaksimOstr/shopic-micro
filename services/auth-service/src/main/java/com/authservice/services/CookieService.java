@@ -13,6 +13,7 @@ public class CookieService {
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
     public static final String DEVICE_ID_COOKIE_NAME = "deviceId";
 
+
     public Cookie createRefreshTokenCookie(String refreshToken) {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
 
@@ -23,6 +24,7 @@ public class CookieService {
 
         return cookie;
     }
+
 
     public Cookie createDeviceCookie(String deviceId) {
         Cookie cookie = new Cookie(DEVICE_ID_COOKIE_NAME, deviceId);

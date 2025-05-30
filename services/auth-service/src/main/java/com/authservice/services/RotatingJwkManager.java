@@ -20,6 +20,7 @@ public class RotatingJwkManager {
 
     private final List<RSAKey> keys = new CopyOnWriteArrayList<>();
 
+
     @Scheduled(fixedDelay = 1000 * 60 * 60)
     public void init() {
         try {
@@ -28,6 +29,7 @@ public class RotatingJwkManager {
             log.error("Error while rotating keys {}", e.getMessage());
         }
     }
+
 
     private void rotateKeys() throws JOSEException {
         RSAKey newKey = new RSAKeyGenerator(2048)
@@ -39,11 +41,13 @@ public class RotatingJwkManager {
         }
     }
 
+
     public JWKSet getPublicJwkSet() {
         return new JWKSet(keys.stream()
                 .map(RSAKey::toPublicJWK)
                 .collect(Collectors.toList()));
     }
+
 
     public RSAKey getActivePrivateKey() {
         return keys.getFirst();

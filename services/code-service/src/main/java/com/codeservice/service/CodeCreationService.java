@@ -20,6 +20,7 @@ public class CodeCreationService {
     @Value("${CODE_EXPIRATION:900}")
     private int expiresIn;
 
+
     public Code getCode(long userId, CodeScopeEnum scope) {
         return codeRepository.findByScopeAndUserId(scope, userId)
                 .map(code -> {
@@ -30,6 +31,7 @@ public class CodeCreationService {
                 })
                 .orElseGet(() -> createCode(userId, scope));
     }
+
 
     private Code createCode(long userId, CodeScopeEnum scope) {
         String generatedCode = codeGeneratorService.generateAlphanumericCode();
@@ -43,6 +45,7 @@ public class CodeCreationService {
 
         return codeRepository.save(code);
     }
+
 
     private Instant getExpirationTime() {
         return Instant.now().plusSeconds(expiresIn);
