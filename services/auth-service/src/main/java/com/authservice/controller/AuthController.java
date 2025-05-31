@@ -69,11 +69,4 @@ public class AuthController {
 
         return ResponseEntity.ok(tokenPair.accessToken());
     }
-
-    @GetMapping("/jwk-set")
-    public ResponseEntity<Map<String, Object>> getJwk() {
-        JWKSet jwkSet = rotatingJwkManager.getPublicJwkSet();
-
-        return ResponseEntity.ok(jwkSet.toJSONObject());
-    }
 }

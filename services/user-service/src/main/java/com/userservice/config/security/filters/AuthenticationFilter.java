@@ -44,6 +44,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
         System.out.println(userId + " " + roles + " " + signature);
+        System.out.println(userId + " " + roles + " " + signature);
         if(!verifyHmac(roles, userId, signature)) {
             response.sendError(
                     HttpStatus.UNAUTHORIZED.value(),

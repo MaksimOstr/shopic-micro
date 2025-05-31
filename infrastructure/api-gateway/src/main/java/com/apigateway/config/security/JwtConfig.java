@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.jwt.*;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
+import java.util.Objects;
 
 @Configuration
 public class JwtConfig {
@@ -20,7 +21,7 @@ public class JwtConfig {
 
     @Bean
     JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri("lb://auth-service/auth/jwk-set").jwsAlgorithm(SignatureAlgorithm.RS256).build();
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri("http://localhost:6000/public-keys").jwsAlgorithm(SignatureAlgorithm.RS256).build();
         JwtIssuerValidator issuerValidator = new JwtIssuerValidator(jwtIssuer);
         jwtDecoder.setJwtValidator(issuerValidator);
 
