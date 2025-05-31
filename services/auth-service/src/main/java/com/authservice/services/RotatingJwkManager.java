@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RotatingJwkManager {
 
+    private final PublicKeyService publicKeyService;
+
     private final List<RSAKey> keys = new CopyOnWriteArrayList<>();
 
 
@@ -34,7 +36,7 @@ public class RotatingJwkManager {
     private void rotateKeys() throws JOSEException {
         RSAKey newKey = new RSAKeyGenerator(2048)
                 .keyID(UUID.randomUUID().toString()).generate();
-
+        publicKeyService.savePublicKey(newKey);
         keys.addFirst(newKey);
         if (keys.size() > 2) {
             keys.removeLast();
