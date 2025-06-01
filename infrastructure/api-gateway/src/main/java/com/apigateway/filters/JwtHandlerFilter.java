@@ -1,15 +1,13 @@
 package com.apigateway.filters;
 
+import com.apigateway.config.security.JwtValidator;
+import com.apigateway.dto.JwtVerificationResult;
 import com.apigateway.dto.response.ErrorResponseDto;
-import jakarta.servlet.ServletRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.HandlerFunction;
@@ -28,7 +26,7 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, ServerResponse> {
 
-    private final JwtDecoder jwtDecoder;
+    private final JwtValidator jwtValidator;
 
     private static final ErrorResponseDto errorResponse = new ErrorResponseDto(
             HttpStatus.UNAUTHORIZED.getReasonPhrase(),
@@ -50,16 +48,13 @@ public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, S
         }
 
         try {
-            Jwt jwt = jwtDecoder.decode(token);
-            String userId = jwt.getSubject();
-            String roles = jwt.getClaimAsStringList("roles").toString();
-            String userRoles = String.join(",", roles);
+            JwtVerificationResult jwt = jwtValidator.validateToken(token, "http://localhost:6000/public-keys");
 
             ServerRequest modified = ServerRequest
                     .from(request)
-                    .header("X-User-Id", userId)
-                    .header("X-Roles", userRoles)
-                    .header("X-Signature", createHmac(userId + userRoles))
+                    .header("X-User-Id", jwt.userId())
+                    .header("X-Roles", jwt.roles())
+                    .header("X-Signature", createHmac(jwt.userId() + jwt.roles()))
                     .build();
 
             return next.handle(modified);
