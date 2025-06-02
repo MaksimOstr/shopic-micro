@@ -3,11 +3,12 @@ package com.authservice.services;
 import com.authservice.entity.PublicKey;
 import com.authservice.repositories.PublicKeyRepository;
 import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PublicKeyService {
@@ -60,5 +62,11 @@ public class PublicKeyService {
 
     private Instant getExpireDate() {
         return Instant.now().plusSeconds(expiration);
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    private void deleteExpiredKeys() {
+        log.info("Deleting expired public keys");
+        publicKeyRepository.deleteExpiredKeys();
     }
 }

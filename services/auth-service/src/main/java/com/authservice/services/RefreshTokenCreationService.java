@@ -4,8 +4,10 @@ import com.authservice.entity.RefreshToken;
 import com.authservice.exceptions.EntityAlreadyExistsException;
 import com.authservice.repositories.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import java.util.UUID;
 
 import static com.authservice.utils.RefreshTokenUtils.hashToken;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenCreationService {
@@ -89,5 +92,11 @@ public class RefreshTokenCreationService {
 
     private Instant getExpireTime() {
         return Instant.now().plusSeconds(refreshTokenTtl);
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    public void deleteExpiredTokens() {
+        log.info("Deleting expired refresh tokens");
+        refreshTokenRepository.deleteExpiredTokens();
     }
 }

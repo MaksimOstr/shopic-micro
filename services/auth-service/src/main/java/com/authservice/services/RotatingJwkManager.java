@@ -19,19 +19,20 @@ import java.util.stream.Collectors;
 public class RotatingJwkManager {
 
     private final PublicKeyService publicKeyService;
+    private final KafkaEventProducer authEventProducer;
 
     private final List<RSAKey> keys = new CopyOnWriteArrayList<>();
 
 
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    @Scheduled(fixedDelay = 1000 * 60)
     public void init() {
         try {
             rotateKeys();
+            authEventProducer.sendJwkSetInvalidationEvent();
         } catch (Exception e) {
             log.error("Error while rotating keys {}", e.getMessage());
         }
     }
-
 
     private void rotateKeys() throws JOSEException {
         RSAKey newKey = new RSAKeyGenerator(2048)
@@ -42,14 +43,6 @@ public class RotatingJwkManager {
             keys.removeLast();
         }
     }
-
-
-    public JWKSet getPublicJwkSet() {
-        return new JWKSet(keys.stream()
-                .map(RSAKey::toPublicJWK)
-                .collect(Collectors.toList()));
-    }
-
 
     public RSAKey getActivePrivateKey() {
         return keys.getFirst();
