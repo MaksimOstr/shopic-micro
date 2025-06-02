@@ -1,13 +1,12 @@
-package com.userservice.config.security.filters;
+package com.productservice.config.security;
 
-import com.userservice.dto.CustomPrincipal;
+import com.productservice.dto.CustomPrincipal;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.Mac;
@@ -24,21 +22,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${SIGNATURE_SECRET}")
     private String signatureSecret;
-
-    private static final List<String> WHITELIST = List.of(
-            "/users/verify",
-            "/users/request-email-verify"
-    );
 
     @Override
     protected void doFilterInternal(
@@ -46,11 +38,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
-        if(WHITELIST.contains(request.getRequestURI())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-Roles");

@@ -30,10 +30,8 @@ public class UserController {
 
     @PostMapping("/request-email-verify")
     public ResponseEntity<String> requestVerificationCode(
-            @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid EmailVerifyRequestDto body
     ) throws JsonProcessingException {
-        System.out.println(principal.getId());
         userVerificationService.requestVerifyEmail(body.email());
         return ResponseEntity.ok("Verification code sent to: " + body.email());
     }

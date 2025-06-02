@@ -26,12 +26,24 @@ public class ApiGatewayConfig {
 
     @Bean
     public RouterFunction<ServerResponse> userRoute(JwtHandlerFilter jwtHandlerFilter) {
-        return route("auth-service-route")
+        return route("user-service-route")
                 .path("/users",  request -> {
                     request
-                            .filter(jwtHandlerFilter)
                             .filter(lb("user-service"))
-                            .POST("/request-email-verify", http());
+                            .POST("/request-email-verify", http())
+                            .PATCH("/verify", http());
+                })
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> productRoute(JwtHandlerFilter jwtHandlerFilter) {
+        return route("product-service-route")
+                .path("/products",  request -> {
+                    request
+                            .filter(jwtHandlerFilter)
+                            .filter(lb("product-service"))
+                            .POST("", http());
                 })
                 .build();
     }

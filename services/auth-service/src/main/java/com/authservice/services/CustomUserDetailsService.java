@@ -33,7 +33,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                     response.getRoleNamesList()
             );
         } catch (EntityDoesNotExistException e) {
-            throw new UsernameNotFoundException(e.getMessage());
+            log.error("User with email {} not found", email);
+            throw new UsernameNotFoundException("test");
         }
     }
 }
+

@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     implementation project(':proto')
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     annotationProcessor 'org.projectlombok:lombok'
     implementation libs.bundles.business.service.additional
     annotationProcessor libs.mapstruct.processor

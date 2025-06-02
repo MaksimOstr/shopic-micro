@@ -39,7 +39,7 @@ public class KafkaListenerService {
 
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 1000))
-    @org.springframework.kafka.annotation.KafkaListener(topics = "email-verification-requested", groupId = "mail-service")
+    @KafkaListener(topics = "email-verification-requested", groupId = "mail-service")
     public void sendRetryEmailVerificationCode(String data, Acknowledgment acknowledgment) {
         try {
             log.info("Received data: {}", data);

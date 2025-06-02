@@ -37,7 +37,8 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            DaoAuthenticationProvider daoAuthenticationProvider
+            DaoAuthenticationProvider daoAuthenticationProvider,
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint
     ) throws Exception {
         return http
                 .authenticationProvider(daoAuthenticationProvider)
@@ -45,6 +46,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll())
+                .exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .build();
     }
 }

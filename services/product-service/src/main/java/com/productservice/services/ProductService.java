@@ -3,6 +3,8 @@ package com.productservice.services;
 import com.productservice.dto.PutObjectDto;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.entity.Product;
+import com.productservice.entity.ProductCategoryEnum;
+import com.productservice.exceptions.InvalidEnumArgException;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class ProductService {
     private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
 
     public Product create(CreateProductRequest dto, MultipartFile productImage, long sellerId) {
+        ProductCategoryEnum productEnum = ProductCategoryEnum.fromString(dto.category());
+
         Product product = new Product(
                 dto.name(),
                 dto.description(),
@@ -26,7 +30,7 @@ public class ProductService {
                 dto.price(),
                 sellerId,
                 getProductImageUrl(sellerId, productImage),
-                dto.category(),
+                productEnum,
                 dto.stockQuantity()
         );
 

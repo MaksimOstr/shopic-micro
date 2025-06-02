@@ -1,6 +1,5 @@
 package com.productservice.dto.request;
 
-import com.productservice.entity.ProductCategoryEnum;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +19,7 @@ public record CreateProductRequest(
         BigDecimal price,
 
         @NotBlank
-        ProductCategoryEnum category,
+        String category,
 
         @NotNull
         @Min(0)
