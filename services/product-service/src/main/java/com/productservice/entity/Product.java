@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
+
 
 @Entity
 @Table(name = "products")
@@ -15,4 +19,41 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "products_seq")
     private Long id;
+
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    private String description;
+
+    private UUID sku;
+
+    private BigDecimal price;
+
+    @Column(name = "seller_id", nullable = false)
+    private long sellerId;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    private ProductCategoryEnum category;
+
+    @Column(name = "stock_quantity", nullable = false)
+    private int stockQuantity;
+
+
+    public Product(String name, String description, UUID sku, BigDecimal price, long sellerId,  String imageUrl, ProductCategoryEnum category, int stockQuantity) {
+        this.name = name;
+        this.description = description;
+        this.sku = sku;
+        this.price = price;
+        this.sellerId = sellerId;
+        this.imageUrl = imageUrl;
+        this.category = category;
+        this.stockQuantity = stockQuantity;
+    }
 }
