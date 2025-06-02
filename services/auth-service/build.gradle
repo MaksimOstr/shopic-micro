@@ -25,8 +25,6 @@ dependencies {
     annotationProcessor libs.mapstruct.processor
     implementation libs.bundles.core
     implementation libs.bundles.business.service
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
 }
 

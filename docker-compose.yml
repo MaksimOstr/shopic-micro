@@ -47,6 +47,18 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${CODE_DB_NAME}
 
+  product-service-db:
+    image: postgres
+    restart: always
+    ports:
+      - "${PRODUCT_DB_PORT}:5432"
+    volumes:
+      - /postgres/product-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${PRODUCT_DB_NAME}
+
   kafka:
     image: apache/kafka:latest
     restart: always
@@ -80,7 +92,6 @@ services:
     volumes:
       - /redis/data
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]
-
 
   kafka-ui:
     container_name: kafka-ui

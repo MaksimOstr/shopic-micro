@@ -43,6 +43,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
+        System.out.println(roles);
+        System.out.println(userId);
         System.out.println(userId + " " + roles + " " + signature);
         System.out.println(userId + " " + roles + " " + signature);
         if(!verifyHmac(roles, userId, signature)) {
@@ -55,7 +57,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         CustomPrincipal principal = new CustomPrincipal(userId);
         Authentication authToken = new UsernamePasswordAuthenticationToken(principal, null, toSimpleGrantedAuthorities(roles));
         SecurityContextHolder.getContext().setAuthentication(authToken);
-
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         filterChain.doFilter(request, response);
     }
 
@@ -83,7 +85,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
     private List<SimpleGrantedAuthority> toSimpleGrantedAuthorities(String roles) {
-        List<String> roleList = Arrays.asList(roles.split(","));
+        String cleaned = roles.replaceAll("^\\[|]$", "");
+        System.out.println(cleaned);
+        List<String> roleList = Arrays.asList(cleaned.split(","));
 
         return roleList.stream()
                 .map(SimpleGrantedAuthority::new)

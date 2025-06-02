@@ -71,6 +71,8 @@ public class JwtValidationService {
         String userId = (String) claims.get("sub");
         String roles = claims.get("roles").toString();
 
+        System.out.println(roles);
+
         return new JwtVerificationResult(userId, roles);
     }
 
