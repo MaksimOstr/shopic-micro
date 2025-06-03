@@ -7,11 +7,15 @@ import com.productservice.entity.Product;
 import com.productservice.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/products")
@@ -22,14 +26,16 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<Product> createProduct(
+    public CompletableFuture<ResponseEntity<Product>> createProduct(
             @RequestPart("product") @Valid CreateProductRequest body,
             @RequestPart("image") MultipartFile imageFile,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        Product product = productService.create(body, imageFile, principal.getId());
-
-        return ResponseEntity.ok(product);
+        return productService.create(body, imageFile, principal.getId())
+                .thenApply(r -> {
+                    System.out.println("created");
+                    return ResponseEntity.ok(r);
+                });
     }
 
     @PreAuthorize("hasRole('SELLER')")

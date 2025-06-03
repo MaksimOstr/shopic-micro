@@ -84,7 +84,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private List<SimpleGrantedAuthority> toSimpleGrantedAuthorities(String roles) {
         String cleaned = roles.replaceAll("^\\[|]$", "");
         List<String> roleList = Arrays.asList(cleaned.split(","));
-
+        System.out.println(roleList);
         return roleList.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
