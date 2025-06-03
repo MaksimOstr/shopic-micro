@@ -1,7 +1,8 @@
-package com.productservice.controller;
+package com.productservice.controller.advice;
 
 import com.productservice.dto.response.ErrorResponseDto;
 import com.productservice.exceptions.InvalidEnumArgException;
+import com.productservice.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -57,8 +58,8 @@ public class ProductControllerAdvice {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidEnumArgException.class)
-    public ResponseEntity<ErrorResponseDto> handleInvalidEnumArgException(InvalidEnumArgException e) {
+    @ExceptionHandler({InvalidEnumArgException.class, NotFoundException.class})
+    public ResponseEntity<ErrorResponseDto> handleInvalidEnumArgException(RuntimeException e) {
         ErrorResponseDto error = new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),
@@ -67,4 +68,5 @@ public class ProductControllerAdvice {
 
         return ResponseEntity.badRequest().body(error);
     }
+
 }

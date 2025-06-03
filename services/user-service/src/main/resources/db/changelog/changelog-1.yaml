@@ -93,11 +93,6 @@ databaseChangeLog:
                   type: varchar(30)
                   constraints:
                     nullable: false
-              - column:
-                  name: avatar
-                  type: text
-                  constraints:
-                    nullable: true
         - addForeignKeyConstraint:
             baseTableName: profiles
             baseColumnNames: user_id

@@ -43,7 +43,9 @@ public class ApiGatewayConfig {
                     request
                             .filter(jwtHandlerFilter)
                             .filter(lb("product-service"))
-                            .POST("", http());
+                            .POST("", http())
+                            .PUT("/{id}", http())
+                            .GET("/{id}", http());
                 })
                 .build();
     }

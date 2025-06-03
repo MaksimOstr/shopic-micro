@@ -29,7 +29,4 @@ public class Profile {
 
     @Column(name = "phone_number", nullable = false, length = 30)
     private String phoneNumber;
-
-    @Column(name = "avatar")
-    private String avatar;
 }

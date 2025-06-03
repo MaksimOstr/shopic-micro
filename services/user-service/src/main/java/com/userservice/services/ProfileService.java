@@ -6,6 +6,7 @@ import com.userservice.entity.User;
 import com.userservice.exceptions.EntityAlreadyExistsException;
 import com.userservice.mapper.ProfileMapper;
 import com.userservice.repositories.ProfileRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,12 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
-    public boolean isProfileExist(long userId) {
+    public Profile getProfileByUserId(long userId) {
+        return profileRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+    }
+
+    private boolean isProfileExist(long userId) {
         return profileRepository.existsByUser_Id(userId);
     }
 }
