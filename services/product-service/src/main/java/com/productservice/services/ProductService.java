@@ -6,9 +6,12 @@ import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
 import com.productservice.entity.ProductCategoryEnum;
 import com.productservice.exceptions.NotFoundException;
+import com.productservice.projection.ProductImageUrlProjection;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -32,11 +36,9 @@ public class ProductService {
     }
 
     public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage, long sellerId) {
-        System.out.println(Thread.currentThread().getName());
         ProductCategoryEnum productEnum = ProductCategoryEnum.fromString(dto.category());
 
         return getProductImageUrl(sellerId, productImage).thenApply(url -> {
-            System.out.println(Thread.currentThread().getName());
             Product product = new Product(
                     dto.name(),
                     dto.description(),
@@ -66,20 +68,50 @@ public class ProductService {
         return product;
     }
 
-    public String updateProductImage() {
-        return "";
+
+    public void updateProductImage(long sellerId, long productId, MultipartFile productImage) {
+        String imageUrl = getProductImageUrl(productId, sellerId);
+        s3Service.delete(imageUrl);
+
+        PutObjectDto dto = new PutObjectDto(
+                PRODUCT_IMAGE_BUCKET,
+                getKey(sellerId),
+                productImage
+        );
+
+        s3Service.uploadFile(dto)
+                .thenAccept(newImageUrl -> {
+                    int updated = productRepository.updateProductImageUrl(productId, newImageUrl);
+                    if (updated == 0) {
+                        log.error("Failed to update product image url");
+                        throw new NotFoundException(PRODUCT_NOT_FOUND);
+                    }
+                });
+    }
+
+    public Page<Product> getPageOfSellerProducts(long sellerId, Pageable pageable) {
+        return productRepository.findBySellerId(sellerId, pageable);
+    }
+
+    private String getProductImageUrl(long productId, long sellerId) {
+        return productRepository.getProductImageUrl(productId, sellerId)
+                .map(ProductImageUrlProjection::getImageUrl)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
 
-    protected CompletableFuture<String> getProductImageUrl(long sellerId, MultipartFile productImage) {
-        String key = UUID.randomUUID().toString() + sellerId;
-        System.out.println(Thread.currentThread().getName());
+    private CompletableFuture<String> getProductImageUrl(long sellerId, MultipartFile productImage) {
         return s3Service.uploadFile(new PutObjectDto(
                 PRODUCT_IMAGE_BUCKET,
-                key,
+                getKey(sellerId),
                 productImage
         ));
     }
+
+    private String getKey(long sellerId) {
+        return UUID.randomUUID().toString() + sellerId;
+    }
+
 
     private UUID getSKU() {
         return UUID.randomUUID();

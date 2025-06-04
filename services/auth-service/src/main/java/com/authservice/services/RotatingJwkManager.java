@@ -24,7 +24,7 @@ public class RotatingJwkManager {
     private final List<RSAKey> keys = new CopyOnWriteArrayList<>();
 
 
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelay = 1000 * 60 * 60 * 3)
     public void init() {
         try {
             rotateKeys();

@@ -68,3 +68,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
 
+        - addUniqueConstraint:
+            tableName: products
+            columnNames: id, seller_id
+
