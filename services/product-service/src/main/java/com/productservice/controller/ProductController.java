@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,10 +34,7 @@ public class ProductController {
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         return productService.create(body, imageFile, principal.getId())
-                .thenApply(r -> {
-                    System.out.println("created");
-                    return ResponseEntity.ok(r);
-                });
+                .thenApply(ResponseEntity::ok);
     }
 
     @PreAuthorize("hasRole('SELLER')")

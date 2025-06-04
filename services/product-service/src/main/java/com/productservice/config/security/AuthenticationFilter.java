@@ -52,8 +52,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
         CustomPrincipal principal = new CustomPrincipal(userId);
         Authentication authToken = new UsernamePasswordAuthenticationToken(principal, null, toSimpleGrantedAuthorities(roles));
-
         SecurityContextHolder.getContext().setAuthentication(authToken);
+
         filterChain.doFilter(request, response);
     }
 

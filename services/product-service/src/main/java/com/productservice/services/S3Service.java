@@ -34,11 +34,8 @@ public class S3Service {
             return s3AsyncClient.putObject(
                     request,
                     AsyncRequestBody.fromBytes(dto.file().getBytes())
-            ).thenApply(response -> generateUrl(dto.bucket(), dto.key()))
-                    .exceptionally(ex -> {
-                        log.error(ex.getMessage());
-                        throw new RuntimeException(ex);
-                    });
+            )
+                    .thenApply(response -> generateUrl(dto.bucket(), dto.key()));
         } catch (IOException e) {
             return CompletableFuture.failedFuture(e);
         }

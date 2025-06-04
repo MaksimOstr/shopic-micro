@@ -12,6 +12,7 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,6 +68,16 @@ public class ProductControllerAdvice {
         );
 
         return ResponseEntity.badRequest().body(error);
+    }
+
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                e.getMessage()
+        ));
     }
 
 }

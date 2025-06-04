@@ -8,6 +8,7 @@ import com.productservice.entity.ProductCategoryEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,11 +31,12 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-
     public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage, long sellerId) {
+        System.out.println(Thread.currentThread().getName());
         ProductCategoryEnum productEnum = ProductCategoryEnum.fromString(dto.category());
 
         return getProductImageUrl(sellerId, productImage).thenApply(url -> {
+            System.out.println(Thread.currentThread().getName());
             Product product = new Product(
                     dto.name(),
                     dto.description(),
@@ -68,9 +70,10 @@ public class ProductService {
         return "";
     }
 
-    private CompletableFuture<String> getProductImageUrl(long sellerId, MultipartFile productImage) {
-        String key = UUID.randomUUID().toString() + sellerId;
 
+    protected CompletableFuture<String> getProductImageUrl(long sellerId, MultipartFile productImage) {
+        String key = UUID.randomUUID().toString() + sellerId;
+        System.out.println(Thread.currentThread().getName());
         return s3Service.uploadFile(new PutObjectDto(
                 PRODUCT_IMAGE_BUCKET,
                 key,
