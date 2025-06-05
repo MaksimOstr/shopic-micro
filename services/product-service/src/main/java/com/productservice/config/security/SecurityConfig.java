@@ -1,5 +1,6 @@
 package com.productservice.config.security;
 
+import com.productservice.config.security.filter.AuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

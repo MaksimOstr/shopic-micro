@@ -1,6 +1,6 @@
 package com.userservice.config.security;
 
-import com.userservice.config.security.filters.AuthenticationFilter;
+import com.userservice.config.security.filter.AuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;

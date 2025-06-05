@@ -54,6 +54,7 @@ public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, S
             @NonNull ServerRequest request,
             @NonNull HandlerFunction<ServerResponse> next
     ) {
+        log.info("JWT handler filter");
         String token = extractToken(request);
         if (token == null) {
             return ServerResponse.status(HttpStatus.UNAUTHORIZED).body(errorResponse);

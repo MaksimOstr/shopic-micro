@@ -36,4 +36,26 @@ public class CookieService {
 
         return cookie;
     }
+
+    public Cookie deleteRefreshTokenCookie(String refreshToken) {
+        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
+
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setAttribute("SameSite", "Lax");
+
+        return cookie;
+    }
+
+    public Cookie deleteDeviceCookie(String deviceId) {
+        Cookie cookie = new Cookie(DEVICE_ID_COOKIE_NAME, deviceId);
+
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setAttribute("SameSite", "Lax");
+
+        return cookie;
+    }
 }

@@ -1,4 +1,4 @@
-package com.userservice.dto;
+package com.userservice.config.security.model;
 
 import lombok.Getter;
 

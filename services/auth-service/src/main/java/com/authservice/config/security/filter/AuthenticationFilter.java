@@ -1,7 +1,8 @@
-package com.productservice.config.security;
+package com.authservice.config.security.filter;
 
-import com.productservice.dto.CustomPrincipal;
-import jakarta.servlet.*;
+import com.authservice.config.security.model.CustomPrincipal;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -39,6 +40,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        if(shouldExclude(request)) {
+            log.debug("Excluding request");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
@@ -50,9 +57,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             );
         }
 
-        CustomPrincipal principal = new CustomPrincipal(userId);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(principal, null, toSimpleGrantedAuthorities(roles));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        setSecurityContext(userId, roles);
 
         filterChain.doFilter(request, response);
     }
@@ -81,12 +86,29 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    private boolean shouldExclude(HttpServletRequest request) {
+        List<String> whiteList = List.of(
+                "/auth/register",
+                "/auth/sign-in",
+                "/auth/refresh",
+                "/public-keys"
+        );
+
+        return whiteList.contains(request.getRequestURI());
+    }
+
     private List<SimpleGrantedAuthority> toSimpleGrantedAuthorities(String roles) {
         String cleaned = roles.replaceAll("^\\[|]$", "");
         List<String> roleList = Arrays.asList(cleaned.split(","));
-        System.out.println(roleList);
+
         return roleList.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
+    }
+
+    private void setSecurityContext(String userId, String roles) {
+        CustomPrincipal principal = new CustomPrincipal(userId);
+        Authentication authToken = new UsernamePasswordAuthenticationToken(principal, null, toSimpleGrantedAuthorities(roles));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 }

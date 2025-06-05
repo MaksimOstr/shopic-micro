@@ -13,19 +13,26 @@ import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFuncti
 @Configuration
 public class ApiGatewayConfig {
     @Bean
-    public RouterFunction<ServerResponse> authRoute() {
+    public RouterFunction<ServerResponse> authRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("auth-service-route")
                 .path("/auth",  request -> {
                     request
                             .filter(lb("auth-service"))
                             .POST("/register", http())
+                            .POST("/refresh", http())
                             .POST("/sign-in", http());
+                })
+                .path("/auth", request -> {
+                    request
+                            .filter(lb("auth-service"))
+                            .filter(jwtHandlerFilter)
+                            .POST("/logout", http());
                 })
                 .build();
     }
 
     @Bean
-    public RouterFunction<ServerResponse> userRoute(JwtHandlerFilter jwtHandlerFilter) {
+    public RouterFunction<ServerResponse> userRoute() {
         return route("user-service-route")
                 .path("/users",  request -> {
                     request

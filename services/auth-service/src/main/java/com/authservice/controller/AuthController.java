@@ -6,17 +6,14 @@ import com.authservice.dto.request.RegisterRequestDto;
 import com.authservice.dto.response.RegisterResponseDto;
 import com.authservice.services.AuthService;
 import com.authservice.services.CookieService;
-import com.authservice.services.RotatingJwkManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.nimbusds.jose.jwk.JWKSet;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 import static com.authservice.services.CookieService.DEVICE_ID_COOKIE_NAME;
 import static com.authservice.services.CookieService.REFRESH_TOKEN_COOKIE_NAME;
@@ -29,16 +26,16 @@ public class AuthController {
 
     private final AuthService authService;
     private final CookieService cookieService;
-    private final RotatingJwkManager rotatingJwkManager;
+
 
     @PostMapping("/register")
-
     public ResponseEntity<RegisterResponseDto> register(
             @Valid @RequestBody RegisterRequestDto body
     ) throws JsonProcessingException {
         RegisterResponseDto response = authService.register(body);
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/sign-in")
     public ResponseEntity<String> signIn(
@@ -56,6 +53,7 @@ public class AuthController {
         return ResponseEntity.ok(tokenPair.accessToken());
     }
 
+
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshTokens(
             @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
@@ -68,5 +66,27 @@ public class AuthController {
         response.addCookie(refreshTokenCookie);
 
         return ResponseEntity.ok(tokenPair.accessToken());
+    }
+
+
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> logout(
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
+            @CookieValue(value = DEVICE_ID_COOKIE_NAME) String deviceId,
+            HttpServletResponse response
+    ) {
+        authService.logout(refreshToken, deviceId);
+
+        Cookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie(refreshToken);
+        Cookie deviceIdCookie = cookieService.deleteDeviceCookie(deviceId);
+
+        response.addCookie(refreshTokenCookie);
+        response.addCookie(deviceIdCookie);
+
+
+        String message = "You have been logged out successfully";
+
+        return ResponseEntity.ok(message);
     }
 }

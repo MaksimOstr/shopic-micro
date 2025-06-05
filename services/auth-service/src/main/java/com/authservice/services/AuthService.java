@@ -56,4 +56,9 @@ public class AuthService {
     public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
         return tokenService.refreshTokens(refreshToken, deviceId);
     }
+
+    public void logout(String refreshToken, String deviceId) {
+        tokenService.logout(refreshToken, deviceId);
+    }
+
 }

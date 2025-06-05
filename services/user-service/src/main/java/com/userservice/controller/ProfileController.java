@@ -1,6 +1,6 @@
 package com.userservice.controller;
 
-import com.userservice.dto.CustomPrincipal;
+import com.userservice.config.security.model.CustomPrincipal;
 import com.userservice.entity.Profile;
 import com.userservice.services.ProfileService;
 import lombok.RequiredArgsConstructor;

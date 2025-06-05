@@ -20,7 +20,7 @@ import static com.authservice.utils.RefreshTokenUtils.hashToken;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenCreationService {
+public class RefreshTokenManager {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -53,6 +53,14 @@ public class RefreshTokenCreationService {
         saveRefreshToken(token);
 
         return newToken;
+    }
+
+    public void deleteRefreshToken(String token, String deviceId) {
+      int deleted = refreshTokenRepository.deleteRefreshTokenByTokenAndDeviceId(hashedToken(token), deviceId);
+
+      if (deleted == 0) {
+          log.info("Refresh token was not deleted");
+      }
     }
 
 

@@ -1,6 +1,6 @@
 package com.productservice.controller;
 
-import com.productservice.dto.CustomPrincipal;
+import com.productservice.config.security.model.CustomPrincipal;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
@@ -50,6 +50,7 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/{id}/image")
     public ResponseEntity<String> updateProductImage(
@@ -65,7 +66,6 @@ public class ProductController {
     }
 
 
-
     @GetMapping
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<Page<Product>> getSellerProducts(
@@ -78,6 +78,7 @@ public class ProductController {
 
         return ResponseEntity.ok(products);
     }
+
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")

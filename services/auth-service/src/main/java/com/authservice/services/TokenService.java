@@ -15,17 +15,17 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class TokenService {
-    private final RefreshTokenCreationService refreshTokenCreationService;
+    private final RefreshTokenManager refreshTokenManager;
     private final JwtTokenService jwtTokenService;
     private final UserGrpcService userGrpcService;
-    private final RefreshTokenValidationService refreshTokenService;
+    private final RefreshTokenValidationService refreshTokenValidationService;
 
 
     @Transactional
     public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
-        RefreshToken validatedRefreshToken = refreshTokenService.validate(refreshToken, deviceId);
+        RefreshToken validatedRefreshToken = refreshTokenValidationService.validate(refreshToken, deviceId);
         long userId = validatedRefreshToken.getUserId();
-        String newRefreshToken = refreshTokenCreationService.updateRefreshToken(validatedRefreshToken);
+        String newRefreshToken = refreshTokenManager.updateRefreshToken(validatedRefreshToken);
         List<String> roleNames = userGrpcService.getUserRoleNames(userId);
         return new TokenPairDto(getAccessToken(userId, roleNames), newRefreshToken);
     }
@@ -33,11 +33,14 @@ public class TokenService {
 
     public TokenPairDto getTokenPair(long userId, Set<String> userRoles, String deviceId) {
         String accessToken = getAccessToken(userId, userRoles);
-        String refreshToken = refreshTokenCreationService.create(userId, deviceId);
+        String refreshToken = refreshTokenManager.create(userId, deviceId);
 
         return new TokenPairDto(accessToken, refreshToken);
     }
 
+    public void logout(String token, String deviceId) {
+        refreshTokenManager.deleteRefreshToken(token, deviceId);
+    }
 
     private String getAccessToken(long userId, Collection<String> roleNames) {
         return jwtTokenService.getJwsToken(roleNames, userId);

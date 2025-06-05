@@ -21,9 +21,7 @@ public class PublicKeyController {
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getJwk() {
-        System.out.println("tetste");
         List<JWK> publicKeys = publicKeyService.getPublicKeys();
-        System.out.println(publicKeys);
         return ResponseEntity.ok(new JWKSet(publicKeys).toJSONObject());
     }
 }
