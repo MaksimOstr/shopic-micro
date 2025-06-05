@@ -42,15 +42,15 @@ public class Product {
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    private ProductCategoryEnum category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "category_id")
+    private Category category;
 
     @Column(name = "stock_quantity", nullable = false)
     private int stockQuantity;
 
 
-    public Product(String name, String description, UUID sku, BigDecimal price, long sellerId,  String imageUrl, ProductCategoryEnum category, int stockQuantity) {
+    public Product(String name, String description, UUID sku, BigDecimal price, long sellerId,  String imageUrl, Category category, int stockQuantity) {
         this.name = name;
         this.description = description;
         this.sku = sku;

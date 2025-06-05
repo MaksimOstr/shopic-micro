@@ -3,8 +3,8 @@ package com.productservice.services;
 import com.productservice.dto.PutObjectDto;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
+import com.productservice.entity.Category;
 import com.productservice.entity.Product;
-import com.productservice.entity.ProductCategoryEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.projection.ProductImageUrlProjection;
 import com.productservice.repository.ProductRepository;
@@ -26,6 +26,7 @@ import java.util.concurrent.CompletableFuture;
 public class ProductService {
     private final ProductRepository productRepository;
     private final S3Service s3Service;
+    private final CategoryService categoryService;
 
     private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
     private static final String PRODUCT_NOT_FOUND = "Product Not Found";
@@ -36,7 +37,7 @@ public class ProductService {
     }
 
     public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage, long sellerId) {
-        ProductCategoryEnum productEnum = ProductCategoryEnum.fromString(dto.category());
+        Category category = categoryService.findByName(dto.category());
 
         return getProductImageUrl(sellerId, productImage).thenApply(url -> {
             Product product = new Product(
@@ -46,7 +47,7 @@ public class ProductService {
                     dto.price(),
                     sellerId,
                     url,
-                    productEnum,
+                    category,
                     dto.stockQuantity()
             );
 
@@ -63,7 +64,10 @@ public class ProductService {
         Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
         Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
         Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
-        Optional.ofNullable(dto.category()).ifPresent(ProductCategoryEnum::fromString);
+        Optional.ofNullable(dto.category()).ifPresent(categoryName -> {
+            Category category = categoryService.findByName(categoryName);
+            product.setCategory(category);
+        });
 
         return product;
     }
@@ -92,6 +96,9 @@ public class ProductService {
     public Page<Product> getPageOfSellerProducts(long sellerId, Pageable pageable) {
         return productRepository.findBySellerId(sellerId, pageable);
     }
+
+
+
 
     private String getProductImageUrl(long productId, long sellerId) {
         return productRepository.getProductImageUrl(productId, sellerId)

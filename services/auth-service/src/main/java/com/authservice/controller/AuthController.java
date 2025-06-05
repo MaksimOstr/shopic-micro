@@ -42,7 +42,6 @@ public class AuthController {
             @RequestBody @Valid SignInRequestDto body,
             HttpServletResponse response
     ) {
-        System.out.println(body.toString());
         TokenPairDto tokenPair = authService.signIn(body);
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(tokenPair.refreshToken());
         Cookie deviceIdCookie = cookieService.createDeviceCookie(body.deviceId());
@@ -83,7 +82,6 @@ public class AuthController {
 
         response.addCookie(refreshTokenCookie);
         response.addCookie(deviceIdCookie);
-
 
         String message = "You have been logged out successfully";
 

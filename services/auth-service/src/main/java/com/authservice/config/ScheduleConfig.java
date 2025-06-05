@@ -9,6 +9,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration(proxyBeanMethods = false)
 @EnableScheduling
 public class ScheduleConfig {
+
     @Bean
     public ThreadPoolTaskScheduler taskScheduler(TaskSchedulingProperties properties) {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();

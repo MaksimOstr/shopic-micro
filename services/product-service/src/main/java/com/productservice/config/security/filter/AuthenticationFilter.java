@@ -50,9 +50,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             );
         }
 
-        CustomPrincipal principal = new CustomPrincipal(userId);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(principal, null, toSimpleGrantedAuthorities(roles));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        setSecurityContext(userId, roles);
 
         filterChain.doFilter(request, response);
     }
@@ -88,5 +86,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         return roleList.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
+    }
+
+    private void setSecurityContext(String userId, String roles) {
+        CustomPrincipal principal = new CustomPrincipal(userId);
+        Authentication authToken = new UsernamePasswordAuthenticationToken(principal, null, toSimpleGrantedAuthorities(roles));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 }

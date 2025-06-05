@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
-import static com.authservice.utils.RefreshTokenUtils.hashToken;
+import static com.authservice.utils.CryptoUtils.createHmac;
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class RefreshTokenValidationService {
     }
 
     private RefreshToken findToken(String token, String deviceId) {
-        return refreshTokenRepository.findByTokenAndDeviceId(hashToken(token, refreshSecret), deviceId)
+        return refreshTokenRepository.findByTokenAndDeviceId(createHmac(token, refreshSecret), deviceId)
                 .orElseThrow(() -> new TokenValidationException("Refresh token not found"));
     }
 }

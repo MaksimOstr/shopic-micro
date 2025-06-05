@@ -17,13 +17,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
+
+import static com.authservice.utils.CryptoUtils.createHmac;
 
 @Component
 @Slf4j
@@ -32,6 +30,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${SIGNATURE_SECRET}")
     private String signatureSecret;
+
 
     @Override
     protected void doFilterInternal(
@@ -63,27 +62,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
 
+    
     private boolean verifyHmac(
             @NonNull String roles,
             @NonNull String userId,
             @NonNull String signature) {
         String data = userId + roles;
-        String generatedSignature = createHmac(data);
+        String generatedSignature = createHmac(data, signatureSecret);
 
         return generatedSignature.equals(signature);
-    }
-
-    private String createHmac(String data) {
-        try {
-            Mac mac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secretKey = new SecretKeySpec(signatureSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-            mac.init(secretKey);
-            byte[] hmacBytes = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(hmacBytes);
-        } catch (Exception e) {
-            log.info("Failed to generate HMAC", e);
-            throw new RuntimeException("Failed to generate HMAC", e);
-        }
     }
 
     private boolean shouldExclude(HttpServletRequest request) {

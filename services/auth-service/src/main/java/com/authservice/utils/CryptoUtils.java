@@ -1,18 +1,18 @@
 package com.authservice.utils;
 
+import lombok.experimental.UtilityClass;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.HexFormat;
-import java.util.UUID;
 
-public final class RefreshTokenUtils {
+@UtilityClass
+public final class CryptoUtils {
 
-    public static String hashToken(String token, String secret) {
+    public static String createHmac(String token, String secret) {
         try {
             Mac sha256HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");

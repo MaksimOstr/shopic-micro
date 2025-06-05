@@ -15,7 +15,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.authservice.utils.RefreshTokenUtils.hashToken;
+import static com.authservice.utils.CryptoUtils.createHmac;
+
 
 @Slf4j
 @Service
@@ -80,7 +81,7 @@ public class RefreshTokenManager {
 
 
     private String hashedToken(String token) {
-        return hashToken(token, refreshSecret);
+        return createHmac(token, refreshSecret);
     }
 
 

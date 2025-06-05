@@ -10,6 +10,7 @@ import static org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFi
 import static org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route;
 import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http;
 
+
 @Configuration
 public class ApiGatewayConfig {
     @Bean
