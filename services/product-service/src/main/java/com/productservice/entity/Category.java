@@ -20,4 +20,9 @@ public class Category {
 
     @Column(nullable = false)
     private String description;
+
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }

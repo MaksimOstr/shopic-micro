@@ -17,7 +17,7 @@ public record UpdateProductRequest(
         @DecimalMin("0")
         BigDecimal price,
 
-        String category,
+        Long categoryId,
 
         @Min(0)
         Integer stockQuantity

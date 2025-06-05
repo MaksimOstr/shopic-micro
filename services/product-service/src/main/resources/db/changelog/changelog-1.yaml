@@ -107,4 +107,31 @@ databaseChangeLog:
             referencedColumnNames: id
             constraintName: fk_product_category
 
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: name
+                  value: Electronics
+              - column:
+                  name: description
+                  value: Category for electronics
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: name
+                  value: Food
+              - column:
+                  name: description
+                  value: Category for food
+
+
+
 

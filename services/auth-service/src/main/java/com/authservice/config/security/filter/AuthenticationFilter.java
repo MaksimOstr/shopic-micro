@@ -31,7 +31,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     @Value("${SIGNATURE_SECRET}")
     private String signatureSecret;
 
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -62,7 +61,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
 
-    
     private boolean verifyHmac(
             @NonNull String roles,
             @NonNull String userId,

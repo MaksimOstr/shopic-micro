@@ -17,8 +17,8 @@ public record CreateProductRequest(
         @DecimalMin("0")
         BigDecimal price,
 
-        @NotBlank
-        String category,
+        @NotNull
+        long categoryId,
 
         @NotNull
         @Min(0)

@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
 
 @Slf4j
 @Service
@@ -31,13 +33,14 @@ public class ProductService {
     private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
     private static final String PRODUCT_NOT_FOUND = "Product Not Found";
 
+    //OPTIMIZE QUERY
     public Product getProductById(long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
     public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage, long sellerId) {
-        Category category = categoryService.findByName(dto.category());
+        Category category = categoryService.findById(dto.categoryId());
 
         return getProductImageUrl(sellerId, productImage).thenApply(url -> {
             Product product = new Product(
@@ -55,7 +58,9 @@ public class ProductService {
         });
     }
 
+
     @Transactional
+    //OPTIMIZE QUERY
     public Product updateProduct(UpdateProductRequest dto, long sellerId, long productId) {
         Product product = productRepository.findBySellerIdAndId(sellerId, productId)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
@@ -64,8 +69,8 @@ public class ProductService {
         Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
         Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
         Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
-        Optional.ofNullable(dto.category()).ifPresent(categoryName -> {
-            Category category = categoryService.findByName(categoryName);
+        Optional.ofNullable(dto.categoryId()).ifPresent(categoryId -> {
+            Category category = categoryService.findById(categoryId);
             product.setCategory(category);
         });
 
@@ -93,11 +98,19 @@ public class ProductService {
                 });
     }
 
+    //OPTIMIZE QUERY
     public Page<Product> getPageOfSellerProducts(long sellerId, Pageable pageable) {
         return productRepository.findBySellerId(sellerId, pageable);
     }
 
+    //OPTIMIZE QUERY
+    public Page<Product> getPageOfProductsByCategory(long categoryId, Pageable pageable) {
+        return productRepository.findByCategoryId(categoryId, pageable);
+    }
 
+    public Page<Product> getPageOfProducts(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
 
 
     private String getProductImageUrl(long productId, long sellerId) {

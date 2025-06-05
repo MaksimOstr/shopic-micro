@@ -6,6 +6,7 @@ import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
 import com.productservice.services.ProductService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,8 +18,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -68,7 +67,7 @@ public class ProductController {
     }
 
 
-    @GetMapping
+    @GetMapping("/seller")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<Page<Product>> getSellerProducts(
             @AuthenticationPrincipal CustomPrincipal principal,
@@ -82,8 +81,29 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/category")
+    public ResponseEntity<Page<Product>> getPageOfProductsByCategory(
+            @RequestParam @NotNull long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Product> pageOfProducts = productService.getPageOfProductsByCategory(categoryId, pageable);
 
+        return ResponseEntity.ok(pageOfProducts);
+    }
 
+    @GetMapping
+    public ResponseEntity<Page<Product>> getPageOfProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Product> pageOfProducts = productService.getPageOfProducts(pageable);
+
+        return ResponseEntity.ok(pageOfProducts);
+    }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
