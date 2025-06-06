@@ -18,15 +18,6 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class ProductControllerAdvice {
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    private ResponseEntity<Map<String, String>> handleNotValidMethodArguments(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
-        return ResponseEntity.badRequest().body(errors);
-    }
-
     @ExceptionHandler(S3Exception.class)
     public ResponseEntity<ErrorResponseDto> handleS3Exception(S3Exception ex) {
 
@@ -57,17 +48,6 @@ public class ProductControllerAdvice {
                 ex.getMessage()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler({InvalidEnumArgException.class, NotFoundException.class})
-    public ResponseEntity<ErrorResponseDto> handleInvalidEnumArgException(RuntimeException e) {
-        ErrorResponseDto error = new ErrorResponseDto(
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                HttpStatus.BAD_REQUEST.value(),
-                e.getMessage()
-        );
-
-        return ResponseEntity.badRequest().body(error);
     }
 
 

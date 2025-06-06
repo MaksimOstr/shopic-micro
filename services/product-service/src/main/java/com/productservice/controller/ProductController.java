@@ -28,7 +28,7 @@ public class ProductController {
 
 
     @PostMapping
-    @PreAuthorize("hasRole('SELLER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public CompletableFuture<ResponseEntity<Product>> createProduct(
             @RequestPart("product") @Valid CreateProductRequest body,
             @RequestPart("image") MultipartFile imageFile,
@@ -40,7 +40,7 @@ public class ProductController {
 
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('SELLER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Product> updateProduct(
             @AuthenticationPrincipal CustomPrincipal principal,
             @PathVariable long id,
@@ -52,7 +52,7 @@ public class ProductController {
     }
 
 
-    @PreAuthorize("hasRole('SELLER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/image")
     public ResponseEntity<String> updateProductImage(
         @AuthenticationPrincipal CustomPrincipal principal,
@@ -68,7 +68,7 @@ public class ProductController {
 
 
     @GetMapping("/seller")
-    @PreAuthorize("hasRole('SELLER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<Product>> getSellerProducts(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
@@ -80,6 +80,8 @@ public class ProductController {
 
         return ResponseEntity.ok(products);
     }
+
+
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/category")

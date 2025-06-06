@@ -33,7 +33,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public Category update(long categoryId, UpdateCategoryRequest dto) {
+    public Category update(int categoryId, UpdateCategoryRequest dto) {
         Category category = findById(categoryId);
 
         Optional.ofNullable(dto.name()).ifPresent(category::setName);
@@ -42,7 +42,7 @@ public class CategoryService {
         return category;
     }
 
-    public Category findById(long id) {
+    public Category findById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
     }

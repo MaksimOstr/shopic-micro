@@ -1,6 +1,5 @@
 package com.userservice.entity;
 
-import com.userservice.enums.AuthProviderEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +30,7 @@ public class User {
     private Boolean isAccountNonLocked = true;
 
     @Column(name = "is_verified", nullable = false)
-    private boolean isVerified = false;
+    private boolean isVerified = true;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider", nullable = false)

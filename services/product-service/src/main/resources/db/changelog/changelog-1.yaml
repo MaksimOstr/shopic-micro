@@ -13,6 +13,11 @@ databaseChangeLog:
             startValue: 1
             cacheSize: 50
             incrementBy: 50
+        - createSequence:
+            sequenceName: brands_seq
+            startValue: 1
+            cacheSize: 50
+            incrementBy: 50
 
         - createTable:
             tableName: products
@@ -57,8 +62,14 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: brand_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    deleteCascade: true
+              - column:
                   name: category_id
-                  type: bigint
+                  type: int
                   constraints:
                     nullable: false
                     deleteCascade: true
@@ -79,11 +90,28 @@ databaseChangeLog:
             columnNames: id, seller_id
 
         - createTable:
+            tableName: brands
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  defaultValueSequenceNext: brands_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+        - createTable:
             tableName: categories
             columns:
               - column:
                   name: id
-                  type: bigint
+                  type: int
                   defaultValueSequenceNext: categories_seq
                   constraints:
                     primaryKey: true
@@ -106,6 +134,12 @@ databaseChangeLog:
             referencedTableName: categories
             referencedColumnNames: id
             constraintName: fk_product_category
+        - addForeignKeyConstraint:
+            baseTableName: products
+            baseColumnNames: brand_id
+            constraintName: fk_product_brand
+            referencedTableName: brands
+            referencedColumnNames: id
 
         - insert:
             tableName: categories

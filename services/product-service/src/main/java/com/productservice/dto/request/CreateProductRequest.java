@@ -18,7 +18,10 @@ public record CreateProductRequest(
         BigDecimal price,
 
         @NotNull
-        long categoryId,
+        int categoryId,
+
+        @NotNull
+        int brandId,
 
         @NotNull
         @Min(0)

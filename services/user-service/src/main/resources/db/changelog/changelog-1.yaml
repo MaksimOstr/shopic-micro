@@ -167,15 +167,6 @@ databaseChangeLog:
               - column:
                   name: role_name
                   value: ROLE_ADMIN
-        - insert:
-            tableName: roles
-            columns:
-              - column:
-                  name: id
-                  value: 3
-              - column:
-                  name: role_name
-                  value: ROLE_SELLER
 
 
 

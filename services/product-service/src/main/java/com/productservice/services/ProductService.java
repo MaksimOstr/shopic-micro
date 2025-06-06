@@ -3,6 +3,7 @@ package com.productservice.services;
 import com.productservice.dto.PutObjectDto;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
+import com.productservice.entity.Brand;
 import com.productservice.entity.Category;
 import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
@@ -29,6 +30,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final S3Service s3Service;
     private final CategoryService categoryService;
+    private final BrandService brandService;
 
     private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
     private static final String PRODUCT_NOT_FOUND = "Product Not Found";
@@ -41,6 +43,7 @@ public class ProductService {
 
     public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage, long sellerId) {
         Category category = categoryService.findById(dto.categoryId());
+        Brand brand = brandService.getBrandById(dto.brandId());
 
         return getProductImageUrl(sellerId, productImage).thenApply(url -> {
             Product product = new Product(
@@ -51,7 +54,8 @@ public class ProductService {
                     sellerId,
                     url,
                     category,
-                    dto.stockQuantity()
+                    dto.stockQuantity(),
+                    brand
             );
 
             return productRepository.save(product);
@@ -72,6 +76,10 @@ public class ProductService {
         Optional.ofNullable(dto.categoryId()).ifPresent(categoryId -> {
             Category category = categoryService.findById(categoryId);
             product.setCategory(category);
+        });
+        Optional.ofNullable(dto.brandId()).ifPresent(brandId -> {
+            Brand brand = brandService.getBrandById(brandId);
+            product.setBrand(brand);
         });
 
         return product;

@@ -24,7 +24,6 @@ public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
     private final UserService userService;
 
 
-
     @Override
     @Transactional
     public void createLocalUser(CreateLocalUserRequest request, StreamObserver<CreateUserResponse> responseObserver) {

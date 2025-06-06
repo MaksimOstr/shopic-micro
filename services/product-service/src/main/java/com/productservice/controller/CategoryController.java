@@ -20,7 +20,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Category>> getCategories() {
         List<Category> categories = categoryService.findAll();
         return ResponseEntity.ok(categories);
@@ -39,7 +39,7 @@ public class CategoryController {
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Category> updateCategory(
-            @PathVariable long id,
+            @PathVariable int id,
             @RequestBody @Valid UpdateCategoryRequest body
     ) {
         Category category = categoryService.update(id, body);
