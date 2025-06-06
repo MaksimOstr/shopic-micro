@@ -52,10 +52,12 @@ public class ApiGatewayConfig {
                             .filter(jwtHandlerFilter)
                             .filter(lb("product-service"))
                             .POST("", http())
-                            .PATCH("/{id}", http())
                             .GET("/{id}", http())
+                            .GET("", http())
+                            .GET("/sku", http())
+                            .GET("/filter", http())
                             .PATCH("/{id}/image", http())
-                            .GET("", http());
+                            .PATCH("/{id}", http());
                 })
                 .build();
     }

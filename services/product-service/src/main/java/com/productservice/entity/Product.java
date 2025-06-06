@@ -32,9 +32,6 @@ public class Product {
 
     private BigDecimal price;
 
-    @Column(name = "seller_id", nullable = false)
-    private long sellerId;
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Brand brand;
 
@@ -53,12 +50,11 @@ public class Product {
     private int stockQuantity;
 
 
-    public Product(String name, String description, UUID sku, BigDecimal price, long sellerId,  String imageUrl, Category category, int stockQuantity, Brand brand) {
+    public Product(String name, String description, UUID sku, BigDecimal price, String imageUrl, Category category, int stockQuantity, Brand brand) {
         this.name = name;
         this.description = description;
         this.sku = sku;
         this.price = price;
-        this.sellerId = sellerId;
         this.imageUrl = imageUrl;
         this.category = category;
         this.stockQuantity = stockQuantity;

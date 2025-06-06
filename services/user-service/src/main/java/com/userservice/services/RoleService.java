@@ -12,7 +12,7 @@ public class RoleService {
     private final RoleRepository roleRepository;
 
     public Role getDefaultUserRole() {
-        return roleRepository.findByName("ROLE_USER")
+        return roleRepository.findById(1)
                 .orElseThrow(() -> new EntityDoesNotExistException("User role not found"));
     }
 

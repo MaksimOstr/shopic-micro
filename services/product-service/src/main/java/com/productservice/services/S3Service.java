@@ -57,7 +57,6 @@ public class S3Service {
         } catch (URISyntaxException e) {
             log.warn(e.getMessage());
         }
-
     }
 
     private String generateUrl(String bucket, String key) {

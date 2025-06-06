@@ -2,6 +2,7 @@ package com.productservice.services;
 
 import com.productservice.dto.PutObjectDto;
 import com.productservice.dto.request.CreateProductRequest;
+import com.productservice.dto.request.GetProductsByFilters;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Brand;
 import com.productservice.entity.Category;
@@ -13,14 +14,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
+import static com.productservice.utils.SpecificationUtils.*;
 
 
 @Slf4j
@@ -41,17 +44,16 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage, long sellerId) {
+    public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage) {
         Category category = categoryService.findById(dto.categoryId());
         Brand brand = brandService.getBrandById(dto.brandId());
 
-        return getProductImageUrl(sellerId, productImage).thenApply(url -> {
+        return postProductPhoto(productImage).thenApply(url -> {
             Product product = new Product(
                     dto.name(),
                     dto.description(),
                     getSKU(),
                     dto.price(),
-                    sellerId,
                     url,
                     category,
                     dto.stockQuantity(),
@@ -65,8 +67,8 @@ public class ProductService {
 
     @Transactional
     //OPTIMIZE QUERY
-    public Product updateProduct(UpdateProductRequest dto, long sellerId, long productId) {
-        Product product = productRepository.findBySellerIdAndId(sellerId, productId)
+    public Product updateProduct(UpdateProductRequest dto, long productId) {
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
 
         Optional.ofNullable(dto.name()).ifPresent(product::setName);
@@ -85,18 +87,27 @@ public class ProductService {
         return product;
     }
 
+    public Page<Product> findProductsByFilters(GetProductsByFilters dto, Pageable pageable) {
+        Specification<Product> specification = iLike("name", dto.name())
+                .and(lte("price", dto.toPrice()))
+                .and(gte("price", dto.fromPrice()))
+                .and(hasChild("category", dto.categoryId()))
+                .and(hasChild("brand", dto.brandId()));
 
-    public void updateProductImage(long sellerId, long productId, MultipartFile productImage) {
-        String imageUrl = getProductImageUrl(productId, sellerId);
+        return productRepository.findAll(specification, pageable);
+    }
+
+    public Product getProductBySku(UUID sku) {
+        return productRepository.findBySku(sku)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+    }
+
+
+    public void updateProductImage(long productId, MultipartFile productImage) {
+        String imageUrl = getProductImageUrl(productId);
         s3Service.delete(imageUrl);
 
-        PutObjectDto dto = new PutObjectDto(
-                PRODUCT_IMAGE_BUCKET,
-                getKey(sellerId),
-                productImage
-        );
-
-        s3Service.uploadFile(dto)
+        postProductPhoto(productImage)
                 .thenAccept(newImageUrl -> {
                     int updated = productRepository.updateProductImageUrl(productId, newImageUrl);
                     if (updated == 0) {
@@ -106,40 +117,27 @@ public class ProductService {
                 });
     }
 
-    //OPTIMIZE QUERY
-    public Page<Product> getPageOfSellerProducts(long sellerId, Pageable pageable) {
-        return productRepository.findBySellerId(sellerId, pageable);
-    }
-
-    //OPTIMIZE QUERY
-    public Page<Product> getPageOfProductsByCategory(long categoryId, Pageable pageable) {
-        return productRepository.findByCategoryId(categoryId, pageable);
-    }
-
     public Page<Product> getPageOfProducts(Pageable pageable) {
         return productRepository.findAll(pageable);
     }
 
-
-    private String getProductImageUrl(long productId, long sellerId) {
-        return productRepository.getProductImageUrl(productId, sellerId)
+    private String getProductImageUrl(long productId) {
+        return productRepository.getProductImageUrl(productId)
                 .map(ProductImageUrlProjection::getImageUrl)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-
-    private CompletableFuture<String> getProductImageUrl(long sellerId, MultipartFile productImage) {
+    private CompletableFuture<String> postProductPhoto(MultipartFile productImage) {
         return s3Service.uploadFile(new PutObjectDto(
                 PRODUCT_IMAGE_BUCKET,
-                getKey(sellerId),
+                getKey(),
                 productImage
         ));
     }
 
-    private String getKey(long sellerId) {
-        return UUID.randomUUID().toString() + sellerId;
+    private String getKey() {
+        return UUID.randomUUID().toString();
     }
-
 
     private UUID getSKU() {
         return UUID.randomUUID();

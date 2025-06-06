@@ -46,11 +46,6 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: seller_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-              - column:
                   name: created_at
                   type: timestamptz
                   defaultValueComputed: CURRENT_TIMESTAMP
@@ -84,10 +79,6 @@ databaseChangeLog:
                   type: decimal(10, 2)
                   constraints:
                     nullable: false
-
-        - addUniqueConstraint:
-            tableName: products
-            columnNames: id, seller_id
 
         - createTable:
             tableName: brands
@@ -165,6 +156,27 @@ databaseChangeLog:
               - column:
                   name: description
                   value: Category for food
+
+        - insert:
+            tableName: brands
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: name
+                  value: Samsung
+        - insert:
+            tableName: brands
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: name
+                  value: Nokia
+
+
 
 
 
