@@ -3,6 +3,7 @@ package com.authservice.controller.advice;
 import com.authservice.controller.AuthController;
 import com.authservice.dto.response.ErrorResponseDto;
 import com.authservice.exceptions.EntityAlreadyExistsException;
+import com.authservice.exceptions.NotFoundException;
 import com.authservice.exceptions.TokenValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.grpc.Status;
@@ -65,6 +66,15 @@ public class AuthControllerAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),
+                e.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                HttpStatus.NOT_FOUND.value(),
                 e.getMessage()
         ));
     }

@@ -1,19 +1,16 @@
 package com.userservice.mapper;
 
-import com.shopic.grpc.userservice.CreateLocalUserRequest;
-import com.shopic.grpc.userservice.CreateUserResponse;
-import com.shopic.grpc.userservice.ProfileRequest;
-import com.shopic.grpc.userservice.UserForAuthResponse;
+import com.shopic.grpc.userservice.*;
 import com.userservice.dto.CreateProfileDto;
 import com.userservice.dto.request.CreateLocalUserRequestDto;
+import com.userservice.dto.request.CreateOAuthUserRequestDto;
+import com.userservice.dto.response.CreateOAuthUserResponseDto;
 import com.userservice.dto.response.CreateUserResponseDto;
 import com.userservice.entity.Profile;
 import com.userservice.entity.Role;
 import com.userservice.entity.User;
 import org.mapstruct.*;
 
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = {InstantMapper.class})
@@ -25,7 +22,11 @@ public interface UserMapper {
 
     CreateLocalUserRequestDto toCreateLocalUserRequestDto(CreateLocalUserRequest request);
 
-    CreateUserResponse toGrpcCreateUserResponse(CreateUserResponseDto responseDto);
+    CreateLocalUserResponse toGrpcCreateUserResponse(CreateUserResponseDto responseDto);
+
+    CreateOAuthUserRequestDto toCreateOAuthUserRequestDto(CreateOAuthUserRequest request);
+
+    CreateOAuthUserResponse toCreateOAuthUserResponseDto(CreateOAuthUserResponseDto response);
 
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "isVerified", source = "verified")
@@ -40,5 +41,10 @@ public interface UserMapper {
                         .map(Role::getName)
                         .collect(Collectors.toList())
         );
+    }
+
+    @AfterMapping
+    default void afterMappingOAuthUser(@MappingTarget CreateOAuthUserResponse.Builder builder, CreateOAuthUserResponseDto responseDto) {
+        builder.addAllRoleNames(responseDto.roleNames());
     }
 }

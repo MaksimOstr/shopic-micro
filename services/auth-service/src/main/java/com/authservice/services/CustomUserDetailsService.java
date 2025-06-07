@@ -1,7 +1,7 @@
 package com.authservice.services;
 
 import com.authservice.config.security.model.CustomUserDetails;
-import com.authservice.exceptions.EntityDoesNotExistException;
+import com.authservice.exceptions.NotFoundException;
 import com.authservice.services.grpc.UserGrpcService;
 import com.shopic.grpc.userservice.UserForAuthResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                     response.getUserId(),
                     response.getRoleNamesList()
             );
-        } catch (EntityDoesNotExistException e) {
+        } catch (NotFoundException e) {
             log.error("User with email {} not found", email);
             throw new UsernameNotFoundException("test");
         }

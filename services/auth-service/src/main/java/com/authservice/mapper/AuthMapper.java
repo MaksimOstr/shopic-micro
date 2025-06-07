@@ -1,7 +1,7 @@
 package com.authservice.mapper;
 
 import com.authservice.dto.response.RegisterResponseDto;
-import com.shopic.grpc.userservice.CreateUserResponse;
+import com.shopic.grpc.userservice.CreateLocalUserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -9,5 +9,5 @@ import org.mapstruct.Mapping;
 public interface AuthMapper {
 
     @Mapping(target = "cratedAt", source = "createdAt")
-    RegisterResponseDto toRegisterResponseDto(CreateUserResponse response);
+    RegisterResponseDto toRegisterResponseDto(CreateLocalUserResponse response);
 }

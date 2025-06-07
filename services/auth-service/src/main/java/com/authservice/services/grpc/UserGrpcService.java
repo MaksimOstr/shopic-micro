@@ -1,8 +1,9 @@
 package com.authservice.services.grpc;
 
-import com.authservice.dto.request.RegisterRequestDto;
+import com.authservice.dto.request.LocalRegistrationRequest;
+import com.authservice.dto.request.OAuthRegistrationRequest;
 import com.authservice.exceptions.EntityAlreadyExistsException;
-import com.authservice.exceptions.EntityDoesNotExistException;
+import com.authservice.exceptions.NotFoundException;
 import com.shopic.grpc.userservice.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 
 
 @Service
@@ -25,23 +27,21 @@ public class UserGrpcService {
             return userServiceGrpc.getUserForAuth(request);
         } catch (StatusRuntimeException e) {
             if(e.getStatus().getCode() == Status.Code.NOT_FOUND) {
-                throw new EntityDoesNotExistException("User with email " + email + " not found");
+                throw new NotFoundException("User with email " + email + " not found");
             }
             throw e;
         }
     }
 
-
-    public CreateUserResponse createUser(RegisterRequestDto dto) {
-        String encodedPassword = passwordEncoder.encode(dto.password());
+    public CreateLocalUserResponse createLocalUser(LocalRegistrationRequest dto) {
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
         ProfileRequest profile = ProfileRequest.newBuilder()
-                .setLastName(dto.lastName())
-                .setFirstName(dto.firstName())
-                .setPhoneNumber(dto.phoneNumber())
+                .setLastName(dto.getLastName())
+                .setFirstName(dto.getFirstName())
                 .build();
 
         CreateLocalUserRequest request = CreateLocalUserRequest.newBuilder()
-                .setEmail(dto.email())
+                .setEmail(dto.getEmail())
                 .setPassword(encodedPassword)
                 .setProfile(profile)
                 .build();
@@ -56,17 +56,27 @@ public class UserGrpcService {
         }
     }
 
+    public CreateOAuthUserResponse createGoogleUser(OAuthRegistrationRequest dto) {
+        ProfileRequest profile = ProfileRequest.newBuilder()
+                .setLastName(dto.getLastName())
+                .setFirstName(dto.getFirstName())
+                .build();
+
+        CreateOAuthUserRequest request = CreateOAuthUserRequest.newBuilder()
+                .setEmail(dto.getEmail())
+                .setProfile(profile);
+    }
+
 
     public List<String> getUserRoleNames(long userId) {
         try {
             UserRolesRequest request = UserRolesRequest.newBuilder().setUserId(userId).build();
             return userServiceGrpc.getUserRoles(request).getRoleNamesList();
         } catch (StatusRuntimeException e) {
-            Status.Code code = e.getStatus().getCode();
-            switch (code) {
-                case NOT_FOUND -> throw new EntityDoesNotExistException("User with id " + userId + " not found");
-                default -> throw e;
+            if(e.getStatus().getCode() == Status.Code.NOT_FOUND) {
+                throw new NotFoundException("User with id " + userId + " not found");
             }
+            throw e;
         }
     }
 }

@@ -11,7 +11,6 @@ option java_package = "com.shopic.grpc.userservice";
 message ProfileRequest {
   string first_name = 11;
   string last_name = 12;
-  string phone_number = 13;
 }
 
 message CreateLocalUserRequest {
@@ -20,13 +19,24 @@ message CreateLocalUserRequest {
   ProfileRequest profile = 3;
 }
 
-message CreateUserResponse {
+message CreateOAuthUserRequest {
+  string email = 1;
+  string provider = 2;
+  ProfileRequest profile = 3;
+}
+
+message CreateLocalUserResponse {
   int64 user_id = 1;
   string email = 2;
   string first_name = 3;
   string last_name = 4;
-  string phone_number = 5;
   google.protobuf.Timestamp created_at = 7;
+}
+
+message CreateOAuthUserResponse {
+  int64 user_id = 1;
+  string email = 2;
+  repeated string role_names = 3;
 }
 
 message UserForAuthRequest {
@@ -34,7 +44,7 @@ message UserForAuthRequest {
 }
 
 message UserForAuthResponse {
-  int64 userId = 1;
+  int64 user_id = 1;
   string email = 2;
   string password = 3;
   repeated string role_names = 4;
@@ -51,7 +61,9 @@ message UserRolesResponse {
 }
 
 service UserService {
-  rpc createLocalUser (CreateLocalUserRequest) returns (CreateUserResponse);
+  rpc createLocalUser (CreateLocalUserRequest) returns (CreateLocalUserResponse);
+
+  rpc createOAuthUser (CreateOAuthUserRequest) returns (CreateOAuthUserResponse);
 
   rpc getUserForAuth (UserForAuthRequest) returns (UserForAuthResponse);
 

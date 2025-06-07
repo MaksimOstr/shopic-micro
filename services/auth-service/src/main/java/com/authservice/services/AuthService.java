@@ -2,13 +2,11 @@ package com.authservice.services;
 
 import com.authservice.config.security.model.CustomUserDetails;
 import com.authservice.dto.TokenPairDto;
+import com.authservice.dto.request.BaseAuthRequest;
 import com.authservice.dto.request.SignInRequestDto;
-import com.authservice.dto.request.RegisterRequestDto;
 import com.authservice.dto.response.RegisterResponseDto;
-import com.authservice.mapper.AuthMapper;
-import com.authservice.services.grpc.UserGrpcService;
+import com.authservice.enums.AuthProviderEnum;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.shopic.grpc.userservice.CreateUserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 import static com.authservice.utils.AuthUtils.mapUserRoles;
@@ -25,19 +24,18 @@ import static com.authservice.utils.AuthUtils.mapUserRoles;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final UserGrpcService userServiceGrpc;
-    private final AuthMapper authMapper;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final KafkaEventProducer authEventProducer;
+    private final List<AuthProvider> authProviders;
 
 
-    public RegisterResponseDto register(RegisterRequestDto dto) throws JsonProcessingException {
-        CreateUserResponse response = userServiceGrpc.createUser(dto);
+    public RegisterResponseDto register(BaseAuthRequest dto, AuthProviderEnum providerEnum) throws JsonProcessingException {
+        AuthProvider provider = authProviders.stream()
+                .filter(p -> p.supports(providerEnum))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("no provider"));
 
-        authEventProducer.sendUserCreatedEvent(response.getEmail(), response.getUserId());
-
-        return authMapper.toRegisterResponseDto(response);
+        return provider.register(dto);
     }
 
 

@@ -1,7 +1,10 @@
 package com.userservice.services;
 
 import com.userservice.dto.request.CreateLocalUserRequestDto;
+import com.userservice.dto.request.CreateOAuthUserRequestDto;
+import com.userservice.dto.response.CreateOAuthUserResponseDto;
 import com.userservice.dto.response.CreateUserResponseDto;
+import com.userservice.entity.AuthProviderEnum;
 import com.userservice.entity.Profile;
 import com.userservice.entity.Role;
 import com.userservice.entity.User;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+
+import static com.userservice.utils.UserUtils.toUserRolesToRoleNames;
 
 
 @Slf4j
@@ -31,22 +36,41 @@ public class UserService {
 
 
     public CreateUserResponseDto createLocalUser(CreateLocalUserRequestDto dto) {
-        if(isUserExist(dto.email())) {
+        if(isUserExist(dto.getEmail())) {
             log.error(USER_ALREADY_EXISTS);
             throw new EntityAlreadyExistsException(USER_ALREADY_EXISTS);
         }
 
         Role defaultRole = roleService.getDefaultUserRole();
         User user = new User(
-                dto.email(),
-                dto.password(),
+                dto.getEmail(),
+                dto.getPassword(),
                 Set.of(defaultRole)
         );
 
         User savedUser = userRepository.save(user);
-        Profile profile = profileService.createProfile(dto.profile() , savedUser);
+        Profile profile = profileService.createProfile(dto.getProfile() , savedUser);
 
         return userMapper.toCreateUserResponseDto(savedUser, profile);
+    }
+
+    public CreateOAuthUserResponseDto createOAuthUser(CreateOAuthUserRequestDto dto) {
+        return userRepository.findByEmail(dto.getEmail())
+                .map(user -> new CreateOAuthUserResponseDto(user.getId(), user.getEmail(), toUserRolesToRoleNames(user.getRoles())))
+                .orElseGet(() -> {
+                    Role defaultRole = roleService.getDefaultUserRole();
+                    User user = new User(
+                            dto.getEmail(),
+                            AuthProviderEnum.fromString(dto.getProvider()),
+                            Set.of(defaultRole)
+                    );
+
+                    profileService.createProfile(dto.getProfile() , user);
+
+                    User savedUser = userRepository.save(user);
+
+                    return new CreateOAuthUserResponseDto(savedUser.getId(), user.getEmail(), toUserRolesToRoleNames(user.getRoles()));
+                });
     }
 
     public User getUserForAuth(String email) {

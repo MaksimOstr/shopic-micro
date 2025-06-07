@@ -1,18 +1,16 @@
 package com.userservice.dto.request;
 
 import com.userservice.dto.CreateProfileDto;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Getter;
 
-public record CreateLocalUserRequestDto (
-        @NotBlank
-        @Email
-        String email,
-
+@Getter
+public class CreateLocalUserRequestDto extends CreateUserRequest {
         @NotBlank
         @Min(8)
-        String password,
+        String password;
 
-        @Valid
-        CreateProfileDto profile
-) {}
+        public CreateLocalUserRequestDto(String email, CreateProfileDto profile) {
+                super(email, profile);
+        }
+}

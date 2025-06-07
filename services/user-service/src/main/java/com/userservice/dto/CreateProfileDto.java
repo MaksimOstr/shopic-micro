@@ -7,8 +7,5 @@ public record CreateProfileDto (
         String firstName,
 
         @NotBlank
-        String lastName,
-
-        @NotBlank
-        String phoneNumber
+        String lastName
 ) {}
