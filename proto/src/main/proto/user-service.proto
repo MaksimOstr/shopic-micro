@@ -13,37 +13,36 @@ message ProfileRequest {
   string last_name = 12;
 }
 
-message CreateLocalUserRequest {
+message CreateLocalUserGrpcRequest {
   string email = 1;
   string password = 2;
   ProfileRequest profile = 3;
 }
 
-message CreateOAuthUserRequest {
+message CreateLocalUserGrpcResponse {
+  int64 user_id = 1;
+  string email = 2;
+  string first_name = 3;
+  string last_name = 4;
+}
+
+message CreateOAuthUserGrpcRequest {
   string email = 1;
   string provider = 2;
   ProfileRequest profile = 3;
 }
 
-message CreateLocalUserResponse {
+message CreateOAuthUserGrpcResponse {
   int64 user_id = 1;
-  string email = 2;
-  string first_name = 3;
-  string last_name = 4;
-  google.protobuf.Timestamp created_at = 7;
+  string provider = 3;
+  repeated string role_names = 4;
 }
 
-message CreateOAuthUserResponse {
-  int64 user_id = 1;
-  string email = 2;
-  repeated string role_names = 3;
-}
-
-message UserForAuthRequest {
+message UserForAuthGrpcRequest {
   string email = 1;
 }
 
-message UserForAuthResponse {
+message UserForAuthGrpcResponse {
   int64 user_id = 1;
   string email = 2;
   string password = 3;
@@ -61,11 +60,11 @@ message UserRolesResponse {
 }
 
 service UserService {
-  rpc createLocalUser (CreateLocalUserRequest) returns (CreateLocalUserResponse);
+  rpc createLocalUser (CreateLocalUserGrpcRequest) returns (CreateLocalUserGrpcResponse);
 
-  rpc createOAuthUser (CreateOAuthUserRequest) returns (CreateOAuthUserResponse);
+  rpc createOAuthUser (CreateOAuthUserGrpcRequest) returns (CreateOAuthUserGrpcResponse);
 
-  rpc getUserForAuth (UserForAuthRequest) returns (UserForAuthResponse);
+  rpc getUserForAuth (UserForAuthGrpcRequest) returns (UserForAuthGrpcResponse);
 
   rpc getUserRoles (UserRolesRequest) returns (UserRolesResponse);
 }

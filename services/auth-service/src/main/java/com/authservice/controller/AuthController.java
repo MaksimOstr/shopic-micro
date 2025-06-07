@@ -1,10 +1,9 @@
 package com.authservice.controller;
 
 import com.authservice.dto.TokenPairDto;
-import com.authservice.dto.request.LocalRegistrationRequest;
+import com.authservice.dto.request.LocalRegisterRequest;
 import com.authservice.dto.request.SignInRequestDto;
-import com.authservice.dto.response.RegisterResponseDto;
-import com.authservice.enums.AuthProviderEnum;
+import com.authservice.dto.response.LocalRegisterResponse;
 import com.authservice.services.AuthService;
 import com.authservice.services.CookieService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,10 +29,10 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDto> registerLocalUser(
-            @Valid @RequestBody LocalRegistrationRequest body
+    public ResponseEntity<LocalRegisterResponse> registerLocalUser(
+            @Valid @RequestBody LocalRegisterRequest body
     ) throws JsonProcessingException {
-        RegisterResponseDto response = authService.register(body, AuthProviderEnum.LOCAL);
+        LocalRegisterResponse response = authService.localRegister(body);
 
         return ResponseEntity.ok(response);
     }

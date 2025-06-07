@@ -2,8 +2,8 @@ package com.userservice.mapper;
 
 import com.shopic.grpc.userservice.*;
 import com.userservice.dto.CreateProfileDto;
-import com.userservice.dto.request.CreateLocalUserRequestDto;
-import com.userservice.dto.request.CreateOAuthUserRequestDto;
+import com.userservice.dto.request.CreateLocalUserRequest;
+import com.userservice.dto.request.CreateOAuthUserRequest;
 import com.userservice.dto.response.CreateOAuthUserResponseDto;
 import com.userservice.dto.response.CreateUserResponseDto;
 import com.userservice.entity.Profile;
@@ -20,22 +20,22 @@ public interface UserMapper {
     @Mapping(target = "userId", source = "user.id")
     CreateUserResponseDto toCreateUserResponseDto(User user, Profile profile);
 
-    CreateLocalUserRequestDto toCreateLocalUserRequestDto(CreateLocalUserRequest request);
+    CreateLocalUserRequest toCreateLocalUserRequest(CreateLocalUserGrpcRequest request);
 
-    CreateLocalUserResponse toGrpcCreateUserResponse(CreateUserResponseDto responseDto);
+    CreateLocalUserGrpcResponse toCreateUserGrpcResponse(CreateUserResponseDto responseDto);
 
-    CreateOAuthUserRequestDto toCreateOAuthUserRequestDto(CreateOAuthUserRequest request);
+    CreateOAuthUserRequest toCreateOAuthUserRequest(CreateOAuthUserGrpcRequest request);
 
-    CreateOAuthUserResponse toCreateOAuthUserResponseDto(CreateOAuthUserResponseDto response);
+    CreateOAuthUserGrpcResponse toCreateOAuthUserGrpcResponse(CreateOAuthUserResponseDto response);
 
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "isVerified", source = "verified")
     @Mapping(target = "roleNamesList", ignore = true)
-    UserForAuthResponse toAuthResponse(User user);
+    UserForAuthGrpcResponse toAuthResponse(User user);
 
 
     @AfterMapping
-    default void afterMapping(@MappingTarget UserForAuthResponse.Builder builder, User user) {
+    default void afterMapping(@MappingTarget UserForAuthGrpcResponse.Builder builder, User user) {
         builder.addAllRoleNames(
                 user.getRoles().stream()
                         .map(Role::getName)
@@ -44,7 +44,7 @@ public interface UserMapper {
     }
 
     @AfterMapping
-    default void afterMappingOAuthUser(@MappingTarget CreateOAuthUserResponse.Builder builder, CreateOAuthUserResponseDto responseDto) {
+    default void afterMappingOAuthUser(@MappingTarget CreateOAuthUserGrpcResponse.Builder builder, CreateOAuthUserResponseDto responseDto) {
         builder.addAllRoleNames(responseDto.roleNames());
     }
 }

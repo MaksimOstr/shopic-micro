@@ -2,10 +2,12 @@ package com.authservice.services;
 
 import com.authservice.config.security.model.CustomUserDetails;
 import com.authservice.dto.TokenPairDto;
-import com.authservice.dto.request.BaseAuthRequest;
+import com.authservice.dto.request.LocalRegisterRequest;
+import com.authservice.dto.request.OAuthRegisterRequest;
 import com.authservice.dto.request.SignInRequestDto;
-import com.authservice.dto.response.RegisterResponseDto;
-import com.authservice.enums.AuthProviderEnum;
+import com.authservice.dto.response.LocalRegisterResponse;
+
+import com.authservice.dto.response.OAuthRegisterResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 import static com.authservice.utils.AuthUtils.mapUserRoles;
@@ -26,18 +27,17 @@ import static com.authservice.utils.AuthUtils.mapUserRoles;
 public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final List<AuthProvider> authProviders;
+    private final LocalAuthProvider localAuthProvider;
+    private final OAuthProvider oAuthProvider;
 
 
-    public RegisterResponseDto register(BaseAuthRequest dto, AuthProviderEnum providerEnum) throws JsonProcessingException {
-        AuthProvider provider = authProviders.stream()
-                .filter(p -> p.supports(providerEnum))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("no provider"));
-
-        return provider.register(dto);
+    public LocalRegisterResponse localRegister(LocalRegisterRequest dto) throws JsonProcessingException {
+        return localAuthProvider.register(dto);
     }
 
+    public OAuthRegisterResponse oAuthRegister(OAuthRegisterRequest dto) throws JsonProcessingException {
+        return oAuthProvider.register(dto);
+    }
 
     public TokenPairDto signIn(SignInRequestDto dto) {
         Authentication authReq = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());

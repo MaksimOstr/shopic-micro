@@ -16,10 +16,11 @@ public class KafkaEventProducer {
     private final ObjectMapper objectMapper;
 
 
-    public void sendUserCreatedEvent(String email, long userId) throws JsonProcessingException {
+    public void sendLocalUserCreatedEvent(String email, long userId) throws JsonProcessingException {
         UserCreatedEvent event = new UserCreatedEvent(email, userId);
         kafkaTemplate.send("user-created", objectMapper.writeValueAsString(event));
     }
+
 
     public void sendJwkSetInvalidationEvent() {
         log.info("Sending jwk-set-invalidation event");

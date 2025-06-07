@@ -92,7 +92,7 @@ databaseChangeLog:
                   name: phone_number
                   type: varchar(30)
                   constraints:
-                    nullable: false
+                    nullable: true
         - addForeignKeyConstraint:
             baseTableName: profiles
             baseColumnNames: user_id

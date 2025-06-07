@@ -1,13 +1,16 @@
 package com.authservice.mapper;
 
-import com.authservice.dto.response.RegisterResponseDto;
-import com.shopic.grpc.userservice.CreateLocalUserResponse;
+import com.authservice.dto.response.LocalRegisterResponse;
+import com.authservice.dto.response.OAuthRegisterResponse;
+import com.authservice.enums.AuthProviderEnum;
+import com.shopic.grpc.userservice.CreateLocalUserGrpcResponse;
+import com.shopic.grpc.userservice.CreateOAuthUserGrpcResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {TimeStampMapper.class})
 public interface AuthMapper {
 
-    @Mapping(target = "cratedAt", source = "createdAt")
-    RegisterResponseDto toRegisterResponseDto(CreateLocalUserResponse response);
+   LocalRegisterResponse toLocalRegisterResponse(CreateLocalUserGrpcResponse response, AuthProviderEnum authProvider);
+
+   OAuthRegisterResponse toOAuthRegisterResponse(CreateOAuthUserGrpcResponse responseDto, AuthProviderEnum authProvider);
 }

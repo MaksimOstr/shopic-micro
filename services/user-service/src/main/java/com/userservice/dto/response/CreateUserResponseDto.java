@@ -7,7 +7,5 @@ public record CreateUserResponseDto (
         String email,
         String firstName,
         String lastName,
-        String phoneNumber,
-        String avatar,
         Instant createdAt
 ) {}

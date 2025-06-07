@@ -3,7 +3,7 @@ package com.authservice.services;
 import com.authservice.config.security.model.CustomUserDetails;
 import com.authservice.exceptions.NotFoundException;
 import com.authservice.services.grpc.UserGrpcService;
-import com.shopic.grpc.userservice.UserForAuthResponse;
+import com.shopic.grpc.userservice.UserForAuthGrpcResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
             log.info("Loading user by email {}", email);
-            UserForAuthResponse response = userServiceGrpc.getUserForAuth(email);
+            UserForAuthGrpcResponse response = userServiceGrpc.getUserForAuth(email);
 
             return new CustomUserDetails(
                     response.getEmail(),

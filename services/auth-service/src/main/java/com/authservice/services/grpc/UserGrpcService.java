@@ -1,7 +1,7 @@
 package com.authservice.services.grpc;
 
-import com.authservice.dto.request.LocalRegistrationRequest;
-import com.authservice.dto.request.OAuthRegistrationRequest;
+import com.authservice.dto.request.LocalRegisterRequest;
+import com.authservice.dto.request.OAuthRegisterRequest;
 import com.authservice.exceptions.EntityAlreadyExistsException;
 import com.authservice.exceptions.NotFoundException;
 import com.shopic.grpc.userservice.*;
@@ -21,9 +21,9 @@ public class UserGrpcService {
     private final UserServiceGrpc.UserServiceBlockingStub userServiceGrpc;
     private final PasswordEncoder passwordEncoder;
 
-    public UserForAuthResponse getUserForAuth(String email) {
+    public UserForAuthGrpcResponse getUserForAuth(String email) {
         try {
-            UserForAuthRequest request = UserForAuthRequest.newBuilder().setEmail(email).build();
+            UserForAuthGrpcRequest request = UserForAuthGrpcRequest.newBuilder().setEmail(email).build();
             return userServiceGrpc.getUserForAuth(request);
         } catch (StatusRuntimeException e) {
             if(e.getStatus().getCode() == Status.Code.NOT_FOUND) {
@@ -33,15 +33,15 @@ public class UserGrpcService {
         }
     }
 
-    public CreateLocalUserResponse createLocalUser(LocalRegistrationRequest dto) {
-        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+    public CreateLocalUserGrpcResponse createLocalUser(LocalRegisterRequest dto) {
+        String encodedPassword = passwordEncoder.encode(dto.password());
         ProfileRequest profile = ProfileRequest.newBuilder()
-                .setLastName(dto.getLastName())
-                .setFirstName(dto.getFirstName())
+                .setLastName(dto.lastName())
+                .setFirstName(dto.firstName())
                 .build();
 
-        CreateLocalUserRequest request = CreateLocalUserRequest.newBuilder()
-                .setEmail(dto.getEmail())
+        CreateLocalUserGrpcRequest request = CreateLocalUserGrpcRequest.newBuilder()
+                .setEmail(dto.email())
                 .setPassword(encodedPassword)
                 .setProfile(profile)
                 .build();
@@ -56,15 +56,20 @@ public class UserGrpcService {
         }
     }
 
-    public CreateOAuthUserResponse createGoogleUser(OAuthRegistrationRequest dto) {
+
+    public CreateOAuthUserGrpcResponse createOAuthUser(OAuthRegisterRequest dto) {
         ProfileRequest profile = ProfileRequest.newBuilder()
-                .setLastName(dto.getLastName())
-                .setFirstName(dto.getFirstName())
+                .setLastName(dto.lastName())
+                .setFirstName(dto.firstName())
                 .build();
 
-        CreateOAuthUserRequest request = CreateOAuthUserRequest.newBuilder()
-                .setEmail(dto.getEmail())
-                .setProfile(profile);
+        CreateOAuthUserGrpcRequest request = CreateOAuthUserGrpcRequest.newBuilder()
+                .setEmail(dto.email())
+                .setProvider(dto.provider().name())
+                .setProfile(profile)
+                .build();
+
+        return userServiceGrpc.createOAuthUser(request);
     }
 
 
