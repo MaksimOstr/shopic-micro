@@ -1,13 +1,12 @@
 package com.authservice.dto.response;
 
 import com.authservice.enums.AuthProviderEnum;
-import lombok.Getter;
 
-import java.util.List;
+import java.util.Set;
 
 
 public record OAuthRegisterResponse(
         long userId,
         AuthProviderEnum authProvider,
-        List<String> roleNames
+        Set<String> roleNames
 ) {}

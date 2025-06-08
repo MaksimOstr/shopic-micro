@@ -1,6 +1,9 @@
 package com.authservice.config.security;
 
 import com.authservice.config.security.filter.AuthenticationFilter;
+import com.authservice.config.security.handler.OAuthSuccessHandler;
+import com.authservice.config.security.handler.OauthFailureHandler;
+import com.authservice.services.CustomOidcUserService;
 import com.authservice.services.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
 @EnableMethodSecurity
@@ -43,14 +47,25 @@ public class SecurityConfig {
             HttpSecurity http,
             DaoAuthenticationProvider daoAuthenticationProvider,
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
-            AuthenticationFilter authenticationFilter
+            AuthenticationFilter authenticationFilter,
+            CustomOidcUserService customOidcUserService,
+            OAuthSuccessHandler oAuthSuccessHandler,
+            OauthFailureHandler oauthFailureHandler
     ) throws Exception {
         return http
+
                 .authenticationProvider(daoAuthenticationProvider)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
+                .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll())
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .oidcUserService(customOidcUserService))
+                        .successHandler(oAuthSuccessHandler)
+                        .failureHandler(oauthFailureHandler)
+                )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .build();

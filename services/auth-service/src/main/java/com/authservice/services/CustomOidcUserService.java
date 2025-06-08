@@ -27,6 +27,7 @@ public class CustomOidcUserService extends OidcUserService {
     @Override
     @Transactional
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+        System.out.println("loadUser");
         OidcIdToken idToken = userRequest.getIdToken();
         String email = idToken.getEmail();
         String username = idToken.getClaimAsString("name");

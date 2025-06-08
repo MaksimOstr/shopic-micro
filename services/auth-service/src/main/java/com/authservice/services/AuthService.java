@@ -43,7 +43,6 @@ public class AuthService {
         Authentication authReq = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
         Authentication authenticatedUser = authenticationManager.authenticate(authReq);
         CustomUserDetails customUserDetails = (CustomUserDetails) authenticatedUser.getPrincipal();
-
         long userId = customUserDetails.getUserId();
         Set<String> roles = mapUserRoles(customUserDetails.getAuthorities());
 
