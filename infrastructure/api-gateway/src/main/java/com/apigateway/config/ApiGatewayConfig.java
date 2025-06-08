@@ -18,7 +18,7 @@ public class ApiGatewayConfig {
         return route("auth-service-route")
                 .path("/auth",  request -> request
                         .filter(lb("auth-service"))
-                        .GET("/login/oauth2/code/google", http())
+                        .GET("/auth/login/oauth2/code/google", http())
                         .GET("/oauth2/authorization/google", http())
                         .POST("/register", http())
                         .POST("/refresh", http())

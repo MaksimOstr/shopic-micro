@@ -78,7 +78,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 "/auth/refresh",
                 "/public-keys",
                 "/auth/oauth2/authorization/google",
-                "/login/oauth2/code/google",
+                "/auth/login/oauth2/code/google",
                 "/favicon.ico"
         );
         System.out.println(request.getRequestURI() + "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd");
