@@ -1,6 +1,7 @@
 package com.productservice.repository;
 
 import com.productservice.entity.Product;
+import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductImageUrlProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +30,16 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     Optional<Product> findBySku(UUID sku);
 
-    @EntityGraph(attributePaths = {"category", "brand"})
-    Page<Product> findAll(Pageable pageable);
+    @Query("SELECT new com.productservice.projection.ProductDto(" +
+            "p.id," +
+            " p.name," +
+            " p.description," +
+            " p.sku," +
+            " p.price," +
+            " p.brand.name," +
+            " p.category.name," +
+            " p.stockQuantity) FROM Product p")
+    Page<ProductDto> getPageOfProducts(Pageable pageable);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

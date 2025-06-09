@@ -17,7 +17,6 @@ public class GRpcCodeService extends CodeServiceGrpc.CodeServiceImplBase {
     private final CodeValidationService codeValidationService;
 
     @Override
-    @Transactional
     public void getCode(CreateCodeRequest request, StreamObserver<CreateCodeResponse> responseObserver) {
         log.info("CreateCode method was called: {}, {}", request.getUserId(), request.getScope());
 
@@ -32,7 +31,7 @@ public class GRpcCodeService extends CodeServiceGrpc.CodeServiceImplBase {
         responseObserver.onCompleted();
     }
 
-
+    @Override
     public void validateCode(ValidateCodeRequest request, StreamObserver<ValidateCodeResponse> responseObserver) {
         CodeScopeEnum scope = CodeScopeEnum.valueOf(request.getScope().name());
         long userId = codeValidationService.validate(request.getCode(), scope);

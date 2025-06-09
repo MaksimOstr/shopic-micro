@@ -1,10 +1,12 @@
 package com.productservice.controller;
 
 
+import com.productservice.config.security.model.CustomPrincipal;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.GetProductsByFilters;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
+import com.productservice.projection.ProductDto;
 import com.productservice.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +17,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,6 +41,19 @@ public class ProductController {
     ) {
         return productService.create(body, imageFile)
                 .thenApply(product -> ResponseEntity.status(HttpStatus.CREATED).body(product));
+    }
+
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteProduct(
+            @PathVariable long id
+    ) {
+        productService.deleteProductById(id);
+
+        String message = "Product with id " + id + " has been deleted";
+
+        return ResponseEntity.ok(message);
     }
 
 
@@ -70,10 +88,11 @@ public class ProductController {
     public ResponseEntity<Page<Product>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestBody GetProductsByFilters body
-            ) {
+            @RequestBody GetProductsByFilters body,
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Product> products = productService.findProductsByFilters(body, pageable);
+        Page<Product> products = productService.findProductsByFilters(body, pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }
@@ -92,14 +111,15 @@ public class ProductController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Product>> getPageOfProducts(
+    public ResponseEntity<List<ProductDto>> getPageOfProducts(
+            @AuthenticationPrincipal CustomPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Product> pageOfProducts = productService.getPageOfProducts(pageable);
+        List<ProductDto> products = productService.getPageOfProducts(pageable, principal.getId());
 
-        return ResponseEntity.ok(pageOfProducts);
+        return ResponseEntity.ok(products);
     }
 
 

@@ -8,6 +8,7 @@ import com.productservice.entity.Brand;
 import com.productservice.entity.Category;
 import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
+import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductImageUrlProjection;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,6 +37,7 @@ public class ProductService {
     private final S3Service s3Service;
     private final CategoryService categoryService;
     private final BrandService brandService;
+    private final LikeService likeService;
 
     private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
     private static final String PRODUCT_NOT_FOUND = "Product Not Found";
@@ -87,7 +91,7 @@ public class ProductService {
         return product;
     }
 
-    public Page<Product> findProductsByFilters(GetProductsByFilters dto, Pageable pageable) {
+    public Page<Product> findProductsByFilters(GetProductsByFilters dto, Pageable pageable, long userId) {
         Specification<Product> specification = iLike("name", dto.name())
                 .and(lte("price", dto.toPrice()))
                 .and(gte("price", dto.fromPrice()))
@@ -96,6 +100,7 @@ public class ProductService {
 
         return productRepository.findAll(specification, pageable);
     }
+
 
     public Product getProductBySku(UUID sku) {
         return productRepository.findBySku(sku)
@@ -117,8 +122,21 @@ public class ProductService {
                 });
     }
 
-    public Page<Product> getPageOfProducts(Pageable pageable) {
-        return productRepository.findAll(pageable);
+
+    public List<ProductDto> getPageOfProducts(Pageable pageable, long userId) {
+        List<ProductDto> products = productRepository.getPageOfProducts(pageable).getContent();
+
+        markLikedProducts(products, userId);
+
+        return products;
+    }
+
+
+    public void deleteProductById(long productId) {
+        Product product = getProductById(productId);
+
+        s3Service.delete(product.getImageUrl());
+        productRepository.delete(product);
     }
 
     private String getProductImageUrl(long productId) {
@@ -141,5 +159,13 @@ public class ProductService {
 
     private UUID getSKU() {
         return UUID.randomUUID();
+    }
+
+    private void markLikedProducts(List<ProductDto> products, long userId) {
+        Set<Long> likesIds = likeService.getLikes(userId);
+
+        for(ProductDto product : products) {
+            product.setLiked(likesIds.contains(product.getProductId()));
+        }
     }
 }

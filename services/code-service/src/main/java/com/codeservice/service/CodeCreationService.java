@@ -7,6 +7,7 @@ import com.shopic.grpc.codeservice.CreateCodeRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -20,7 +21,7 @@ public class CodeCreationService {
     @Value("${CODE_EXPIRATION:900}")
     private int expiresIn;
 
-
+    @Transactional
     public Code getCode(long userId, CodeScopeEnum scope) {
         return codeRepository.findByScopeAndUserId(scope, userId)
                 .map(code -> {

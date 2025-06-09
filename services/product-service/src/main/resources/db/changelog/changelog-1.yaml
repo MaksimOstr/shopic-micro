@@ -18,6 +18,11 @@ databaseChangeLog:
             startValue: 1
             cacheSize: 50
             incrementBy: 50
+        - createSequence:
+            sequenceName: likes_seq
+            startValue: 1
+            cacheSize: 50
+            incrementBy: 50
 
         - createTable:
             tableName: products
@@ -96,6 +101,37 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: true
+
+        - createTable:
+            tableName: likes
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: likes_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    deleteCascade: true
+        - addUniqueConstraint:
+            tableName: likes
+            columnNames: user_id, product_id
+        - addForeignKeyConstraint:
+            baseTableName: likes
+            baseColumnNames: product_id
+            constraintName: fk_likes_product_id
+            referencedTableName: products
+            referencedColumnNames: id
 
         - createTable:
             tableName: categories

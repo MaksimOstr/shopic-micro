@@ -43,6 +43,9 @@ public class ApiGatewayConfig {
     public RouterFunction<ServerResponse> productRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("product-service-route")
                 .filter(lb("product-service"))
+                .path("/likes", request -> request
+                        .filter(jwtHandlerFilter)
+                        .POST("", http()))
                 .path("/products",  request -> request
                         .filter(jwtHandlerFilter)
                         .POST("", http())

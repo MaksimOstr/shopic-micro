@@ -3,7 +3,7 @@ package com.codeservice.service;
 import com.codeservice.entity.Code;
 import com.codeservice.enums.CodeScopeEnum;
 import com.codeservice.exception.CodeValidationException;
-import com.codeservice.exception.EntityDoesNotExistException;
+import com.codeservice.exception.NotFoundException;
 import com.codeservice.repository.CodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class CodeValidationService {
                     deleteCode(code);
                     return foundCode.getUserId();
                 })
-                .orElseThrow(() -> new EntityDoesNotExistException(CODE_VALIDATION_FAILED));
+                .orElseThrow(() -> new NotFoundException(CODE_VALIDATION_FAILED));
     }
 
     private void deleteCode(String code) {
