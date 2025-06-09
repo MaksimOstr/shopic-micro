@@ -1,12 +1,11 @@
-package com.authservice.services;
+package com.authservice.services.impl;
 
 import com.authservice.dto.request.OAuthRegisterRequest;
 import com.authservice.dto.response.OAuthRegisterResponse;
 import com.authservice.enums.AuthProviderEnum;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 public interface OAuthProvider {
-    OAuthRegisterResponse register(OAuthRegisterRequest request);
+    OAuthRegisterResponse handleOAuth(OAuthRegisterRequest request);
 
     boolean supports(AuthProviderEnum provider);
 }

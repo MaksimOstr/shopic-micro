@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
-import static com.userservice.utils.UserUtils.toUserRolesToRoleNames;
+import static com.userservice.utils.UserUtils.userRolesToRoleNames;
 
 
 @Slf4j
@@ -30,13 +30,11 @@ public class UserService {
     private final ProfileService profileService;
     private final RoleService roleService;
     private final UserMapper userMapper;
-
-
     private static final String USER_ALREADY_EXISTS = "User with such an email already exists";
 
 
     public CreateUserResponseDto createLocalUser(CreateLocalUserRequest dto) {
-        if(isUserExist(dto.email())) {
+        if (isUserExist(dto.email())) {
             log.error(USER_ALREADY_EXISTS);
             throw new EntityAlreadyExistsException(USER_ALREADY_EXISTS);
         }
@@ -49,15 +47,21 @@ public class UserService {
         );
 
         User savedUser = userRepository.save(user);
-        Profile profile = profileService.createProfile(dto.profile() , savedUser);
+        Profile profile = profileService.createProfile(dto.profile(), savedUser);
 
         return userMapper.toCreateUserResponseDto(savedUser, profile);
     }
 
     @Transactional
     public CreateOAuthUserResponseDto createOAuthUser(CreateOAuthUserRequest dto) {
+        System.out.println(dto.email());
         return userRepository.findByEmail(dto.email())
-                .map(user -> new CreateOAuthUserResponseDto(user.getId(), user.getEmail(), toUserRolesToRoleNames(user.getRoles())))
+                .map(user -> new CreateOAuthUserResponseDto(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getAuthProvider(),
+                        userRolesToRoleNames(user.getRoles())
+                ))
                 .orElseGet(() -> {
                     Role defaultRole = roleService.getDefaultUserRole();
                     User user = new User(
@@ -65,12 +69,11 @@ public class UserService {
                             AuthProviderEnum.fromString(dto.provider()),
                             Set.of(defaultRole)
                     );
-
-                    profileService.createProfile(dto.profile() , user);
-
                     User savedUser = userRepository.save(user);
 
-                    return new CreateOAuthUserResponseDto(savedUser.getId(), savedUser.getEmail(), toUserRolesToRoleNames(savedUser.getRoles()));
+                    profileService.createProfile(dto.profile(), savedUser);
+
+                    return new CreateOAuthUserResponseDto(savedUser.getId(), savedUser.getEmail(), savedUser.getAuthProvider(), userRolesToRoleNames(savedUser.getRoles()));
                 });
     }
 

@@ -1,4 +1,4 @@
-package com.authservice.services;
+package com.authservice.services.impl;
 
 import com.authservice.dto.request.LocalRegisterRequest;
 import com.authservice.dto.response.LocalRegisterResponse;

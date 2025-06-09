@@ -8,6 +8,8 @@ import com.authservice.dto.request.SignInRequestDto;
 import com.authservice.dto.response.LocalRegisterResponse;
 
 import com.authservice.dto.response.OAuthRegisterResponse;
+import com.authservice.services.impl.LocalAuthProvider;
+import com.authservice.services.impl.OAuthProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,7 @@ public class AuthService {
     }
 
     public OAuthRegisterResponse oAuthRegister(OAuthRegisterRequest dto) throws JsonProcessingException {
-        return oAuthProvider.register(dto);
+        return oAuthProvider.handleOAuth(dto);
     }
 
     public TokenPairDto signIn(SignInRequestDto dto) {

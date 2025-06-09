@@ -2,7 +2,6 @@ package com.authservice.config.security.handler;
 
 import com.authservice.dto.response.ErrorResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class UserUtils {
-    public static List<String> toUserRolesToRoleNames(Set<Role> userRoles) {
+    public static List<String> userRolesToRoleNames(Set<Role> userRoles) {
         return userRoles.stream().map(Role::getName).collect(Collectors.toList());
     }
 }

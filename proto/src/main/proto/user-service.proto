@@ -49,6 +49,7 @@ message UserForAuthGrpcResponse {
   repeated string role_names = 4;
   bool is_verified = 5;
   bool is_account_non_locked = 6;
+  string provider = 7;
 }
 
 message UserRolesRequest {

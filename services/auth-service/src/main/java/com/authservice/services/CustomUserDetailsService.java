@@ -24,6 +24,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             log.info("Loading user by email {}", email);
             UserForAuthGrpcResponse response = userServiceGrpc.getUserForAuth(email);
 
+
+
             return new CustomUserDetails(
                     response.getEmail(),
                     response.getPassword(),

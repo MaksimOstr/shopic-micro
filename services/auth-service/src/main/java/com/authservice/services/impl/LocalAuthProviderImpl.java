@@ -5,7 +5,6 @@ import com.authservice.dto.response.LocalRegisterResponse;
 import com.authservice.enums.AuthProviderEnum;
 import com.authservice.mapper.AuthMapper;
 import com.authservice.services.KafkaEventProducer;
-import com.authservice.services.LocalAuthProvider;
 import com.authservice.services.grpc.UserGrpcService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shopic.grpc.userservice.CreateLocalUserGrpcResponse;

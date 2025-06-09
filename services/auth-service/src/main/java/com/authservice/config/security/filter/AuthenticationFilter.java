@@ -81,7 +81,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 "/auth/login/oauth2/code/google",
                 "/favicon.ico"
         );
-        System.out.println(request.getRequestURI() + "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd");
 
         return whiteList.contains(request.getRequestURI());
     }

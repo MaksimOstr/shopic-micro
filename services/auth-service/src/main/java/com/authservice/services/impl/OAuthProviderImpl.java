@@ -4,7 +4,6 @@ import com.authservice.dto.request.OAuthRegisterRequest;
 import com.authservice.dto.response.OAuthRegisterResponse;
 import com.authservice.enums.AuthProviderEnum;
 import com.authservice.mapper.AuthMapper;
-import com.authservice.services.OAuthProvider;
 import com.authservice.services.grpc.UserGrpcService;
 import com.shopic.grpc.userservice.CreateOAuthUserGrpcResponse;
 
@@ -21,10 +20,9 @@ public class OAuthProviderImpl implements OAuthProvider {
     private final AuthMapper authMapper;
 
 
-    public OAuthRegisterResponse register(OAuthRegisterRequest dto) {
+    public OAuthRegisterResponse handleOAuth(OAuthRegisterRequest dto) {
         CreateOAuthUserGrpcResponse response = userGrpcService.createOAuthUser(dto);
-
-        return authMapper.toOAuthRegisterResponse(response, AuthProviderEnum.GOOGLE);
+        return authMapper.toOAuthRegisterResponse(response, AuthProviderEnum.fromString(response.getProvider()));
     };
 
    public boolean supports(AuthProviderEnum provider) {

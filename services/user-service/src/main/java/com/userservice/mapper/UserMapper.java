@@ -13,6 +13,8 @@ import org.mapstruct.*;
 
 import java.util.stream.Collectors;
 
+import static com.userservice.utils.UserUtils.userRolesToRoleNames;
+
 @Mapper(componentModel = "spring", uses = {InstantMapper.class})
 public interface UserMapper {
     CreateProfileDto toCreateProfileDto(ProfileRequest profile);
@@ -36,11 +38,7 @@ public interface UserMapper {
 
     @AfterMapping
     default void afterMapping(@MappingTarget UserForAuthGrpcResponse.Builder builder, User user) {
-        builder.addAllRoleNames(
-                user.getRoles().stream()
-                        .map(Role::getName)
-                        .collect(Collectors.toList())
-        );
+        builder.addAllRoleNames(userRolesToRoleNames(user.getRoles()));
     }
 
     @AfterMapping
