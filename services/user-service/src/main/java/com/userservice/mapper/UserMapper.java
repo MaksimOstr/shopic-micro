@@ -4,31 +4,29 @@ import com.shopic.grpc.userservice.*;
 import com.userservice.dto.CreateProfileDto;
 import com.userservice.dto.request.CreateLocalUserRequest;
 import com.userservice.dto.request.CreateOAuthUserRequest;
-import com.userservice.dto.response.CreateOAuthUserResponseDto;
-import com.userservice.dto.response.CreateUserResponseDto;
+import com.userservice.dto.response.CreateOAuthUserResponse;
+import com.userservice.dto.response.CreateLocalUserResponse;
 import com.userservice.entity.Profile;
-import com.userservice.entity.Role;
 import com.userservice.entity.User;
 import org.mapstruct.*;
 
-import java.util.stream.Collectors;
-
 import static com.userservice.utils.UserUtils.userRolesToRoleNames;
+
 
 @Mapper(componentModel = "spring", uses = {InstantMapper.class})
 public interface UserMapper {
     CreateProfileDto toCreateProfileDto(ProfileRequest profile);
 
     @Mapping(target = "userId", source = "user.id")
-    CreateUserResponseDto toCreateUserResponseDto(User user, Profile profile);
+    CreateLocalUserResponse toCreateUserResponseDto(User user, Profile profile);
 
     CreateLocalUserRequest toCreateLocalUserRequest(CreateLocalUserGrpcRequest request);
 
-    CreateLocalUserGrpcResponse toCreateUserGrpcResponse(CreateUserResponseDto responseDto);
+    CreateLocalUserGrpcResponse toCreateUserGrpcResponse(CreateLocalUserResponse responseDto);
 
     CreateOAuthUserRequest toCreateOAuthUserRequest(CreateOAuthUserGrpcRequest request);
 
-    CreateOAuthUserGrpcResponse toCreateOAuthUserGrpcResponse(CreateOAuthUserResponseDto response);
+    CreateOAuthUserGrpcResponse toCreateOAuthUserGrpcResponse(CreateOAuthUserResponse response);
 
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "isVerified", source = "verified")
@@ -42,7 +40,7 @@ public interface UserMapper {
     }
 
     @AfterMapping
-    default void afterMappingOAuthUser(@MappingTarget CreateOAuthUserGrpcResponse.Builder builder, CreateOAuthUserResponseDto responseDto) {
+    default void afterMappingOAuthUser(@MappingTarget CreateOAuthUserGrpcResponse.Builder builder, CreateOAuthUserResponse responseDto) {
         builder.addAllRoleNames(responseDto.roleNames());
     }
 }

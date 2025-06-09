@@ -28,7 +28,7 @@ import java.util.Base64;
 @Component
 @RequiredArgsConstructor
 public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, ServerResponse> {
-    private final static String JWT_SET_URL = "http://localhost:6000/public-keys";
+    private final static String JWT_SET_URL = "http://auth-service/public-keys";
     private static final ErrorResponseDto invalidJwtResponse = new ErrorResponseDto(
             HttpStatus.UNAUTHORIZED.getReasonPhrase(),
             HttpStatus.UNAUTHORIZED.value(),

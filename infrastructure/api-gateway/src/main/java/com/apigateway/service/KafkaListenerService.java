@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class KafkaListenerService {
-    private final JwtValidationService jwtValidationService;
+    private final JwkService jwkService;
 
     @KafkaListener(topics = "jwk-set-invalidation", groupId = "api-gateway")
     public void invalidateJwkSetCache(Acknowledgment acknowledgment) {
         log.info("Received jwk-set-invalidation event");
-        jwtValidationService.evictJwkSetsCache();
+        jwkService.evictJwkSetsCache();
 
         acknowledgment.acknowledge();
     }

@@ -16,10 +16,10 @@ public class ApiGatewayConfig {
     @Bean
     public RouterFunction<ServerResponse> authRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("auth-service-route")
+                .filter(lb("auth-service"))
                 .path("/auth",  request -> request
-                        .filter(lb("auth-service"))
-                        .GET("/login/oauth2/code/google", http())
-                        .GET("/oauth2/authorization/google", http())
+                        .GET("/login/oauth2/code/*", http())
+                        .GET("/oauth2/authorization/*", http())
                         .POST("/register", http())
                         .POST("/refresh", http())
                         .POST("/sign-in", http()))
@@ -32,8 +32,8 @@ public class ApiGatewayConfig {
     @Bean
     public RouterFunction<ServerResponse> userRoute() {
         return route("user-service-route")
+                .filter(lb("user-service"))
                 .path("/users",  request -> request
-                        .filter(lb("user-service"))
                         .POST("/request-email-verify", http())
                         .PATCH("/verify", http()))
                 .build();
@@ -42,9 +42,9 @@ public class ApiGatewayConfig {
     @Bean
     public RouterFunction<ServerResponse> productRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("product-service-route")
+                .filter(lb("product-service"))
                 .path("/products",  request -> request
                         .filter(jwtHandlerFilter)
-                        .filter(lb("product-service"))
                         .POST("", http())
                         .GET("/{id}", http())
                         .GET("", http())

@@ -3,11 +3,13 @@ package com.userservice.services.grpc;
 import com.shopic.grpc.userservice.*;
 import com.userservice.dto.request.CreateLocalUserRequest;
 import com.userservice.dto.request.CreateOAuthUserRequest;
-import com.userservice.dto.response.CreateOAuthUserResponseDto;
-import com.userservice.dto.response.CreateUserResponseDto;
+import com.userservice.dto.response.CreateOAuthUserResponse;
+import com.userservice.dto.response.CreateLocalUserResponse;
 import com.userservice.entity.User;
 import com.userservice.mapper.UserMapper;
-import com.userservice.services.UserService;
+import com.userservice.services.LocalUserService;
+import com.userservice.services.OAuthUserService;
+import com.userservice.services.QueryUserService;
 import io.grpc.stub.StreamObserver;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,9 @@ import java.util.Set;
 public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
 
     private final UserMapper userMapper;
-    private final UserService userService;
+    private final QueryUserService queryUserService;
+    private final OAuthUserService oAuthUserService;
+    private final LocalUserService localUserService;
 
 
     @Override
@@ -32,7 +36,7 @@ public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
         log.info("Auth service received request to create local user: {}", request.toString());
 
         CreateLocalUserRequest body = userMapper.toCreateLocalUserRequest(request);
-        CreateUserResponseDto response = userService.createLocalUser(body);
+        CreateLocalUserResponse response = localUserService.createLocalUser(body);
         CreateLocalUserGrpcResponse dto = userMapper.toCreateUserGrpcResponse(response);
 
         log.info("Auth service created local user: {}", dto.toString());
@@ -46,7 +50,7 @@ public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
         log.info("Auth service received request to create oauth user: {}", request.toString());
 
         CreateOAuthUserRequest body = userMapper.toCreateOAuthUserRequest(request);
-        CreateOAuthUserResponseDto response = userService.createOAuthUser(body);
+        CreateOAuthUserResponse response = oAuthUserService.createOrGetOAuthUser(body);
         CreateOAuthUserGrpcResponse dto = userMapper.toCreateOAuthUserGrpcResponse(response);
 
         responseObserver.onNext(dto);
@@ -58,7 +62,7 @@ public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
     public void getUserForAuth(UserForAuthGrpcRequest request, StreamObserver<UserForAuthGrpcResponse> responseObserver) {
         log.info("Auth service received request to get user for auth: {}", request.toString());
 
-        User user = userService.getUserForAuth(request.getEmail());
+        User user = queryUserService.getUserForAuth(request.getEmail());
 
         UserForAuthGrpcResponse response = userMapper.toAuthResponse(user);
 
@@ -73,7 +77,7 @@ public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
     public void getUserRoles(UserRolesRequest request, StreamObserver<UserRolesResponse> responseObserver) {
         log.info("Auth service received request to get user roles: {}", request.toString());
 
-        Set<String> roleNames = userService.getUserRoleNames(request.getUserId());
+        Set<String> roleNames = queryUserService.getUserRoleNames(request.getUserId());
 
         UserRolesResponse response = UserRolesResponse.newBuilder()
                 .addAllRoleNames(roleNames)

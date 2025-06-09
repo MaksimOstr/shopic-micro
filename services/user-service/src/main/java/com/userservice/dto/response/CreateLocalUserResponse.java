@@ -2,7 +2,7 @@ package com.userservice.dto.response;
 
 import java.time.Instant;
 
-public record CreateUserResponseDto (
+public record CreateLocalUserResponse (
         long userId,
         String email,
         String firstName,

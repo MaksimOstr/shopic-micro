@@ -6,7 +6,6 @@ import com.authservice.dto.request.LocalRegisterRequest;
 import com.authservice.dto.request.OAuthRegisterRequest;
 import com.authservice.dto.request.SignInRequestDto;
 import com.authservice.dto.response.LocalRegisterResponse;
-
 import com.authservice.dto.response.OAuthRegisterResponse;
 import com.authservice.services.impl.LocalAuthProvider;
 import com.authservice.services.impl.OAuthProvider;
@@ -50,7 +49,6 @@ public class AuthService {
 
         return tokenService.getTokenPair(userId, roles, dto.deviceId());
     }
-
 
     public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
         return tokenService.refreshTokens(refreshToken, deviceId);
