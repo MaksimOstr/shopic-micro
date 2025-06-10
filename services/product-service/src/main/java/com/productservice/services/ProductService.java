@@ -8,23 +8,24 @@ import com.productservice.entity.Brand;
 import com.productservice.entity.Category;
 import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
+import com.productservice.mapper.ProductMapper;
 import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductImageUrlProjection;
+import com.productservice.projection.ProductProjection;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.productservice.utils.SpecificationUtils.*;
 
@@ -38,6 +39,7 @@ public class ProductService {
     private final CategoryService categoryService;
     private final BrandService brandService;
     private final LikeService likeService;
+    private final ProductMapper productMapper;
 
     private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
     private static final String PRODUCT_NOT_FOUND = "Product Not Found";
@@ -91,14 +93,25 @@ public class ProductService {
         return product;
     }
 
-    public Page<Product> findProductsByFilters(GetProductsByFilters dto, Pageable pageable, long userId) {
-        Specification<Product> specification = iLike("name", dto.name())
+    public Page<ProductDto> findProductsByFilters(GetProductsByFilters dto, Pageable pageable, long userId) {
+        Specification<Product> spec = iLike("name", dto.name())
                 .and(lte("price", dto.toPrice()))
                 .and(gte("price", dto.fromPrice()))
                 .and(hasChild("category", dto.categoryId()))
                 .and(hasChild("brand", dto.brandId()));
 
-        return productRepository.findAll(specification, pageable);
+        List<Product> products = productRepository.findAll(spec, pageable).getContent();
+        List<ProductDto> productDto = products.stream().map(productMapper::productToProductDto).toList();
+
+        markLikedProducts(productDto, userId);
+
+        return new PageImpl<>(productDto, pageable, pageable.getPageSize());
+    }
+
+    public List<ProductDto> getLikedProducts(long userId) {
+        Set<Long> likedProducts = likeService.getLikedProductIds(userId);
+
+        return productRepository.findProductsByIds(likedProducts);
     }
 
 
@@ -123,12 +136,12 @@ public class ProductService {
     }
 
 
-    public List<ProductDto> getPageOfProducts(Pageable pageable, long userId) {
+    public Page<ProductDto> getPageOfProducts(Pageable pageable, long userId) {
         List<ProductDto> products = productRepository.getPageOfProducts(pageable).getContent();
 
         markLikedProducts(products, userId);
 
-        return products;
+        return new PageImpl<>(products, pageable, pageable.getPageSize());
     }
 
 
@@ -139,11 +152,13 @@ public class ProductService {
         productRepository.delete(product);
     }
 
+
     private String getProductImageUrl(long productId) {
         return productRepository.getProductImageUrl(productId)
                 .map(ProductImageUrlProjection::getImageUrl)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
+
 
     private CompletableFuture<String> postProductPhoto(MultipartFile productImage) {
         return s3Service.uploadFile(new PutObjectDto(
@@ -162,10 +177,10 @@ public class ProductService {
     }
 
     private void markLikedProducts(List<ProductDto> products, long userId) {
-        Set<Long> likesIds = likeService.getLikes(userId);
+        Set<Long> likesIds = likeService.getLikedProductIds(userId);
 
-        for(ProductDto product : products) {
-            product.setLiked(likesIds.contains(product.getProductId()));
+        for (ProductDto product : products) {
+            product.setLiked(likesIds.contains(product.getId()));
         }
     }
 }

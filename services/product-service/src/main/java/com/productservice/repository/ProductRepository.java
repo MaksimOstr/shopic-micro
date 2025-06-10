@@ -7,12 +7,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
@@ -31,15 +35,34 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     Optional<Product> findBySku(UUID sku);
 
     @Query("SELECT new com.productservice.projection.ProductDto(" +
-            "p.id," +
-            " p.name," +
-            " p.description," +
-            " p.sku," +
-            " p.price," +
-            " p.brand.name," +
-            " p.category.name," +
-            " p.stockQuantity) FROM Product p")
+            "p.id, " +
+            "p.name, " +
+            "p.description, " +
+            "p.imageUrl,"+
+            "p.sku," +
+            "p.price, " +
+            "b.name, " +
+            "c.name, " +
+            "p.stockQuantity) " +
+            "FROM Product p " +
+            "JOIN p.brand b " +
+            "JOIN p.category c")
     Page<ProductDto> getPageOfProducts(Pageable pageable);
+
+    @Query("SELECT new com.productservice.projection.ProductDto(" +
+            "p.id, " +
+            "p.name, " +
+            "p.description, " +
+            "p.imageUrl,"+
+            "p.sku," +
+            "p.price, " +
+            "b.name, " +
+            "c.name, " +
+            "p.stockQuantity) " +
+            "FROM Product p " +
+            "JOIN p.brand b " +
+            "JOIN p.category c WHERE p.id IN :productIds")
+    List<ProductDto> findProductsByIds(@Param("productIds") Set<Long> productIds);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

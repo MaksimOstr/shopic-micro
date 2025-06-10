@@ -41,7 +41,8 @@ public class LikeService {
         }
     }
 
-    public Set<Long> getLikes(long userId) {
+
+    public Set<Long> getLikedProductIds(long userId) {
         return likeRepository.findLikedProductIds(userId);
     }
 

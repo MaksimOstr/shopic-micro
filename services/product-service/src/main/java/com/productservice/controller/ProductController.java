@@ -85,14 +85,24 @@ public class ProductController {
 
     @GetMapping("/filter")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Product>> getPageOfProductsByFilter(
+    public ResponseEntity<Page<ProductDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestBody GetProductsByFilters body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Product> products = productService.findProductsByFilters(body, pageable, principal.getId());
+        Page<ProductDto> products = productService.findProductsByFilters(body, pageable, principal.getId());
+
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/liked")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<ProductDto>> getLikedProducts(
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        List<ProductDto> products = productService.getLikedProducts(principal.getId());
 
         return ResponseEntity.ok(products);
     }
@@ -111,13 +121,13 @@ public class ProductController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<ProductDto>> getPageOfProducts(
+    public ResponseEntity<Page<ProductDto>> getPageOfProducts(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        List<ProductDto> products = productService.getPageOfProducts(pageable, principal.getId());
+        Page<ProductDto> products = productService.getPageOfProducts(pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }

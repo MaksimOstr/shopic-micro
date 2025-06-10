@@ -14,6 +14,7 @@ import java.util.Set;
 
 import static com.userservice.utils.UserUtils.userRolesToRoleNames;
 
+
 @Service
 @RequiredArgsConstructor
 public class OAuthUserService {
