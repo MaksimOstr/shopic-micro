@@ -1,9 +1,7 @@
 package com.userservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -15,6 +13,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
@@ -53,11 +53,5 @@ public class User {
         this.password = password;
         this.roles = roles;
         authProvider = AuthProviderEnum.LOCAL;
-    }
-
-    public User(String email, AuthProviderEnum providerEnum, Set<Role> roles) {
-        this.email = email;
-        this.roles = roles;
-        authProvider = providerEnum;
     }
 }

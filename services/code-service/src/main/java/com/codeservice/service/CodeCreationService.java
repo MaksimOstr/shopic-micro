@@ -36,13 +36,12 @@ public class CodeCreationService {
 
     private Code createCode(long userId, CodeScopeEnum scope) {
         String generatedCode = codeGeneratorService.generateAlphanumericCode();
-
-        Code code = new Code(
-                generatedCode,
-                getExpirationTime(),
-                scope,
-                userId
-        );
+        Code code = Code.builder()
+                .code(generatedCode)
+                .expiresAt(getExpirationTime())
+                .scope(scope)
+                .userId(userId)
+                .build();
 
         return codeRepository.save(code);
     }

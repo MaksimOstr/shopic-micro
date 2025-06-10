@@ -55,16 +55,17 @@ public class ProductService {
         Brand brand = brandService.getBrandById(dto.brandId());
 
         return postProductPhoto(productImage).thenApply(url -> {
-            Product product = new Product(
-                    dto.name(),
-                    dto.description(),
-                    getSKU(),
-                    dto.price(),
-                    url,
-                    category,
-                    dto.stockQuantity(),
-                    brand
-            );
+            Product product = Product.builder()
+                    .name(dto.name())
+                    .description(dto.description())
+                    .sku(getSKU())
+                    .price(dto.price())
+                    .imageUrl(url)
+                    .category(category)
+                    .stockQuantity(dto.stockQuantity())
+                    .brand(brand)
+                    .build();
+
 
             return productRepository.save(product);
         });

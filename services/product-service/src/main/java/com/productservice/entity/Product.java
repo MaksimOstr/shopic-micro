@@ -1,9 +1,7 @@
 package com.productservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -16,6 +14,8 @@ import java.util.UUID;
 @Table(name = "products")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Product {
@@ -48,16 +48,4 @@ public class Product {
 
     @Column(name = "stock_quantity", nullable = false)
     private int stockQuantity;
-
-
-    public Product(String name, String description, UUID sku, BigDecimal price, String imageUrl, Category category, int stockQuantity, Brand brand) {
-        this.name = name;
-        this.description = description;
-        this.sku = sku;
-        this.price = price;
-        this.imageUrl = imageUrl;
-        this.category = category;
-        this.stockQuantity = stockQuantity;
-        this.brand = brand;
-    }
 }

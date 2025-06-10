@@ -32,11 +32,12 @@ public class OAuthUserService {
 
     private CreateOAuthUserResponse createOAuthUser(CreateOAuthUserRequest dto) {
         Role defaultRole = roleService.getDefaultUserRole();
-        User user = new User(
-                dto.email(),
-                AuthProviderEnum.fromString(dto.provider()),
-                Set.of(defaultRole)
-        );
+        AuthProviderEnum provider = AuthProviderEnum.fromString(dto.provider());
+        User user = User.builder()
+                .email(dto.email())
+                .authProvider(provider)
+                .roles(Set.of(defaultRole))
+                .build();
         User savedUser = userRepository.save(user);
 
         profileService.createProfile(dto.profile(), savedUser);

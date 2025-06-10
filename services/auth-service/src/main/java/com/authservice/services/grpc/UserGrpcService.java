@@ -19,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserGrpcService {
     private final UserServiceGrpc.UserServiceBlockingStub userServiceGrpc;
-    private final PasswordEncoder passwordEncoder;
 
     public UserForAuthGrpcResponse getUserForAuth(String email) {
         try {
@@ -34,7 +33,6 @@ public class UserGrpcService {
     }
 
     public CreateLocalUserGrpcResponse createLocalUser(LocalRegisterRequest dto) {
-        String encodedPassword = passwordEncoder.encode(dto.password());
         ProfileRequest profile = ProfileRequest.newBuilder()
                 .setLastName(dto.lastName())
                 .setFirstName(dto.firstName())
@@ -42,7 +40,7 @@ public class UserGrpcService {
 
         CreateLocalUserGrpcRequest request = CreateLocalUserGrpcRequest.newBuilder()
                 .setEmail(dto.email())
-                .setPassword(encodedPassword)
+                .setPassword(dto.password())
                 .setProfile(profile)
                 .build();
 
