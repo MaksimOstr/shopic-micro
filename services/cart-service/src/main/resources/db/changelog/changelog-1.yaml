@@ -1,2 +1,77 @@
 databaseChangeLog:
-  - 
+  - changeSet:
+      id: 1
+      author: Maksim Ostroginskiy
+      changes:
+        - createSequence:
+            sequenceName: carts_seq
+            startValue: 1
+            incrementBy: 50
+        - createSequence:
+            sequenceName: cart_items_seq
+            startValue: 1
+            incrementBy: 50
+
+        - createTable:
+            tableName: carts
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: carts_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: cart_items
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: cart_items_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: cart_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    deleteCascade: true
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: int
+                  constraints:
+                    nullable: false
+                    checkConstraint: "quantity > 0"
+              - column:
+                  name: price_at_add
+                  type: decimal(10, 2)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: cart_items
+            baseColumnNames: cart_id
+            constraintName: fk_card_items_cart
+            referencedTableName: carts
+            referencedColumnNames: id
+
