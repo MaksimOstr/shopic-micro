@@ -27,10 +27,10 @@ public class User {
     private String password;
 
     @Column(name = "account_non_locked", nullable = false)
-    private Boolean isAccountNonLocked = true;
+    private Boolean isAccountNonLocked;
 
     @Column(name = "is_verified", nullable = false)
-    private boolean isVerified = true;
+    private Boolean isVerified;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider", nullable = false)
@@ -53,5 +53,15 @@ public class User {
         this.password = password;
         this.roles = roles;
         authProvider = AuthProviderEnum.LOCAL;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if(isAccountNonLocked == null) {
+            isAccountNonLocked = true;
+        }
+        if(isVerified == null) {
+            isVerified = true;
+        }
     }
 }

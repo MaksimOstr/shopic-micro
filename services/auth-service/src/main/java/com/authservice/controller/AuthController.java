@@ -57,10 +57,9 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshTokens(
             @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
-            @CookieValue(value = DEVICE_ID_COOKIE_NAME) String deviceId,
             HttpServletResponse response
     ) {
-        TokenPairDto tokenPair = authService.refreshTokens(refreshToken, deviceId);
+        TokenPairDto tokenPair = authService.refreshTokens(refreshToken);
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(tokenPair.refreshToken());
 
         response.addCookie(refreshTokenCookie);
@@ -76,7 +75,7 @@ public class AuthController {
             @CookieValue(value = DEVICE_ID_COOKIE_NAME) String deviceId,
             HttpServletResponse response
     ) {
-        authService.logout(refreshToken, deviceId);
+        authService.logout(refreshToken);
 
         Cookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie(refreshToken);
         Cookie deviceIdCookie = cookieService.deleteDeviceCookie(deviceId);

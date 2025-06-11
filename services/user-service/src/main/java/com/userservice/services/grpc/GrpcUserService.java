@@ -63,7 +63,6 @@ public class GrpcUserService extends UserServiceGrpc.UserServiceImplBase {
         log.info("Auth service received request to get user for auth: {}", request.toString());
 
         User user = queryUserService.getUserForAuth(request.getEmail());
-
         UserForAuthGrpcResponse response = userMapper.toAuthResponse(user);
 
         log.info("Auth service returned user for auth: {}", response.toString());

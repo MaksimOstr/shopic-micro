@@ -1,7 +1,7 @@
 package com.userservice.services;
 
 import com.userservice.entity.Role;
-import com.userservice.exceptions.EntityDoesNotExistException;
+import com.userservice.exceptions.NotFoundException;
 import com.userservice.repositories.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ public class RoleService {
 
     public Role getDefaultUserRole() {
         return roleRepository.findById(1)
-                .orElseThrow(() -> new EntityDoesNotExistException("User role not found"));
+                .orElseThrow(() -> new NotFoundException("User role not found"));
     }
 
 }

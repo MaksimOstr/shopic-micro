@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.userservice.dto.response.ErrorResponseDto;
 import com.userservice.exceptions.CodeVerificationException;
 import com.userservice.exceptions.EmailVerifyException;
-import com.userservice.exceptions.EntityDoesNotExistException;
+import com.userservice.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,8 +26,8 @@ public class GlobalControllerAdvice {
         ));
     }
 
-    @ExceptionHandler(EntityDoesNotExistException.class)
-    public ResponseEntity<ErrorResponseDto> handleEntityDoesNotExistException(EntityDoesNotExistException e) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleEntityDoesNotExistException(NotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body((new ErrorResponseDto(
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 HttpStatus.NOT_FOUND.value(),

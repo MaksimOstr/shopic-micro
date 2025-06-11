@@ -45,7 +45,7 @@ message UserForAuthGrpcRequest {
 message UserForAuthGrpcResponse {
   int64 user_id = 1;
   string email = 2;
-  string password = 3;
+  optional string password = 3;
   repeated string role_names = 4;
   bool is_verified = 5;
   bool is_account_non_locked = 6;

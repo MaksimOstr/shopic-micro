@@ -1,7 +1,7 @@
 package com.userservice.services;
 
 import com.userservice.entity.User;
-import com.userservice.exceptions.EntityDoesNotExistException;
+import com.userservice.exceptions.NotFoundException;
 import com.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +22,11 @@ public class QueryUserService {
     public User getUserForAuth(String email) {
         log.info("Auth service received request to get user for auth: {}", email);
         return userRepository.getUserForAuth(email)
-                .orElseThrow(() -> new EntityDoesNotExistException(USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
     public Set<String> getUserRoleNames(long userId) {
         return userRepository.getUserRoleNames(userId)
-                .orElseThrow(() -> new EntityDoesNotExistException(USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 }

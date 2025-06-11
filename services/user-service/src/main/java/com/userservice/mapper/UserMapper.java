@@ -29,8 +29,10 @@ public interface UserMapper {
     CreateOAuthUserGrpcResponse toCreateOAuthUserGrpcResponse(CreateOAuthUserResponse response);
 
     @Mapping(target = "userId", source = "id")
-    @Mapping(target = "isVerified", source = "verified")
+    @Mapping(target = "isVerified", source = "isVerified")
     @Mapping(target = "roleNamesList", ignore = true)
+    @Mapping(target = "provider", source = "authProvider")
+    @Mapping(target = "password", ignore = true)
     UserForAuthGrpcResponse toAuthResponse(User user);
 
 
@@ -42,5 +44,12 @@ public interface UserMapper {
     @AfterMapping
     default void afterMappingOAuthUser(@MappingTarget CreateOAuthUserGrpcResponse.Builder builder, CreateOAuthUserResponse responseDto) {
         builder.addAllRoleNames(responseDto.roleNames());
+    }
+
+    @AfterMapping
+    default void afterMappingUserForAuthGrpcResponse(@MappingTarget UserForAuthGrpcResponse.Builder response, User user) {
+        if(user.getPassword() != null) {
+            response.setPassword(user.getPassword());
+        }
     }
 }

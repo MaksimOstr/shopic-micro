@@ -6,16 +6,14 @@ import com.shopic.grpc.codeservice.CodeScopeEnum;
 import com.shopic.grpc.codeservice.CodeServiceGrpc;
 import com.shopic.grpc.codeservice.ValidateCodeRequest;
 import com.shopic.grpc.codeservice.ValidateCodeResponse;
-import com.userservice.dto.event.EmailVerifyRequestDto;
 import com.userservice.exceptions.CodeVerificationException;
 import com.userservice.exceptions.EmailVerifyException;
-import com.userservice.exceptions.EntityDoesNotExistException;
+import com.userservice.exceptions.NotFoundException;
 import com.userservice.projection.EmailVerifyProjection;
 import com.userservice.repositories.UserRepository;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,13 +57,13 @@ public class UserVerificationService {
         int updated = userRepository.markUserVerified(userId);
 
         if(updated == 0) {
-            throw new EntityDoesNotExistException("User not found");
+            throw new NotFoundException("User not found");
         }
     }
 
 
     private EmailVerifyProjection getUserForEmailVerify(String email) {
         return userRepository.findUserForEmailVerify(email)
-                .orElseThrow(() -> new EntityDoesNotExistException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

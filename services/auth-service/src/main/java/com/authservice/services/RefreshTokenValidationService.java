@@ -23,8 +23,8 @@ public class RefreshTokenValidationService {
     private String refreshSecret;
 
     @Transactional
-    public RefreshToken validate(String refreshToken, String deviceId) {
-        RefreshToken token = findToken(refreshToken, deviceId);
+    public RefreshToken validate(String refreshToken) {
+        RefreshToken token = findToken(refreshToken);
 
         if(token.getExpiresAt().isBefore(Instant.now())) {
             deleteTokenById(token.getId());
@@ -38,8 +38,8 @@ public class RefreshTokenValidationService {
         refreshTokenRepository.deleteById(id);
     }
 
-    private RefreshToken findToken(String token, String deviceId) {
-        return refreshTokenRepository.findByTokenAndDeviceId(createHmac(token, refreshSecret), deviceId)
+    private RefreshToken findToken(String token) {
+        return refreshTokenRepository.findByToken(createHmac(token, refreshSecret))
                 .orElseThrow(() -> new TokenValidationException("Refresh token not found"));
     }
 }

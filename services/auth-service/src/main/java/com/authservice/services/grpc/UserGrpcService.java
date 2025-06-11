@@ -25,6 +25,8 @@ public class UserGrpcService {
             UserForAuthGrpcRequest request = UserForAuthGrpcRequest.newBuilder().setEmail(email).build();
             return userServiceGrpc.getUserForAuth(request);
         } catch (StatusRuntimeException e) {
+            System.out.println(e.getStatus());
+            System.out.println("Error: " + e.getMessage());
             if(e.getStatus().getCode() == Status.Code.NOT_FOUND) {
                 throw new NotFoundException("User with email " + email + " not found");
             }

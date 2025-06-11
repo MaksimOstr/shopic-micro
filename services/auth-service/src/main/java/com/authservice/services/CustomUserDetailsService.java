@@ -1,6 +1,7 @@
 package com.authservice.services;
 
 import com.authservice.config.security.model.CustomUserDetails;
+import com.authservice.enums.AuthProviderEnum;
 import com.authservice.exceptions.NotFoundException;
 import com.authservice.services.grpc.UserGrpcService;
 import com.shopic.grpc.userservice.UserForAuthGrpcResponse;
@@ -23,8 +24,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         try {
             log.info("Loading user by email {}", email);
             UserForAuthGrpcResponse response = userServiceGrpc.getUserForAuth(email);
+            AuthProviderEnum provider = AuthProviderEnum.fromString(response.getProvider());
 
-
+            if(provider != AuthProviderEnum.LOCAL || !response.hasPassword()) {
+                throw new UsernameNotFoundException("User was registered with another provider");
+            }
 
             return new CustomUserDetails(
                     response.getEmail(),
