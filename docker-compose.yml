@@ -59,6 +59,18 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${PRODUCT_DB_NAME}
 
+  cart-service-db:
+    image: postgres
+    restart: always
+    ports:
+      - "${CART_DB_PORT}:5432"
+    volumes:
+      - /postgres/cart-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${CART_DB_NAME}
+
   kafka:
     image: apache/kafka:latest
     restart: always

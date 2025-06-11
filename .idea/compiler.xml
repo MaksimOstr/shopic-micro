@@ -21,10 +21,14 @@
         <module name="shopic.auth-service.main" />
         <module name="shopic.user-service.main" />
         <module name="com.shopic.product-service.main" />
+        <module name="shopic.cart-service.main" />
         <module name="shopic.code-service.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="23">
+      <module name="cart-service" target="24" />
+      <module name="cart-service.main" target="24" />
+      <module name="cart-service.test" target="24" />
       <module name="code-service" target="24" />
       <module name="code-service.main" target="24" />
       <module name="code-service.test" target="24" />
@@ -53,6 +57,9 @@
       <module name="auth-service" options="-parameters" />
       <module name="auth-service.main" options="-parameters" />
       <module name="auth-service.test" options="-parameters" />
+      <module name="cart-service" options="-parameters" />
+      <module name="cart-service.main" options="-parameters" />
+      <module name="cart-service.test" options="-parameters" />
       <module name="code-service" options="-parameters" />
       <module name="code-service.main" options="-parameters" />
       <module name="code-service.test" options="-parameters" />
@@ -80,6 +87,9 @@
       <module name="shopic.auth-service" options="-parameters" />
       <module name="shopic.auth-service.main" options="-parameters" />
       <module name="shopic.auth-service.test" options="-parameters" />
+      <module name="shopic.cart-service" options="-parameters" />
+      <module name="shopic.cart-service.main" options="-parameters" />
+      <module name="shopic.cart-service.test" options="-parameters" />
       <module name="shopic.code-service" options="-parameters" />
       <module name="shopic.code-service.main" options="-parameters" />
       <module name="shopic.code-service.test" options="-parameters" />

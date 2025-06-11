@@ -30,4 +30,7 @@ project(':code-service').projectDir = new File('services/code-service')
 include ':product-service'
 project(':product-service').projectDir = new File('services/product-service')
 
+include ':cart-service'
+project(':cart-service').projectDir = new File('services/cart-service')
+
 include 'proto'
