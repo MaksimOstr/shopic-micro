@@ -50,12 +50,11 @@ public class AuthService {
         return tokenService.getTokenPair(userId, roles, dto.deviceId());
     }
 
-    public TokenPairDto refreshTokens(String refreshToken) {
-        return tokenService.refreshTokens(refreshToken);
+    public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
+        return tokenService.refreshTokens(refreshToken, deviceId);
     }
 
-    public void logout(String refreshToken) {
-        tokenService.logout(refreshToken);
+    public void logout(String refreshToken, String deviceId) {
+        tokenService.logout(refreshToken, deviceId);
     }
-
 }

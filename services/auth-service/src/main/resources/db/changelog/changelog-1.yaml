@@ -53,6 +53,15 @@ databaseChangeLog:
                   defaultValueComputed: CURRENT_TIMESTAMP
                   constraints:
                     nullable: false
+        - createIndex:
+            tableName: refresh_tokens
+            indexName: idx_token_device_id
+            columns:
+              - column:
+                  name: token
+              - column:
+                  name: device_id
+            unique: false
         - addUniqueConstraint:
             tableName: refresh_tokens
             columnNames: user_id, device_id

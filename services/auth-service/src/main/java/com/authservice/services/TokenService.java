@@ -22,14 +22,13 @@ public class TokenService {
 
 
     @Transactional
-    public TokenPairDto refreshTokens(String refreshToken) {
-        RefreshToken validatedRefreshToken = refreshTokenValidationService.validate(refreshToken);
+    public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
+        RefreshToken validatedRefreshToken = refreshTokenValidationService.validate(refreshToken, deviceId);
         long userId = validatedRefreshToken.getUserId();
         String newRefreshToken = refreshTokenManager.updateRefreshToken(validatedRefreshToken);
         List<String> roleNames = userGrpcService.getUserRoleNames(userId);
         return new TokenPairDto(getAccessToken(userId, roleNames), newRefreshToken);
     }
-
 
     public TokenPairDto getTokenPair(long userId, Set<String> userRoles, String deviceId) {
         String accessToken = getAccessToken(userId, userRoles);
@@ -38,8 +37,8 @@ public class TokenService {
         return new TokenPairDto(accessToken, refreshToken);
     }
 
-    public void logout(String token) {
-        refreshTokenManager.deleteRefreshToken(token);
+    public void logout(String token, String deviceId) {
+        refreshTokenManager.deleteRefreshToken(token, deviceId);
     }
 
     private String getAccessToken(long userId, Collection<String> roleNames) {

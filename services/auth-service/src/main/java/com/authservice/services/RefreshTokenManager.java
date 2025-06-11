@@ -56,8 +56,8 @@ public class RefreshTokenManager {
         return newToken;
     }
 
-    public void deleteRefreshToken(String token) {
-      int deleted = refreshTokenRepository.deleteRefreshTokenByTokenAndDeviceId(hashedToken(token));
+    public void deleteRefreshToken(String token, String deviceId) {
+      int deleted = refreshTokenRepository.deleteRefreshTokenByTokenAndDeviceId(hashedToken(token), deviceId);
 
       if (deleted == 0) {
           log.info("Refresh token was not deleted");
@@ -102,7 +102,6 @@ public class RefreshTokenManager {
     private Instant getExpireTime() {
         return Instant.now().plusSeconds(refreshTokenTtl);
     }
-
 
     @Scheduled(fixedDelay = 1000 * 60 * 60)
     public void deleteExpiredTokens() {

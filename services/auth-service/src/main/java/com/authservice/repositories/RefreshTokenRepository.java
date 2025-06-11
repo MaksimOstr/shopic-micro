@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
-    Optional<RefreshToken> findByToken(String token);
+    Optional<RefreshToken> findByTokenAndDeviceId(String token, String deviceId);
 
     Optional<RefreshToken> findByUserIdAndDeviceId(long userId, String deviceId);
 
@@ -23,6 +23,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
     @Transactional
     @Modifying
-    @Query("DELETE FROM RefreshToken r WHERE r.token = :token")
-    int deleteRefreshTokenByTokenAndDeviceId(String token);
+    @Query("DELETE FROM RefreshToken r WHERE r.token = :token AND r.deviceId = :deviceId")
+    int deleteRefreshTokenByTokenAndDeviceId(String token, String deviceId);
 }
