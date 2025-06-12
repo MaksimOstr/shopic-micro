@@ -2,6 +2,7 @@ package com.productservice.repository;
 
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
+import com.productservice.projection.ProductForCartDto;
 import com.productservice.projection.ProductImageUrlProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
+
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
@@ -63,6 +64,13 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "JOIN p.brand b " +
             "JOIN p.category c WHERE p.id IN :productIds")
     List<ProductDto> findProductsByIds(@Param("productIds") Set<Long> productIds);
+
+    @Query("SELECT new com.productservice.projection.ProductForCartDto(" +
+            "p.price," +
+            "p.stockQuantity" +
+            ")" +
+            "FROM Product p WHERE p.id = :id")
+    Optional<ProductForCartDto> getProductForCartById(long id);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

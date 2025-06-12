@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/product-service/com.shopic.product-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/product-service/com.shopic.product-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/infrastructure/api-gateway/shopic.api-gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/infrastructure/api-gateway/shopic.api-gateway.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/auth-service/shopic.auth-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/auth-service/shopic.auth-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/cart-service/shopic.cart-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/cart-service/shopic.cart-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/code-service/shopic.code-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/code-service/shopic.code-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/mail-service/shopic.mail-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/mail-service/shopic.mail-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/order-service/shopic.order-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/order-service/shopic.order-service.main.iml" />

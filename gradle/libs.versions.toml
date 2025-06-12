@@ -22,7 +22,6 @@ liquidBase = { module = "org.liquibase:liquibase-core" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 bean-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
-spring-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
 grpc = { module = "org.springframework.grpc:spring-grpc-spring-boot-starter" }
 kafka = { module = "org.springframework.kafka:spring-kafka" }
 kafka-test = { module = "org.springframework.kafka:spring-kafka-test" }
@@ -33,7 +32,7 @@ protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
 
 [bundles]
-core = ["spring-boot-starter-test", "spring-boot-starter", "junit", "spring-devtools"]
+core = ["spring-boot-starter-test", "spring-boot-starter", "junit"]
 business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc", "spring-security"]
 business-service-additional = ["postgreSQL-driver", "liquidBase", "liquidBase", "data-jpa"]
 

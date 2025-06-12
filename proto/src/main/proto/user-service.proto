@@ -8,7 +8,7 @@ option java_multiple_files = true;
 option java_package = "com.shopic.grpc.userservice";
 
 
-message ProfileRequest {
+message ProfileGrpcRequest {
   string first_name = 11;
   string last_name = 12;
 }
@@ -16,7 +16,7 @@ message ProfileRequest {
 message CreateLocalUserGrpcRequest {
   string email = 1;
   string password = 2;
-  ProfileRequest profile = 3;
+  ProfileGrpcRequest profile = 3;
 }
 
 message CreateLocalUserGrpcResponse {
@@ -29,7 +29,7 @@ message CreateLocalUserGrpcResponse {
 message CreateOAuthUserGrpcRequest {
   string email = 1;
   string provider = 2;
-  ProfileRequest profile = 3;
+  ProfileGrpcRequest profile = 3;
 }
 
 message CreateOAuthUserGrpcResponse {

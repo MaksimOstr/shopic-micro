@@ -1,6 +1,7 @@
 package com.userservice.entity;
 
-import jakarta.ws.rs.NotFoundException;
+
+import com.userservice.exceptions.NotFoundException;
 
 public enum AuthProviderEnum {
     LOCAL, GOOGLE;

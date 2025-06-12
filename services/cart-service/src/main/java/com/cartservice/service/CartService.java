@@ -1,6 +1,6 @@
 package com.cartservice.service;
 
-import com.cartservice.dto.CreateCartItem;
+import com.cartservice.dto.CreateCartItemDto;
 import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.dto.request.DecreaseCartItemQuantity;
 import com.cartservice.entity.Cart;
@@ -26,7 +26,7 @@ public class CartService {
                 .orElseGet(() -> createCart(userId).getId());
 
 
-        CreateCartItem createCartItem = new CreateCartItem(
+        CreateCartItemDto createCartItem = new CreateCartItemDto(
                 dto.productId(),
                 cartId,
                 dto.quantity()
@@ -40,7 +40,6 @@ public class CartService {
                 .map(cartItemService::getCartItems)
                 .orElseGet(ArrayList::new);
     }
-
 
     public void removeItemFromCart(long userId, long productId) {
         long cartId = getCartIdByUserId(userId);
@@ -62,6 +61,7 @@ public class CartService {
             cartItem.setQuantity(currentQuantity - dto.amount());
         }
     }
+
 
     private long getCartIdByUserId(long userId) {
         return cartRepository.findCartIdByUserId(userId)

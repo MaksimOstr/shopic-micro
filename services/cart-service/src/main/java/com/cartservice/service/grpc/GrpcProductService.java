@@ -16,14 +16,14 @@ import org.springframework.stereotype.Service;
 public class GrpcProductService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productServiceGrpc;
 
-    public CartItemAddGrpcResponse fetchProductInfoForCart(long productId, int quantity) {
+    public CartItemAddGrpcResponse getProductInfoForCart(long productId, int quantity) {
         CartItemAddGrpcRequest request = CartItemAddGrpcRequest.newBuilder()
                 .setProductId(productId)
                 .setQuantity(quantity)
                 .build();
 
         try {
-            return productServiceGrpc.cartItemAdd(request);
+            return productServiceGrpc.getProductInfoForCart(request);
         } catch (StatusRuntimeException e) {
             Status.Code code = e.getStatus().getCode();
 

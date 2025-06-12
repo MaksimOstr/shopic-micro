@@ -57,4 +57,17 @@ public class ApiGatewayConfig {
                         .PATCH("/{id}", http()))
                 .build();
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> cartRoute(JwtHandlerFilter jwtHandlerFilter) {
+        return route("cart-service-route")
+                .filter(lb("cart-service"))
+                .path("/carts",  request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("/items", http())
+                        .POST("/items", http())
+                        .DELETE("/items", http())
+                        .PATCH("/items/quantity", http()))
+                .build();
+    }
 }

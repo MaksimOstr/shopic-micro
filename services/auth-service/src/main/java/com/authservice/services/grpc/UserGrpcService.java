@@ -8,11 +8,9 @@ import com.shopic.grpc.userservice.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 
 
 @Service
@@ -35,11 +33,7 @@ public class UserGrpcService {
     }
 
     public CreateLocalUserGrpcResponse createLocalUser(LocalRegisterRequest dto) {
-        ProfileRequest profile = ProfileRequest.newBuilder()
-                .setLastName(dto.lastName())
-                .setFirstName(dto.firstName())
-                .build();
-
+        ProfileGrpcRequest profile = createGrpcProfile(dto.firstName(), dto.lastName());
         CreateLocalUserGrpcRequest request = CreateLocalUserGrpcRequest.newBuilder()
                 .setEmail(dto.email())
                 .setPassword(dto.password())
@@ -56,13 +50,8 @@ public class UserGrpcService {
         }
     }
 
-
     public CreateOAuthUserGrpcResponse createOAuthUser(OAuthRegisterRequest dto) {
-        ProfileRequest profile = ProfileRequest.newBuilder()
-                .setLastName(dto.lastName())
-                .setFirstName(dto.firstName())
-                .build();
-
+        ProfileGrpcRequest profile = createGrpcProfile(dto.firstName(), dto.lastName());
         CreateOAuthUserGrpcRequest request = CreateOAuthUserGrpcRequest.newBuilder()
                 .setEmail(dto.email())
                 .setProvider(dto.provider().name())
@@ -71,7 +60,6 @@ public class UserGrpcService {
 
         return userServiceGrpc.createOAuthUser(request);
     }
-
 
     public List<String> getUserRoleNames(long userId) {
         try {
@@ -83,5 +71,13 @@ public class UserGrpcService {
             }
             throw e;
         }
+    }
+
+
+    private ProfileGrpcRequest createGrpcProfile(String firstName, String lastName) {
+        return ProfileGrpcRequest.newBuilder()
+                .setLastName(firstName)
+                .setFirstName(lastName)
+                .build();
     }
 }

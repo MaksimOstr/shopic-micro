@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package productservice;
+
+option java_multiple_files = true;
+option java_package = "com.shopic.grpc.productservice";
+
+message CartItemAddGrpcRequest {
+  int64 product_id = 1;
+  int32 quantity = 2;
+}
+
+message CartItemAddGrpcResponse {
+  string product_price = 1;
+}
+
+service ProductService {
+  rpc getProductInfoForCart(CartItemAddGrpcRequest) returns (CartItemAddGrpcResponse);
+}
+

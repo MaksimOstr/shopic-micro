@@ -1,6 +1,6 @@
 package com.cartservice.service;
 
-import com.cartservice.dto.CreateCartItem;
+import com.cartservice.dto.CreateCartItemDto;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
 import com.cartservice.exception.NotFoundException;
@@ -35,8 +35,8 @@ public class CartItemService {
     }
 
     @Transactional
-    public void createCartItem(CreateCartItem dto) {
-        CartItemAddGrpcResponse response = grpcProductService.fetchProductInfoForCart(dto.productId(), dto.quantity());
+    public void createCartItem(CreateCartItemDto dto) {
+        CartItemAddGrpcResponse response = grpcProductService.getProductInfoForCart(dto.productId(), dto.quantity());
 
         cartItemRepository.findByCart_IdAndProductId(dto.cartId(), dto.productId())
                 .ifPresentOrElse(
@@ -61,13 +61,14 @@ public class CartItemService {
         }
     }
 
-    private void createAndSaveCartItem(CreateCartItem dto, String priceAtAdd) {
+    private void createAndSaveCartItem(CreateCartItemDto dto, String priceAtAdd) {
         CartItem cartItem = CartItem.builder()
                 .productId(dto.productId())
                 .cart(entityManager.getReference(Cart.class, dto.cartId()))
                 .quantity(dto.quantity())
                 .priceAtAdd(new BigDecimal(priceAtAdd))
                 .build();
+
         cartItemRepository.save(cartItem);
     }
 }

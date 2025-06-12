@@ -10,8 +10,8 @@ import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ProductMapper;
 import com.productservice.projection.ProductDto;
+import com.productservice.projection.ProductForCartDto;
 import com.productservice.projection.ProductImageUrlProjection;
-import com.productservice.projection.ProductProjection;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static com.productservice.utils.SpecificationUtils.*;
 
@@ -134,6 +133,11 @@ public class ProductService {
                         throw new NotFoundException(PRODUCT_NOT_FOUND);
                     }
                 });
+    }
+
+    public ProductForCartDto getProductInfoForCart(long productId) {
+        return productRepository.getProductForCartById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
 

@@ -1,4 +1,8 @@
 package com.productservice.projection;
 
-public class ProductForCartDto {
-}
+import java.math.BigDecimal;
+
+public record ProductForCartDto(
+        BigDecimal productPrice,
+        int stockQuantity
+) {}
