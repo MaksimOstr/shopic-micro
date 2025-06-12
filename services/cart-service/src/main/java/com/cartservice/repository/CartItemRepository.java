@@ -1,13 +1,25 @@
 package com.cartservice.repository;
 
-import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
+import com.cartservice.projection.CartItemProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    List<CartItem> findByCart_Id(Long cartId);
+
+    @Query("SELECT new com.cartservice.projection.CartItemProjection(" +
+            "ci.id," +
+            "ci.productId," +
+            "ci.quantity," +
+            "ci.priceAtAdd" +
+            ")" +
+            "FROM CartItem ci WHERE ci.cart.id = :cartId")
+    List<CartItemProjection> findByCart_Id(Long cartId);
+
+    Optional<CartItem> findByCart_IdAndProductId(Long cartId, Long productId);
 }

@@ -9,7 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.grpc.server.exception.GrpcExceptionHandler;
 
 @Configuration(proxyBeanMethods = false)
-public class ExceptionHandlersConfig {
+public class GrpcExceptionHandlerConfig {
 
     @Bean
     GrpcExceptionHandler userServiceExceptionHandler() {
