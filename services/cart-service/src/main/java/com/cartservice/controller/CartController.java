@@ -2,6 +2,7 @@ package com.cartservice.controller;
 
 import com.cartservice.config.security.model.CustomPrincipal;
 import com.cartservice.dto.request.AddItemToCartRequest;
+import com.cartservice.dto.request.DecreaseCartItemQuantity;
 import com.cartservice.entity.CartItem;
 import com.cartservice.projection.CartItemProjection;
 import com.cartservice.service.CartService;
@@ -20,7 +21,7 @@ import java.util.List;
 public class CartController {
     private final CartService cartService;
 
-    @GetMapping
+    @GetMapping("/items")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<CartItemProjection>> getCartItems(
             @AuthenticationPrincipal CustomPrincipal principal
@@ -30,13 +31,36 @@ public class CartController {
         return ResponseEntity.ok(cartItems);
     }
 
-    @PostMapping
+    @PostMapping("/items")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CartItem> addCartItem(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid AddItemToCartRequest body
     ) {
         cartService.addItemToCart(body, principal.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/items")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> deleteCartItem(
+            @RequestParam long productId,
+            @AuthenticationPrincipal CustomPrincipal principal
+
+    ) {
+        cartService.removeItemFromCart(principal.getId(), productId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/items/quantity")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> decreaseCartItemQuantity(
+            @RequestBody @Valid DecreaseCartItemQuantity body,
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        cartService.decreaseCartItemQuantity(body, principal.getId());
 
         return ResponseEntity.ok().build();
     }

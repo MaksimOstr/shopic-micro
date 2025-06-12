@@ -3,6 +3,7 @@ package com.cartservice.service;
 import com.cartservice.dto.CreateCartItem;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
+import com.cartservice.exception.NotFoundException;
 import com.cartservice.projection.CartItemProjection;
 import com.cartservice.repository.CartItemRepository;
 import com.cartservice.service.grpc.GrpcProductService;
@@ -23,8 +24,14 @@ public class CartItemService {
     private final EntityManager entityManager;
     private final GrpcProductService grpcProductService;
 
+
     public List<CartItemProjection> getCartItems(long cartId) {
         return cartItemRepository.findByCart_Id(cartId);
+    }
+
+    public CartItem getCartItem(long cartId, long productId) {
+        return cartItemRepository.findByCart_IdAndProductId(cartId, productId)
+                .orElseThrow(() -> new NotFoundException("Cart item not found"));
     }
 
     @Transactional
@@ -42,14 +49,25 @@ public class CartItemService {
                 );
     }
 
+    public int countCartItems(long cartId) {
+        return cartItemRepository.countByCart_Id(cartId);
+    }
+
+    public void deleteCartItem(long cartId, long productId) {
+        int deleted = cartItemRepository.deleteCartItem(cartId, productId);
+
+        if(deleted == 0) {
+            throw new NotFoundException("Cart item not found");
+        }
+    }
+
     private void createAndSaveCartItem(CreateCartItem dto, String priceAtAdd) {
         CartItem cartItem = CartItem.builder()
                 .productId(dto.productId())
                 .cart(entityManager.getReference(Cart.class, dto.cartId()))
+                .quantity(dto.quantity())
                 .priceAtAdd(new BigDecimal(priceAtAdd))
                 .build();
         cartItemRepository.save(cartItem);
     }
-
-
 }
