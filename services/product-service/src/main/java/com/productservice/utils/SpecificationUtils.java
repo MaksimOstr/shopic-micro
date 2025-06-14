@@ -25,6 +25,14 @@ public class SpecificationUtils {
         return (root, query, cb) -> cb.equal(root.get(field).get("id"), value);
     }
 
+    public static Specification<Product> hasActiveStatus(String field, Boolean value) {
+        if (value == null) {
+            return Specification.where(null);
+        }
+
+        return (root, query, cb) -> cb.equal(root.get(field), value);
+    }
+
     public static <T extends Comparable<? super T>> Specification<Product> gte(String field, T value) {
         if (value == null) {
             return Specification.where(null);

@@ -17,7 +17,7 @@ public class ApiGatewayConfig {
     public RouterFunction<ServerResponse> authRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("auth-service-route")
                 .filter(lb("auth-service"))
-                .path("/auth",  request -> request
+                .path("/auth", request -> request
                         .GET("/login/oauth2/code/*", http())
                         .GET("/oauth2/authorization/*", http())
                         .POST("/register", http())
@@ -33,7 +33,7 @@ public class ApiGatewayConfig {
     public RouterFunction<ServerResponse> userRoute() {
         return route("user-service-route")
                 .filter(lb("user-service"))
-                .path("/users",  request -> request
+                .path("/users", request -> request
                         .POST("/request-email-verify", http())
                         .PATCH("/verify", http()))
                 .build();
@@ -46,23 +46,28 @@ public class ApiGatewayConfig {
                 .path("/likes", request -> request
                         .filter(jwtHandlerFilter)
                         .POST("", http()))
-                .path("/products",  request -> request
+                .path("/products", request -> request
                         .filter(jwtHandlerFilter)
-                        .POST("", http())
                         .GET("/{id}", http())
                         .GET("", http())
+                        .GET("/liked", http())
+                        .GET("/filter", http()))
+                .path("/admin/products", request -> request
+                        .filter(jwtHandlerFilter)
+                        .POST("", http())
                         .GET("/sku", http())
                         .GET("/filter", http())
                         .PATCH("/{id}/image", http())
-                        .PATCH("/{id}", http()))
-                .build();
+                        .PATCH("/{id}", http())
+                        .DELETE("/{id}", http()))
+                        .build();
     }
 
     @Bean
     public RouterFunction<ServerResponse> cartRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("cart-service-route")
                 .filter(lb("cart-service"))
-                .path("/carts",  request -> request
+                .path("/carts", request -> request
                         .filter(jwtHandlerFilter)
                         .GET("/items", http())
                         .POST("/items", http())

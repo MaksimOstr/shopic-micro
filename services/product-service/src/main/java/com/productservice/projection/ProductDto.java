@@ -19,6 +19,7 @@ public class ProductDto {
     private final String brandName;
     private final String categoryName;
     private final int stockQuantity;
+    private final boolean enabled;
 
     @Setter
     private boolean isLiked;

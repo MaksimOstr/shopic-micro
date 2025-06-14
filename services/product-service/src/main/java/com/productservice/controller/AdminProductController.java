@@ -2,8 +2,9 @@ package com.productservice.controller;
 
 
 import com.productservice.config.security.model.CustomPrincipal;
+import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
-import com.productservice.dto.request.GetProductsByFilters;
+import com.productservice.dto.request.ProductParams;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
@@ -21,20 +22,18 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/admin/products")
 @RequiredArgsConstructor
-public class ProductController {
+@PreAuthorize("hasRole('ADMIN')")
+public class AdminProductController {
     private final ProductService productService;
 
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public CompletableFuture<ResponseEntity<Product>> createProduct(
             @RequestPart("product") @Valid CreateProductRequest body,
             @RequestPart("image") MultipartFile imageFile
@@ -45,7 +44,6 @@ public class ProductController {
 
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteProduct(
             @PathVariable long id
     ) {
@@ -58,7 +56,6 @@ public class ProductController {
 
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Product> updateProduct(
             @PathVariable long id,
             @RequestBody @Valid UpdateProductRequest body
@@ -68,9 +65,21 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<Page<ProductDto>> getPageOfProductsByFilter(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestBody AdminProductParams body,
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<ProductDto> products = productService.findAdminProductsByFilters(body, pageable, principal.getId());
+
+        return ResponseEntity.ok(products);
+    }
+
 
     @PatchMapping("/{id}/image")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateProductImage(
         @PathVariable long id,
         @RequestPart("image") MultipartFile imageFile
@@ -83,62 +92,12 @@ public class ProductController {
     }
 
 
-    @GetMapping("/filter")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<ProductDto>> getPageOfProductsByFilter(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestBody GetProductsByFilters body,
-            @AuthenticationPrincipal CustomPrincipal principal
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProductDto> products = productService.findProductsByFilters(body, pageable, principal.getId());
-
-        return ResponseEntity.ok(products);
-    }
-
-    @GetMapping("/liked")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<ProductDto>> getLikedProducts(
-            @AuthenticationPrincipal CustomPrincipal principal
-    ) {
-        List<ProductDto> products = productService.getLikedProducts(principal.getId());
-
-        return ResponseEntity.ok(products);
-    }
-
 
     @GetMapping("/sku")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Product> getProductBySku(
             @RequestParam UUID sku
     ) {
         Product product = productService.getProductBySku(sku);
-
-        return ResponseEntity.ok(product);
-    }
-
-
-    @GetMapping
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<ProductDto>> getPageOfProducts(
-            @AuthenticationPrincipal CustomPrincipal principal,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProductDto> products = productService.getPageOfProducts(pageable, principal.getId());
-
-        return ResponseEntity.ok(products);
-    }
-
-
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Product> getProduct(
-            @PathVariable long id
-    ) {
-        Product product = productService.getProductById(id);
 
         return ResponseEntity.ok(product);
     }

@@ -14,16 +14,19 @@ public record CreateProductRequest(
         String description,
 
         @NotNull
+        Boolean enabled,
+
+        @NotNull
         @DecimalMin("0")
         BigDecimal price,
 
         @NotNull
-        int categoryId,
+        Integer categoryId,
 
         @NotNull
-        int brandId,
+        Integer brandId,
 
         @NotNull
         @Min(0)
-        int stockQuantity
+        Integer stockQuantity
 ) {}

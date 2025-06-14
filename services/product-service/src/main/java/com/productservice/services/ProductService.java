@@ -1,8 +1,9 @@
 package com.productservice.services;
 
 import com.productservice.dto.PutObjectDto;
+import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
-import com.productservice.dto.request.GetProductsByFilters;
+import com.productservice.dto.request.ProductParams;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Brand;
 import com.productservice.entity.Category;
@@ -60,6 +61,7 @@ public class ProductService {
                     .sku(getSKU())
                     .price(dto.price())
                     .imageUrl(url)
+                    .enabled(dto.enabled())
                     .category(category)
                     .stockQuantity(dto.stockQuantity())
                     .brand(brand)
@@ -67,6 +69,10 @@ public class ProductService {
 
 
             return productRepository.save(product);
+        }).exceptionally(ex -> {
+            System.out.println(ex.getMessage());
+
+            return null;
         });
     }
 
@@ -81,6 +87,7 @@ public class ProductService {
         Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
         Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
         Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
+        Optional.ofNullable(dto.enabled()).ifPresent(product::setEnabled);
         Optional.ofNullable(dto.categoryId()).ifPresent(categoryId -> {
             Category category = categoryService.findById(categoryId);
             product.setCategory(category);
@@ -93,19 +100,12 @@ public class ProductService {
         return product;
     }
 
-    public Page<ProductDto> findProductsByFilters(GetProductsByFilters dto, Pageable pageable, long userId) {
-        Specification<Product> spec = iLike("name", dto.name())
-                .and(lte("price", dto.toPrice()))
-                .and(gte("price", dto.fromPrice()))
-                .and(hasChild("category", dto.categoryId()))
-                .and(hasChild("brand", dto.brandId()));
+    public Page<ProductDto> findPublicProductsByFilters(ProductParams dto, Pageable pageable, long userId) {
+        return getPageOfProductsByFilters(dto, pageable, true, userId);
+    }
 
-        List<Product> products = productRepository.findAll(spec, pageable).getContent();
-        List<ProductDto> productDto = products.stream().map(productMapper::productToProductDto).toList();
-
-        markLikedProducts(productDto, userId);
-
-        return new PageImpl<>(productDto, pageable, pageable.getPageSize());
+    public Page<ProductDto> findAdminProductsByFilters(AdminProductParams dto, Pageable pageable, long userId) {
+        return getPageOfProductsByFilters(dto, pageable, dto.getEnabled(), userId);
     }
 
     public List<ProductDto> getLikedProducts(long userId) {
@@ -114,12 +114,10 @@ public class ProductService {
         return productRepository.findProductsByIds(likedProducts);
     }
 
-
     public Product getProductBySku(UUID sku) {
         return productRepository.findBySku(sku)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
-
 
     public void updateProductImage(long productId, MultipartFile productImage) {
         String imageUrl = getProductImageUrl(productId);
@@ -187,5 +185,21 @@ public class ProductService {
         for (ProductDto product : products) {
             product.setLiked(likesIds.contains(product.getId()));
         }
+    }
+
+    private Page<ProductDto> getPageOfProductsByFilters(ProductParams dto, Pageable pageable, Boolean enabled, long userId) {
+        Specification<Product> spec = iLike("name", dto.getName())
+                .and(hasActiveStatus("enabled", enabled))
+                .and(lte("price", dto.getToPrice()))
+                .and(gte("price", dto.getFromPrice()))
+                .and(hasChild("category", dto.getCategoryId()))
+                .and(hasChild("brand", dto.getBrandId()));
+
+        List<Product> products = productRepository.findAll(spec, pageable).getContent();
+        List<ProductDto> productDtoList = products.stream().map(productMapper::productToProductDto).toList();
+
+        markLikedProducts(productDtoList, userId);
+
+        return new PageImpl<>(productDtoList, pageable, productDtoList.size());
     }
 }

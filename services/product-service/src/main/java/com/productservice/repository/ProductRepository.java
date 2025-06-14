@@ -44,7 +44,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.price, " +
             "b.name, " +
             "c.name, " +
-            "p.stockQuantity) " +
+            "p.stockQuantity," +
+            "p.enabled) " +
             "FROM Product p " +
             "JOIN p.brand b " +
             "JOIN p.category c")
@@ -59,7 +60,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.price, " +
             "b.name, " +
             "c.name, " +
-            "p.stockQuantity) " +
+            "p.stockQuantity," +
+            "p.enabled) " +
             "FROM Product p " +
             "JOIN p.brand b " +
             "JOIN p.category c WHERE p.id IN :productIds")

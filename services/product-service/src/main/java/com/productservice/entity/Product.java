@@ -32,8 +32,10 @@ public class Product {
 
     private BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, optional = false)
     private Brand brand;
+
+    private boolean enabled;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
@@ -42,7 +44,7 @@ public class Product {
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false, name = "category_id")
     private Category category;
 
