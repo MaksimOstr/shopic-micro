@@ -4,6 +4,7 @@ import com.productservice.dto.PutObjectDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -25,16 +26,17 @@ public class S3Service {
 
     public CompletableFuture<String> uploadFile(PutObjectDto dto) {
         try {
+            MultipartFile file = dto.file();
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(dto.bucket())
                     .key(dto.key())
-                    .contentType(dto.file().getContentType())
+                    .contentType(file.getContentType())
                     .acl(ObjectCannedACL.PUBLIC_READ)
                     .build();
 
             return s3AsyncClient.putObject(
                     request,
-                    AsyncRequestBody.fromBytes(dto.file().getBytes())
+                    AsyncRequestBody.fromBytes(file.getBytes())
             )
                     .thenApply(_ -> generateUrl(dto.bucket(), dto.key()));
         } catch (IOException e) {

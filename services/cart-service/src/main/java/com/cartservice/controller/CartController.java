@@ -2,7 +2,7 @@ package com.cartservice.controller;
 
 import com.cartservice.config.security.model.CustomPrincipal;
 import com.cartservice.dto.request.AddItemToCartRequest;
-import com.cartservice.dto.request.DecreaseCartItemQuantity;
+import com.cartservice.dto.request.ChangeCartItemQuantity;
 import com.cartservice.entity.CartItem;
 import com.cartservice.projection.CartItemProjection;
 import com.cartservice.service.CartService;
@@ -54,13 +54,23 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/items/quantity")
+    @DeleteMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> decreaseCartItemQuantity(
-            @RequestBody @Valid DecreaseCartItemQuantity body,
+    public ResponseEntity<String> deleteCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        cartService.decreaseCartItemQuantity(body, principal.getId());
+        cartService.deleteCartByUserId(principal.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/items/quantity")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> changeCartItemQuantity(
+            @RequestBody @Valid ChangeCartItemQuantity body,
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        cartService.changeCartItemQuantity(body, principal.getId());
 
         return ResponseEntity.ok().build();
     }

@@ -2,7 +2,7 @@ package com.cartservice.service;
 
 import com.cartservice.dto.CreateCartItemDto;
 import com.cartservice.dto.request.AddItemToCartRequest;
-import com.cartservice.dto.request.DecreaseCartItemQuantity;
+import com.cartservice.dto.request.ChangeCartItemQuantity;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
 import com.cartservice.exception.NotFoundException;
@@ -21,10 +21,10 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemService cartItemService;
 
+
     public void addItemToCart(AddItemToCartRequest dto, long userId) {
         Long cartId = cartRepository.findCartIdByUserId(userId)
                 .orElseGet(() -> createCart(userId).getId());
-
 
         CreateCartItemDto createCartItem = new CreateCartItemDto(
                 dto.productId(),
@@ -49,16 +49,23 @@ public class CartService {
     }
 
     @Transactional
-    public void decreaseCartItemQuantity(DecreaseCartItemQuantity dto, long userId) {
+    public void changeCartItemQuantity(ChangeCartItemQuantity dto, long userId) {
         long cartId = getCartIdByUserId(userId);
         CartItem cartItem = cartItemService.getCartItem(cartId, dto.productId());
-        int currentQuantity = cartItem.getQuantity();
 
-        if(cartItem.getQuantity() <= dto.amount()) {
+        if(dto.amount() <= 0) {
             cartItemService.deleteCartItem(cartId, dto.productId());
             deleteCartIfEmpty(cartId);
         } else {
-            cartItem.setQuantity(currentQuantity - dto.amount());
+            cartItem.setQuantity(dto.amount());
+        }
+    }
+
+    public void deleteCartByUserId(long userId) {
+        int deleted = cartRepository.deleteCartByUserId(userId);
+
+        if(deleted == 0) {
+            throw new NotFoundException("Cart not found");
         }
     }
 
