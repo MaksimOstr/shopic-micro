@@ -85,11 +85,13 @@ databaseChangeLog:
                   defaultValue: 0
                   constraints:
                     nullable: false
+                    checkConstraint: "stock_quantity >= 0"
               - column:
                   name: price
                   type: decimal(10, 2)
                   constraints:
                     nullable: false
+                    checkConstraint: "price >= 0"
 
         - createTable:
             tableName: brands

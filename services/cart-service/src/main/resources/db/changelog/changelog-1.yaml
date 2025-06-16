@@ -67,6 +67,7 @@ databaseChangeLog:
                   type: decimal(10, 2)
                   constraints:
                     nullable: false
+                    checkConstraint: "price_at_add >= 0"
         - addUniqueConstraint:
             tableName: cart_items
             columnNames: cart_id, product_id

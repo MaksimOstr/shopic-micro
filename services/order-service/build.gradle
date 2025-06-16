@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(':proto')
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
     annotationProcessor libs.mapstruct.processor

@@ -2,3 +2,85 @@ databaseChangeLog:
   - changeSet:
       id: 1
       author: Maksim
+      changes:
+        - createSequence:
+            sequenceName: orders_seq
+            startValue: 1
+            cacheSize: 50
+            incrementBy: 50
+        - createSequence:
+            sequenceName: order_items_seq
+            startValue: 1
+            cacheSize: 50
+            incrementBy: 50
+
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: orders_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_price
+                  type: decimal(10, 2)
+                  constraints:
+                    nullable: false
+                    checkConstraint: "total_price >= 0"
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: order_items
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: order_items_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_order_items_order
+                    references: orders(id)
+              - column:
+                  name: price_at_purchase
+                  type: decimal(10, 2)
+                  constraints:
+                    nullable: false
+                    checkConstraint: "price_at_purchase >= 0"
+              - column:
+                  name: quantity
+                  type: int
+                  constraints:
+                    nullable: false
+                    checkConstraint: "quantity > 0"
+
+
+

@@ -1,6 +1,8 @@
 package com.cartservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -26,8 +28,10 @@ public class CartItem {
     private Long productId;
 
     @Column(nullable = false)
+    @Min(1)
     private int quantity;
 
     @Column(name = "price_at_add", nullable = false)
+    @DecimalMin(value = "0.0", message = "Price cannot be negative")
     private BigDecimal priceAtAdd;
 }

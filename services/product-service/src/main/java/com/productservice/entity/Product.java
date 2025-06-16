@@ -1,6 +1,8 @@
 package com.productservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,6 +32,7 @@ public class Product {
 
     private UUID sku;
 
+    @DecimalMin(value = "0.0", message = "Price cannot be negative")
     private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, optional = false)
@@ -49,5 +52,6 @@ public class Product {
     private Category category;
 
     @Column(name = "stock_quantity", nullable = false)
+    @Min(value = 0)
     private int stockQuantity;
 }
