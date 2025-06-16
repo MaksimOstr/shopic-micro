@@ -51,6 +51,14 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
+    public void deleteCategory(int categoryId) {
+        int deleted = categoryRepository.deleteById(categoryId);
+
+        if(deleted == 0) {
+            throw new NotFoundException("Category not found");
+        }
+    }
+
     private boolean existsByName(String name) {
         return categoryRepository.existsByName(name);
     }

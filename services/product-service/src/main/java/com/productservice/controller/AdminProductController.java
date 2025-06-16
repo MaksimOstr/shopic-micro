@@ -4,10 +4,10 @@ package com.productservice.controller;
 import com.productservice.config.security.model.CustomPrincipal;
 import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
-import com.productservice.dto.request.ProductParams;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
+import com.productservice.services.ProductImageService;
 import com.productservice.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -80,17 +80,13 @@ public class AdminProductController {
 
 
     @PatchMapping("/{id}/image")
-    public ResponseEntity<String> updateProductImage(
+    public CompletableFuture<ResponseEntity<String>> updateProductImage(
         @PathVariable long id,
         @RequestPart("image") MultipartFile imageFile
     ) {
-        productService.updateProductImage(id, imageFile);
-
-        String message = "Product image updated successfully";
-
-        return ResponseEntity.ok(message);
+        return productService.updateProductImage(id, imageFile)
+                .thenApply(_ -> ResponseEntity.ok().build());
     }
-
 
 
     @GetMapping("/sku")

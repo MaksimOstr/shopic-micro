@@ -22,8 +22,8 @@ import java.util.UUID;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
-    @Query("SELECT p.imageUrl as imageUrl FROM Product p WHERE p.id = :id")
-    Optional<ProductImageUrlProjection> getProductImageUrl(long id);
+    @Query("SELECT p.imageUrl FROM Product p WHERE p.id = :id")
+    Optional<String> getProductImageUrl(long id);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Optional<Product> findById(long id);
@@ -76,4 +76,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Product p WHERE p.id = :id")
+    int deleteProductById(long id);
 }

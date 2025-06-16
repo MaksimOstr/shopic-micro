@@ -1,6 +1,5 @@
 package com.productservice.services;
 
-import com.productservice.dto.PutObjectDto;
 import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.ProductParams;
@@ -12,7 +11,6 @@ import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ProductMapper;
 import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductImageUrlProjection;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static com.productservice.utils.SpecificationUtils.*;
+import static com.productservice.utils.ProductUtils.PRODUCT_NOT_FOUND;
+import static com.productservice.utils.ProductUtils.buildSpecification;
+import static com.productservice.utils.Utils.getUUID;
 
 
 @Slf4j
@@ -35,67 +35,32 @@ import static com.productservice.utils.SpecificationUtils.*;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final S3Service s3Service;
+    private final ProductImageService imageService;
     private final CategoryService categoryService;
     private final BrandService brandService;
     private final LikeService likeService;
     private final ProductMapper productMapper;
+    private final ProductImageService productImageService;
 
-    private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
-    private static final String PRODUCT_NOT_FOUND = "Product Not Found";
-
-    //OPTIMIZE QUERY
-    public Product getProductById(long id) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
-    }
 
     public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage) {
         Category category = categoryService.findById(dto.categoryId());
         Brand brand = brandService.getBrandById(dto.brandId());
 
-        return postProductPhoto(productImage).thenApply(url -> {
-            Product product = Product.builder()
-                    .name(dto.name())
-                    .description(dto.description())
-                    .sku(getSKU())
-                    .price(dto.price())
-                    .imageUrl(url)
-                    .enabled(dto.enabled())
-                    .category(category)
-                    .stockQuantity(dto.stockQuantity())
-                    .brand(brand)
-                    .build();
-
+        return productImageService.uploadProductImage(productImage).thenApply(url -> {
+            Product product =  createProductEntity(dto, url, category, brand);
 
             return productRepository.save(product);
-        }).exceptionally(ex -> {
-            System.out.println(ex.getMessage());
-
-            return null;
         });
     }
 
 
     @Transactional
-    //OPTIMIZE QUERY
     public Product updateProduct(UpdateProductRequest dto, long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
 
-        Optional.ofNullable(dto.name()).ifPresent(product::setName);
-        Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
-        Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
-        Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
-        Optional.ofNullable(dto.enabled()).ifPresent(product::setEnabled);
-        Optional.ofNullable(dto.categoryId()).ifPresent(categoryId -> {
-            Category category = categoryService.findById(categoryId);
-            product.setCategory(category);
-        });
-        Optional.ofNullable(dto.brandId()).ifPresent(brandId -> {
-            Brand brand = brandService.getBrandById(brandId);
-            product.setBrand(brand);
-        });
+        updateProductFieldsIfExists(product, dto);
 
         return product;
     }
@@ -119,17 +84,23 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public void updateProductImage(long productId, MultipartFile productImage) {
-        String imageUrl = getProductImageUrl(productId);
-        s3Service.delete(imageUrl);
+    public Product getProductById(long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+    }
 
-        postProductPhoto(productImage)
+    public CompletableFuture<Void> updateProductImage(long productId, MultipartFile productImage) {
+        String imageUrl = getProductImageUrl(productId);
+
+        return productImageService.uploadProductImage(productImage)
                 .thenAccept(newImageUrl -> {
                     int updated = productRepository.updateProductImageUrl(productId, newImageUrl);
                     if (updated == 0) {
                         log.error("Failed to update product image url");
                         throw new NotFoundException(PRODUCT_NOT_FOUND);
                     }
+
+                    imageService.deleteImage(imageUrl);
                 });
     }
 
@@ -137,7 +108,6 @@ public class ProductService {
         return productRepository.getProductForCartById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
     }
-
 
     public Page<ProductDto> getPageOfProducts(Pageable pageable, long userId) {
         List<ProductDto> products = productRepository.getPageOfProducts(pageable).getContent();
@@ -147,36 +117,28 @@ public class ProductService {
         return new PageImpl<>(products, pageable, pageable.getPageSize());
     }
 
-
     public void deleteProductById(long productId) {
-        Product product = getProductById(productId);
+        String imageUrl = getProductImageUrl(productId);
 
-        s3Service.delete(product.getImageUrl());
-        productRepository.delete(product);
+        productImageService.deleteImage(imageUrl);
+        productRepository.deleteProductById(productId);
     }
 
 
     private String getProductImageUrl(long productId) {
         return productRepository.getProductImageUrl(productId)
-                .map(ProductImageUrlProjection::getImageUrl)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
+    private Page<ProductDto> getPageOfProductsByFilters(ProductParams params, Pageable pageable, Boolean enabled, long userId) {
+        Specification<Product> spec = buildSpecification(params, enabled);
 
-    private CompletableFuture<String> postProductPhoto(MultipartFile productImage) {
-        return s3Service.uploadFile(new PutObjectDto(
-                PRODUCT_IMAGE_BUCKET,
-                getKey(),
-                productImage
-        ));
-    }
+        List<Product> products = productRepository.findAll(spec, pageable).getContent();
+        List<ProductDto> productDtoList = products.stream().map(productMapper::productToProductDto).toList();
 
-    private String getKey() {
-        return UUID.randomUUID().toString();
-    }
+        markLikedProducts(productDtoList, userId);
 
-    private UUID getSKU() {
-        return UUID.randomUUID();
+        return new PageImpl<>(productDtoList, pageable, productDtoList.size());
     }
 
     private void markLikedProducts(List<ProductDto> products, long userId) {
@@ -187,19 +149,33 @@ public class ProductService {
         }
     }
 
-    private Page<ProductDto> getPageOfProductsByFilters(ProductParams dto, Pageable pageable, Boolean enabled, long userId) {
-        Specification<Product> spec = iLike("name", dto.getName())
-                .and(hasActiveStatus("enabled", enabled))
-                .and(lte("price", dto.getToPrice()))
-                .and(gte("price", dto.getFromPrice()))
-                .and(hasChild("category", dto.getCategoryId()))
-                .and(hasChild("brand", dto.getBrandId()));
+    private void updateProductFieldsIfExists(Product product, UpdateProductRequest dto) {
+        Optional.ofNullable(dto.name()).ifPresent(product::setName);
+        Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
+        Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
+        Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
+        Optional.ofNullable(dto.enabled()).ifPresent(product::setEnabled);
+        Optional.ofNullable(dto.categoryId()).ifPresent(categoryId -> {
+            Category category = categoryService.findById(categoryId);
+            product.setCategory(category);
+        });
+        Optional.ofNullable(dto.brandId()).ifPresent(brandId -> {
+            Brand brand = brandService.getBrandById(brandId);
+            product.setBrand(brand);
+        });
+    }
 
-        List<Product> products = productRepository.findAll(spec, pageable).getContent();
-        List<ProductDto> productDtoList = products.stream().map(productMapper::productToProductDto).toList();
-
-        markLikedProducts(productDtoList, userId);
-
-        return new PageImpl<>(productDtoList, pageable, productDtoList.size());
+    private Product createProductEntity(CreateProductRequest dto, String url, Category category, Brand brand) {
+        return Product.builder()
+                .name(dto.name())
+                .description(dto.description())
+                .sku(getUUID())
+                .price(dto.price())
+                .imageUrl(url)
+                .enabled(dto.enabled())
+                .category(category)
+                .stockQuantity(dto.stockQuantity())
+                .brand(brand)
+                .build();
     }
 }

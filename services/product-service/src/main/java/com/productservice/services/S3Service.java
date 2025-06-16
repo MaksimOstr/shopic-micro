@@ -12,8 +12,6 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -35,30 +33,22 @@ public class S3Service {
                     .build();
 
             return s3AsyncClient.putObject(
-                    request,
-                    AsyncRequestBody.fromBytes(file.getBytes())
-            )
+                            request,
+                            AsyncRequestBody.fromBytes(file.getBytes())
+                    )
                     .thenApply(_ -> generateUrl(dto.bucket(), dto.key()));
         } catch (IOException e) {
             return CompletableFuture.failedFuture(e);
         }
     }
 
-    public void delete(String itemUrl) {
-        try {
-            URI uri = new URI(itemUrl);
-            String host = uri.getHost();
-            String bucket = host.split("\\.")[0];
-            String key = uri.getPath().substring(1);
-            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                    .bucket(bucket)
-                    .key(key)
-                    .build();
+    public void delete(String bucket, String key) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
 
-            s3AsyncClient.deleteObject(deleteObjectRequest);
-        } catch (URISyntaxException e) {
-            log.warn(e.getMessage());
-        }
+        s3AsyncClient.deleteObject(deleteObjectRequest);
     }
 
     private String generateUrl(String bucket, String key) {

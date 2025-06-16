@@ -24,6 +24,7 @@ import java.util.List;
 public class PublicProductController {
     private final ProductService productService;
 
+
     @GetMapping("/filter")
     public ResponseEntity<Page<ProductDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
@@ -62,7 +63,7 @@ public class PublicProductController {
     public ResponseEntity<Product> getProduct(
             @PathVariable long id
     ) {
-        Product product = productService.getProductById(id);
+        Product product =  productService.getProductById(id);
 
         return ResponseEntity.ok(product);
     }
