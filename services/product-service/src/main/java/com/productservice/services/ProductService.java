@@ -35,7 +35,6 @@ import static com.productservice.utils.Utils.getUUID;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final ProductImageService imageService;
     private final CategoryService categoryService;
     private final BrandService brandService;
     private final LikeService likeService;
@@ -54,7 +53,6 @@ public class ProductService {
         });
     }
 
-
     @Transactional
     public Product updateProduct(UpdateProductRequest dto, long productId) {
         Product product = productRepository.findById(productId)
@@ -63,6 +61,28 @@ public class ProductService {
         updateProductFieldsIfExists(product, dto);
 
         return product;
+    }
+
+    public CompletableFuture<Void> updateProductImage(long productId, MultipartFile productImage) {
+        String imageUrl = getProductImageUrl(productId);
+
+        return productImageService.uploadProductImage(productImage)
+                .thenAccept(newImageUrl -> {
+                    int updated = productRepository.updateProductImageUrl(productId, newImageUrl);
+                    if (updated == 0) {
+                        log.error("Failed to update product image url");
+                        throw new NotFoundException(PRODUCT_NOT_FOUND);
+                    }
+
+                    productImageService.deleteImage(imageUrl);
+                });
+    }
+
+    public void deleteProductById(long productId) {
+        String imageUrl = getProductImageUrl(productId);
+
+        productImageService.deleteImage(imageUrl);
+        productRepository.deleteProductById(productId);
     }
 
     public Page<ProductDto> findPublicProductsByFilters(ProductParams dto, Pageable pageable, long userId) {
@@ -89,21 +109,6 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public CompletableFuture<Void> updateProductImage(long productId, MultipartFile productImage) {
-        String imageUrl = getProductImageUrl(productId);
-
-        return productImageService.uploadProductImage(productImage)
-                .thenAccept(newImageUrl -> {
-                    int updated = productRepository.updateProductImageUrl(productId, newImageUrl);
-                    if (updated == 0) {
-                        log.error("Failed to update product image url");
-                        throw new NotFoundException(PRODUCT_NOT_FOUND);
-                    }
-
-                    imageService.deleteImage(imageUrl);
-                });
-    }
-
     public ProductForCartDto getProductInfoForCart(long productId) {
         return productRepository.getProductForCartById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
@@ -115,13 +120,6 @@ public class ProductService {
         markLikedProducts(products, userId);
 
         return new PageImpl<>(products, pageable, pageable.getPageSize());
-    }
-
-    public void deleteProductById(long productId) {
-        String imageUrl = getProductImageUrl(productId);
-
-        productImageService.deleteImage(imageUrl);
-        productRepository.deleteProductById(productId);
     }
 
 

@@ -75,4 +75,15 @@ public class ApiGatewayConfig {
                         .PATCH("/items/quantity", http()))
                 .build();
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> orderServiceRoute(JwtHandlerFilter jwtHandlerFilter) {
+        return route("order-service-route")
+                .filter(lb("order-service"))
+                .path("/orders", request -> request
+                        .filter(jwtHandlerFilter)
+                        .POST("/request-email-verify", http())
+                        .PATCH("/verify", http()))
+                .build();
+    }
 }
