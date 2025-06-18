@@ -1,16 +1,17 @@
 package com.productservice.mapper;
 
-import com.productservice.projection.ProductPriceAndQuantityDto;
-import com.shopic.grpc.productservice.CartItemAddGrpcResponse;
-import com.shopic.grpc.productservice.ProductInfoForOrder;
+import com.productservice.projection.ProductForCartDto;
+import com.productservice.projection.ProductForOrderDto;
+import com.shopic.grpc.productservice.ProductDetailsResponse;
+import com.shopic.grpc.productservice.ProductInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
 
-    CartItemAddGrpcResponse toCartItemAddGrpcResponse(ProductPriceAndQuantityDto dto);
+    ProductDetailsResponse toCartItemAddGrpcResponse(ProductForCartDto dto);
 
     @Mapping(target = "availableQuantity", source = "stockQuantity")
-    ProductInfoForOrder toProductInfoForOrder(ProductPriceAndQuantityDto dto);
+    ProductInfo toProductInfo(ProductForOrderDto dto);
 }

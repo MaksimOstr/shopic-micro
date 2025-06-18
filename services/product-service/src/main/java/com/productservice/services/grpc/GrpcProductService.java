@@ -2,7 +2,8 @@ package com.productservice.services.grpc;
 
 import com.productservice.exceptions.ProductStockUnavailableException;
 import com.productservice.mapper.GrpcMapper;
-import com.productservice.projection.ProductPriceAndQuantityDto;
+import com.productservice.projection.ProductForCartDto;
+import com.productservice.projection.ProductForOrderDto;
 import com.productservice.services.ProductService;
 import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
@@ -20,26 +21,26 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     private final GrpcMapper grpcMapper;
 
     @Override
-    public void getProductInfoForCart(CartItemAddGrpcRequest request, StreamObserver<CartItemAddGrpcResponse> responseObserver) {
-        ProductPriceAndQuantityDto productDto = productService.getProductInfoForCart(request.getProductId());
+    public void getProductPriceAndStock(GetProductDetailsRequest request, StreamObserver<ProductDetailsResponse> responseObserver) {
+        ProductForCartDto productDto = productService.getProductInfoForCart(request.getProductId());
 
         if(productDto.stockQuantity() < request.getQuantity()) {
             throw new ProductStockUnavailableException("Insufficient stock");
         }
 
-        CartItemAddGrpcResponse response = grpcMapper.toCartItemAddGrpcResponse(productDto);
+        ProductDetailsResponse response = grpcMapper.toCartItemAddGrpcResponse(productDto);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
     @Override
-    public void checkActualProductPriceAndStock(CheckProductGrpcRequest request, StreamObserver<CheckProductGrpcResponse> responseObserver) {
-        List<ProductPriceAndQuantityDto> productPriceAndQuantityList = productService.getProductPriceAndQuantity(request.getProductIdList());
-        List<ProductInfoForOrder> productInfoForOrderList = mapProductInfoForOrder(productPriceAndQuantityList);
+    public void getProductInfoBatch(GetProductInfoBatchRequest request, StreamObserver<GetProductInfoBatchResponse> responseObserver) {
+        List<ProductForOrderDto> productPriceAndQuantityList = productService.getProductPriceAndQuantity(request.getProductIdsList());
+        List<ProductInfo> productInfoForOrderList = mapProductInfoForOrder(productPriceAndQuantityList);
 
-        CheckProductGrpcResponse response = CheckProductGrpcResponse.newBuilder()
-                .addAllProductInfoForOrderList(productInfoForOrderList)
+        GetProductInfoBatchResponse response = GetProductInfoBatchResponse.newBuilder()
+                .addAllProductInfoList(productInfoForOrderList)
                 .build();
 
         responseObserver.onNext(response);
@@ -47,9 +48,9 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     }
 
 
-    private List<ProductInfoForOrder> mapProductInfoForOrder(List<ProductPriceAndQuantityDto> productInfoForOrderList) {
+    private List<ProductInfo> mapProductInfoForOrder(List<ProductForOrderDto> productInfoForOrderList) {
         return productInfoForOrderList.stream()
-                .map(grpcMapper::toProductInfoForOrder)
+                .map(grpcMapper::toProductInfo)
                 .toList();
     }
 }

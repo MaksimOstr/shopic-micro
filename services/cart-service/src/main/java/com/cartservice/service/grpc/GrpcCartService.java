@@ -3,10 +3,10 @@ package com.cartservice.service.grpc;
 import com.cartservice.mapper.GrpcMapper;
 import com.cartservice.projection.CartItemForOrderProjection;
 import com.cartservice.service.CartService;
+import com.shopic.grpc.cartservice.CartItem;
 import com.shopic.grpc.cartservice.CartServiceGrpc;
-import com.shopic.grpc.cartservice.OrderCartInfoGrpcRequest;
-import com.shopic.grpc.cartservice.OrderCartInfoGrpcResponse;
-import com.shopic.grpc.cartservice.OrderCartItem;
+import com.shopic.grpc.cartservice.GetCartRequest;
+import com.shopic.grpc.cartservice.CartResponse;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,12 @@ public class GrpcCartService extends CartServiceGrpc.CartServiceImplBase {
 
 
     @Override
-    public void getOrderCartInfo(OrderCartInfoGrpcRequest request, StreamObserver<OrderCartInfoGrpcResponse> responseObserver) {
+    public void getCart(GetCartRequest request, StreamObserver<CartResponse> responseObserver) {
         List<CartItemForOrderProjection> cartItems = cartService.getCartItemsForOrder(request.getUserId());
-        List<OrderCartItem> orderCartItems = mapToOrderCartItem(cartItems);
+        List<CartItem> cartItemList = mapToOrderCartItem(cartItems);
 
-        OrderCartInfoGrpcResponse response = OrderCartInfoGrpcResponse.newBuilder()
-                .addAllOrderCartItems(orderCartItems)
+        CartResponse response = CartResponse.newBuilder()
+                .addAllCartItems(cartItemList)
                 .build();
 
         responseObserver.onNext(response);
@@ -34,7 +34,7 @@ public class GrpcCartService extends CartServiceGrpc.CartServiceImplBase {
     }
 
 
-    private List<OrderCartItem> mapToOrderCartItem(List<CartItemForOrderProjection> cartItems) {
+    private List<CartItem> mapToOrderCartItem(List<CartItemForOrderProjection> cartItems) {
         return cartItems.stream()
                 .map(grpcMapper::toOrderCartItem)
                 .toList();

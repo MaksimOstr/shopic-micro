@@ -1,7 +1,7 @@
 package com.orderservice.service.grpc;
 
-import com.shopic.grpc.productservice.CheckProductGrpcRequest;
-import com.shopic.grpc.productservice.CheckProductGrpcResponse;
+import com.shopic.grpc.productservice.GetProductInfoBatchRequest;
+import com.shopic.grpc.productservice.GetProductInfoBatchResponse;
 import com.shopic.grpc.productservice.ProductServiceGrpc;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,10 +13,10 @@ import java.util.List;
 public class ProductGrpcService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productGrpcService;
 
-    public CheckProductGrpcResponse checkProducts(List<Long> productIds) {
-        CheckProductGrpcRequest request = CheckProductGrpcRequest.newBuilder()
-                .addAllProductId(productIds).build();
+    public GetProductInfoBatchResponse getProductInfoBatch(List<Long> productIds) {
+        GetProductInfoBatchRequest request = GetProductInfoBatchRequest.newBuilder()
+                .addAllProductIds(productIds).build();
 
-        return productGrpcService.checkActualProductPriceAndStock(request);
+        return productGrpcService.getProductInfoBatch(request);
     }
 }

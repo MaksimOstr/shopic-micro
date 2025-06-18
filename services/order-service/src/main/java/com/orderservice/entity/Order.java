@@ -1,25 +1,25 @@
 package com.orderservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
 @Getter
 @Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orders_seq")
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -30,6 +30,9 @@ public class Order {
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
+
+    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<OrderItem> orderItems;
 
     @Column(name = "created_at", nullable = false)
     @CreatedDate

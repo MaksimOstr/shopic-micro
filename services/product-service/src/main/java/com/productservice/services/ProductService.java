@@ -10,7 +10,8 @@ import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ProductMapper;
 import com.productservice.projection.ProductDto;
-import com.productservice.projection.ProductPriceAndQuantityDto;
+import com.productservice.projection.ProductForCartDto;
+import com.productservice.projection.ProductForOrderDto;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -109,12 +110,12 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public ProductPriceAndQuantityDto getProductInfoForCart(long productId) {
+    public ProductForCartDto getProductInfoForCart(long productId) {
         return productRepository.getProductForCartById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
-    public List<ProductPriceAndQuantityDto> getProductPriceAndQuantity(List<Long> productIds) {
+    public List<ProductForOrderDto> getProductPriceAndQuantity(List<Long> productIds) {
         return productRepository.findProductPriceAndQuantity(productIds);
     }
 

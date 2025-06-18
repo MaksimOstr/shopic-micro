@@ -8,7 +8,7 @@ import com.cartservice.projection.CartItemForOrderProjection;
 import com.cartservice.projection.CartItemProjection;
 import com.cartservice.repository.CartItemRepository;
 import com.cartservice.service.grpc.GrpcProductService;
-import com.shopic.grpc.productservice.CartItemAddGrpcResponse;
+import com.shopic.grpc.productservice.ProductDetailsResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ public class CartItemService {
 
     @Transactional
     public void createCartItem(CreateCartItemDto dto) {
-        CartItemAddGrpcResponse response = grpcProductService.getProductInfoForCart(dto.productId(), dto.quantity());
+        ProductDetailsResponse response = grpcProductService.getProductInfoForCart(dto.productId(), dto.quantity());
 
         cartItemRepository.findByCart_IdAndProductId(dto.cartId(), dto.productId())
                 .ifPresentOrElse(

@@ -7,31 +7,34 @@ package productservice;
 option java_multiple_files = true;
 option java_package = "com.shopic.grpc.productservice";
 
-message CartItemAddGrpcRequest {
+message GetProductDetailsRequest {
   int64 product_id = 1;
   int32 quantity = 2;
 }
 
-message CartItemAddGrpcResponse {
+message ProductDetailsResponse {
   string product_price = 1;
 }
 
-message CheckProductGrpcRequest {
-  repeated int64 product_id = 1;
+
+message GetProductInfoBatchRequest {
+  repeated int64 product_ids = 1;
 }
 
-message ProductInfoForOrder {
-  string product_price = 1;
-  int32 available_quantity = 2;
+message GetProductInfoBatchResponse {
+  repeated ProductInfo product_info_list = 1;
 }
 
-message CheckProductGrpcResponse {
-  repeated ProductInfoForOrder product_info_for_order_list = 1;
+message ProductInfo {
+  int64 product_id = 1;
+  string price = 2;
+  int32 available_quantity = 3;
 }
+
 
 service ProductService {
-  rpc getProductInfoForCart(CartItemAddGrpcRequest) returns (CartItemAddGrpcResponse);
+  rpc getProductPriceAndStock(GetProductDetailsRequest) returns (ProductDetailsResponse);
 
-  rpc checkActualProductPriceAndStock(CheckProductGrpcRequest) returns (CheckProductGrpcResponse);
+  rpc getProductInfoBatch(GetProductInfoBatchRequest) returns (GetProductInfoBatchResponse);
 }
 

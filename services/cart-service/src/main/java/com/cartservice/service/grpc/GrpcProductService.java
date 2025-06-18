@@ -2,8 +2,8 @@ package com.cartservice.service.grpc;
 
 import com.cartservice.exception.InsufficientProductStockException;
 import com.cartservice.exception.NotFoundException;
-import com.shopic.grpc.productservice.CartItemAddGrpcRequest;
-import com.shopic.grpc.productservice.CartItemAddGrpcResponse;
+import com.shopic.grpc.productservice.GetProductDetailsRequest;
+import com.shopic.grpc.productservice.ProductDetailsResponse;
 import com.shopic.grpc.productservice.ProductServiceGrpc;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -16,14 +16,14 @@ import org.springframework.stereotype.Service;
 public class GrpcProductService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productServiceGrpc;
 
-    public CartItemAddGrpcResponse getProductInfoForCart(long productId, int quantity) {
-        CartItemAddGrpcRequest request = CartItemAddGrpcRequest.newBuilder()
+    public ProductDetailsResponse getProductInfoForCart(long productId, int quantity) {
+        GetProductDetailsRequest request = GetProductDetailsRequest.newBuilder()
                 .setProductId(productId)
                 .setQuantity(quantity)
                 .build();
 
         try {
-            return productServiceGrpc.getProductInfoForCart(request);
+            return productServiceGrpc.getProductPriceAndStock(request);
         } catch (StatusRuntimeException e) {
             Status.Code code = e.getStatus().getCode();
 

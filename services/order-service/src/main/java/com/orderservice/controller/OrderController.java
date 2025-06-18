@@ -1,5 +1,6 @@
 package com.orderservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.orderservice.config.security.model.CustomPrincipal;
 import com.orderservice.entity.Order;
 import com.orderservice.service.OrderService;
@@ -19,7 +20,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Order> createOrder(
             @AuthenticationPrincipal CustomPrincipal principal
-    ) {
+    ) throws JsonProcessingException {
         orderService.createOrder(principal.getId());
 
         return ResponseEntity.ok().build();
