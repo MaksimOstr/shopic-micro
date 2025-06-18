@@ -3,7 +3,7 @@ package com.orderservice.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.orderservice.config.security.model.CustomPrincipal;
 import com.orderservice.entity.Order;
-import com.orderservice.service.OrderService;
+import com.orderservice.service.OrderCreationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/orders")
 public class OrderController {
-    private final OrderService orderService;
+    private final OrderCreationService orderCreationService;
 
     @PostMapping
     public ResponseEntity<Order> createOrder(
             @AuthenticationPrincipal CustomPrincipal principal
     ) throws JsonProcessingException {
-        orderService.createOrder(principal.getId());
+        orderCreationService.createOrder(principal.getId());
 
         return ResponseEntity.ok().build();
     }

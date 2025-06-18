@@ -1,9 +1,6 @@
 package com.productservice.services;
 
-import com.productservice.dto.request.AdminProductParams;
-import com.productservice.dto.request.CreateProductRequest;
-import com.productservice.dto.request.ProductParams;
-import com.productservice.dto.request.UpdateProductRequest;
+import com.productservice.dto.request.*;
 import com.productservice.entity.Brand;
 import com.productservice.entity.Category;
 import com.productservice.entity.Product;
@@ -115,10 +112,6 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
-    public List<ProductForOrderDto> getProductPriceAndQuantity(List<Long> productIds) {
-        return productRepository.findProductPriceAndQuantity(productIds);
-    }
-
     public Page<ProductDto> getPageOfProducts(Pageable pageable, long userId) {
         List<ProductDto> products = productRepository.getPageOfProducts(pageable).getContent();
 
@@ -127,6 +120,9 @@ public class ProductService {
         return new PageImpl<>(products, pageable, pageable.getPageSize());
     }
 
+    public void checkAndReserveProduct(long userId, long productId, int quantity) {
+
+    }
 
     private String getProductImageUrl(long productId) {
         return productRepository.getProductImageUrl(productId)

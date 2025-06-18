@@ -35,12 +35,12 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     }
 
     @Override
-    public void getProductInfoBatch(GetProductInfoBatchRequest request, StreamObserver<GetProductInfoBatchResponse> responseObserver) {
-        List<ProductForOrderDto> productPriceAndQuantityList = productService.getProductPriceAndQuantity(request.getProductIdsList());
+    public void checkAndReserveProducts(CheckAndReserveProductsRequest request, StreamObserver<CheckProductResponse> responseObserver) {
+        List<ProductForOrderDto> productPriceAndQuantityList = productService.checkAndReserveProduct();
         List<ProductInfo> productInfoForOrderList = mapProductInfoForOrder(productPriceAndQuantityList);
 
-        GetProductInfoBatchResponse response = GetProductInfoBatchResponse.newBuilder()
-                .addAllProductInfoList(productInfoForOrderList)
+        CheckProductResponse response = CheckProductResponse.newBuilder()
+                .addAllProducts(productInfoForOrderList)
                 .build();
 
         responseObserver.onNext(response);

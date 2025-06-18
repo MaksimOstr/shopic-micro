@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Maksim
+      changes:
+        - createSequence:
+            sequenceName: reservations_seq
+            startValue: 1
+            cacheSize: 50
+            incrementBy: 50
+
+        - createTable:
+            tableName: reservations
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: reservations_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    references: products(id)
+                    foreignKeyName: fk_reservations_product
+              - column:
+                  name: quantity
+                  type: int
+                  constraints:
+                    nullable: false
+                    checkConstraint: "quantity > 0"
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false

@@ -1,4 +1,4 @@
-package com.authservice.config.security;
+package com.authservice.config.security.handler;
 
 import com.authservice.dto.response.ErrorResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;

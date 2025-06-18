@@ -1,6 +1,7 @@
 package com.authservice.config.security;
 
 import com.authservice.config.security.filter.AuthenticationFilter;
+import com.authservice.config.security.handler.CustomAuthenticationEntryPoint;
 import com.authservice.config.security.handler.OAuthSuccessHandler;
 import com.authservice.config.security.handler.OauthFailureHandler;
 import com.authservice.services.CustomOidcUserService;

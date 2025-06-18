@@ -11,6 +11,7 @@ import com.orderservice.service.grpc.CartGrpcService;
 import com.orderservice.service.grpc.ProductGrpcService;
 import com.shopic.grpc.cartservice.CartResponse;
 import com.shopic.grpc.cartservice.CartItem;
+import com.shopic.grpc.productservice.CheckProductResponse;
 import com.shopic.grpc.productservice.GetProductInfoBatchResponse;
 import com.shopic.grpc.productservice.ProductInfo;
 import jakarta.ws.rs.NotFoundException;
@@ -30,7 +31,7 @@ import static com.orderservice.utils.OrderUtils.getProductIds;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class OrderCreationService {
     private final OrderRepository orderRepository;
     private final OrderItemService orderItemService;
     private final CartGrpcService cartGrpcService;
@@ -45,14 +46,13 @@ public class OrderService {
         List<CartItem> cartItems = cartInfo.getCartItemsList();
         List<Long> productIds = getProductIds(cartItems);
 
-        Map<Long, ProductInfo> productInfoMap = getProductInfoMap(productIds);
+        CheckProductResponse response = productGrpcService.checkAndReserveProduct(cartItems);
 
-        validateStock(productInfoMap, cartItems);
+
+        Map<Long, ProductInfo> productInfoMap = getProductInfoMap(productIds);
 
         Order savedOrder = createAndSaveOrderEntity(userId, productInfoMap);
         saveOrderItems(cartItems, savedOrder, productInfoMap);
-
-        kafkaEventProducer.sendOrderCreatedEvent();
     }
 
 
@@ -72,21 +72,6 @@ public class OrderService {
 
         return response.getProductInfoListList().stream()
                 .collect(Collectors.toMap(ProductInfo::getProductId, Function.identity()));
-    }
-
-    private void validateStock(Map<Long, ProductInfo> productInfoMap, List<CartItem> cartItems) {
-        for (CartItem cartItem : cartItems) {
-            ProductInfo productInfo = productInfoMap.get(cartItem.getProductId());
-
-            if (productInfo == null) {
-                throw new NotFoundException("Product not found");
-            }
-
-            if (cartItem.getQuantity() > productInfo.getAvailableQuantity()) {
-                throw new InsufficientStockException("Insufficient stock for product " + cartItem.getProductId());
-            }
-        }
-
     }
 
     private List<CreateOrderItem> createOrderItems(List<CartItem> cartItems, Order order, Map<Long, ProductInfo> productInfoMap) {

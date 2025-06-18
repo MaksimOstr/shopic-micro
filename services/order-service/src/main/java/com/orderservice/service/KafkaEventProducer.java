@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class KafkaEventProducer {
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<Object, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
     public void sendOrderCreatedEvent() throws JsonProcessingException {
