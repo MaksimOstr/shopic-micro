@@ -2,8 +2,7 @@ package com.productservice.repository;
 
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
-import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductImageUrlProjection;
+import com.productservice.projection.ProductPriceAndQuantityDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -39,7 +38,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.id, " +
             "p.name, " +
             "p.description, " +
-            "p.imageUrl,"+
+            "p.imageUrl," +
             "p.sku," +
             "p.price, " +
             "b.name, " +
@@ -55,7 +54,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.id, " +
             "p.name, " +
             "p.description, " +
-            "p.imageUrl,"+
+            "p.imageUrl," +
             "p.sku," +
             "p.price, " +
             "b.name, " +
@@ -67,12 +66,19 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "JOIN p.category c WHERE p.id IN :productIds")
     List<ProductDto> findProductsByIds(@Param("productIds") Set<Long> productIds);
 
-    @Query("SELECT new com.productservice.projection.ProductForCartDto(" +
+    @Query("SELECT new com.productservice.projection.ProductPriceAndQuantityDto(" +
+            "p.price," +
+            "p.stockQuantity" +
+            ")" +
+            "FROM Product p WHERE p.id IN :productIds")
+    List<ProductPriceAndQuantityDto> findProductPriceAndQuantity(List<Long> productIds);
+
+    @Query("SELECT new com.productservice.projection.ProductPriceAndQuantityDto(" +
             "p.price," +
             "p.stockQuantity" +
             ")" +
             "FROM Product p WHERE p.id = :id")
-    Optional<ProductForCartDto> getProductForCartById(long id);
+    Optional<ProductPriceAndQuantityDto> getProductForCartById(long id);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

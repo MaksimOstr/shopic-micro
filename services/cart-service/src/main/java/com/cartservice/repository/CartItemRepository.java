@@ -1,6 +1,7 @@
 package com.cartservice.repository;
 
 import com.cartservice.entity.CartItem;
+import com.cartservice.projection.CartItemForOrderProjection;
 import com.cartservice.projection.CartItemProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,4 +32,11 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     @Modifying
     @Query("DELETE FROM CartItem c WHERE c.cart.id = :cartId AND c.productId = :productId")
     int deleteCartItem(long cartId, long productId);
+
+    @Query("SELECT new com.cartservice.projection.CartItemForOrderProjection(" +
+            "ci.productId," +
+            "ci.quantity" +
+            ")" +
+            "FROM CartItem ci WHERE ci.cart.id = :cartId")
+    List<CartItemForOrderProjection> findCartItemForOrderByCartId(Long cartId);
 }

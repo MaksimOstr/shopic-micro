@@ -130,16 +130,12 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_likes_order
+                    references: products(id)
                     deleteCascade: true
         - addUniqueConstraint:
             tableName: likes
             columnNames: user_id, product_id
-        - addForeignKeyConstraint:
-            baseTableName: likes
-            baseColumnNames: product_id
-            constraintName: fk_likes_product_id
-            referencedTableName: products
-            referencedColumnNames: id
 
         - createTable:
             tableName: categories

@@ -16,7 +16,22 @@ message CartItemAddGrpcResponse {
   string product_price = 1;
 }
 
+message CheckProductGrpcRequest {
+  repeated int64 product_id = 1;
+}
+
+message ProductInfoForOrder {
+  string product_price = 1;
+  int32 available_quantity = 2;
+}
+
+message CheckProductGrpcResponse {
+  repeated ProductInfoForOrder product_info_for_order_list = 1;
+}
+
 service ProductService {
   rpc getProductInfoForCart(CartItemAddGrpcRequest) returns (CartItemAddGrpcResponse);
+
+  rpc checkActualProductPriceAndStock(CheckProductGrpcRequest) returns (CheckProductGrpcResponse);
 }
 

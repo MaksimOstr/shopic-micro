@@ -69,6 +69,7 @@ databaseChangeLog:
                     nullable: false
                     foreignKeyName: fk_order_items_order
                     references: orders(id)
+                    deleteCascade: true
               - column:
                   name: price_at_purchase
                   type: decimal(10, 2)

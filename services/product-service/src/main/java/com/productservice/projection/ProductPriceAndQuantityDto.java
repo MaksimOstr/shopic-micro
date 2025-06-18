@@ -2,7 +2,7 @@ package com.productservice.projection;
 
 import java.math.BigDecimal;
 
-public record ProductForCartDto(
+public record ProductPriceAndQuantityDto(
         BigDecimal productPrice,
         int stockQuantity
 ) {}

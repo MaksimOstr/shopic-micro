@@ -1,4 +1,4 @@
-package com.cartservice.config;
+package com.cartservice.config.grpc;
 
 import com.shopic.grpc.productservice.ProductServiceGrpc;
 import org.springframework.context.annotation.Bean;

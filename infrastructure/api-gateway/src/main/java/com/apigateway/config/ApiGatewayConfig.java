@@ -82,8 +82,7 @@ public class ApiGatewayConfig {
                 .filter(lb("order-service"))
                 .path("/orders", request -> request
                         .filter(jwtHandlerFilter)
-                        .POST("/request-email-verify", http())
-                        .PATCH("/verify", http()))
+                        .POST("", http()))
                 .build();
     }
 }

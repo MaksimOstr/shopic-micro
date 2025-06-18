@@ -6,6 +6,7 @@ import com.cartservice.dto.request.ChangeCartItemQuantity;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
 import com.cartservice.exception.NotFoundException;
+import com.cartservice.projection.CartItemForOrderProjection;
 import com.cartservice.projection.CartItemProjection;
 import com.cartservice.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,12 @@ public class CartService {
         return cartRepository.findCartIdByUserId(userId)
                 .map(cartItemService::getCartItems)
                 .orElseGet(ArrayList::new);
+    }
+
+    public List<CartItemForOrderProjection> getCartItemsForOrder(long userId) {
+        long cartId = getCartIdByUserId(userId);
+
+        return cartItemService.getCartItemsForOrder(cartId);
     }
 
     public void removeItemFromCart(long userId, long productId) {

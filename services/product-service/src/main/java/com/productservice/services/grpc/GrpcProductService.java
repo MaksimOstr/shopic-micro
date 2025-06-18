@@ -2,14 +2,14 @@ package com.productservice.services.grpc;
 
 import com.productservice.exceptions.ProductStockUnavailableException;
 import com.productservice.mapper.GrpcMapper;
-import com.productservice.projection.ProductForCartDto;
+import com.productservice.projection.ProductPriceAndQuantityDto;
 import com.productservice.services.ProductService;
-import com.shopic.grpc.productservice.CartItemAddGrpcRequest;
-import com.shopic.grpc.productservice.CartItemAddGrpcResponse;
-import com.shopic.grpc.productservice.ProductServiceGrpc;
+import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -21,7 +21,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getProductInfoForCart(CartItemAddGrpcRequest request, StreamObserver<CartItemAddGrpcResponse> responseObserver) {
-        ProductForCartDto productDto = productService.getProductInfoForCart(request.getProductId());
+        ProductPriceAndQuantityDto productDto = productService.getProductInfoForCart(request.getProductId());
 
         if(productDto.stockQuantity() < request.getQuantity()) {
             throw new ProductStockUnavailableException("Insufficient stock");
@@ -31,5 +31,25 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void checkActualProductPriceAndStock(CheckProductGrpcRequest request, StreamObserver<CheckProductGrpcResponse> responseObserver) {
+        List<ProductPriceAndQuantityDto> productPriceAndQuantityList = productService.getProductPriceAndQuantity(request.getProductIdList());
+        List<ProductInfoForOrder> productInfoForOrderList = mapProductInfoForOrder(productPriceAndQuantityList);
+
+        CheckProductGrpcResponse response = CheckProductGrpcResponse.newBuilder()
+                .addAllProductInfoForOrderList(productInfoForOrderList)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+
+    private List<ProductInfoForOrder> mapProductInfoForOrder(List<ProductPriceAndQuantityDto> productInfoForOrderList) {
+        return productInfoForOrderList.stream()
+                .map(grpcMapper::toProductInfoForOrder)
+                .toList();
     }
 }

@@ -4,6 +4,7 @@ import com.cartservice.dto.CreateCartItemDto;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
 import com.cartservice.exception.NotFoundException;
+import com.cartservice.projection.CartItemForOrderProjection;
 import com.cartservice.projection.CartItemProjection;
 import com.cartservice.repository.CartItemRepository;
 import com.cartservice.service.grpc.GrpcProductService;
@@ -59,6 +60,10 @@ public class CartItemService {
         if(deleted == 0) {
             throw new NotFoundException("Cart item not found");
         }
+    }
+
+    public List<CartItemForOrderProjection> getCartItemsForOrder(long cartId) {
+        return cartItemRepository.findCartItemForOrderByCartId(cartId);
     }
 
     private void createAndSaveCartItem(CreateCartItemDto dto, String priceAtAdd) {
