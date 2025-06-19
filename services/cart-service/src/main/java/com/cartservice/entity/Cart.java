@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.List;
 
 
 @Entity
@@ -24,6 +25,9 @@ public class Cart {
 
     @Column(nullable = false, unique = true, name = "user_id")
     private Long userId;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CartItem> cartItems;
 
     @CreatedDate
     @Column(nullable = false, name = "created_at")

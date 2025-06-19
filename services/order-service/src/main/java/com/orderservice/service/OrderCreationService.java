@@ -1,19 +1,16 @@
 package com.orderservice.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.orderservice.dto.request.CreateOrderItem;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderStatusEnum;
-import com.orderservice.exception.InsufficientStockException;
-import com.orderservice.mapper.OrderMapper;
+import com.orderservice.exception.NotFoundException;
 import com.orderservice.repository.OrderRepository;
 import com.orderservice.service.grpc.CartGrpcService;
 import com.orderservice.service.grpc.ProductGrpcService;
 import com.shopic.grpc.cartservice.CartResponse;
 import com.shopic.grpc.cartservice.CartItem;
-import com.shopic.grpc.productservice.CheckProductResponse;
+import com.shopic.grpc.productservice.CheckAndReserveProductResponse;
 import com.shopic.grpc.productservice.ProductInfo;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.orderservice.utils.OrderUtils.calculateTotalPrice;
-import static com.orderservice.utils.OrderUtils.getProductIds;
 
 
 @Service
@@ -36,26 +29,24 @@ public class OrderCreationService {
     private final CartGrpcService cartGrpcService;
     private final ProductGrpcService productGrpcService;
     private final KafkaEventProducer kafkaEventProducer;
-    private final OrderMapper orderMapper;
 
 
     @Transactional
-    public void createOrder(long userId) throws JsonProcessingException {
+    public void createOrder(long userId) {
         CartResponse cartInfo = cartGrpcService.getCartInfo(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
-        List<Long> productIds = getProductIds(cartItems);
 
-        CheckProductResponse response = productGrpcService.checkAndReserveProduct(cartItems);
+        CheckAndReserveProductResponse response = productGrpcService.checkAndReserveProduct(cartItems);
 
-        Map<Long, ProductInfo> productInfoMap = getProductInfoMap(productIds);
+        Map<Long, BigDecimal> productPriceMap = getProductPriceMap(response.getProductsList());
 
-        Order savedOrder = createAndSaveOrderEntity(userId, productInfoMap);
-        saveOrderItems(cartItems, savedOrder, productInfoMap);
+        Order savedOrder = createAndSaveOrderEntity(userId, productPriceMap, cartItems);
+        saveOrderItems(cartItems, savedOrder, productPriceMap);
     }
 
 
-    private Order createAndSaveOrderEntity(long userId, Map<Long, ProductInfo> productInfoMap) {
-        BigDecimal totalPrice = calculateTotalPrice(productInfoMap.values());
+    private Order createAndSaveOrderEntity(long userId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
+        BigDecimal totalPrice = calculateTotalPrice(priceMap, cartItems);
         Order order = Order.builder()
                 .status(OrderStatusEnum.CREATED)
                 .totalPrice(totalPrice)
@@ -65,22 +56,41 @@ public class OrderCreationService {
         return orderRepository.save(order);
     }
 
-    private Map<Long, ProductInfo> getProductInfoMap(List<Long> productIds) {
-        GetProductInfoBatchResponse response = productGrpcService.getProductInfoBatch(productIds);
+    private BigDecimal calculateTotalPrice(Map<Long, BigDecimal> products, List<CartItem> cartItems) {
+        return cartItems.stream().map(item -> {
+            BigDecimal price = products.get(item.getProductId());
 
-        return response.getProductInfoListList().stream()
-                .collect(Collectors.toMap(ProductInfo::getProductId, Function.identity()));
+            if(price == null) {
+                throw new NotFoundException("Product not found");
+            }
+
+            return price.multiply(new BigDecimal(item.getQuantity()));
+        }).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private List<CreateOrderItem> createOrderItems(List<CartItem> cartItems, Order order, Map<Long, ProductInfo> productInfoMap) {
+    private Map<Long, BigDecimal> getProductPriceMap(List<ProductInfo> productInfoList) {
+
+        return productInfoList.stream()
+                .collect(Collectors.toMap(
+                        ProductInfo::getProductId,
+                        info -> new BigDecimal(info.getPrice())
+                ));
+    }
+
+    private List<CreateOrderItem> createOrderItems(List<CartItem> cartItems, Order order, Map<Long, BigDecimal> priceMap) {
         return cartItems.parallelStream()
                 .map(item -> {
-                    ProductInfo productInfo = productInfoMap.get(item.getProductId());
-                    return orderMapper.toCreateOrderItem(productInfo, item.getQuantity(), order);
+                    BigDecimal price = priceMap.get(item.getProductId());
+                    return new CreateOrderItem(
+                            item.getProductId(),
+                            item.getQuantity(),
+                            price,
+                            order.getId()
+                    );
                 }).toList();
     }
 
-    private void saveOrderItems(List<CartItem> cartItems, Order order, Map<Long, ProductInfo> productInfoMap) {
+    private void saveOrderItems(List<CartItem> cartItems, Order order, Map<Long, BigDecimal> productInfoMap) {
         List<CreateOrderItem> createOrderItems = createOrderItems(cartItems, order, productInfoMap);
 
         orderItemService.saveAllOrderItems(createOrderItems);

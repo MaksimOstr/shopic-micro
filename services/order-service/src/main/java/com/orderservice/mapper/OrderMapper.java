@@ -11,7 +11,4 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
 
-    @Mapping(target = "orderId", source = "order.id")
-    @Mapping(target = "quantity", source = "orderQuantity")
-    CreateOrderItem toCreateOrderItem(ProductInfo productInfo, int orderQuantity, Order order);
 }

@@ -72,6 +72,7 @@ public class ApiGatewayConfig {
                         .GET("/items", http())
                         .POST("/items", http())
                         .DELETE("/items", http())
+                        .DELETE("", http())
                         .PATCH("/items/quantity", http()))
                 .build();
     }

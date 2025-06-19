@@ -20,7 +20,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Order> createOrder(
             @AuthenticationPrincipal CustomPrincipal principal
-    ) throws JsonProcessingException {
+    ) {
         orderCreationService.createOrder(principal.getId());
 
         return ResponseEntity.ok().build();

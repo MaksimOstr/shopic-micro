@@ -50,6 +50,8 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_card_items_cart
+                    references: carts(id)
                     deleteCascade: true
               - column:
                   name: product_id
@@ -71,11 +73,4 @@ databaseChangeLog:
         - addUniqueConstraint:
             tableName: cart_items
             columnNames: cart_id, product_id
-
-        - addForeignKeyConstraint:
-            baseTableName: cart_items
-            baseColumnNames: cart_id
-            constraintName: fk_card_items_cart
-            referencedTableName: carts
-            referencedColumnNames: id
 

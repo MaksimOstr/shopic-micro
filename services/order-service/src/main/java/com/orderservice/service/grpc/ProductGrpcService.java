@@ -1,9 +1,8 @@
 package com.orderservice.service.grpc;
 
-import com.orderservice.mapper.GrpcMapper;
 import com.shopic.grpc.cartservice.CartItem;
 import com.shopic.grpc.productservice.CheckAndReserveProductsRequest;
-import com.shopic.grpc.productservice.CheckProductResponse;
+import com.shopic.grpc.productservice.CheckAndReserveProductResponse;
 import com.shopic.grpc.productservice.ProductServiceGrpc;
 import com.shopic.grpc.productservice.ReservationItem;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +14,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductGrpcService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productGrpcService;
-    private final GrpcMapper grpcMapper;
 
-    public CheckProductResponse checkAndReserveProduct(List<CartItem> cartItems) {
+    public CheckAndReserveProductResponse checkAndReserveProduct(List<CartItem> cartItems) {
+        System.out.println(cartItems);
         List<ReservationItem> reservationItems = mapToReservationItems(cartItems);
         CheckAndReserveProductsRequest request = CheckAndReserveProductsRequest.newBuilder()
                 .addAllReservationItems(reservationItems).build();
@@ -26,6 +25,9 @@ public class ProductGrpcService {
     }
 
     private List<ReservationItem> mapToReservationItems(List<CartItem> cartItems) {
-        return cartItems.stream().map(grpcMapper::toReservationItem).toList();
+        return cartItems.stream().map(item -> ReservationItem.newBuilder()
+                .setProductId(item.getProductId())
+                .setQuantity(item.getQuantity())
+                .build()).toList();
     }
 }

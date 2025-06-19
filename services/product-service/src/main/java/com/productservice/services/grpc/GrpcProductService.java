@@ -2,7 +2,7 @@ package com.productservice.services.grpc;
 
 import com.productservice.dto.request.ItemForReservation;
 import com.productservice.dto.request.CreateReservationDto;
-import com.productservice.exceptions.ProductStockUnavailableException;
+import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.mapper.GrpcMapper;
 import com.productservice.projection.ProductForCartDto;
 import com.productservice.projection.ProductPrice;
@@ -32,7 +32,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
         ProductForCartDto productDto = productService.getProductInfoForCart(request.getProductId());
 
         if(productDto.stockQuantity() < request.getQuantity()) {
-            throw new ProductStockUnavailableException("Insufficient stock");
+            throw new InsufficientStockException("Insufficient stock");
         }
 
         ProductDetailsResponse response = grpcMapper.toCartItemAddGrpcResponse(productDto);
@@ -57,6 +57,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
                 .setReservationId(reservationId)
                 .build();
 
+        System.out.println("teststsadasdad");
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

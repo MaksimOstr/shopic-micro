@@ -7,5 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
+    @Mapping(target = "productId", source = "productId")
+    @Mapping(target = "quantity", source = "quantity")
     ReservationItem toReservationItem(CartItem cartItem);
 }
