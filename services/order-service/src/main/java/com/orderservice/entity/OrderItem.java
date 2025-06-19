@@ -27,6 +27,12 @@ public class OrderItem {
     @Min(value = 0)
     private int quantity;
 
+    @Column(name = "product_name", nullable = false)
+    private String productName;
+
+    @Column(name = "product_image_url", nullable = false)
+    private String productImageUrl;
+
     @Column(name = "price_at_purchase", nullable = false)
     @DecimalMin(value = "0.0", message = "Price cannot be negative")
     private BigDecimal priceAtPurchase;

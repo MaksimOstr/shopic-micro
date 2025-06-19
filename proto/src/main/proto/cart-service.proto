@@ -20,6 +20,8 @@ message CartResponse {
 message CartItem {
   int64 product_id = 1;
   int32 quantity = 2;
+  string product_name = 3;
+  string product_image_url = 4;
 }
 
 

@@ -6,5 +6,7 @@ public record CartItemProjection(
         long id,
         long productId,
         int quantity,
-        BigDecimal priceAtAdd
+        BigDecimal priceAtAdd,
+        String productName,
+        String productImageUrl
 ) {}

@@ -2,6 +2,7 @@ package com.orderservice.controller.advice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.orderservice.dto.response.ErrorResponseDto;
+import com.orderservice.exception.InsufficientStockException;
 import com.orderservice.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,15 @@ public class GlobalControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 HttpStatus.NOT_FOUND.value(),
+                e.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    private ResponseEntity<ErrorResponseDto> handleAlreadyExists(InsufficientStockException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
                 e.getMessage()
         ));
     }

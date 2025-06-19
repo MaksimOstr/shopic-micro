@@ -6,5 +6,7 @@ public record CreateOrderItem (
         long productId,
         int quantity,
         BigDecimal price,
-        long orderId
+        long orderId,
+        String productName,
+        String productImageUrl
 ) {}

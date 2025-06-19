@@ -45,7 +45,7 @@ public class CartItemService {
                             value.setQuantity(dto.quantity() + value.getQuantity());
                         },
                         () -> {
-                            createAndSaveCartItem(dto, response.getProductPrice());
+                            createAndSaveCartItem(dto, response);
                         }
                 );
     }
@@ -66,12 +66,15 @@ public class CartItemService {
         return cartItemRepository.findCartItemForOrderByCartId(cartId);
     }
 
-    private void createAndSaveCartItem(CreateCartItemDto dto, String priceAtAdd) {
+    private void createAndSaveCartItem(CreateCartItemDto dto, ProductDetailsResponse response) {
+        System.out.println(response.getProductImageUrl());
         CartItem cartItem = CartItem.builder()
                 .productId(dto.productId())
+                .productName(response.getProductName())
+                .productImageUrl(response.getProductImageUrl())
                 .cart(entityManager.getReference(Cart.class, dto.cartId()))
                 .quantity(dto.quantity())
-                .priceAtAdd(new BigDecimal(priceAtAdd))
+                .priceAtAdd(new BigDecimal(response.getProductPrice()))
                 .build();
 
         cartItemRepository.save(cartItem);

@@ -85,7 +85,9 @@ public class OrderCreationService {
                             item.getProductId(),
                             item.getQuantity(),
                             price,
-                            order.getId()
+                            order.getId(),
+                            item.getProductName(),
+                            item.getProductImageUrl()
                     );
                 }).toList();
     }

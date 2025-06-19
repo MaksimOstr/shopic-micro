@@ -54,6 +54,15 @@ public class AdminProductController {
         return ResponseEntity.ok(message);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProduct(
+            @PathVariable long id
+    ) {
+        Product product = productService.getProductById(id);
+
+        return ResponseEntity.ok(product);
+    }
+
 
     @PatchMapping("/{id}")
     public ResponseEntity<Product> updateProduct(

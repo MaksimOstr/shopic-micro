@@ -48,13 +48,14 @@ public class ApiGatewayConfig {
                         .POST("", http()))
                 .path("/products", request -> request
                         .filter(jwtHandlerFilter)
-                        .GET("/{id}", http())
+                        .GET("/active/{id}", http())
                         .GET("", http())
                         .GET("/liked", http())
                         .GET("/filter", http()))
                 .path("/admin/products", request -> request
                         .filter(jwtHandlerFilter)
                         .POST("", http())
+                        .GET("/{id}", http())
                         .GET("/sku", http())
                         .GET("/filter", http())
                         .PATCH("/{id}/image", http())
@@ -83,7 +84,8 @@ public class ApiGatewayConfig {
                 .filter(lb("order-service"))
                 .path("/orders", request -> request
                         .filter(jwtHandlerFilter)
-                        .POST("", http()))
+                        .POST("", http())
+                        .GET("", http()))
                 .build();
     }
 }

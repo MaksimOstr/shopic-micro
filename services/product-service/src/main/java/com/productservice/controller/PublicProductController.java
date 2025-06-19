@@ -59,11 +59,11 @@ public class PublicProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Product> getProduct(
+    @GetMapping("/active/{id}")
+    public ResponseEntity<Product> getActiveProduct(
             @PathVariable long id
     ) {
-        Product product =  productService.getProductById(id);
+        Product product =  productService.getEnabledProductById(id);
 
         return ResponseEntity.ok(product);
     }

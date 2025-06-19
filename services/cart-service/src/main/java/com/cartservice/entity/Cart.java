@@ -1,6 +1,7 @@
 package com.cartservice.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,7 +27,8 @@ public class Cart {
     @Column(nullable = false, unique = true, name = "user_id")
     private Long userId;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
+    @JsonManagedReference
     private List<CartItem> cartItems;
 
     @CreatedDate

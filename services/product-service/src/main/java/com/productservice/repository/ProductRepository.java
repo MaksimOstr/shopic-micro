@@ -26,6 +26,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("SELECT p.imageUrl FROM Product p WHERE p.id = :id")
     Optional<String> getProductImageUrl(long id);
 
+    @Query("SELECT p FROM Product p JOIN FETCH p.category JOIN FETCH  p.brand WHERE p.id = :id AND p.enabled = true")
+    Optional<Product> getEnabledProducts(long id);
+
     @EntityGraph(attributePaths = {"category", "brand"})
     Optional<Product> findById(long id);
 
@@ -81,9 +84,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     @Query("SELECT new com.productservice.projection.ProductForCartDto(" +
             "p.price," +
-            "p.stockQuantity" +
+            "p.stockQuantity," +
+            "p.name," +
+            "p.imageUrl" +
             ")" +
-            "FROM Product p WHERE p.id = :id")
+            "FROM Product p WHERE p.id = :id AND p.enabled = true")
     Optional<ProductForCartDto> getProductForCartById(long id);
 
     @EntityGraph(attributePaths = {"category", "brand"})

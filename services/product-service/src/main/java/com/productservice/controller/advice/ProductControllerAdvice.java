@@ -1,6 +1,7 @@
 package com.productservice.controller.advice;
 
 import com.productservice.dto.response.ErrorResponseDto;
+import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.InvalidEnumArgException;
 import com.productservice.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -60,4 +61,12 @@ public class ProductControllerAdvice {
         ));
     }
 
+    @ExceptionHandler(InsufficientStockException.class)
+    private ResponseEntity<ErrorResponseDto> handleAlreadyExists(InsufficientStockException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                e.getMessage()
+        ));
+    }
 }

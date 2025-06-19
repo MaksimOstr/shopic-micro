@@ -4,5 +4,7 @@ import java.math.BigDecimal;
 
 public record ProductForCartDto(
         BigDecimal productPrice,
-        int stockQuantity
+        int stockQuantity,
+        String productName,
+        String productImageUrl
 ) {}

@@ -11,7 +11,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
 
-    ProductDetailsResponse toCartItemAddGrpcResponse(ProductForCartDto dto);
+    ProductDetailsResponse toProductDetails(ProductForCartDto dto);
 
     ProductInfo toProductInfo(ProductPrice dto);
 

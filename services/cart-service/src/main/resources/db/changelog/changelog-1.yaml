@@ -54,6 +54,17 @@ databaseChangeLog:
                     references: carts(id)
                     deleteCascade: true
               - column:
+                  name: product_name
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_image_url
+                  type: text
+                  constraints:
+                    nullable: false
+
+              - column:
                   name: product_id
                   type: bigint
                   constraints:

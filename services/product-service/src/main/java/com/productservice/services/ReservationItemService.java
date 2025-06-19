@@ -1,7 +1,6 @@
 package com.productservice.services;
 
 import com.productservice.dto.request.CreateReservationItem;
-import com.productservice.dto.request.ItemForReservation;
 import com.productservice.entity.ReservationItem;
 import com.productservice.mapper.ReservationItemMapper;
 import com.productservice.repository.ReservationItemRepository;

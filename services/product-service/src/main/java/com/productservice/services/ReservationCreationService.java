@@ -22,7 +22,7 @@ import static com.productservice.utils.Utils.extractIds;
 
 @Service
 @RequiredArgsConstructor
-public class ReservationService {
+public class ReservationCreationService {
     private final ReservationRepository reservationRepository;
     private final ReservationItemService reservationItemService;
     private final ProductService productService;

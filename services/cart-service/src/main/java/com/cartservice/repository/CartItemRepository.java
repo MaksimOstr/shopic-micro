@@ -19,7 +19,9 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
             "ci.id," +
             "ci.productId," +
             "ci.quantity," +
-            "ci.priceAtAdd" +
+            "ci.priceAtAdd," +
+            "ci.productName," +
+            "ci.productImageUrl" +
             ")" +
             "FROM CartItem ci WHERE ci.cart.id = :cartId")
     List<CartItemProjection> findByCart_Id(Long cartId);
@@ -35,6 +37,8 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     @Query("SELECT new com.cartservice.projection.CartItemForOrderProjection(" +
             "ci.productId," +
+            "ci.productName," +
+            "ci.productImageUrl," +
             "ci.quantity" +
             ")" +
             "FROM CartItem ci WHERE ci.cart.id = :cartId")

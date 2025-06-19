@@ -54,8 +54,7 @@ public class ProductService {
 
     @Transactional
     public Product updateProduct(UpdateProductRequest dto, long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+        Product product = getProductById(productId);
 
         updateProductFieldsIfExists(product, dto);
 
@@ -108,6 +107,11 @@ public class ProductService {
 
     public Product getProductBySku(UUID sku) {
         return productRepository.findBySku(sku)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+    }
+
+    public Product getEnabledProductById(long id) {
+        return productRepository.getEnabledProducts(id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 

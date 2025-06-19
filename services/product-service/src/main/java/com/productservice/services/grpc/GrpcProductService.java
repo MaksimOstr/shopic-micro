@@ -7,7 +7,7 @@ import com.productservice.mapper.GrpcMapper;
 import com.productservice.projection.ProductForCartDto;
 import com.productservice.projection.ProductPrice;
 import com.productservice.services.ProductService;
-import com.productservice.services.ReservationService;
+import com.productservice.services.ReservationCreationService;
 import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import static com.productservice.utils.Utils.extractIds;
 public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBase {
 
     private final ProductService productService;
-    private final ReservationService reservationService;
+    private final ReservationCreationService reservationCreationService;
     private final GrpcMapper grpcMapper;
 
     @Override
@@ -35,7 +35,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
             throw new InsufficientStockException("Insufficient stock");
         }
 
-        ProductDetailsResponse response = grpcMapper.toCartItemAddGrpcResponse(productDto);
+        ProductDetailsResponse response = grpcMapper.toProductDetails(productDto);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -46,7 +46,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     public void checkAndReserveProducts(CheckAndReserveProductsRequest request, StreamObserver<CheckAndReserveProductResponse > responseObserver) {
         List<ItemForReservation> itemsForReservation = mapToItemForReservation(request.getReservationItemsList());
         CreateReservationDto dto = new CreateReservationDto(itemsForReservation, request.getUserId());
-        long reservationId = reservationService.createReservation(dto);
+        long reservationId = reservationCreationService.createReservation(dto);
 
         List<Long> productIds = extractIds(itemsForReservation);
         List<ProductPrice> productPrices = productService.getProductPrices(productIds);

@@ -22,7 +22,7 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemService cartItemService;
 
-
+    @Transactional
     public void addItemToCart(AddItemToCartRequest dto, long userId) {
         Long cartId = cartRepository.findCartIdByUserId(userId)
                 .orElseGet(() -> createCart(userId).getId());
@@ -36,12 +36,14 @@ public class CartService {
         cartItemService.createCartItem(createCartItem);
     }
 
+    @Transactional(readOnly = true)
     public List<CartItemProjection> getCartItemsByUserId(long userId) {
         return cartRepository.findCartIdByUserId(userId)
                 .map(cartItemService::getCartItems)
                 .orElseGet(ArrayList::new);
     }
 
+    @Transactional(readOnly = true)
     public List<CartItemForOrderProjection> getCartItemsForOrder(long userId) {
         long cartId = getCartIdByUserId(userId);
 
