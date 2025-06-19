@@ -12,7 +12,6 @@ import com.orderservice.service.grpc.ProductGrpcService;
 import com.shopic.grpc.cartservice.CartResponse;
 import com.shopic.grpc.cartservice.CartItem;
 import com.shopic.grpc.productservice.CheckProductResponse;
-import com.shopic.grpc.productservice.GetProductInfoBatchResponse;
 import com.shopic.grpc.productservice.ProductInfo;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,6 @@ public class OrderCreationService {
         List<Long> productIds = getProductIds(cartItems);
 
         CheckProductResponse response = productGrpcService.checkAndReserveProduct(cartItems);
-
 
         Map<Long, ProductInfo> productInfoMap = getProductInfoMap(productIds);
 

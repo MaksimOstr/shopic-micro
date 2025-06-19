@@ -8,7 +8,7 @@ import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ProductMapper;
 import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductForOrderDto;
+import com.productservice.projection.ProductPrice;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -76,6 +77,10 @@ public class ProductService {
                 });
     }
 
+    public List<Product> getProductsForUpdate(List<Long> productIds) {
+        return productRepository.findProductsForUpdate(productIds);
+    }
+
     public void deleteProductById(long productId) {
         String imageUrl = getProductImageUrl(productId);
 
@@ -95,6 +100,10 @@ public class ProductService {
         Set<Long> likedProducts = likeService.getLikedProductIds(userId);
 
         return productRepository.findProductsByIds(likedProducts);
+    }
+
+    public List<ProductPrice> getProductPrices(List<Long> productIds) {
+        return productRepository.findProductPrices(productIds);
     }
 
     public Product getProductBySku(UUID sku) {
@@ -120,9 +129,7 @@ public class ProductService {
         return new PageImpl<>(products, pageable, pageable.getPageSize());
     }
 
-    public void checkAndReserveProduct(long userId, long productId, int quantity) {
 
-    }
 
     private String getProductImageUrl(long productId) {
         return productRepository.getProductImageUrl(productId)

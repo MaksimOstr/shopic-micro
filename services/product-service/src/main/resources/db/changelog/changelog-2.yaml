@@ -8,6 +8,11 @@ databaseChangeLog:
             startValue: 1
             cacheSize: 50
             incrementBy: 50
+        - createSequence:
+            sequenceName: reservation_items_seq
+            startValue: 1
+            cacheSize: 50
+            incrementBy: 50
 
         - createTable:
             tableName: reservations
@@ -16,6 +21,28 @@ databaseChangeLog:
                   name: id
                   type: bigint
                   defaultValueSequenceNext: reservations_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: reservation_items
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: reservation_items_seq
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -33,13 +60,10 @@ databaseChangeLog:
                     nullable: false
                     checkConstraint: "quantity > 0"
               - column:
-                  name: user_id
+                  name: reservation_id
                   type: bigint
                   constraints:
                     nullable: false
-              - column:
-                  name: created_at
-                  type: timestamptz
-                  defaultValueComputed: CURRENT_TIMESTAMP
-                  constraints:
-                    nullable: false
+                    references: reservations(id)
+                    foreignKeyName: fk_reservation_items_reservation
+

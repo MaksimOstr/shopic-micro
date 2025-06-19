@@ -19,13 +19,13 @@ message ProductDetailsResponse {
 
 
 message CheckAndReserveProductsRequest {
-  repeated ReservationItem reservation_items = 1;
+  int64 user_id = 1;
+  repeated ReservationItem reservation_items = 2;
 }
 
 message ReservationItem {
   int64 product_id = 1;
-  int64 user_id = 2;
-  int32 quantity = 3;
+  int32 quantity = 2;
 }
 
 
@@ -34,8 +34,9 @@ message ProductInfo {
   string price = 2;
 }
 
-message CheckProductResponse {
- repeated ProductInfo products = 1;
+message CheckAndReserveProductResponse {
+  int64 reservation_id = 1;
+  repeated ProductInfo products = 2;
 }
 
 
@@ -44,7 +45,7 @@ message CheckProductResponse {
 service ProductService {
   rpc getProductPriceAndStock(GetProductDetailsRequest) returns (ProductDetailsResponse);
 
-  rpc checkAndReserveProducts(CheckAndReserveProductsRequest) returns (CheckProductResponse);
+  rpc checkAndReserveProducts(CheckAndReserveProductsRequest) returns (CheckAndReserveProductResponse);
 
 }
 

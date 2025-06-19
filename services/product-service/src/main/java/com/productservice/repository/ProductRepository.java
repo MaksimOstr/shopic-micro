@@ -3,7 +3,8 @@ package com.productservice.repository;
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductForOrderDto;
+import com.productservice.projection.ProductPrice;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,6 +35,13 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     int updateProductImageUrl(long id, String imageUrl);
 
     Optional<Product> findBySku(UUID sku);
+
+    @Query("SELECT new com.productservice.projection.ProductPrice(" +
+            "p.id," +
+            "p.price" +
+            ")" +
+            "FROM Product p WHERE p.id IN :ids")
+    List<ProductPrice> findProductPrices(List<Long> ids);
 
     @Query("SELECT new com.productservice.projection.ProductDto(" +
             "p.id, " +
@@ -67,13 +75,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "JOIN p.category c WHERE p.id IN :productIds")
     List<ProductDto> findProductsByIds(@Param("productIds") Set<Long> productIds);
 
-    @Query("SELECT new com.productservice.projection.ProductForOrderDto(" +
-            "p.id," +
-            "p.price," +
-            "p.stockQuantity" +
-            ")" +
-            "FROM Product p WHERE p.id IN :productIds")
-    List<ProductForOrderDto> findProductPriceAndQuantity(List<Long> productIds);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Product p WHERE p.id IN :productIds")
+    List<Product> findProductsForUpdate(List<Long> productIds);
 
     @Query("SELECT new com.productservice.projection.ProductForCartDto(" +
             "p.price," +

@@ -20,13 +20,6 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reservations_seq")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
-
-    @Column(name = "quantity", nullable = false)
-    private int quantity;
-
     @Column(name = "user_id", nullable = false)
     private long userId;
 
