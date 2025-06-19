@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "reservations")
@@ -22,6 +23,9 @@ public class Reservation {
 
     @Column(name = "user_id", nullable = false)
     private long userId;
+
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ReservationItem> items;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
