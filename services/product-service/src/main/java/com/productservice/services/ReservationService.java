@@ -4,6 +4,7 @@ import com.productservice.entity.Product;
 import com.productservice.entity.ReservationItem;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
+import com.productservice.services.products.ProductQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReservationService {
     private final ReservationRepository reservationRepository;
-    private final ProductService productService;
+    private final ProductQueryService productQueryService;
 
     @Transactional
     public void cancelReservation(long reservationId) {
@@ -27,7 +28,7 @@ public class ReservationService {
 
         List<Long> productIds = reservationItemList.stream().map(item -> item.getProduct().getId()).toList();
 
-        List<Product> productList = productService.getProductsForUpdate(productIds);
+        List<Product> productList = productQueryService.getProductsForUpdate(productIds);
 
         updateProductQuantity(productList, reservationItemList);
 

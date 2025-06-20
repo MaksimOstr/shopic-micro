@@ -4,7 +4,7 @@ import com.productservice.config.security.model.CustomPrincipal;
 import com.productservice.dto.request.ProductParams;
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
-import com.productservice.services.ProductService;
+import com.productservice.services.products.UserProductFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/products")
 @PreAuthorize("hasRole('USER')")
 public class PublicProductController {
-    private final ProductService productService;
+    private final UserProductFacade productFacade;
 
 
     @GetMapping("/filter")
@@ -33,7 +33,7 @@ public class PublicProductController {
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProductDto> products = productService.findPublicProductsByFilters(body, pageable, principal.getId());
+        Page<ProductDto> products = productFacade.getProductsByFilters(body, pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }
@@ -45,7 +45,7 @@ public class PublicProductController {
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProductDto> products = productService.getPageOfProducts(pageable, principal.getId());
+        Page<ProductDto> products = productFacade.getProductPage(pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }
@@ -54,7 +54,7 @@ public class PublicProductController {
     public ResponseEntity<List<ProductDto>> getLikedProducts(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        List<ProductDto> products = productService.getLikedProducts(principal.getId());
+        List<ProductDto> products = productFacade.getLikedProducts(principal.getId());
 
         return ResponseEntity.ok(products);
     }
@@ -63,7 +63,7 @@ public class PublicProductController {
     public ResponseEntity<Product> getActiveProduct(
             @PathVariable long id
     ) {
-        Product product =  productService.getEnabledProductById(id);
+        Product product = productFacade.getProduct(id);
 
         return ResponseEntity.ok(product);
     }

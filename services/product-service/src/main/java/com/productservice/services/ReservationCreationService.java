@@ -8,7 +8,7 @@ import com.productservice.entity.Reservation;
 import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
-import com.shopic.grpc.productservice.ProductInfo;
+import com.productservice.services.products.ProductQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,7 @@ import static com.productservice.utils.Utils.extractIds;
 public class ReservationCreationService {
     private final ReservationRepository reservationRepository;
     private final ReservationItemService reservationItemService;
-    private final ProductService productService;
+    private final ProductQueryService productQueryService;
 
 
     @Transactional
@@ -88,7 +88,7 @@ public class ReservationCreationService {
     }
 
     private Map<Long, Product> getProductQuantityMap(List<Long> productIds) {
-        List<Product> products = productService.getProductsForUpdate(productIds);
+        List<Product> products = productQueryService.getProductsForUpdate(productIds);
 
         return products.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));

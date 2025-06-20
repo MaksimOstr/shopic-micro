@@ -7,8 +7,7 @@ import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
-import com.productservice.services.ProductImageService;
-import com.productservice.services.ProductService;
+import com.productservice.services.products.AdminProductFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminProductController {
-    private final ProductService productService;
+    private final AdminProductFacade adminProductFacade;
 
 
     @PostMapping
@@ -38,7 +37,7 @@ public class AdminProductController {
             @RequestPart("product") @Valid CreateProductRequest body,
             @RequestPart("image") MultipartFile imageFile
     ) {
-        return productService.create(body, imageFile)
+        return adminProductFacade.createProduct(body, imageFile)
                 .thenApply(product -> ResponseEntity.status(HttpStatus.CREATED).body(product));
     }
 
@@ -47,18 +46,16 @@ public class AdminProductController {
     public ResponseEntity<String> deleteProduct(
             @PathVariable long id
     ) {
-        productService.deleteProductById(id);
+        adminProductFacade.deleteProduct(id);
 
-        String message = "Product with id " + id + " has been deleted";
-
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProduct(
             @PathVariable long id
     ) {
-        Product product = productService.getProductById(id);
+        Product product = adminProductFacade.getProduct(id);
 
         return ResponseEntity.ok(product);
     }
@@ -69,7 +66,7 @@ public class AdminProductController {
             @PathVariable long id,
             @RequestBody @Valid UpdateProductRequest body
     ) {
-        Product product = productService.updateProduct(body, id);
+        Product product = adminProductFacade.updateProduct(body, id);
 
         return ResponseEntity.ok(product);
     }
@@ -82,18 +79,18 @@ public class AdminProductController {
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProductDto> products = productService.findAdminProductsByFilters(body, pageable, principal.getId());
+        Page<ProductDto> products = adminProductFacade.getProductsByFilters(body, pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }
 
 
     @PatchMapping("/{id}/image")
-    public CompletableFuture<ResponseEntity<String>> updateProductImage(
+    public CompletableFuture<ResponseEntity<Void>> updateProductImage(
         @PathVariable long id,
         @RequestPart("image") MultipartFile imageFile
     ) {
-        return productService.updateProductImage(id, imageFile)
+        return adminProductFacade.updateProductImage(id, imageFile)
                 .thenApply(_ -> ResponseEntity.ok().build());
     }
 
@@ -102,7 +99,7 @@ public class AdminProductController {
     public ResponseEntity<Product> getProductBySku(
             @RequestParam UUID sku
     ) {
-        Product product = productService.getProductBySku(sku);
+        Product product = adminProductFacade.getProductBySku(sku);
 
         return ResponseEntity.ok(product);
     }

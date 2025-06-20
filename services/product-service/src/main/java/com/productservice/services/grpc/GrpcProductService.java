@@ -6,8 +6,8 @@ import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.mapper.GrpcMapper;
 import com.productservice.projection.ProductForCartDto;
 import com.productservice.projection.ProductPrice;
-import com.productservice.services.ProductService;
 import com.productservice.services.ReservationCreationService;
+import com.productservice.services.products.ProductQueryService;
 import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +23,13 @@ import static com.productservice.utils.Utils.extractIds;
 @RequiredArgsConstructor
 public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBase {
 
-    private final ProductService productService;
+    private final ProductQueryService productQueryService;
     private final ReservationCreationService reservationCreationService;
     private final GrpcMapper grpcMapper;
 
     @Override
     public void getProductPriceAndStock(GetProductDetailsRequest request, StreamObserver<ProductDetailsResponse> responseObserver) {
-        ProductForCartDto productDto = productService.getProductInfoForCart(request.getProductId());
+        ProductForCartDto productDto = productQueryService.getProductInfoForCart(request.getProductId());
 
         if(productDto.stockQuantity() < request.getQuantity()) {
             throw new InsufficientStockException("Insufficient stock");
@@ -49,7 +49,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
         long reservationId = reservationCreationService.createReservation(dto);
 
         List<Long> productIds = extractIds(itemsForReservation);
-        List<ProductPrice> productPrices = productService.getProductPrices(productIds);
+        List<ProductPrice> productPrices = productQueryService.getProductPrices(productIds);
         List<ProductInfo> productInfoList = productPrices.stream().map(grpcMapper::toProductInfo).toList();
 
         CheckAndReserveProductResponse response = CheckAndReserveProductResponse.newBuilder()
@@ -57,7 +57,6 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
                 .setReservationId(reservationId)
                 .build();
 
-        System.out.println("teststsadasdad");
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

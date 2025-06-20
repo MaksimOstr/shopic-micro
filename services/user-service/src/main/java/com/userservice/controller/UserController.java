@@ -15,20 +15,4 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserVerificationService userVerificationService;
-
-    @PatchMapping("/verify")
-    public ResponseEntity<String> verifyUser(
-            @RequestBody @Valid VerifyUserRequestDto body
-    ) {
-        userVerificationService.verifyUser(body.code());
-        return ResponseEntity.ok("User verified successfully");
-    }
-
-    @PostMapping("/request-email-verify")
-    public ResponseEntity<String> requestVerificationCode(
-            @RequestBody @Valid EmailVerifyRequestDto body
-    ) throws JsonProcessingException {
-        userVerificationService.requestVerifyEmail(body.email());
-        return ResponseEntity.ok("Verification code sent to: " + body.email());
-    }
 }
