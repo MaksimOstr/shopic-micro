@@ -25,6 +25,12 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
+                  name: reservation_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
                   name: user_id
                   type: bigint
                   constraints:

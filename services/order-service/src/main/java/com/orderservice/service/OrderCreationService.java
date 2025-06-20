@@ -1,6 +1,8 @@
 package com.orderservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.orderservice.dto.request.CreateOrderItem;
+import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderStatusEnum;
 import com.orderservice.exception.NotFoundException;
@@ -32,7 +34,7 @@ public class OrderCreationService {
 
 
     @Transactional
-    public void createOrder(long userId) {
+    public void createOrder(long userId, CreateOrderRequest dto) throws JsonProcessingException {
         CartResponse cartInfo = cartGrpcService.getCartInfo(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
 
@@ -40,14 +42,16 @@ public class OrderCreationService {
 
         Map<Long, BigDecimal> productPriceMap = getProductPriceMap(response.getProductsList());
 
-        Order savedOrder = createAndSaveOrderEntity(userId, productPriceMap, cartItems);
+        Order savedOrder = createAndSaveOrderEntity(userId, response.getReservationId(), productPriceMap, cartItems);
         saveOrderItems(cartItems, savedOrder, productPriceMap);
+        kafkaEventProducer.sendOrderCreatedEvent();
     }
 
 
-    private Order createAndSaveOrderEntity(long userId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
+    private Order createAndSaveOrderEntity(long userId, long reservationId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
         BigDecimal totalPrice = calculateTotalPrice(priceMap, cartItems);
         Order order = Order.builder()
+                .reservationId(reservationId)
                 .status(OrderStatusEnum.CREATED)
                 .totalPrice(totalPrice)
                 .userId(userId)

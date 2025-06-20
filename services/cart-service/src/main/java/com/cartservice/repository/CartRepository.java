@@ -25,7 +25,4 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Modifying
     @Query("DELETE FROM Cart c WHERE c.userId = :userId")
     int deleteCartByUserId(long userId);
-
-    @Query("SELECT DISTINCT c FROM Cart c JOIN FETCH c.cartItems WHERE c.userId = :userId")
-    Optional<Cart> getCartWithItems(long userId);
 }

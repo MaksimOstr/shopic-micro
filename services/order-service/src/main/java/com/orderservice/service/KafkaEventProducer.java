@@ -13,7 +13,9 @@ public class KafkaEventProducer {
     private final KafkaTemplate<Object, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    public void sendOrderCreatedEvent() throws JsonProcessingException {
+    public void sendOrderCreatedEvent(
+
+    ) throws JsonProcessingException {
         OrderCreatedEvent event = new OrderCreatedEvent();
         kafkaTemplate.send("order-created", objectMapper.writeValueAsString(event));
     }
