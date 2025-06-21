@@ -26,6 +26,8 @@ message ValidateCodeResponse {
 
 service CodeService {
   rpc getEmailVerificationCode(CreateCodeRequest) returns (CreateCodeResponse);
-
   rpc validateEmailCode(ValidateCodeRequest) returns (ValidateCodeResponse);
+
+  rpc getResetPasswordCode(CreateCodeRequest) returns (CreateCodeResponse);
+  rpc validateResetPasswordCode(ValidateCodeRequest) returns (ValidateCodeResponse);
 }

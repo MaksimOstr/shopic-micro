@@ -2,6 +2,7 @@ package com.userservice.repositories;
 
 import com.userservice.entity.User;
 import com.userservice.projection.EmailVerifyProjection;
+import com.userservice.projection.ResetPasswordProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,4 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<Set<String>> getUserRoleNames(long id);
 
     Optional<User> findByEmail(String email);
+
+    @Query("SELECT u.id as id, u.authProvider as authProvider FROM User u WHERE u.email = :email")
+    Optional<ResetPasswordProjection> findUserForResetPassword(String email);
 }

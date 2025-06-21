@@ -10,20 +10,30 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 
 
-@GrpcService
 @Slf4j
+@GrpcService
 @RequiredArgsConstructor
 public class GrpcCodeService {
     private final CodeServiceGrpc.CodeServiceBlockingStub codeGrpcService;
 
     private static final String INTERNAL_SERVICE_ERROR = "Internal code service error";
 
+
     public CreateCodeResponse getEmailVerificationCode(long userId) {
-        CreateCodeRequest request = CreateCodeRequest.newBuilder()
-                .setUserId(userId)
-                .build();
+
         try {
-            return codeGrpcService.getEmailVerificationCode(request);
+            return codeGrpcService.getEmailVerificationCode(getCreateCodeRequest(userId));
+        } catch (StatusRuntimeException e) {
+            switch (e.getStatus().getCode()) {
+                case ALREADY_EXISTS -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
+                default -> throw e;
+            }
+        }
+    }
+
+    public CreateCodeResponse getResetPasswordCode(long userId) {
+        try {
+            return codeGrpcService.getResetPasswordCode(getCreateCodeRequest(userId));
         } catch (StatusRuntimeException e) {
             switch (e.getStatus().getCode()) {
                 case ALREADY_EXISTS -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
@@ -33,11 +43,8 @@ public class GrpcCodeService {
     }
 
     public ValidateCodeResponse validateEmailCode(String code) {
-        ValidateCodeRequest request = ValidateCodeRequest.newBuilder()
-                .setCode(code)
-                .build();
         try {
-            return codeGrpcService.validateEmailCode(request);
+            return codeGrpcService.validateEmailCode(getValidateCodeRequest(code));
         } catch (StatusRuntimeException e) {
             log.error("gRpc code service{}", e.getMessage());
             switch (e.getStatus().getCode()) {
@@ -47,5 +54,31 @@ public class GrpcCodeService {
                 default -> throw new CodeVerificationException("Unexpected error from code service" + e.getMessage());
             }
         }
+    }
+
+    public ValidateCodeResponse validateResetPasswordCode(String code) {
+        try {
+            return codeGrpcService.validateResetPasswordCode(getValidateCodeRequest(code));
+        } catch (StatusRuntimeException e) {
+            log.error("gRpc code service{}", e.getMessage());
+            switch (e.getStatus().getCode()) {
+                case NOT_FOUND -> throw new NotFoundException(e.getStatus().getDescription());
+                case INVALID_ARGUMENT -> throw new CodeVerificationException(e.getStatus().getDescription());
+                case INTERNAL -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
+                default -> throw new CodeVerificationException("Unexpected error from code service" + e.getMessage());
+            }
+        }
+    }
+
+    private CreateCodeRequest getCreateCodeRequest(long userId) {
+        return CreateCodeRequest.newBuilder()
+                .setUserId(userId)
+                .build();
+    }
+
+    private ValidateCodeRequest getValidateCodeRequest(String code) {
+        return ValidateCodeRequest.newBuilder()
+                .setCode(code)
+                .build();
     }
 }

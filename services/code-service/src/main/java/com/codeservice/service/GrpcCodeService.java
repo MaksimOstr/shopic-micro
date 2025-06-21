@@ -17,9 +17,29 @@ public class GrpcCodeService extends CodeServiceGrpc.CodeServiceImplBase {
 
     @Override
     public void getEmailVerificationCode(CreateCodeRequest request, StreamObserver<CreateCodeResponse> responseObserver) {
+        getCode(request, responseObserver, CodeScopeEnum.EMAIL_VERIFICATION);
+    }
+
+    @Override
+    public void getResetPasswordCode(CreateCodeRequest request, StreamObserver<CreateCodeResponse> responseObserver) {
+        getCode(request, responseObserver, CodeScopeEnum.RESET_PASSWORD);
+    }
+
+    @Override
+    public void validateEmailCode(ValidateCodeRequest request, StreamObserver<ValidateCodeResponse> responseObserver) {
+        validateCode(request, responseObserver, CodeScopeEnum.EMAIL_VERIFICATION);
+    }
+
+    @Override
+    public void validateResetPasswordCode(ValidateCodeRequest request, StreamObserver<ValidateCodeResponse> responseObserver) {
+        validateCode(request, responseObserver, CodeScopeEnum.RESET_PASSWORD);
+    }
+
+
+    private void getCode(CreateCodeRequest request, StreamObserver<CreateCodeResponse> responseObserver, CodeScopeEnum scope) {
         log.info("CreateCode method was called: {}", request.getUserId());
 
-        Code createdCode = codeCreationServiceService.getCode(request.getUserId(), CodeScopeEnum.EMAIL_VERIFICATION);
+        Code createdCode = codeCreationServiceService.getCode(request.getUserId(), scope);
 
         CreateCodeResponse response = CreateCodeResponse.newBuilder()
                 .setCode(createdCode.getCode())
@@ -27,12 +47,10 @@ public class GrpcCodeService extends CodeServiceGrpc.CodeServiceImplBase {
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
-
     }
 
-    @Override
-    public void validateEmailCode(ValidateCodeRequest request, StreamObserver<ValidateCodeResponse> responseObserver) {
-        long userId = codeValidationService.validate(request.getCode(), CodeScopeEnum.EMAIL_VERIFICATION);
+    private void validateCode(ValidateCodeRequest request, StreamObserver<ValidateCodeResponse> responseObserver, CodeScopeEnum scope) {
+        long userId = codeValidationService.validate(request.getCode(), scope);
 
         ValidateCodeResponse response = ValidateCodeResponse.newBuilder()
                 .setUserId(userId)

@@ -5,6 +5,7 @@ import com.userservice.dto.response.ErrorResponseDto;
 import com.userservice.exceptions.CodeVerificationException;
 import com.userservice.exceptions.EmailVerifyException;
 import com.userservice.exceptions.NotFoundException;
+import com.userservice.exceptions.ResetPasswordException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,8 +18,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalControllerAdvice {
 
-    @ExceptionHandler({EmailVerifyException.class, CodeVerificationException.class})
-    public ResponseEntity<ErrorResponseDto> handleCodeVerificationException(RuntimeException e) {
+    @ExceptionHandler({EmailVerifyException.class, CodeVerificationException.class, ResetPasswordException.class})
+    public ResponseEntity<ErrorResponseDto> handleException(RuntimeException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),

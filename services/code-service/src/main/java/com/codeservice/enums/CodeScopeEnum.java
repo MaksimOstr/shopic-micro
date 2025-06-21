@@ -1,5 +1,6 @@
 package com.codeservice.enums;
 
 public enum CodeScopeEnum {
-    EMAIL_VERIFICATION
+    EMAIL_VERIFICATION,
+    RESET_PASSWORD,
 }

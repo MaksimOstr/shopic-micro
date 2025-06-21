@@ -1,15 +1,12 @@
 package com.userservice.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shopic.grpc.codeservice.*;
-import com.userservice.exceptions.CodeVerificationException;
 import com.userservice.exceptions.EmailVerifyException;
 import com.userservice.exceptions.NotFoundException;
 import com.userservice.projection.EmailVerifyProjection;
 import com.userservice.repositories.UserRepository;
 import com.userservice.services.grpc.GrpcCodeService;
-import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
