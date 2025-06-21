@@ -24,7 +24,7 @@ public class LocalUserService {
     private final ProfileService profileService;
     private final RoleService roleService;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordService passwordService;
 
     private static final String USER_ALREADY_EXISTS = "User with such an email already exists";
 
@@ -48,7 +48,7 @@ public class LocalUserService {
 
     private User createLocalUserEntity(CreateLocalUserRequest dto) {
         Role defaultRole = roleService.getDefaultUserRole();
-        String hashedPassword = passwordEncoder.encode(dto.password());
+        String hashedPassword = passwordService.encode(dto.password());
 
         return User.builder()
                 .email(dto.email())

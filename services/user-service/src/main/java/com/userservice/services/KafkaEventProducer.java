@@ -13,8 +13,8 @@ public class KafkaEventProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    public void requestEmailVerification(long userId, String email) throws JsonProcessingException {
-        EmailVerifyRequestDto event = new EmailVerifyRequestDto(userId, email);
+    public void requestEmailVerification(String code, String email) throws JsonProcessingException {
+        EmailVerifyRequestDto event = new EmailVerifyRequestDto(code, email);
 
         kafkaTemplate.send("email-verification-requested", objectMapper.writeValueAsString(event));
     }

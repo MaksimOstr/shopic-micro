@@ -39,12 +39,11 @@ public class OrderCreationService {
         List<CartItem> cartItems = cartInfo.getCartItemsList();
 
         CheckAndReserveProductResponse response = productGrpcService.checkAndReserveProduct(cartItems);
-
+        System.out.println(response.getReservationId());
         Map<Long, BigDecimal> productPriceMap = getProductPriceMap(response.getProductsList());
 
         Order savedOrder = createAndSaveOrderEntity(userId, response.getReservationId(), productPriceMap, cartItems);
         saveOrderItems(cartItems, savedOrder, productPriceMap);
-        kafkaEventProducer.sendOrderCreatedEvent();
     }
 
 
