@@ -86,7 +86,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     private boolean shouldExclude(HttpServletRequest request) {
         List<String> whiteList = List.of(
-                "/users/verify",
+                "/verify",
+                "/verify/request",
                 "/users/request-email-verify"
         );
 

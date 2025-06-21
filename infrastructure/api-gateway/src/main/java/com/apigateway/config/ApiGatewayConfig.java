@@ -33,9 +33,6 @@ public class ApiGatewayConfig {
     public RouterFunction<ServerResponse> userRoute() {
         return route("user-service-route")
                 .filter(lb("user-service"))
-                .path("/users", request -> request
-                        .POST("/request-email-verify", http())
-                        .PATCH("/verify", http()))
                 .path("/verify", request -> request
                         .POST("/request", http())
                         .PATCH("", http()))

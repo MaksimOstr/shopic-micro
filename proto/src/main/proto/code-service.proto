@@ -10,20 +10,14 @@ option java_package = "com.shopic.grpc.codeservice";
 
 message CreateCodeRequest {
   int64 userId = 1;
-  CodeScopeEnum scope = 2;
 }
 
 message CreateCodeResponse {
   string code = 1;
 }
 
-enum CodeScopeEnum {
-  EMAIL_VERIFICATION = 0;
-}
-
 message ValidateCodeRequest {
   string code = 1;
-  CodeScopeEnum scope = 2;
 }
 
 message ValidateCodeResponse {
@@ -31,7 +25,7 @@ message ValidateCodeResponse {
 }
 
 service CodeService {
-  rpc getCode(CreateCodeRequest) returns (CreateCodeResponse);
+  rpc getEmailVerificationCode(CreateCodeRequest) returns (CreateCodeResponse);
 
-  rpc validateCode(ValidateCodeRequest) returns (ValidateCodeResponse);
+  rpc validateEmailCode(ValidateCodeRequest) returns (ValidateCodeResponse);
 }

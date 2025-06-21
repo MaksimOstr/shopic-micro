@@ -32,13 +32,13 @@ public class UserVerificationService {
             throw new EmailVerifyException("Email verification request failed");
         }
 
-        CreateCodeResponse response = grpcCodeService.getCode(CodeScopeEnum.EMAIL_VERIFICATION, user.getId());
+        CreateCodeResponse response = grpcCodeService.getEmailVerificationCode(user.getId());
 
         kafkaEventProducer.requestEmailVerification(response.getCode(), email);
     }
 
     public void verifyUser(String code) {
-        ValidateCodeResponse response = grpcCodeService.validateCode(code);
+        ValidateCodeResponse response = grpcCodeService.validateEmailCode(code);
         markUserVerified(response.getUserId());
     }
 

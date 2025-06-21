@@ -2,5 +2,5 @@ package com.authservice.dto.event;
 
 public record UserCreatedEvent(
         String email,
-        long userId
+        String code
 ) {}

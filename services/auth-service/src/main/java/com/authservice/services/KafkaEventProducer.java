@@ -16,8 +16,8 @@ public class KafkaEventProducer {
     private final ObjectMapper objectMapper;
 
 
-    public void sendLocalUserCreatedEvent(String email, long userId) throws JsonProcessingException {
-        UserCreatedEvent event = new UserCreatedEvent(email, userId);
+    public void sendLocalUserCreatedEvent(String email, String code) throws JsonProcessingException {
+        UserCreatedEvent event = new UserCreatedEvent(email, code);
         kafkaTemplate.send("user-created", objectMapper.writeValueAsString(event));
     }
 
