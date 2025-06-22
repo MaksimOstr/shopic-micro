@@ -11,7 +11,6 @@ import com.userservice.mapper.UserMapper;
 import com.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -24,7 +23,7 @@ public class LocalUserService {
     private final ProfileService profileService;
     private final RoleService roleService;
     private final UserMapper userMapper;
-    private final PasswordService passwordService;
+    private final UserPasswordService userPasswordService;
 
     private static final String USER_ALREADY_EXISTS = "User with such an email already exists";
 
@@ -48,7 +47,7 @@ public class LocalUserService {
 
     private User createLocalUserEntity(CreateLocalUserRequest dto) {
         Role defaultRole = roleService.getDefaultUserRole();
-        String hashedPassword = passwordService.encode(dto.password());
+        String hashedPassword = userPasswordService.encode(dto.password());
 
         return User.builder()
                 .email(dto.email())

@@ -2,7 +2,7 @@ package com.mailservice.services;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mailservice.dto.event.EmailVerifyRequestDto;
+import com.mailservice.dto.event.SendCodeEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -22,22 +22,31 @@ public class KafkaListenerService {
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 1000))
     @KafkaListener(topics = {"user-created", "email-verification-requested"}, groupId = "mail-service")
     public void sendEmailVerificationCode(String data, Acknowledgment acknowledgment) {
+        String subject = "Email verification";
+        String text = "Your verification code is: ";
+
+        sendCode(data, subject, text);
+
+        acknowledgment.acknowledge();
+    }
+
+    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 1000))
+    @KafkaListener(topics = {"password-reset-requested"}, groupId = "mail-service")
+    public void sendResetPasswordCode(String data, Acknowledgment acknowledgment) {
+        String subject = "Reset Password";
+        String text = "Reset password code: ";
+
+        sendCode(data, subject, text);
+
+        acknowledgment.acknowledge();
+    }
+
+    private void sendCode(String data, String subject, String text) {
         try {
-            log.info("Received data: {}", data);
-            EmailVerifyRequestDto event = objectMapper.readValue(data,  EmailVerifyRequestDto.class);
-
-            sendEmailVerificationEmail(event.email(), event.code());
-
-            acknowledgment.acknowledge();
+            SendCodeEvent event = objectMapper.readValue(data, SendCodeEvent.class);
+            mailService.send(event.email(), subject, text + event.code());
         } catch (JacksonException e) {
             log.error(e.getMessage());
         }
-    }
-
-    private void sendEmailVerificationEmail(String email, String code) {
-        String subject = "Email verification";
-        String text = "Your verification code is: " + code;
-
-        mailService.send(email, subject, text);
     }
 }

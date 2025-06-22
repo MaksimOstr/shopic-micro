@@ -1,7 +1,6 @@
 package com.userservice.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.shopic.grpc.codeservice.CodeServiceGrpc;
 import com.shopic.grpc.codeservice.CreateCodeResponse;
 import com.shopic.grpc.codeservice.ValidateCodeResponse;
 import com.userservice.dto.request.ResetPasswordRequest;
@@ -24,6 +23,7 @@ public class UserPasswordService {
     private final PasswordEncoder passwordEncoder;
     private final GrpcCodeService grpcCodeService;
     private final KafkaEventProducer kafkaEventProducer;
+
 
     public String encode(String password) {
         return passwordEncoder.encode(password);

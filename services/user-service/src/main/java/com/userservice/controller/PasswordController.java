@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class PasswordController {
     private final UserPasswordService userPasswordService;
 
-    @PostMapping("/request")
+    @PostMapping("/forgot-password")
     public ResponseEntity<Void> requestPassword(
             @RequestBody @Valid ResetPasswordRequest body
     ) throws JsonProcessingException {

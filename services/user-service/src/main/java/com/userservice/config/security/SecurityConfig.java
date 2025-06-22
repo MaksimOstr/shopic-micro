@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/verify/**", "/users/request-email-verify").permitAll()
-                        .requestMatchers("/password/request", "/password/change").permitAll()
+                        .requestMatchers("/password/forgot-password", "/password/change").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

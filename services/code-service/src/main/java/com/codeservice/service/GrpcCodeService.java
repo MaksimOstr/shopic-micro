@@ -15,6 +15,7 @@ public class GrpcCodeService extends CodeServiceGrpc.CodeServiceImplBase {
     private final CodeCreationService codeCreationServiceService;
     private final CodeValidationService codeValidationService;
 
+
     @Override
     public void getEmailVerificationCode(CreateCodeRequest request, StreamObserver<CreateCodeResponse> responseObserver) {
         getCode(request, responseObserver, CodeScopeEnum.EMAIL_VERIFICATION);

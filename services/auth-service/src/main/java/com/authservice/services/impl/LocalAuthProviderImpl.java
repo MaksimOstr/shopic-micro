@@ -26,7 +26,9 @@ public class LocalAuthProviderImpl implements LocalAuthProvider {
 
 
     public LocalRegisterResponse register(LocalRegisterRequest dto) throws JsonProcessingException {
+        System.out.println(dto.toString());
         CreateLocalUserGrpcResponse response = userServiceGrpc.createLocalUser(dto);
+        System.out.println("Created local user");
         CreateCodeResponse codeResponse = codeGrpcService.getEmailVerificationCode(response.getUserId());
 
         authEventProducer.sendLocalUserCreatedEvent(response.getEmail(), codeResponse.getCode());
