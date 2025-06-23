@@ -5,9 +5,7 @@ import com.userservice.projection.EmailVerifyProjection;
 import com.userservice.projection.ResetPasswordProjection;
 import com.userservice.projection.UserEmailAndPasswordProjection;
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -15,7 +13,7 @@ import java.util.Set;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     boolean existsByEmail(String email);
 
     Optional<UserEmailAndPasswordProjection> findEmailAndPasswordById(long id);
@@ -30,6 +28,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.email = :email")
     Optional<User> getUserForAuth(String email);
+
+    @EntityGraph(attributePaths = {"roles"})
+    Optional<User> findWithProfileAndRolesById(Long id);
 
     @Query("SELECT r.name FROM User u JOIN u.roles r WHERE u.id = :id")
     Optional<Set<String>> getUserRoleNames(long id);

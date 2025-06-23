@@ -36,6 +36,9 @@ public class User {
     @Column(name = "auth_provider", nullable = false)
     private AuthProviderEnum authProvider;
 
+    @OneToOne(cascade = CascadeType.REMOVE, mappedBy = "user")
+    private Profile profile;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

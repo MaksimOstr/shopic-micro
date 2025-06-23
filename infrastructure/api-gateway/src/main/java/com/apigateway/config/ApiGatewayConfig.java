@@ -46,6 +46,14 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .POST("/change-request", http())
                         .PATCH("/change", http()))
+                .path("/admin/users", request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("/{id}", http())
+                        .GET("", http()))
+                .path("/profiles", request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("", http())
+                        .PATCH("", http()))
                 .build();
     }
 

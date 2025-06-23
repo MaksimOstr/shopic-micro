@@ -8,6 +8,9 @@ import com.userservice.projection.UserEmailAndPasswordProjection;
 import com.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -53,6 +56,11 @@ public class QueryUserService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
+    public User findUserWithProfileAndRolesById(long id) {
+        return userRepository.findWithProfileAndRolesById(id)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+    }
+
     public Optional<User> findOptionalByEmail(String email) {
         return userRepository.findByEmail(email);
     }
@@ -60,5 +68,9 @@ public class QueryUserService {
     public UserEmailAndPasswordProjection getUserEmailAndPassword(long id) {
         return userRepository.findEmailAndPasswordById(id)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+    }
+
+    public Page<User> getUserPageBySpec(Pageable pageable, Specification<User> spec) {
+        return userRepository.findAll(spec, pageable);
     }
 }

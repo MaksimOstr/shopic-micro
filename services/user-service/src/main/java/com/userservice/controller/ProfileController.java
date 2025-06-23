@@ -1,15 +1,14 @@
 package com.userservice.controller;
 
 import com.userservice.config.security.model.CustomPrincipal;
+import com.userservice.dto.request.ProfileParams;
 import com.userservice.entity.Profile;
 import com.userservice.services.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/profiles")
@@ -27,4 +26,14 @@ public class ProfileController {
         return ResponseEntity.ok(profile);
     }
 
+    @PatchMapping
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<Void> editProfile(
+            @RequestBody ProfileParams params,
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        profileService.editProfile(params, principal.getId());
+
+        return ResponseEntity.ok().build();
+    }
 }

@@ -1,6 +1,7 @@
 package com.userservice.services;
 
 import com.userservice.dto.CreateProfileDto;
+import com.userservice.dto.request.ProfileParams;
 import com.userservice.entity.Profile;
 import com.userservice.entity.User;
 import com.userservice.exceptions.EntityAlreadyExistsException;
@@ -10,6 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,14 @@ public class ProfileService {
         Profile profile = profileMapper.toProfile(dto, user);
 
         return profileRepository.save(profile);
+    }
+
+    @Transactional
+    public void editProfile(ProfileParams param, long userId) {
+        Profile profile = getProfileByUserId(userId);
+
+        Optional.ofNullable(param.firstName()).ifPresent(profile::setFirstName);
+        Optional.ofNullable(param.lastName()).ifPresent(profile::setLastName);
     }
 
     public Profile getProfileByUserId(long userId) {
