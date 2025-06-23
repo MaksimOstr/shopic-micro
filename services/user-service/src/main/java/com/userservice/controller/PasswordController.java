@@ -1,37 +1,29 @@
 package com.userservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.userservice.config.security.model.CustomPrincipal;
 import com.userservice.dto.request.ChangePasswordRequest;
-import com.userservice.dto.request.ResetPasswordRequest;
-import com.userservice.services.UserPasswordService;
+import com.userservice.services.PasswordService ;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/password")
 @RequiredArgsConstructor
 public class PasswordController {
-    private final UserPasswordService userPasswordService;
-
-    @PostMapping("/forgot-password")
-    public ResponseEntity<Void> requestPassword(
-            @RequestBody @Valid ResetPasswordRequest body
-    ) throws JsonProcessingException {
-        userPasswordService.requestResetPassword(body);
-
-        return ResponseEntity.ok().build();
-    }
+    private final PasswordService passwordService;
 
     @PatchMapping("/change")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> changePassword(
-            @RequestParam("code") String code,
+            @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid ChangePasswordRequest body
     ) {
-        userPasswordService.resetPassword(body.newPassword(), code);
+        passwordService.changePassword(body, principal.getId());
 
         return ResponseEntity.ok().build();
     }
-
 }

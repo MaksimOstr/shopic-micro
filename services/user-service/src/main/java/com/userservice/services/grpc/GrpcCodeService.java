@@ -20,14 +20,11 @@ public class GrpcCodeService {
 
 
     public CreateCodeResponse getEmailVerificationCode(long userId) {
-
         try {
             return codeGrpcService.getEmailVerificationCode(getCreateCodeRequest(userId));
         } catch (StatusRuntimeException e) {
-            switch (e.getStatus().getCode()) {
-                case ALREADY_EXISTS -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
-                default -> throw e;
-            }
+            getCodeExceptionHandler(e);
+            throw e;
         }
     }
 
@@ -35,10 +32,8 @@ public class GrpcCodeService {
         try {
             return codeGrpcService.getResetPasswordCode(getCreateCodeRequest(userId));
         } catch (StatusRuntimeException e) {
-            switch (e.getStatus().getCode()) {
-                case ALREADY_EXISTS -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
-                default -> throw e;
-            }
+            getCodeExceptionHandler(e);
+            throw e;
         }
     }
 
@@ -46,13 +41,8 @@ public class GrpcCodeService {
         try {
             return codeGrpcService.validateEmailCode(getValidateCodeRequest(code));
         } catch (StatusRuntimeException e) {
-            log.error("gRpc code service{}", e.getMessage());
-            switch (e.getStatus().getCode()) {
-                case NOT_FOUND -> throw new NotFoundException(e.getStatus().getDescription());
-                case INVALID_ARGUMENT -> throw new CodeVerificationException(e.getStatus().getDescription());
-                case INTERNAL -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
-                default -> throw new CodeVerificationException("Unexpected error from code service" + e.getMessage());
-            }
+            codeVerifyExceptionHandler(e);
+            throw e;
         }
     }
 
@@ -60,15 +50,28 @@ public class GrpcCodeService {
         try {
             return codeGrpcService.validateResetPasswordCode(getValidateCodeRequest(code));
         } catch (StatusRuntimeException e) {
-            log.error("gRpc code service{}", e.getMessage());
-            switch (e.getStatus().getCode()) {
-                case NOT_FOUND -> throw new NotFoundException(e.getStatus().getDescription());
-                case INVALID_ARGUMENT -> throw new CodeVerificationException(e.getStatus().getDescription());
-                case INTERNAL -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
-                default -> throw new CodeVerificationException("Unexpected error from code service" + e.getMessage());
-            }
+            codeVerifyExceptionHandler(e);
+            throw e;
         }
     }
+
+
+    private void getCodeExceptionHandler(StatusRuntimeException e) {
+        switch (e.getStatus().getCode()) {
+            case ALREADY_EXISTS -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
+            default -> throw e;
+        }
+    }
+
+    private void codeVerifyExceptionHandler(StatusRuntimeException e) {
+        switch (e.getStatus().getCode()) {
+            case NOT_FOUND -> throw new NotFoundException(e.getStatus().getDescription());
+            case INVALID_ARGUMENT -> throw new CodeVerificationException(e.getStatus().getDescription());
+            case INTERNAL -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
+            default -> throw new CodeVerificationException("Unexpected error from code service" + e.getMessage());
+        }
+    }
+
 
     private CreateCodeRequest getCreateCodeRequest(long userId) {
         return CreateCodeRequest.newBuilder()

@@ -36,8 +36,10 @@ public class ApiGatewayConfig {
                 .path("/verify", request -> request
                         .POST("/request", http())
                         .PATCH("", http()))
+                .path("/forgot-password", request -> request
+                        .POST("/request", http())
+                        .PATCH("/reset", http()))
                 .path("/password", request -> request
-                        .POST("/forgot-password", http())
                         .PATCH("/change", http()))
                 .build();
     }

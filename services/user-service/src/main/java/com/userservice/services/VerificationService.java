@@ -15,14 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserVerificationService {
+public class VerificationService {
     private final UserRepository userRepository;
     private final GrpcCodeService grpcCodeService;
     private final KafkaEventProducer kafkaEventProducer;
+    private final QueryUserService queryUserService;
 
     @Transactional
     public void requestVerifyEmail(String email) throws JsonProcessingException {
-        EmailVerifyProjection user = getUserForEmailVerify(email);
+        EmailVerifyProjection user = queryUserService.getUserForEmailVerify(email);
 
         if (user.getVerified()) {
             log.error("User already verified");
@@ -46,11 +47,5 @@ public class UserVerificationService {
         if (updated == 0) {
             throw new NotFoundException("User not found");
         }
-    }
-
-
-    private EmailVerifyProjection getUserForEmailVerify(String email) {
-        return userRepository.findUserForEmailVerify(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

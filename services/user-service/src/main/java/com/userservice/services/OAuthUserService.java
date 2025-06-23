@@ -21,11 +21,12 @@ public class OAuthUserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final ProfileService profileService;
+    private final QueryUserService queryUserService;
 
     @Transactional
     public CreateOAuthUserResponse createOrGetOAuthUser(CreateOAuthUserRequest dto) {
         System.out.println(dto.email());
-        return userRepository.findByEmail(dto.email())
+        return queryUserService.findOptionalByEmail(dto.email())
                 .map(this::mapToOAuthResponse)
                 .orElseGet(() -> createOAuthUser(dto));
     }

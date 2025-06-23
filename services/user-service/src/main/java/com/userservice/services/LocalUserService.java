@@ -23,12 +23,13 @@ public class LocalUserService {
     private final ProfileService profileService;
     private final RoleService roleService;
     private final UserMapper userMapper;
-    private final UserPasswordService userPasswordService;
+    private final PasswordService passwordService;
+    private final QueryUserService queryUserService;
 
     private static final String USER_ALREADY_EXISTS = "User with such an email already exists";
 
     public CreateLocalUserResponse createLocalUser(CreateLocalUserRequest dto) {
-        if (isUserExist(dto.email())) {
+        if (queryUserService.isUserExist(dto.email())) {
             log.error(USER_ALREADY_EXISTS);
             throw new EntityAlreadyExistsException(USER_ALREADY_EXISTS);
         }
@@ -40,14 +41,9 @@ public class LocalUserService {
         return userMapper.toCreateUserResponseDto(savedUser, profile);
     }
 
-
-    private boolean isUserExist(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
     private User createLocalUserEntity(CreateLocalUserRequest dto) {
         Role defaultRole = roleService.getDefaultUserRole();
-        String hashedPassword = userPasswordService.encode(dto.password());
+        String hashedPassword = passwordService.encode(dto.password());
 
         return User.builder()
                 .email(dto.email())

@@ -2,10 +2,7 @@ package com.userservice.controller.advice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.userservice.dto.response.ErrorResponseDto;
-import com.userservice.exceptions.CodeVerificationException;
-import com.userservice.exceptions.EmailVerifyException;
-import com.userservice.exceptions.NotFoundException;
-import com.userservice.exceptions.ResetPasswordException;
+import com.userservice.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,7 +15,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalControllerAdvice {
 
-    @ExceptionHandler({EmailVerifyException.class, CodeVerificationException.class, ResetPasswordException.class})
+    @ExceptionHandler({CodeVerificationException.class, ResetPasswordException.class, IllegalArgumentException.class})
     public ResponseEntity<ErrorResponseDto> handleException(RuntimeException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -48,6 +45,15 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(JsonProcessingException.class)
     public ResponseEntity<ErrorResponseDto> handleJsonProcessingException(JsonProcessingException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                e.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(InternalServiceException.class)
+    public ResponseEntity<ErrorResponseDto> handleInternalServiceException(InternalServiceException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()
