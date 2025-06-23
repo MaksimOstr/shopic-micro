@@ -1,7 +1,7 @@
 package com.codeservice.repository;
 
 import com.codeservice.entity.Code;
-import com.codeservice.enums.CodeScopeEnum;
+import com.codeservice.entity.CodeScopeEnum;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

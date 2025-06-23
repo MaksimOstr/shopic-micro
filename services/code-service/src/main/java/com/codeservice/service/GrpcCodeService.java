@@ -1,7 +1,7 @@
 package com.codeservice.service;
 
 import com.codeservice.entity.Code;
-import com.codeservice.enums.CodeScopeEnum;
+import com.codeservice.entity.CodeScopeEnum;
 import com.shopic.grpc.codeservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,11 @@ public class GrpcCodeService extends CodeServiceGrpc.CodeServiceImplBase {
     }
 
     @Override
+    public void getEmailChangeCode(CreateCodeRequest request, StreamObserver<CreateCodeResponse> responseObserver) {
+        getCode(request, responseObserver, CodeScopeEnum.EMAIL_CHANGE);
+    }
+
+    @Override
     public void validateEmailCode(ValidateCodeRequest request, StreamObserver<ValidateCodeResponse> responseObserver) {
         validateCode(request, responseObserver, CodeScopeEnum.EMAIL_VERIFICATION);
     }
@@ -34,6 +39,11 @@ public class GrpcCodeService extends CodeServiceGrpc.CodeServiceImplBase {
     @Override
     public void validateResetPasswordCode(ValidateCodeRequest request, StreamObserver<ValidateCodeResponse> responseObserver) {
         validateCode(request, responseObserver, CodeScopeEnum.RESET_PASSWORD);
+    }
+
+    @Override
+    public void validateEmailChangeCode(ValidateCodeRequest request, StreamObserver<ValidateCodeResponse> responseObserver) {
+        validateCode(request, responseObserver, CodeScopeEnum.EMAIL_CHANGE);
     }
 
 

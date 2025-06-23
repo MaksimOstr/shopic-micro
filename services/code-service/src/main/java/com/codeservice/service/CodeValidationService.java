@@ -1,7 +1,7 @@
 package com.codeservice.service;
 
 import com.codeservice.entity.Code;
-import com.codeservice.enums.CodeScopeEnum;
+import com.codeservice.entity.CodeScopeEnum;
 import com.codeservice.exception.CodeValidationException;
 import com.codeservice.exception.NotFoundException;
 import com.codeservice.repository.CodeRepository;

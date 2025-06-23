@@ -1,6 +1,5 @@
 package com.codeservice.entity;
 
-import com.codeservice.enums.CodeScopeEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

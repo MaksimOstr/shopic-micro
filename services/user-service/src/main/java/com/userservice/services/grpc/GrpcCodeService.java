@@ -37,6 +37,15 @@ public class GrpcCodeService {
         }
     }
 
+    public CreateCodeResponse getEmailChangeCode(long userId) {
+        try {
+            return codeGrpcService.getEmailChangeCode(getCreateCodeRequest(userId));
+        } catch (StatusRuntimeException e) {
+            getCodeExceptionHandler(e);
+            throw e;
+        }
+    }
+
     public ValidateCodeResponse validateEmailCode(String code) {
         try {
             return codeGrpcService.validateEmailCode(getValidateCodeRequest(code));
@@ -49,6 +58,15 @@ public class GrpcCodeService {
     public ValidateCodeResponse validateResetPasswordCode(String code) {
         try {
             return codeGrpcService.validateResetPasswordCode(getValidateCodeRequest(code));
+        } catch (StatusRuntimeException e) {
+            codeVerifyExceptionHandler(e);
+            throw e;
+        }
+    }
+
+    public ValidateCodeResponse validateEmailChangeCode(String code) {
+        try {
+            return codeGrpcService.validateEmailChangeCode(getValidateCodeRequest(code));
         } catch (StatusRuntimeException e) {
             codeVerifyExceptionHandler(e);
             throw e;

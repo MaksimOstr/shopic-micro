@@ -1,12 +1,10 @@
 package com.codeservice.service;
 
 import com.codeservice.entity.Code;
-import com.codeservice.enums.CodeScopeEnum;
+import com.codeservice.entity.CodeScopeEnum;
 import com.codeservice.repository.CodeRepository;
-import com.shopic.grpc.codeservice.CreateCodeRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -30,4 +30,7 @@ service CodeService {
 
   rpc getResetPasswordCode(CreateCodeRequest) returns (CreateCodeResponse);
   rpc validateResetPasswordCode(ValidateCodeRequest) returns (ValidateCodeResponse);
+
+  rpc getEmailChangeCode(CreateCodeRequest) returns (CreateCodeResponse);
+  rpc validateEmailChangeCode(ValidateCodeRequest) returns (ValidateCodeResponse);
 }
