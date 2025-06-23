@@ -3,6 +3,7 @@ package com.userservice.repositories;
 import com.userservice.entity.User;
 import com.userservice.projection.EmailVerifyProjection;
 import com.userservice.projection.ResetPasswordProjection;
+import com.userservice.projection.UserEmailAndPasswordProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,6 +17,8 @@ import java.util.Set;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
+
+    Optional<UserEmailAndPasswordProjection> findEmailAndPasswordById(long id);
 
     @Transactional
     @Modifying

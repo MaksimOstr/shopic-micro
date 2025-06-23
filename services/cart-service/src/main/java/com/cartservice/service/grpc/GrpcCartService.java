@@ -9,11 +9,12 @@ import com.shopic.grpc.cartservice.GetCartRequest;
 import com.shopic.grpc.cartservice.CartResponse;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.grpc.server.service.GrpcService;
 
 import java.util.List;
 
-@Service
+
+@GrpcService
 @RequiredArgsConstructor
 public class GrpcCartService extends CartServiceGrpc.CartServiceImplBase {
     private final CartService cartService;

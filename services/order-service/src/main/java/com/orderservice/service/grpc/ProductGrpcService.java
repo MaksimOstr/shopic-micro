@@ -9,11 +9,12 @@ import com.shopic.grpc.productservice.ReservationItem;
 import io.grpc.StatusRuntimeException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.grpc.server.service.GrpcService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 public class ProductGrpcService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productGrpcService;

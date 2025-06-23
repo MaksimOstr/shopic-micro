@@ -86,8 +86,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     private boolean shouldExclude(HttpServletRequest request) {
         List<String> whiteList = List.of(
-                "/password/forgot-password",
-                "/password/change",
+                "/forgot-password/request",
+                "/forgot-password/reset",
                 "/verify",
                 "/verify/request",
                 "/users/request-email-verify"

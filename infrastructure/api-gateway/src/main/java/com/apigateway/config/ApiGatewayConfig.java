@@ -30,7 +30,7 @@ public class ApiGatewayConfig {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> userRoute() {
+    public RouterFunction<ServerResponse> userRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("user-service-route")
                 .filter(lb("user-service"))
                 .path("/verify", request -> request
@@ -40,6 +40,11 @@ public class ApiGatewayConfig {
                         .POST("/request", http())
                         .PATCH("/reset", http()))
                 .path("/password", request -> request
+                        .filter(jwtHandlerFilter)
+                        .PATCH("/change", http()))
+                .path("/email", request -> request
+                        .filter(jwtHandlerFilter)
+                        .POST("/change-request", http())
                         .PATCH("/change", http()))
                 .build();
     }

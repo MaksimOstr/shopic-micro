@@ -8,12 +8,12 @@ import com.shopic.grpc.userservice.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.grpc.server.service.GrpcService;
 
 import java.util.List;
 
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 public class UserGrpcService {
     private final UserServiceGrpc.UserServiceBlockingStub userServiceGrpc;

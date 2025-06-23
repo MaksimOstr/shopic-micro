@@ -9,7 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.Instant;
 
 @Entity
-@Table(name = "users")
+@Table(name = "email_change_requests")
 @NoArgsConstructor
 @Getter
 @Setter

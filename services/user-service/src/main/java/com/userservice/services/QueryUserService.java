@@ -4,6 +4,7 @@ import com.userservice.entity.User;
 import com.userservice.exceptions.NotFoundException;
 import com.userservice.projection.EmailVerifyProjection;
 import com.userservice.projection.ResetPasswordProjection;
+import com.userservice.projection.UserEmailAndPasswordProjection;
 import com.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,5 +55,10 @@ public class QueryUserService {
 
     public Optional<User> findOptionalByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public UserEmailAndPasswordProjection getUserEmailAndPassword(long id) {
+        return userRepository.findEmailAndPasswordById(id)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 }

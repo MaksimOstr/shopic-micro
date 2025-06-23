@@ -2,6 +2,7 @@ package com.userservice.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.userservice.dto.event.ChangeEmailEvent;
 import com.userservice.dto.event.EmailVerifyRequestDto;
 import com.userservice.dto.event.PasswordResetEvent;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,11 @@ public class KafkaEventProducer {
         PasswordResetEvent event = new PasswordResetEvent(email, code);
 
         kafkaTemplate.send("password-reset-requested", objectMapper.writeValueAsString(event));
+    }
+
+    public void requestEmailChange(String code, String email) throws JsonProcessingException {
+        ChangeEmailEvent event = new ChangeEmailEvent(code, email);
+
+        kafkaTemplate.send("email-change-requested", objectMapper.writeValueAsString(event));
     }
 }

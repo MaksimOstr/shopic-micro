@@ -11,7 +11,7 @@ import com.productservice.services.products.ProductQueryService;
 import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.grpc.server.service.GrpcService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 import static com.productservice.utils.Utils.extractIds;
 
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBase {
 

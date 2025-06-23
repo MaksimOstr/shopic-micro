@@ -7,9 +7,10 @@ import com.shopic.grpc.cartservice.CartResponse;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.grpc.server.service.GrpcService;
 import org.springframework.stereotype.Service;
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 public class CartGrpcService {
     private final CartServiceGrpc.CartServiceBlockingStub cartGrpcService;

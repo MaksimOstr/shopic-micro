@@ -41,6 +41,17 @@ public class KafkaListenerService {
         acknowledgment.acknowledge();
     }
 
+    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 1000))
+    @KafkaListener(topics = {"email-change-requested"}, groupId = "mail-service")
+    public void sendEmailChangeCode(String data, Acknowledgment acknowledgment) {
+        String subject = "Change email";
+        String text = "Code for changing email: ";
+
+        sendCode(data, subject, text);
+
+        acknowledgment.acknowledge();
+    }
+
     private void sendCode(String data, String subject, String text) {
         try {
             SendCodeEvent event = objectMapper.readValue(data, SendCodeEvent.class);
