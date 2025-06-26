@@ -22,6 +22,8 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemService cartItemService;
 
+    private static final String CART_NOT_FOUND = "Cart Not Found";
+
     @Transactional
     public void addItemToCart(AddItemToCartRequest dto, long userId) {
         Long cartId = cartRepository.findCartIdByUserId(userId)
@@ -50,21 +52,20 @@ public class CartService {
         return cartItemService.getCartItemsForOrder(cartId);
     }
 
-    public void removeItemFromCart(long userId, long productId) {
-        long cartId = getCartIdByUserId(userId);
+    public void removeItemFromCart(long cartItemId) {
+        long cartId = cartItemService.getCartIdFromCartItem(cartItemId);
 
-        cartItemService.deleteCartItem(cartId, productId);
+        cartItemService.deleteCartItemById(cartItemId);
         deleteCartIfEmpty(cartId);
     }
 
     @Transactional
-    public void changeCartItemQuantity(ChangeCartItemQuantity dto, long userId) {
-        long cartId = getCartIdByUserId(userId);
-        CartItem cartItem = cartItemService.getCartItem(cartId, dto.productId());
+    public void changeCartItemQuantity(ChangeCartItemQuantity dto) {
+        CartItem cartItem = cartItemService.getCartItemById(dto.cartItemId());
 
-        if(dto.amount() <= 0) {
-            cartItemService.deleteCartItem(cartId, dto.productId());
-            deleteCartIfEmpty(cartId);
+        if (dto.amount() <= 0) {
+            cartItemService.deleteCartItemById(cartItem.getId());
+            deleteCartIfEmpty(cartItem.getCart().getId());
         } else {
             cartItem.setQuantity(dto.amount());
         }
@@ -73,20 +74,20 @@ public class CartService {
     public void deleteCartByUserId(long userId) {
         int deleted = cartRepository.deleteCartByUserId(userId);
 
-        if(deleted == 0) {
-            throw new NotFoundException("Cart not found");
+        if (deleted == 0) {
+            throw new NotFoundException(CART_NOT_FOUND);
         }
     }
 
 
     private long getCartIdByUserId(long userId) {
         return cartRepository.findCartIdByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Cart was not found"));
+                .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
     }
 
     private void deleteCartIfEmpty(long cartId) {
         int cartItemsCount = cartItemService.countCartItems(cartId);
-        if(cartItemsCount == 0) {
+        if (cartItemsCount == 0) {
             cartRepository.deleteById(cartId);
         }
     }

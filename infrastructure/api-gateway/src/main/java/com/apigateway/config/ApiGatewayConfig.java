@@ -90,7 +90,7 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .GET("/items", http())
                         .POST("/items", http())
-                        .DELETE("/items", http())
+                        .DELETE("/items/{id}", http())
                         .DELETE("", http())
                         .PATCH("/items/quantity", http()))
                 .build();

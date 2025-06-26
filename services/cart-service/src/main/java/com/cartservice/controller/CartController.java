@@ -42,14 +42,13 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/items")
+    @DeleteMapping("/items/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> deleteCartItem(
-            @RequestParam long productId,
-            @AuthenticationPrincipal CustomPrincipal principal
+            @PathVariable long id
 
     ) {
-        cartService.removeItemFromCart(principal.getId(), productId);
+        cartService.removeItemFromCart(id);
 
         return ResponseEntity.ok().build();
     }
@@ -67,10 +66,9 @@ public class CartController {
     @PatchMapping("/items/quantity")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> changeCartItemQuantity(
-            @RequestBody @Valid ChangeCartItemQuantity body,
-            @AuthenticationPrincipal CustomPrincipal principal
+            @RequestBody @Valid ChangeCartItemQuantity body
     ) {
-        cartService.changeCartItemQuantity(body, principal.getId());
+        cartService.changeCartItemQuantity(body);
 
         return ResponseEntity.ok().build();
     }

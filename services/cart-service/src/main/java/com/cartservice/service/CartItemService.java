@@ -25,14 +25,21 @@ public class CartItemService {
     private final EntityManager entityManager;
     private final GrpcProductService grpcProductService;
 
+    private static final String CART_ITEM_NOT_FOUND = "CartItem not found";
+
 
     public List<CartItemProjection> getCartItems(long cartId) {
         return cartItemRepository.findByCart_Id(cartId);
     }
 
-    public CartItem getCartItem(long cartId, long productId) {
-        return cartItemRepository.findByCart_IdAndProductId(cartId, productId)
-                .orElseThrow(() -> new NotFoundException("Cart item not found"));
+    public long getCartIdFromCartItem(long cartId) {
+        return cartItemRepository.getCartIdByCartItemId(cartId)
+                .orElseThrow(() -> new NotFoundException(CART_ITEM_NOT_FOUND));
+    }
+
+    public CartItem getCartItemById(long cartItemId) {
+        return cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new NotFoundException(CART_ITEM_NOT_FOUND));
     }
 
     @Transactional
@@ -54,11 +61,11 @@ public class CartItemService {
         return cartItemRepository.countByCart_Id(cartId);
     }
 
-    public void deleteCartItem(long cartId, long productId) {
-        int deleted = cartItemRepository.deleteCartItem(cartId, productId);
+    public void deleteCartItemById(long id) {
+        int deleted = cartItemRepository.deleteById(id);
 
         if(deleted == 0) {
-            throw new NotFoundException("Cart item not found");
+            throw new NotFoundException(CART_ITEM_NOT_FOUND);
         }
     }
 
@@ -67,7 +74,6 @@ public class CartItemService {
     }
 
     private void createAndSaveCartItem(CreateCartItemDto dto, ProductDetailsResponse response) {
-        System.out.println(response.getProductImageUrl());
         CartItem cartItem = CartItem.builder()
                 .productId(dto.productId())
                 .productName(response.getProductName())

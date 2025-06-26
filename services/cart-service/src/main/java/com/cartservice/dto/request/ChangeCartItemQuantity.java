@@ -9,5 +9,5 @@ public record ChangeCartItemQuantity(
         Integer amount,
 
         @NotNull
-        Long productId
+        Long cartItemId
 ) {}

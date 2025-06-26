@@ -30,10 +30,13 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     Optional<CartItem> findByCart_IdAndProductId(Long cartId, Long productId);
 
+    @Query("SELECT ci.cart.id FROM CartItem ci WHERE ci.id = :cartItemId")
+    Optional<Long> getCartIdByCartItemId(long cartItemId);
+
     @Transactional
     @Modifying
-    @Query("DELETE FROM CartItem c WHERE c.cart.id = :cartId AND c.productId = :productId")
-    int deleteCartItem(long cartId, long productId);
+    @Query("DELETE FROM CartItem ci WHERE ci.id = :id")
+    int deleteById(long id);
 
     @Query("SELECT new com.cartservice.projection.CartItemForOrderProjection(" +
             "ci.productId," +
