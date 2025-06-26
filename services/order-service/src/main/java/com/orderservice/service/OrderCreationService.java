@@ -1,11 +1,11 @@
 package com.orderservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.orderservice.dto.request.CreateOrderItem;
 import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.entity.Order;
+import com.orderservice.entity.OrderItem;
 import com.orderservice.entity.OrderStatusEnum;
-import com.orderservice.exception.NotFoundException;
+import com.orderservice.mapper.OrderItemMapper;
 import com.orderservice.repository.OrderRepository;
 import com.orderservice.service.grpc.CartGrpcService;
 import com.orderservice.service.grpc.ProductGrpcService;
@@ -30,6 +30,7 @@ public class OrderCreationService {
     private final OrderItemService orderItemService;
     private final CartGrpcService cartGrpcService;
     private final ProductGrpcService productGrpcService;
+    private final OrderItemMapper orderItemMapper;
     private final KafkaEventProducer kafkaEventProducer;
 
 
@@ -39,36 +40,24 @@ public class OrderCreationService {
         List<CartItem> cartItems = cartInfo.getCartItemsList();
 
         CheckAndReserveProductResponse response = productGrpcService.checkAndReserveProduct(cartItems);
-        System.out.println(response.getReservationId());
         Map<Long, BigDecimal> productPriceMap = getProductPriceMap(response.getProductsList());
 
-        Order savedOrder = createAndSaveOrderEntity(userId, response.getReservationId(), productPriceMap, cartItems);
-        saveOrderItems(cartItems, savedOrder, productPriceMap);
+        createAndSaveOrderWithOrderItems(userId, response.getReservationId(), productPriceMap, cartItems);
     }
 
 
-    private Order createAndSaveOrderEntity(long userId, long reservationId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
-        BigDecimal totalPrice = calculateTotalPrice(priceMap, cartItems);
+    private void createAndSaveOrderWithOrderItems(long userId, long reservationId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
         Order order = Order.builder()
                 .reservationId(reservationId)
                 .status(OrderStatusEnum.CREATED)
-                .totalPrice(totalPrice)
                 .userId(userId)
                 .build();
+        List<OrderItem> orderItems = orderItemMapper.mapToOrderItems(cartItems, order, priceMap);
 
-        return orderRepository.save(order);
-    }
+        order.setOrderItems(orderItems);
+        order.setTotalPrice(order.calculateTotalPrice());
 
-    private BigDecimal calculateTotalPrice(Map<Long, BigDecimal> products, List<CartItem> cartItems) {
-        return cartItems.stream().map(item -> {
-            BigDecimal price = products.get(item.getProductId());
-
-            if(price == null) {
-                throw new NotFoundException("Product not found");
-            }
-
-            return price.multiply(new BigDecimal(item.getQuantity()));
-        }).reduce(BigDecimal.ZERO, BigDecimal::add);
+        orderRepository.save(order);
     }
 
     private Map<Long, BigDecimal> getProductPriceMap(List<ProductInfo> productInfoList) {
@@ -78,26 +67,5 @@ public class OrderCreationService {
                         ProductInfo::getProductId,
                         info -> new BigDecimal(info.getPrice())
                 ));
-    }
-
-    private List<CreateOrderItem> createOrderItems(List<CartItem> cartItems, Order order, Map<Long, BigDecimal> priceMap) {
-        return cartItems.parallelStream()
-                .map(item -> {
-                    BigDecimal price = priceMap.get(item.getProductId());
-                    return new CreateOrderItem(
-                            item.getProductId(),
-                            item.getQuantity(),
-                            price,
-                            order.getId(),
-                            item.getProductName(),
-                            item.getProductImageUrl()
-                    );
-                }).toList();
-    }
-
-    private void saveOrderItems(List<CartItem> cartItems, Order order, Map<Long, BigDecimal> productInfoMap) {
-        List<CreateOrderItem> createOrderItems = createOrderItems(cartItems, order, productInfoMap);
-
-        orderItemService.saveAllOrderItems(createOrderItems);
     }
 }

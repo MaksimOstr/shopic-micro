@@ -40,4 +40,10 @@ public class Order {
     @Column(name = "created_at", nullable = false)
     @CreatedDate
     private Instant createdAt;
+
+    public BigDecimal calculateTotalPrice() {
+        return orderItems.stream()
+                .map(OrderItem::calculateTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }
