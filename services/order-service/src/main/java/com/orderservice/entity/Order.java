@@ -2,6 +2,7 @@ package com.orderservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -40,6 +41,10 @@ public class Order {
     @Column(name = "created_at", nullable = false)
     @CreatedDate
     private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    private Instant updatedAt;
 
     public BigDecimal calculateTotalPrice() {
         return orderItems.stream()

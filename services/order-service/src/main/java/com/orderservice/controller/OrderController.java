@@ -34,6 +34,16 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<OrderDto> getOrder(
+            @PathVariable Long id
+    ) {
+        OrderDto order = orderService.getOrderById(id);
+
+        return ResponseEntity.ok().body(order);
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<OrderDto>> getUserOrders(
@@ -48,6 +58,7 @@ public class OrderController {
     public ResponseEntity<?> cancelOrder(
             @PathVariable String id
     ) {
+
         return ResponseEntity.ok().build();
     }
 }
