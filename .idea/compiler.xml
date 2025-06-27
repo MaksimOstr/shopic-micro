@@ -17,9 +17,10 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.38/57f8f5e02e92a30fd21b80cbd426a4172b5f8e29/lombok-1.18.38.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.6.3/52e345c907fbf173b376586c7f8b131d53fa5867/mapstruct-processor-1.6.3.jar" />
         </processorPath>
+        <module name="shopic.user-service.main" />
+        <module name="shopic.payment-service.main" />
         <module name="shopic.order-service.main" />
         <module name="shopic.auth-service.main" />
-        <module name="shopic.user-service.main" />
         <module name="com.shopic.product-service.main" />
         <module name="shopic.cart-service.main" />
         <module name="shopic.code-service.main" />
@@ -38,6 +39,9 @@
       <module name="order-service" target="24" />
       <module name="order-service.main" target="24" />
       <module name="order-service.test" target="24" />
+      <module name="payment-service" target="24" />
+      <module name="payment-service.main" target="24" />
+      <module name="payment-service.test" target="24" />
       <module name="product-service" target="24" />
       <module name="product-service.main" target="24" />
       <module name="product-service.test" target="24" />
@@ -78,6 +82,9 @@
       <module name="order-service" options="-parameters" />
       <module name="order-service.main" options="-parameters" />
       <module name="order-service.test" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
+      <module name="payment-service.main" options="-parameters" />
+      <module name="payment-service.test" options="-parameters" />
       <module name="product-service" options="-parameters" />
       <module name="product-service.main" options="-parameters" />
       <module name="product-service.test" options="-parameters" />
@@ -105,6 +112,9 @@
       <module name="shopic.order-service" options="-parameters" />
       <module name="shopic.order-service.main" options="-parameters" />
       <module name="shopic.order-service.test" options="-parameters" />
+      <module name="shopic.payment-service" options="-parameters" />
+      <module name="shopic.payment-service.main" options="-parameters" />
+      <module name="shopic.payment-service.test" options="-parameters" />
       <module name="shopic.user-service" options="-parameters" />
       <module name="shopic.user-service.main" options="-parameters" />
       <module name="shopic.user-service.test" options="-parameters" />

@@ -37,7 +37,7 @@ public class ProductQueryService {
     }
 
     public Product getEnabledProductById(long id) {
-        return productRepository.getEnabledProducts(id)
+        return productRepository.getEnabledProduct(id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 

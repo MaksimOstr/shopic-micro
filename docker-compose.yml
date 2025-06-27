@@ -71,6 +71,18 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${CART_DB_NAME}
 
+  payment-service-db:
+    image: postgres
+    restart: always
+    ports:
+      - "${PAYMENT_DB_PORT}:5432"
+    volumes:
+      - /postgres/payment-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${PAYMENT_DB_NAME}
+
   kafka:
     image: apache/kafka:latest
     restart: always

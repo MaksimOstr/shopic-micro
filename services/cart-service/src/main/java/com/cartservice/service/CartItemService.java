@@ -48,12 +48,8 @@ public class CartItemService {
 
         cartItemRepository.findByCart_IdAndProductId(dto.cartId(), dto.productId())
                 .ifPresentOrElse(
-                        value -> {
-                            value.setQuantity(dto.quantity() + value.getQuantity());
-                        },
-                        () -> {
-                            createAndSaveCartItem(dto, response);
-                        }
+                        value -> value.setQuantity(dto.quantity() + value.getQuantity()),
+                        () -> createAndSaveCartItem(dto, response)
                 );
     }
 

@@ -27,7 +27,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     Optional<String> getProductImageUrl(long id);
 
     @Query("SELECT p FROM Product p JOIN FETCH p.category JOIN FETCH  p.brand WHERE p.id = :id AND p.enabled = true")
-    Optional<Product> getEnabledProducts(long id);
+    Optional<Product> getEnabledProduct(long id);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Optional<Product> findById(long id);
