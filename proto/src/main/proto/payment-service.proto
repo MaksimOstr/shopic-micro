@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+
+package paymentservice;
+
+option java_multiple_files = true;
+option java_package = "com.shopic.grpc.paymentservice";
+
+message CreatePaymentRequest {
+  int64 order_id = 1;
+  int64 customer_id = 2;
+  repeated OrderLineItem line_items = 3;
+}
+
+message OrderLineItem {
+  string product_name = 1;
+  string product_image = 2;
+  int64 quantity = 3;
+  string unit_amount_in_cents = 4;
+}
+
+message CreatePaymentResponse {
+  string checkout_url = 1;
+}
+
+
+service PaymentService {
+  rpc createPaymentForOrder(CreatePaymentRequest) returns (CreatePaymentResponse);
+}

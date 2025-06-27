@@ -8,6 +8,7 @@ import com.orderservice.entity.OrderStatusEnum;
 import com.orderservice.mapper.OrderItemMapper;
 import com.orderservice.repository.OrderRepository;
 import com.orderservice.service.grpc.CartGrpcService;
+import com.orderservice.service.grpc.PaymentGrpcService;
 import com.orderservice.service.grpc.ProductGrpcService;
 import com.shopic.grpc.cartservice.CartResponse;
 import com.shopic.grpc.cartservice.CartItem;
@@ -32,21 +33,24 @@ public class OrderCreationService {
     private final ProductGrpcService productGrpcService;
     private final OrderItemMapper orderItemMapper;
     private final KafkaEventProducer kafkaEventProducer;
+    private final PaymentGrpcService paymentGrpcService;
 
 
     @Transactional
-    public void createOrder(long userId, CreateOrderRequest dto) throws JsonProcessingException {
+    public String createOrder(long userId, CreateOrderRequest dto) throws JsonProcessingException {
         CartResponse cartInfo = cartGrpcService.getCartInfo(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
 
         CheckAndReserveProductResponse response = productGrpcService.checkAndReserveProduct(cartItems);
         Map<Long, BigDecimal> productPriceMap = getProductPriceMap(response.getProductsList());
 
-        createAndSaveOrderWithOrderItems(userId, response.getReservationId(), productPriceMap, cartItems);
+        Order order = createAndSaveOrderWithOrderItems(userId, response.getReservationId(), productPriceMap, cartItems);
+
+        return paymentGrpcService.createPayment(order.getId(), userId, productPriceMap, cartItems).getCheckoutUrl();
     }
 
 
-    private void createAndSaveOrderWithOrderItems(long userId, long reservationId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
+    private Order createAndSaveOrderWithOrderItems(long userId, long reservationId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
         Order order = Order.builder()
                 .reservationId(reservationId)
                 .status(OrderStatusEnum.CREATED)
@@ -57,7 +61,7 @@ public class OrderCreationService {
         order.setOrderItems(orderItems);
         order.setTotalPrice(order.calculateTotalPrice());
 
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
     private Map<Long, BigDecimal> getProductPriceMap(List<ProductInfo> productInfoList) {

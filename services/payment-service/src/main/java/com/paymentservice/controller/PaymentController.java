@@ -19,6 +19,6 @@ public class PaymentController {
     public ResponseEntity<?> charge(
             @RequestBody @Valid ChargeRequest body
     ) {
-
+        return ResponseEntity.ok().build();
     }
 }

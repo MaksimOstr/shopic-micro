@@ -2,6 +2,9 @@ package com.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
@@ -12,6 +15,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payments_seq")
@@ -26,6 +30,7 @@ public class Payment {
     @Column(name = "payment_id", nullable = false)
     private String paymentId;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 }

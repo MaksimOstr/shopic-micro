@@ -20,7 +20,6 @@ public class ProductGrpcService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productGrpcService;
 
     public CheckAndReserveProductResponse checkAndReserveProduct(List<CartItem> cartItems) {
-        System.out.println(cartItems);
         List<ReservationItem> reservationItems = mapToReservationItems(cartItems);
         CheckAndReserveProductsRequest request = CheckAndReserveProductsRequest.newBuilder()
                 .addAllReservationItems(reservationItems).build();
