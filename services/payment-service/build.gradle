@@ -20,6 +20,7 @@ repositories {
 dependencies {
 	implementation project(':proto')
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation'com.stripe:stripe-java:29.2.0'
 	annotationProcessor libs.mapstruct.processor
 	implementation libs.bundles.core
 	implementation libs.bundles.business.service
