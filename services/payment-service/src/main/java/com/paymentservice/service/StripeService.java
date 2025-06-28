@@ -4,11 +4,14 @@ import com.paymentservice.dto.CheckoutItem;
 import com.paymentservice.dto.CreateCheckoutSessionDto;
 import com.paymentservice.dto.CreatePaymentDto;
 import com.paymentservice.exception.InternalException;
+import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +23,14 @@ import java.util.List;
 public class StripeService {
     private final PaymentService paymentService;
 
+    @Value("${STRIPE_SECRET_KEY}")
+    private String stripeSecretKey;
+
+    @PostConstruct
+    public void init() {
+        Stripe.apiKey = stripeSecretKey;
+    }
+
     public String createCheckoutSession(CreateCheckoutSessionDto dto) {
         try {
             List<SessionCreateParams.LineItem> lineItems = getLineItems(dto);
@@ -28,6 +39,8 @@ public class StripeService {
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .setCurrency("USD")
                     .addAllLineItem(lineItems)
+                    .setSuccessUrl("https://stripe.com")
+                    .setCancelUrl("https://stripe.com")
                     .putMetadata("order_id", String.valueOf(dto.orderId()))
                     .build();
             Session session = Session.create(params);
@@ -50,6 +63,7 @@ public class StripeService {
                             .setPriceData(
                                     SessionCreateParams.LineItem.PriceData.builder()
                                             .setUnitAmountDecimal(item.price())
+                                            .setCurrency("USD")
                                             .setProductData(
                                                     SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                             .addImage(item.imageUrl())

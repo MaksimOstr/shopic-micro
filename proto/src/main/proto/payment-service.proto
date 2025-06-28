@@ -16,7 +16,7 @@ message OrderLineItem {
   string product_name = 1;
   string product_image = 2;
   int64 quantity = 3;
-  string unit_amount_in_cents = 4;
+  string price_for_one = 4;
 }
 
 message CreatePaymentResponse {

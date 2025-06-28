@@ -106,4 +106,13 @@ public class ApiGatewayConfig {
                         .GET("", http()))
                 .build();
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> paymentServiceRoute() {
+        return route("payment-service-route")
+                .filter(lb("payment-service"))
+                .path("/payments", request -> request
+                        .POST("/webhook", http()))
+                .build();
+    }
 }

@@ -17,7 +17,7 @@ public interface GrpcMapper {
 
     @AfterMapping
     default void afterMapping(@MappingTarget OrderLineItem.Builder orderLineItemBuilder, BigDecimal priceForOne) {
-        orderLineItemBuilder.setUnitAmountInCents(priceForOne.toString());
+        orderLineItemBuilder.setPriceForOne(priceForOne.toString());
     }
 
 }

@@ -24,14 +24,14 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Order> createOrder(
+    public ResponseEntity<String> createOrder(
             @AuthenticationPrincipal CustomPrincipal principal,
             //Add additional info for order
             @RequestBody CreateOrderRequest body
     ) throws JsonProcessingException {
-        orderCreationService.createOrder(principal.getId(), body);
+        String redirectUrl = orderCreationService.createOrder(principal.getId(), body);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(redirectUrl);
     }
 
     @GetMapping("/{id}")

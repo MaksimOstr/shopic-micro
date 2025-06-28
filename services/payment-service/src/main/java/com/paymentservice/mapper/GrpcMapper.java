@@ -10,6 +10,6 @@ public interface GrpcMapper {
 
     @Mapping(target = "name", source = "productName")
     @Mapping(target = "imageUrl", source = "productImage")
-    @Mapping(target = "price", source = "unitAmountInCents")
+    @Mapping(target = "price", source = "priceForOne")
     CheckoutItem toCheckoutItem(OrderLineItem item);
 }

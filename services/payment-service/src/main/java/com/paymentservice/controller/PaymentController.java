@@ -1,24 +1,34 @@
 package com.paymentservice.controller;
 
-import com.paymentservice.dto.request.ChargeRequest;
-import com.stripe.model.Charge;
-import jakarta.validation.Valid;
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.model.Event;
+import com.stripe.net.Webhook;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/payments")
 @RequiredArgsConstructor
 public class PaymentController {
 
-    @PostMapping
-    public ResponseEntity<?> charge(
-            @RequestBody @Valid ChargeRequest body
+    @Value("${STRIPE_WEBHOOK_SECRET}")
+    private String STRIPE_WEBHOOK_SECRET;
+
+
+    @PostMapping("/webhook")
+    public String handleWebhook(
+            String payload,
+            @RequestHeader("Stripe-Signature") String sigHeader
     ) {
-        return ResponseEntity.ok().build();
-    }
+        System.out.println("payload: " + payload + sigHeader);
+        try {
+            Event event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
+            System.out.println(event);
+
+            return "OK";
+        } catch (SignatureVerificationException e) {
+            return "Error: " + e.getMessage();
+        }
+    };
 }

@@ -2,6 +2,7 @@ package com.paymentservice.service;
 
 import com.paymentservice.dto.CreatePaymentDto;
 import com.paymentservice.entity.Payment;
+import com.paymentservice.entity.PaymentStatus;
 import com.paymentservice.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class PaymentService {
                 .userId(dto.userId())
                 .paymentId(dto.paymentId())
                 .orderId(dto.orderId())
+                .status(PaymentStatus.PENDING)
                 .build();
 
         paymentRepository.save(payment);
