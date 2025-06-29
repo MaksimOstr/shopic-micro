@@ -32,6 +32,7 @@ databaseChangeLog:
                   name: payment_id
                   type: text
                   constraints:
+                    unique: true
                     nullable: false
               - column:
                   name: status

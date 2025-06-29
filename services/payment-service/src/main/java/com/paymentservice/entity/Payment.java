@@ -26,7 +26,7 @@ public class Payment {
     @Column(name = "order_id", nullable = false)
     private long orderId;
 
-    @Column(name = "payment_id", nullable = false)
+    @Column(name = "payment_id", nullable = false, unique = true)
     private String paymentId;
 
     @Enumerated(EnumType.STRING)
