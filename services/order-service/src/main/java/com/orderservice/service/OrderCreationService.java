@@ -28,16 +28,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderCreationService {
     private final OrderRepository orderRepository;
-    private final OrderItemService orderItemService;
     private final CartGrpcService cartGrpcService;
     private final ProductGrpcService productGrpcService;
     private final OrderItemMapper orderItemMapper;
-    private final KafkaEventProducer kafkaEventProducer;
     private final PaymentGrpcService paymentGrpcService;
 
 
     @Transactional
-    public String createOrder(long userId, CreateOrderRequest dto) throws JsonProcessingException {
+    public String createOrder(long userId, CreateOrderRequest dto) {
         CartResponse cartInfo = cartGrpcService.getCartInfo(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
 
