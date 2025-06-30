@@ -1,14 +1,18 @@
 package com.productservice.services;
 
 import com.productservice.entity.Product;
+import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
 import com.productservice.services.products.ProductQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -55,5 +59,12 @@ public class ReservationService {
 
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
         }
+    }
+
+    @Scheduled
+    public void checkForUnpaidReservations() {
+        Instant expirationThreshold = Instant.now().minus(30, ChronoUnit.MINUTES);
+
+        List<Reservation> reservations = reservationRepository.findByCreatedAtBefore(expirationThreshold);
     }
 }

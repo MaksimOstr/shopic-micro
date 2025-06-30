@@ -13,14 +13,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OrderQueryService queryService;
 
     public List<OrderDto> getOrdersByUserId(long userId) {
-        List<Order> orders = orderRepository.findOrdersByUserId(userId);
+        List<Order> orders = queryService.getOrdersWithItems(userId);
 
         return orders.stream()
                 .map(this::mapToOrderDto)
@@ -28,8 +30,7 @@ public class OrderService {
     }
 
     public OrderDto getOrderById(long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("Order not found"));
+        Order order = queryService.getOrderWithItems(orderId);
 
         return mapToOrderDto(order);
     }

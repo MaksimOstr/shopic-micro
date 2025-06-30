@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +21,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.id = :id")
     Optional<Reservation> findByIdWithItems(long id);
+
+    @Query("SELECT r FROM Reservation r WHERE r.createdAt < :threshold")
+    List<Reservation> findByCreatedAtBefore(Instant threshold);
 }

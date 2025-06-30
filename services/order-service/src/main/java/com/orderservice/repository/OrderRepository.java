@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
@@ -17,4 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     @Modifying
     @Query("UPDATE Order o SET o.status = :status WHERE o.id = :id")
     int changeOrderStatus(long id, OrderStatusEnum status);
+
+    @Query("SELECT o FROM Order o JOIN FETCH o.orderItems oi WHERE o.id = :id")
+    Optional<Order> findByIdWithItems(long id);
 }

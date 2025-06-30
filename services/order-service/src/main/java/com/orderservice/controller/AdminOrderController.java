@@ -14,19 +14,13 @@ import org.springframework.web.bind.annotation.*;
 public class AdminOrderController {
     private final AdminOrderService adminOrderService;
 
-    @GetMapping
-    public ResponseEntity<?> getOrders(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-
-    ) {
-
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<AdminOrderDto> getOrderById(
             @PathVariable("id") int id
     ) {
+        AdminOrderDto order = adminOrderService.getOrder(id);
 
+        return ResponseEntity.ok().body(order);
     }
 }

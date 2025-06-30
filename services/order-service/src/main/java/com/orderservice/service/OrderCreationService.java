@@ -63,7 +63,6 @@ public class OrderCreationService {
     }
 
     private Map<Long, BigDecimal> getProductPriceMap(List<ProductInfo> productInfoList) {
-
         return productInfoList.stream()
                 .collect(Collectors.toMap(
                         ProductInfo::getProductId,
