@@ -7,6 +7,7 @@ import com.shopic.grpc.paymentservice.CreatePaymentRequest;
 import com.shopic.grpc.paymentservice.CreatePaymentResponse;
 import com.shopic.grpc.paymentservice.OrderLineItem;
 import com.shopic.grpc.paymentservice.PaymentServiceGrpc;
+import com.shopic.grpc.productservice.ProductInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,11 @@ import java.util.Map;
 public class PaymentGrpcService {
     private final PaymentServiceGrpc.PaymentServiceBlockingStub paymentGrpcService;
 
-    public CreatePaymentResponse createPayment(long orderId, long userId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
+    public CreatePaymentResponse createPayment(long orderId, long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap) {
         CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
                 .setOrderId(orderId)
                 .setCustomerId(userId)
-                .addAllLineItems(toOrderLineItemList(priceMap, cartItems))
+                .addAllLineItems(toOrderLineItemList(productInfoList, productQuantityMap))
                 .build();
 
 
@@ -33,15 +34,12 @@ public class PaymentGrpcService {
         return paymentGrpcService.createPaymentForOrder(request);
     }
 
-    private List<OrderLineItem> toOrderLineItemList(Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
-        return cartItems.stream().map(item -> {
-            BigDecimal price = priceMap.get(item.getProductId());
-            return OrderLineItem.newBuilder()
-                    .setPriceForOne(price.toString())
-                    .setQuantity(item.getQuantity())
-                    .setProductName(item.getProductName())
-                    .setProductImage(item.getProductImageUrl())
-                    .build();
-        }).toList();
+    private List<OrderLineItem> toOrderLineItemList(List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap) {
+        return productInfoList.stream().map(item -> OrderLineItem.newBuilder()
+                .setPriceForOne(item.getPrice())
+                .setQuantity(productQuantityMap.get(item.getProductId()))
+                .setProductName(item.getProductName())
+                .setProductImage(item.getProductImageUrl())
+                .build()).toList();
     }
 }

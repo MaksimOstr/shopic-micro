@@ -2,7 +2,7 @@ package com.productservice.mapper;
 
 import com.productservice.dto.request.ItemForReservation;
 import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductPrice;
+import com.productservice.projection.ProductInfoDto;
 import com.shopic.grpc.productservice.ProductDetailsResponse;
 import com.shopic.grpc.productservice.ProductInfo;
 import com.shopic.grpc.productservice.ReservationItem;
@@ -13,7 +13,7 @@ public interface GrpcMapper {
 
     ProductDetailsResponse toProductDetails(ProductForCartDto dto);
 
-    ProductInfo toProductInfo(ProductPrice dto);
+    ProductInfo toProductInfo(ProductInfoDto dto);
 
     ItemForReservation toItemForReservation(ReservationItem reservationItem);
 }

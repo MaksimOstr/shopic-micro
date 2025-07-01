@@ -3,7 +3,7 @@ package com.productservice.repository;
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductPrice;
+import com.productservice.projection.ProductInfoDto;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,12 +39,14 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     Optional<Product> findBySku(UUID sku);
 
-    @Query("SELECT new com.productservice.projection.ProductPrice(" +
+    @Query("SELECT new com.productservice.projection.ProductInfoDto(" +
             "p.id," +
-            "p.price" +
+            "p.price," +
+            "p.imageUrl," +
+            "p.name" +
             ")" +
             "FROM Product p WHERE p.id IN :ids")
-    List<ProductPrice> findProductPrices(List<Long> ids);
+    List<ProductInfoDto> findProductPrices(List<Long> ids);
 
     @Query("SELECT new com.productservice.projection.ProductDto(" +
             "p.id, " +

@@ -1,6 +1,5 @@
 package com.orderservice.config;
 
-import com.orderservice.service.grpc.PaymentGrpcService;
 import com.shopic.grpc.cartservice.CartServiceGrpc;
 import com.shopic.grpc.paymentservice.PaymentServiceGrpc;
 import com.shopic.grpc.productservice.ProductServiceGrpc;

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package cartservice;
+package com.shopic.grpc.cartservice;
 
 option java_multiple_files = true;
 option java_package = "com.shopic.grpc.cartservice";
@@ -18,8 +18,6 @@ message CartResponse {
 message CartItem {
   int64 product_id = 1;
   int32 quantity = 2;
-  string product_name = 3;
-  string product_image_url = 4;
 }
 
 

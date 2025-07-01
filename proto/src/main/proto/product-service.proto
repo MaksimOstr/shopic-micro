@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
-package productservice;
+package com.shopic.grpc.productservice;
 
 option java_multiple_files = true;
 option java_package = "com.shopic.grpc.productservice";

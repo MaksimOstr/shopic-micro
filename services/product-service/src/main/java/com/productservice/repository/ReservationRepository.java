@@ -14,14 +14,8 @@ import java.util.Optional;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM Reservation r WHERE r.id = :id")
-    int deleteByOrderId(long id);
+    int deleteByOrderId(Long orderId);
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.orderId = :orderId")
     Optional<Reservation> findByOrderIdWithItems(long orderId);
-
-    @Query("SELECT r FROM Reservation r WHERE r.createdAt < :threshold")
-    List<Reservation> findByCreatedAtBefore(Instant threshold);
 }

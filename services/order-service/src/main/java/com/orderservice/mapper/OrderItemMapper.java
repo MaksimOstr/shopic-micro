@@ -4,6 +4,8 @@ package com.orderservice.mapper;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderItem;
 import com.shopic.grpc.cartservice.CartItem;
+import com.shopic.grpc.productservice.ActualProductInfoResponse;
+import com.shopic.grpc.productservice.ProductInfo;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,21 +17,15 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class OrderItemMapper {
-    public List<OrderItem> mapToOrderItems(List<CartItem> cartItems, Order order, Map<Long, BigDecimal> priceMap) {
-        return cartItems.stream()
-                .map(item -> {
-                    BigDecimal price = priceMap.get(item.getProductId());
-                    if (price == null) {
-                        throw new NotFoundException("Product not found");
-                    }
-                    return OrderItem.builder()
-                            .productId(item.getProductId())
-                            .quantity(item.getQuantity())
-                            .productName(item.getProductName())
-                            .productImageUrl(item.getProductImageUrl())
-                            .priceAtPurchase(priceMap.get(item.getProductId()))
-                            .order(order)
-                            .build();
-                }).toList();
+    public List<OrderItem> mapToOrderItems(Order order, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap) {
+        return productInfoList.stream()
+                .map(item -> OrderItem.builder()
+                        .productId(item.getProductId())
+                        .quantity(productQuantityMap.get(item.getProductId()))
+                        .productName(item.getProductName())
+                        .productImageUrl(item.getProductImageUrl())
+                        .priceAtPurchase(new BigDecimal(item.getPrice()))
+                        .order(order)
+                        .build()).toList();
     }
 }

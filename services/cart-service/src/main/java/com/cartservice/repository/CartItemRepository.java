@@ -40,8 +40,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     @Query("SELECT new com.cartservice.projection.CartItemForOrderProjection(" +
             "ci.productId," +
-            "ci.productName," +
-            "ci.productImageUrl," +
             "ci.quantity" +
             ")" +
             "FROM CartItem ci WHERE ci.cart.id = :cartId")

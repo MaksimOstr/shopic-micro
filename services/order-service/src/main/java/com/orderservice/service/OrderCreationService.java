@@ -14,12 +14,10 @@ import com.shopic.grpc.cartservice.CartResponse;
 import com.shopic.grpc.cartservice.CartItem;
 import com.shopic.grpc.productservice.ActualProductInfoResponse;
 import com.shopic.grpc.productservice.ProductInfo;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,20 +40,21 @@ public class OrderCreationService {
         ActualProductInfoResponse response = productGrpcService.getActualProductInfo(
                 cartItems.stream().map(CartItem::getProductId).toList()
         );
-        Map<Long, BigDecimal> productPriceMap = getProductPriceMap(response.getProductsList());
-        Order order = createAndSaveOrderWithOrderItems(userId, productPriceMap, cartItems);
+        List<ProductInfo> productInfoList = response.getProductsList();
+        Map<Long, Integer> productQuantityMap = getProductQuantityMap(cartItems);
+        Order order = createAndSaveOrderWithOrderItems(userId, productInfoList, productQuantityMap);
 
         productGrpcService.reserveProduct(cartItems, order.getId());
 
-        return paymentGrpcService.createPayment(order.getId(), userId, productPriceMap, cartItems).getCheckoutUrl();
+        return paymentGrpcService.createPayment(order.getId(), userId, productInfoList, productQuantityMap).getCheckoutUrl();
     }
 
-    private Order createAndSaveOrderWithOrderItems(long userId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
+    private Order createAndSaveOrderWithOrderItems(long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap) {
         Order order = Order.builder()
                 .status(OrderStatusEnum.CREATED)
                 .userId(userId)
                 .build();
-        List<OrderItem> orderItems = orderItemMapper.mapToOrderItems(cartItems, order, priceMap);
+        List<OrderItem> orderItems = orderItemMapper.mapToOrderItems(order, productInfoList, productQuantityMap);
 
         order.setOrderItems(orderItems);
         order.setTotalPrice(order.calculateTotalPrice());
@@ -63,11 +62,11 @@ public class OrderCreationService {
         return orderRepository.save(order);
     }
 
-    private Map<Long, BigDecimal> getProductPriceMap(List<ProductInfo> productInfoList) {
-        return productInfoList.stream()
+    private Map<Long, Integer> getProductQuantityMap(List<CartItem> cartItems) {
+        return cartItems.stream()
                 .collect(Collectors.toMap(
-                        ProductInfo::getProductId,
-                        info -> new BigDecimal(info.getPrice())
+                        CartItem::getProductId,
+                        CartItem::getQuantity
                 ));
     }
 }

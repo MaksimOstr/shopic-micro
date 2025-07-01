@@ -6,18 +6,16 @@ import com.productservice.dto.request.CreateReservationDto;
 import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.mapper.GrpcMapper;
 import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductPrice;
+import com.productservice.projection.ProductInfoDto;
 import com.productservice.services.ReservationCreationService;
 import com.productservice.services.products.ProductQueryService;
 import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.grpc.server.service.GrpcService;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.productservice.utils.Utils.extractIds;
 
 
 @GrpcService
@@ -55,7 +53,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getActualProductInfo(GetActualProductInfoRequest request, StreamObserver<ActualProductInfoResponse> responseObserver) {
-        List<ProductPrice> productPrices = productQueryService.getProductPrices(request.getProductIdList());
+        List<ProductInfoDto> productPrices = productQueryService.getProductInfo(request.getProductIdList());
         List<ProductInfo> productInfoList = productPrices.stream().map(grpcMapper::toProductInfo).toList();
         ActualProductInfoResponse response = ActualProductInfoResponse.newBuilder()
                 .addAllProducts(productInfoList)

@@ -4,7 +4,7 @@ import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductPrice;
+import com.productservice.projection.ProductInfoDto;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ public class ProductQueryService {
         return productRepository.findProductsForUpdate(productIds);
     }
 
-    public List<ProductPrice> getProductPrices(List<Long> productIds) {
+    public List<ProductInfoDto> getProductInfo(List<Long> productIds) {
         return productRepository.findProductPrices(productIds);
     }
 

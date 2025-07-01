@@ -40,7 +40,7 @@ public class ReservationService {
         int delete = reservationRepository.deleteByOrderId(orderId);
 
         if(delete == 0) {
-            throw new NotFoundException("Reservation with id " + orderId + " not found");
+            throw new NotFoundException("Reservation with orderId: " + orderId + " not found");
         }
     }
 

@@ -14,17 +14,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaListenerService {
     private final ObjectMapper objectMapper;
-    private ReservationService reservationService;
+    private final ReservationService reservationService;
 
     @KafkaListener(topics = "order.cancelled", groupId = "product-service")
     public void orderCancelledEvent(String data, Acknowledgment ack) {
 
         try {
+            log.info("Order cancelled");
             OrderCanceledEvent event = objectMapper.readValue(data, OrderCanceledEvent.class);
 
             reservationService.cancelReservation(event.orderId());
             ack.acknowledge();
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
