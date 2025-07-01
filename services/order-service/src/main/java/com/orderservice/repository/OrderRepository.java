@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +22,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
 
     @Query("SELECT o FROM Order o JOIN FETCH o.orderItems oi WHERE o.id = :id")
     Optional<Order> findByIdWithItems(long id);
+
+    List<Order> findByStatusAndCreatedAtBefore(OrderStatusEnum status, Instant date);
 }

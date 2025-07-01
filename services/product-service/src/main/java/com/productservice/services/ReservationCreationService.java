@@ -34,7 +34,7 @@ public class ReservationCreationService {
 
         checkAndDecreaseStockQuantity(reservationItems);
 
-        Reservation reservation = createAndSaveReservation(dto.userId());
+        Reservation reservation = createAndSaveReservation(dto.orderId());
         long reservationId = reservation.getId();
 
         mapToReservationItemDtoAndSave(reservationItems, reservationId);
@@ -57,6 +57,7 @@ public class ReservationCreationService {
                 throw new InsufficientStockException("Insufficient stock for product " + reservationItem.productId());
             }
         }
+
         decreaseStockQuantity(reservationItems, productMap);
     }
 
@@ -79,9 +80,9 @@ public class ReservationCreationService {
         }
     }
 
-    private Reservation createAndSaveReservation(long userId) {
+    private Reservation createAndSaveReservation(long orderId) {
         Reservation reservation = Reservation.builder()
-                .userId(userId)
+                .orderId(orderId)
                 .build();
 
         return reservationRepository.save(reservation);

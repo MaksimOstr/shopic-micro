@@ -25,10 +25,11 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: user_id
+                  name: order_id
                   type: bigint
                   constraints:
                     nullable: false
+                    unique: true
               - column:
                   name: created_at
                   type: timestamptz

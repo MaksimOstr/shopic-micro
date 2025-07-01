@@ -12,8 +12,9 @@ import com.orderservice.service.grpc.PaymentGrpcService;
 import com.orderservice.service.grpc.ProductGrpcService;
 import com.shopic.grpc.cartservice.CartResponse;
 import com.shopic.grpc.cartservice.CartItem;
-import com.shopic.grpc.productservice.CheckAndReserveProductResponse;
+import com.shopic.grpc.productservice.ActualProductInfoResponse;
 import com.shopic.grpc.productservice.ProductInfo;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,19 +39,19 @@ public class OrderCreationService {
     public String createOrder(long userId, CreateOrderRequest dto) {
         CartResponse cartInfo = cartGrpcService.getCartInfo(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
-
-        CheckAndReserveProductResponse response = productGrpcService.checkAndReserveProduct(cartItems);
+        ActualProductInfoResponse response = productGrpcService.getActualProductInfo(
+                cartItems.stream().map(CartItem::getProductId).toList()
+        );
         Map<Long, BigDecimal> productPriceMap = getProductPriceMap(response.getProductsList());
+        Order order = createAndSaveOrderWithOrderItems(userId, productPriceMap, cartItems);
 
-        Order order = createAndSaveOrderWithOrderItems(userId, response.getReservationId(), productPriceMap, cartItems);
+        productGrpcService.reserveProduct(cartItems, order.getId());
 
         return paymentGrpcService.createPayment(order.getId(), userId, productPriceMap, cartItems).getCheckoutUrl();
     }
 
-
-    private Order createAndSaveOrderWithOrderItems(long userId, long reservationId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
+    private Order createAndSaveOrderWithOrderItems(long userId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
         Order order = Order.builder()
-                .reservationId(reservationId)
                 .status(OrderStatusEnum.CREATED)
                 .userId(userId)
                 .build();

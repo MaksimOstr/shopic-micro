@@ -26,7 +26,7 @@ public class PaymentController {
     ) {
         try {
             Event event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
-
+            System.out.println(event);
             webhookService.handleWebhookEvent(event);
 
             return "OK";

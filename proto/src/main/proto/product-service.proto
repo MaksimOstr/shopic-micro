@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 package productservice;
 
@@ -21,9 +22,10 @@ message ProductDetailsResponse {
 
 
 
-message CheckAndReserveProductsRequest {
-  int64 user_id = 1;
-  repeated ReservationItem reservation_items = 2;
+message ReserveProductsRequest {
+  int64 order_id = 2;
+
+  repeated ReservationItem reservation_items = 3;
 }
 
 message ReservationItem {
@@ -39,8 +41,11 @@ message ProductInfo {
   string price = 4;
 }
 
-message CheckAndReserveProductResponse {
-  int64 reservation_id = 1;
+message GetActualProductInfoRequest {
+  repeated int64 product_id = 1;
+}
+
+message ActualProductInfoResponse {
   repeated ProductInfo products = 2;
 }
 
@@ -50,7 +55,9 @@ message CheckAndReserveProductResponse {
 service ProductService {
   rpc getProductPriceAndStock(GetProductDetailsRequest) returns (ProductDetailsResponse);
 
-  rpc checkAndReserveProducts(CheckAndReserveProductsRequest) returns (CheckAndReserveProductResponse);
+  rpc reserveProducts(ReserveProductsRequest) returns (google.protobuf.Empty);
+
+  rpc getActualProductInfo(GetActualProductInfoRequest) returns (ActualProductInfoResponse);
 
 }
 

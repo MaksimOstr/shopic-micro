@@ -17,10 +17,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Transactional
     @Modifying
     @Query("DELETE FROM Reservation r WHERE r.id = :id")
-    int deleteById(long id);
+    int deleteByOrderId(long id);
 
-    @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.id = :id")
-    Optional<Reservation> findByIdWithItems(long id);
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.orderId = :orderId")
+    Optional<Reservation> findByOrderIdWithItems(long orderId);
 
     @Query("SELECT r FROM Reservation r WHERE r.createdAt < :threshold")
     List<Reservation> findByCreatedAtBefore(Instant threshold);

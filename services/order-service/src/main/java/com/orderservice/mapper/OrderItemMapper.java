@@ -4,6 +4,7 @@ package com.orderservice.mapper;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderItem;
 import com.shopic.grpc.cartservice.CartItem;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,15 +16,20 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OrderItemMapper {
     public List<OrderItem> mapToOrderItems(List<CartItem> cartItems, Order order, Map<Long, BigDecimal> priceMap) {
-        return cartItems.parallelStream()
-                .map(item -> OrderItem.builder()
-                        .productId(item.getProductId())
-                        .quantity(item.getQuantity())
-                        .productName(item.getProductName())
-                        .productImageUrl(item.getProductImageUrl())
-                        .priceAtPurchase(priceMap.get(item.getProductId()))
-                        .order(order)
-                        .build())
-                .toList();
+        return cartItems.stream()
+                .map(item -> {
+                    BigDecimal price = priceMap.get(item.getProductId());
+                    if (price == null) {
+                        throw new NotFoundException("Product not found");
+                    }
+                    return OrderItem.builder()
+                            .productId(item.getProductId())
+                            .quantity(item.getQuantity())
+                            .productName(item.getProductName())
+                            .productImageUrl(item.getProductImageUrl())
+                            .priceAtPurchase(priceMap.get(item.getProductId()))
+                            .order(order)
+                            .build();
+                }).toList();
     }
 }

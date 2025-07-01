@@ -20,7 +20,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentGrpcService {
     private final PaymentServiceGrpc.PaymentServiceBlockingStub paymentGrpcService;
-    private final GrpcMapper grpcMapper;
 
     public CreatePaymentResponse createPayment(long orderId, long userId, Map<Long, BigDecimal> priceMap, List<CartItem> cartItems) {
         CreatePaymentRequest request = CreatePaymentRequest.newBuilder()

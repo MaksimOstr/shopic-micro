@@ -25,25 +25,22 @@ public class ReservationService {
     private final ProductQueryService productQueryService;
 
     @Transactional
-    public void cancelReservation(long reservationId) {
-        List<ReservationItem> reservationItemList = reservationRepository.findByIdWithItems(reservationId)
-                .orElseThrow(() -> new NotFoundException("Reservation with id " + reservationId + " not found"))
+    public void cancelReservation(long orderId) {
+        List<ReservationItem> reservationItemList = reservationRepository.findByOrderIdWithItems(orderId)
+                .orElseThrow(() -> new NotFoundException("Reservation with id " + orderId + " not found"))
                 .getItems();
-
         List<Long> productIds = reservationItemList.stream().map(item -> item.getProduct().getId()).toList();
-
         List<Product> productList = productQueryService.getProductsForUpdate(productIds);
 
         updateProductQuantity(productList, reservationItemList);
-
-        deleteReservation(reservationId);
+        deleteReservation(orderId);
     }
 
-    public void deleteReservation(long reservationId) {
-        int delete = reservationRepository.deleteById(reservationId);
+    public void deleteReservation(long orderId) {
+        int delete = reservationRepository.deleteByOrderId(orderId);
 
         if(delete == 0) {
-            throw new NotFoundException("Reservation with id " + reservationId + " not found");
+            throw new NotFoundException("Reservation with id " + orderId + " not found");
         }
     }
 
@@ -59,12 +56,5 @@ public class ReservationService {
 
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
         }
-    }
-
-    @Scheduled
-    public void checkForUnpaidReservations() {
-        Instant expirationThreshold = Instant.now().minus(30, ChronoUnit.MINUTES);
-
-        List<Reservation> reservations = reservationRepository.findByCreatedAtBefore(expirationThreshold);
     }
 }

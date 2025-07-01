@@ -1,5 +1,6 @@
 package com.productservice.services.grpc;
 
+import com.google.protobuf.Empty;
 import com.productservice.dto.request.ItemForReservation;
 import com.productservice.dto.request.CreateReservationDto;
 import com.productservice.exceptions.InsufficientStockException;
@@ -42,19 +43,22 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     }
 
     @Override
-    @Transactional
-    public void checkAndReserveProducts(CheckAndReserveProductsRequest request, StreamObserver<CheckAndReserveProductResponse > responseObserver) {
+    public void reserveProducts(ReserveProductsRequest request, StreamObserver<Empty> responseObserver) {
         List<ItemForReservation> itemsForReservation = mapToItemForReservation(request.getReservationItemsList());
-        CreateReservationDto dto = new CreateReservationDto(itemsForReservation, request.getUserId());
-        long reservationId = reservationCreationService.createReservation(dto);
+        CreateReservationDto dto = new CreateReservationDto(itemsForReservation, request.getOrderId());
 
-        List<Long> productIds = extractIds(itemsForReservation);
-        List<ProductPrice> productPrices = productQueryService.getProductPrices(productIds);
+        reservationCreationService.createReservation(dto);
+
+        responseObserver.onNext(Empty.newBuilder().build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getActualProductInfo(GetActualProductInfoRequest request, StreamObserver<ActualProductInfoResponse> responseObserver) {
+        List<ProductPrice> productPrices = productQueryService.getProductPrices(request.getProductIdList());
         List<ProductInfo> productInfoList = productPrices.stream().map(grpcMapper::toProductInfo).toList();
-
-        CheckAndReserveProductResponse response = CheckAndReserveProductResponse.newBuilder()
+        ActualProductInfoResponse response = ActualProductInfoResponse.newBuilder()
                 .addAllProducts(productInfoList)
-                .setReservationId(reservationId)
                 .build();
 
         responseObserver.onNext(response);

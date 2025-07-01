@@ -21,11 +21,11 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reservations_seq")
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private long userId;
-
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReservationItem> items;
+
+    @Column(name = "order_id", nullable = false, unique = true)
+    private long orderId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

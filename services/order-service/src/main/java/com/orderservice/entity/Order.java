@@ -29,9 +29,6 @@ public class Order {
     @Column(name = "user_id", nullable = false)
     private long userId;
 
-    @Column(name = "reservation_id", nullable = false, unique = true)
-    private long reservationId;
-
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 

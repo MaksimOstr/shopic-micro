@@ -34,8 +34,7 @@ public class AdminOrderService {
                 order.getUpdatedAt(),
                 order.getCreatedAt(),
                 items,
-                order.getUserId(),
-                order.getReservationId()
+                order.getUserId()
         );
     }
 

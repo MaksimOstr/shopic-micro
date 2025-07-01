@@ -9,8 +9,12 @@ import com.orderservice.exception.NotFoundException;
 import com.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 
@@ -20,6 +24,7 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderQueryService queryService;
+    private final KafkaService kafkaService;
 
     public List<OrderDto> getOrdersByUserId(long userId) {
         List<Order> orders = queryService.getOrdersWithItems(userId);
@@ -42,6 +47,17 @@ public class OrderService {
             log.error("Order status change failed");
             throw new NotFoundException("Order not found");
         }
+    }
+
+    @Scheduled(initialDelay = 5000, fixedDelay = 1000 * 60)
+    @Transactional
+    public void checkUnpaidOrders() {
+        Instant thirtyMinutesAgo = Instant.now().minus(Duration.ofMinutes(30));
+        queryService.getOrdersByStatusAndCreatedAtBefore(OrderStatusEnum.CREATED, thirtyMinutesAgo)
+                .forEach(order -> {
+                    order.setStatus(OrderStatusEnum.FAILED);
+                    kafkaService.sendOrderCancelledEvent(order.getId());
+                });
     }
 
 
