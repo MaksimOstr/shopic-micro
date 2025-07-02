@@ -21,12 +21,12 @@ public class PaymentController {
 
     @PostMapping("/webhook")
     public String handleWebhook(
-            String payload,
+            @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader
     ) {
         try {
             Event event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
-            System.out.println(event);
+            System.out.println(event.getType());
             webhookService.handleWebhookEvent(event);
 
             return "OK";
