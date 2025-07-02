@@ -32,6 +32,14 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "firstName", column = @Column(name = "customer_first_name", nullable = false)),
+            @AttributeOverride(name = "lastName", column = @Column(name = "customer_last_name", nullable = false)),
+            @AttributeOverride(name = "phoneNumber", column = @Column(name = "customer_phone_number", nullable = false)),
+    })
+    private OrderCustomer customer;
+
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<OrderItem> orderItems;
 

@@ -104,6 +104,10 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .POST("", http())
                         .GET("", http()))
+                .path("/admin/orders", request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("{id}", http())
+                        .GET("", http()))
                 .build();
     }
 

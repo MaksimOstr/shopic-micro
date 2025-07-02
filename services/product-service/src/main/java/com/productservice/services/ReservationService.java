@@ -53,7 +53,7 @@ public class ReservationService {
         for (ReservationItem item : reservationItemList) {
             Product product = productMap.get(item.getProduct().getId());
             if(product == null) {
-                log.error("Product with id " + item.getProduct().getId() + " not found");
+                log.error("Product with id {} not found", item.getProduct().getId());
                 throw new NotFoundException("Product with id " + item.getProduct().getId() + " not found");
             }
 

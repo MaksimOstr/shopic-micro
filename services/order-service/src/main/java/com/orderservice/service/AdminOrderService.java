@@ -1,51 +1,48 @@
 package com.orderservice.service;
 
 import com.orderservice.dto.AdminOrderDto;
+import com.orderservice.dto.AdminOrderSummaryDto;
+import com.orderservice.dto.OrderDto;
 import com.orderservice.dto.OrderItemDto;
+import com.orderservice.dto.request.AdminOrderParams;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderItem;
+import com.orderservice.mapper.OrderClassMapper;
+import com.orderservice.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.orderservice.utils.SpecificationUtils.*;
 
 @Service
 @RequiredArgsConstructor
 public class AdminOrderService {
     private final OrderQueryService queryService;
+    private final OrderMapper orderMapper;
 
 
     public AdminOrderDto getOrder(long orderId) {
         Order order = queryService.getOrderWithItems(orderId);
 
-        return mapToDto(order);
+        return orderMapper.toAdminOrderDto(order);
     }
 
+    @Transactional
+    public Page<AdminOrderSummaryDto> getOrders(AdminOrderParams params, Pageable pageable) {
+        Specification<Order> spec = iLikeNested("firstName", "customer" , params.firstName())
+                .and(iLikeNested("lastName", "customer", params.lastName()))
+                .and(equalsEnum("status", params.status()));
+        Page<Order> orderPage = queryService.getOrdersBySpec(spec, pageable);
+        List<Order> orderList = orderPage.getContent();
+        List<AdminOrderSummaryDto> orderDtoList = orderMapper.toAdminOrderSummaryDto(orderList);
 
-    private AdminOrderDto mapToDto(Order order) {
-        List<OrderItemDto> items = order.getOrderItems().stream()
-                .map(this::mapToItemDto)
-                .toList();
-
-        return new AdminOrderDto(
-                order.getId(),
-                order.getStatus(),
-                order.getTotalPrice(),
-                order.getUpdatedAt(),
-                order.getCreatedAt(),
-                items,
-                order.getUserId()
-        );
-    }
-
-    private OrderItemDto mapToItemDto(OrderItem item) {
-        return new OrderItemDto(
-                item.getId(),
-                item.getQuantity(),
-                item.getProductName(),
-                item.getProductImageUrl(),
-                item.getProductId(),
-                item.getPriceAtPurchase()
-        );
+        return new PageImpl<>(orderDtoList, pageable, orderPage.getTotalElements());
     }
 }

@@ -25,6 +25,21 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
+                  name: customer_first_name
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: customer_last_name
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: customer_phone_number
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+              - column:
                   name: user_id
                   type: bigint
                   constraints:

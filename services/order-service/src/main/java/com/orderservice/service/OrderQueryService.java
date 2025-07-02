@@ -5,6 +5,9 @@ import com.orderservice.entity.OrderStatusEnum;
 import com.orderservice.exception.NotFoundException;
 import com.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -20,11 +23,7 @@ public class OrderQueryService {
                 .orElseThrow(() -> new NotFoundException("Order not found"));
     }
 
-    public List<Order> getOrdersByStatusAndCreatedAtBefore(OrderStatusEnum status, Instant createdAt) {
-        return orderRepository.findByStatusAndCreatedAtBefore(status, createdAt);
-    }
-
-    public List<Order> getOrdersWithItems(long userId) {
-        return orderRepository.findOrdersByUserId(userId);
+    public Page<Order> getOrdersBySpec(Specification<Order> spec, Pageable pageable) {
+        return orderRepository.findAll(spec, pageable);
     }
 }

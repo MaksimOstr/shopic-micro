@@ -5,9 +5,11 @@ import com.orderservice.entity.OrderStatusEnum;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-public record OrderSummaryDto(
-        long orderId,
+public record AdminOrderSummaryDto(
+        Long orderId,
         OrderStatusEnum status,
         BigDecimal totalPrice,
-        Instant createdAt
+        Instant createdAt,
+        String firstName,
+        String lastName
 ) {}

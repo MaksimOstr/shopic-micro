@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @RequiredArgsConstructor
 public class OrderDto {
-    private final long id;
+    private final long orderId;
     private final OrderStatusEnum status;
     private final BigDecimal price;
     private final Instant updatedAt;

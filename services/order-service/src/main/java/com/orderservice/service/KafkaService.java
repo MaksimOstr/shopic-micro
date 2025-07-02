@@ -15,13 +15,4 @@ public class KafkaService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    public void sendOrderCancelledEvent(long orderId) {
-        try {
-            OrderCanceledEvent event = new OrderCanceledEvent(orderId);
-
-            kafkaTemplate.send("order.cancelled", objectMapper.writeValueAsString(event));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-        }
-    }
 }

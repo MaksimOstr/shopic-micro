@@ -1,11 +1,11 @@
 package com.orderservice.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.entity.Order;
+import com.orderservice.entity.OrderCustomer;
 import com.orderservice.entity.OrderItem;
 import com.orderservice.entity.OrderStatusEnum;
-import com.orderservice.mapper.OrderItemMapper;
+import com.orderservice.mapper.OrderItemClassMapper;
 import com.orderservice.repository.OrderRepository;
 import com.orderservice.service.grpc.CartGrpcService;
 import com.orderservice.service.grpc.PaymentGrpcService;
@@ -29,7 +29,7 @@ public class OrderCreationService {
     private final OrderRepository orderRepository;
     private final CartGrpcService cartGrpcService;
     private final ProductGrpcService productGrpcService;
-    private final OrderItemMapper orderItemMapper;
+    private final OrderItemClassMapper orderItemClassMapper;
     private final PaymentGrpcService paymentGrpcService;
 
 
@@ -42,19 +42,25 @@ public class OrderCreationService {
         );
         List<ProductInfo> productInfoList = response.getProductsList();
         Map<Long, Integer> productQuantityMap = getProductQuantityMap(cartItems);
-        Order order = createAndSaveOrderWithOrderItems(userId, productInfoList, productQuantityMap);
+        Order order = createAndSaveOrderWithOrderItems(userId, dto, productInfoList, productQuantityMap);
 
         productGrpcService.reserveProduct(cartItems, order.getId());
 
         return paymentGrpcService.createPayment(order.getId(), userId, productInfoList, productQuantityMap).getCheckoutUrl();
     }
 
-    private Order createAndSaveOrderWithOrderItems(long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap) {
+    private Order createAndSaveOrderWithOrderItems(long userId, CreateOrderRequest dto, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap) {
+        OrderCustomer customer = new OrderCustomer(
+                dto.firstName(),
+                dto.lastName(),
+                dto.phoneNumber()
+        );
         Order order = Order.builder()
+                .customer(customer)
                 .status(OrderStatusEnum.CREATED)
                 .userId(userId)
                 .build();
-        List<OrderItem> orderItems = orderItemMapper.mapToOrderItems(order, productInfoList, productQuantityMap);
+        List<OrderItem> orderItems = orderItemClassMapper.mapToOrderItems(order, productInfoList, productQuantityMap);
 
         order.setOrderItems(orderItems);
         order.setTotalPrice(order.calculateTotalPrice());
