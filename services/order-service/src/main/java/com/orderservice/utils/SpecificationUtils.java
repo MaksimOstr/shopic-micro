@@ -7,14 +7,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 @UtilityClass
 public class SpecificationUtils {
-    public static Specification<Order> iLike(String field, String value) {
-        if (value == null || value.isBlank()) {
-            return Specification.where(null);
-        }
-        return (root, query, cb) ->
-                cb.like(cb.lower(root.get(field)), "%" + value.toLowerCase() + "%");
-    }
-
     public static Specification<Order> iLikeNested(String field, String nested, String value) {
         if (value == null || value.isBlank()) {
             return Specification.where(null);
