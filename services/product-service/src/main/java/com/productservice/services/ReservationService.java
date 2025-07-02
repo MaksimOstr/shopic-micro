@@ -7,6 +7,7 @@ import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
 import com.productservice.services.products.ProductQueryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -51,6 +53,7 @@ public class ReservationService {
         for (ReservationItem item : reservationItemList) {
             Product product = productMap.get(item.getProduct().getId());
             if(product == null) {
+                log.error("Product with id " + item.getProduct().getId() + " not found");
                 throw new NotFoundException("Product with id " + item.getProduct().getId() + " not found");
             }
 

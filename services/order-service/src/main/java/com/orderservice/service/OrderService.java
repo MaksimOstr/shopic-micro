@@ -49,18 +49,6 @@ public class OrderService {
         }
     }
 
-    @Scheduled(initialDelay = 5000, fixedDelay = 1000 * 60)
-    @Transactional
-    public void checkUnpaidOrders() {
-        Instant thirtyMinutesAgo = Instant.now().minus(Duration.ofMinutes(3));
-        queryService.getOrdersByStatusAndCreatedAtBefore(OrderStatusEnum.CREATED, thirtyMinutesAgo)
-                .forEach(order -> {
-                    System.out.println(order);
-                    order.setStatus(OrderStatusEnum.FAILED);
-                    kafkaService.sendOrderCancelledEvent(order.getId());
-                });
-    }
-
 
     private OrderDto mapToOrderDto(Order order) {
         List<OrderItemDto> items = order.getOrderItems().stream()

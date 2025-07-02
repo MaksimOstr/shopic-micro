@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +58,7 @@ public class StripeService {
         }
     }
 
+
     private List<SessionCreateParams.LineItem> getLineItems(CreateCheckoutSessionDto dto) {
         List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
         for (CheckoutItem item : dto.checkoutItems()) {
@@ -63,7 +66,7 @@ public class StripeService {
                     SessionCreateParams.LineItem.builder()
                             .setPriceData(
                                     SessionCreateParams.LineItem.PriceData.builder()
-                                            .setUnitAmountDecimal(item.price())
+                                            .setUnitAmountDecimal(convertToCents(item.price()))
                                             .setCurrency("USD")
                                             .setProductData(
                                                     SessionCreateParams.LineItem.PriceData.ProductData.builder()
@@ -78,6 +81,10 @@ public class StripeService {
             );
         }
         return lineItems;
+    }
+
+    private BigDecimal convertToCents(BigDecimal price) {
+        return price.multiply(new BigDecimal(100));
     }
 
     private void savePayment(long userId, String paymentId, long orderId) {

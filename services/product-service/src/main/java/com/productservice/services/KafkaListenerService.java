@@ -1,8 +1,7 @@
 package com.productservice.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.productservice.dto.event.OrderCanceledEvent;
+import com.productservice.dto.event.UnpaidPaymentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,12 +15,12 @@ public class KafkaListenerService {
     private final ObjectMapper objectMapper;
     private final ReservationService reservationService;
 
-    @KafkaListener(topics = "order.cancelled", groupId = "product-service")
-    public void orderCancelledEvent(String data, Acknowledgment ack) {
+    @KafkaListener(topics = "payment.unpaid", groupId = "product-service")
+    public void listenUnpaidPayment(String data, Acknowledgment ack) {
 
         try {
             log.info("Order cancelled");
-            OrderCanceledEvent event = objectMapper.readValue(data, OrderCanceledEvent.class);
+            UnpaidPaymentEvent event = objectMapper.readValue(data, UnpaidPaymentEvent.class);
 
             reservationService.cancelReservation(event.orderId());
             ack.acknowledge();
