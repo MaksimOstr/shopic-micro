@@ -2,7 +2,6 @@ package com.orderservice.controller;
 
 import com.orderservice.dto.AdminOrderDto;
 import com.orderservice.dto.AdminOrderSummaryDto;
-import com.orderservice.dto.OrderDto;
 import com.orderservice.dto.request.AdminOrderParams;
 import com.orderservice.service.AdminOrderService;
 import lombok.RequiredArgsConstructor;

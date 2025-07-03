@@ -8,7 +8,7 @@ public enum OrderStatusEnum {
     PAID,
     PROCESSING,
     SHIPPED,
-    DELIVERED,
+    READY_FOR_PICKUP,
     COMPLETED,
     CANCELLED,
     FAILED;

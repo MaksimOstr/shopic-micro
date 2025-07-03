@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.orderservice.dto.response.ErrorResponseDto;
 import com.orderservice.exception.InsufficientStockException;
 import com.orderservice.exception.NotFoundException;
+import com.orderservice.exception.StateTransitionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.statemachine.StateMachineException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -42,8 +44,8 @@ public class GlobalControllerAdvice {
         ));
     }
 
-    @ExceptionHandler(InsufficientStockException.class)
-    private ResponseEntity<ErrorResponseDto> handleAlreadyExists(InsufficientStockException e) {
+    @ExceptionHandler({InsufficientStockException.class, StateTransitionException.class})
+    private ResponseEntity<ErrorResponseDto> handleAlreadyExists(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),
