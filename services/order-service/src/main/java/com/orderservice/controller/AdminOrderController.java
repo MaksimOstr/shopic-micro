@@ -43,4 +43,44 @@ public class AdminOrderController {
 
         return ResponseEntity.ok().body(orders);
     }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<Void> completeOrder(
+            @PathVariable long id
+    ) {
+        adminOrderService.completeOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable long id
+    ) {
+        adminOrderService.cancelOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/process")
+    public ResponseEntity<Void> processOrder(
+            @PathVariable long id
+    ) {
+        adminOrderService.processOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/ship")
+    public ResponseEntity<Void> shipOrder(
+            @PathVariable long id
+    ) {
+        adminOrderService.shipOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/pickup-ready")
+    public ResponseEntity<Void> pickupReadyOrder(
+            @PathVariable long id
+    ) {
+        adminOrderService.pickupOrder(id);
+        return ResponseEntity.ok().build();
+    }
 }

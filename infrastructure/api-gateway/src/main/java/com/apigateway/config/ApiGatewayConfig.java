@@ -107,7 +107,9 @@ public class ApiGatewayConfig {
                 .path("/admin/orders", request -> request
                         .filter(jwtHandlerFilter)
                         .GET("{id}", http())
-                        .GET("", http()))
+                        .GET("", http())
+                        .PATCH("/{id}/complete", http())
+                        .PATCH("/{id}/cancel", http()))
                 .build();
     }
 

@@ -1,5 +1,7 @@
 package com.orderservice.config.statemachine;
 
+import com.orderservice.config.statemachine.action.CancelAction;
+import com.orderservice.config.statemachine.action.CompleteAction;
 import com.orderservice.entity.OrderStatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ import java.util.EnumSet;
 @RequiredArgsConstructor
 public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderStatusEnum, OrderEvents> {
     private final StateMachineLogListener listener;
+    private final CompleteAction completeAction;
+    private final CancelAction cancelAction;
 
 
     @Override
@@ -72,12 +76,14 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
                 .withExternal()
                     .source(OrderStatusEnum.READY_FOR_PICKUP)
                     .target(OrderStatusEnum.COMPLETED)
+                    .action(completeAction)
                     .event(OrderEvents.COMPLETE)
                     .and()
                 .withExternal()
                     .source(OrderStatusEnum.READY_FOR_PICKUP)
                     .target(OrderStatusEnum.CANCELLED)
                     .event(OrderEvents.CANCEL)
+                    .action(cancelAction)
                     .and();
 
     }

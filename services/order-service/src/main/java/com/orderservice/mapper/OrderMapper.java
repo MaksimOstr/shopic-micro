@@ -2,11 +2,8 @@ package com.orderservice.mapper;
 
 import com.orderservice.dto.*;
 import com.orderservice.entity.Order;
-import com.orderservice.entity.OrderItem;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 
 import java.util.List;

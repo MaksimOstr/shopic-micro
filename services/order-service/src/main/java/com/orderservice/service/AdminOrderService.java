@@ -23,6 +23,7 @@ import static com.orderservice.utils.SpecificationUtils.*;
 public class AdminOrderService {
     private final OrderQueryService queryService;
     private final OrderMapper orderMapper;
+    private final OrderEventService orderEventService;
 
 
     public AdminOrderDto getOrder(long orderId) {
@@ -43,5 +44,23 @@ public class AdminOrderService {
         return new PageImpl<>(orderDtoList, pageable, orderPage.getTotalElements());
     }
 
+    public void completeOrder(long orderId) {
+        orderEventService.completeOrder(orderId);
+    }
 
+    public void cancelOrder(long orderId) {
+        orderEventService.cancelOrder(orderId);
+    }
+
+    public void processOrder(long orderId) {
+        orderEventService.processOrder(orderId);
+    }
+
+    public void shipOrder(long orderId) {
+        orderEventService.shipOrder(orderId);
+    }
+
+    public void pickupOrder(long orderId) {
+        orderEventService.pickupReadyOrder(orderId);
+    }
 }
