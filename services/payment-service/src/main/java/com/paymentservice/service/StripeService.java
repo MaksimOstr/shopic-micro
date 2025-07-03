@@ -48,8 +48,9 @@ public class StripeService {
                     .build();
             Session session = Session.create(params);
             String sessionId = session.getId();
-
-            savePayment(dto.userId(), sessionId, dto.orderId());
+            long amountInCents = session.getAmountTotal();
+            BigDecimal amountInDollars = BigDecimal.valueOf(amountInCents).divide(BigDecimal.valueOf(100));
+            savePayment(dto.userId(), sessionId, dto.orderId(), session.getCurrency(), amountInCents, amountInDollars);
 
             return session.getUrl();
         } catch (StripeException e) {
@@ -87,11 +88,14 @@ public class StripeService {
         return price.multiply(new BigDecimal(100));
     }
 
-    private void savePayment(long userId, String paymentId, long orderId) {
+    private void savePayment(long userId, String sessionId, long orderId, String currency, Long totalInSmallestUnit, BigDecimal amount) {
         CreatePaymentDto dto = new CreatePaymentDto(
                 userId,
                 orderId,
-                paymentId
+                sessionId,
+                currency,
+                amount,
+                totalInSmallestUnit
         );
 
         paymentService.createPayment(dto);

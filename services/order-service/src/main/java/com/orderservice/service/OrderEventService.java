@@ -5,7 +5,6 @@ import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderStatusEnum;
 import com.orderservice.exception.StateTransitionException;
 import com.orderservice.repository.OrderRepository;
-import jakarta.transaction.InvalidTransactionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -15,9 +14,6 @@ import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Slf4j
 @Service

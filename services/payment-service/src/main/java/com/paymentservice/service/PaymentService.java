@@ -24,16 +24,23 @@ public class PaymentService {
     public void createPayment(CreatePaymentDto dto) {
         Payment payment = Payment.builder()
                 .userId(dto.userId())
-                .paymentId(dto.paymentId())
+                .sessionId(dto.sessionId())
                 .orderId(dto.orderId())
+                .amount(dto.amount())
+                .currency(dto.currency())
+                .totalInSmallestUnit(dto.totalInSmallestUnit())
                 .status(PaymentStatus.PENDING)
                 .build();
 
         paymentRepository.save(payment);
     }
 
-    public long getOrderIdByPaymentId(String paymentId) {
-        return paymentRepository.getOrderIdByPaymentId(paymentId)
+    public void save(Payment payment) {
+        paymentRepository.save(payment);
+    }
+
+    public Payment getPaymentBySessionId(String sessionId) {
+        return paymentRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new NotFoundException(PAYMENT_NOT_FOUND));
 
     }

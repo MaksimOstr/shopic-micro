@@ -14,14 +14,12 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-
-    @Query("SELECT p.orderId FROM Payment p WHERE p.paymentId = :paymentId ")
-    Optional<Long> getOrderIdByPaymentId(String paymentId);
+    Optional<Payment> findBySessionId(String sessionId);
 
     @Transactional
     @Modifying
-    @Query("UPDATE Payment p SET p.status = :paymentStatus WHERE p.paymentId = :paymentId")
-    int updatePaymentStatus(String paymentId, PaymentStatus paymentStatus);
+    @Query("UPDATE Payment p SET p.status = :paymentStatus WHERE p.sessionId = :sessionId")
+    int updatePaymentStatus(String sessionId, PaymentStatus paymentStatus);
 
     List<Payment> findByStatusAndCreatedAtBefore(PaymentStatus status, Instant date);
 }

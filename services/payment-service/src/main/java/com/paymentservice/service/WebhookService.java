@@ -1,16 +1,15 @@
 package com.paymentservice.service;
 
+import com.paymentservice.entity.Payment;
 import com.paymentservice.entity.PaymentStatus;
 import com.paymentservice.exception.NotFoundException;
 import com.stripe.model.Event;
-import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Slf4j
@@ -31,27 +30,29 @@ public class WebhookService {
         }
     }
 
-    private void handleCheckoutSuccess(Event event) {
-        String sessionId = getSessionIdFromEvent(event);
+    public void handleCheckoutSuccess(Event event) {
+        Session session = getSessionFromEvent(event);
+        String sessionId = session.getId();
+        Payment payment = paymentService.getPaymentBySessionId(sessionId);
 
-        long orderId = paymentService.getOrderIdByPaymentId(sessionId);
+        payment.setPaymentId(session.getPaymentIntent());
+        payment.setStatus(PaymentStatus.SUCCEEDED);
 
-        paymentService.changePaymentStatus(sessionId, PaymentStatus.SUCCEEDED);
-        kafkaService.sendCheckoutSessionSuccess(orderId);
+        paymentService.save(payment);
+        kafkaService.sendCheckoutSessionSuccess(payment.getOrderId());
     }
 
     private void handleChargeFailed(Event event) {
-        String sessionId = getSessionIdFromEvent(event);
+        Session session = getSessionFromEvent(event);
 
-        paymentService.changePaymentStatus(sessionId, PaymentStatus.FAILED);
+        paymentService.changePaymentStatus(session.getId(), PaymentStatus.FAILED);
     }
 
-    private String getSessionIdFromEvent(Event event) {
+    private Session getSessionFromEvent(Event event) {
         Optional<StripeObject> optionalSession = event.getDataObjectDeserializer().getObject();
 
         if (optionalSession.isPresent()) {
-            Session session = (Session) optionalSession.get();
-            return session.getId();
+            return (Session) optionalSession.get();
         } else {
             log.error("Checkout session not found");
             throw new NotFoundException("Checkout session not found");
