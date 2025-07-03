@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import static com.productservice.utils.ProductUtils.PRODUCT_NOT_FOUND;
 
+
 @Service
 @RequiredArgsConstructor
 public class ProductQueryService {
@@ -48,7 +49,7 @@ public class ProductQueryService {
 
     public ProductForCartDto getProductInfoForCart(long productId) {
         return productRepository.getProductForCartById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found"));
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
     public List<ProductDto> getProductsByIds(Set<Long> productIds) {

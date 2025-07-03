@@ -56,13 +56,4 @@ public class OrderService {
 
         return orderMapper.toOrderDto(order);
     }
-
-    public void changeOrderStatus(long orderId, OrderStatusEnum status) {
-        int updated = orderRepository.changeOrderStatus(orderId, status);
-
-        if(updated == 0) {
-            log.error("Order status change failed");
-            throw new NotFoundException("Order not found");
-        }
-    }
 }

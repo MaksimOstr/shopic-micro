@@ -12,21 +12,23 @@ import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class KafkaListenerService {
     private final ObjectMapper objectMapper;
-    private final OrderService orderService;
+    private final OrderEventService orderEventService;
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
     @KafkaListener(topics = "checkout-session-success", groupId = "order-service")
+    @Transactional
     public void listenCheckoutSessionSuccess(String payload, Acknowledgment ack) {
         try {
             CheckoutSuccessEvent event = objectMapper.readValue(payload, CheckoutSuccessEvent.class);
 
-            orderService.changeOrderStatus(event.orderId(), OrderStatusEnum.PAID);
+            orderEventService.payOrder(event.orderId());
             ack.acknowledge();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
@@ -35,11 +37,12 @@ public class KafkaListenerService {
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
     @KafkaListener(topics = "payment.unpaid", groupId = "order-service")
+    @Transactional
     public void listenUnpaidPayment(String payload, Acknowledgment ack) {
         try {
             UnpaidPaymentEvent event = objectMapper.readValue(payload, UnpaidPaymentEvent.class);
 
-            orderService.changeOrderStatus(event.orderId(), OrderStatusEnum.FAILED);
+            orderEventService.failOrder(event.orderId());
             ack.acknowledge();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());

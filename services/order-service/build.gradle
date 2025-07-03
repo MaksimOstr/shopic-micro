@@ -21,6 +21,7 @@ dependencies {
     implementation project(':proto')
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+    implementation 'org.springframework.statemachine:spring-statemachine-starter:3.2.0'
     annotationProcessor libs.mapstruct.processor
     implementation libs.bundles.core
     implementation libs.bundles.business.service

@@ -23,6 +23,11 @@ public class OrderQueryService {
                 .orElseThrow(() -> new NotFoundException("Order not found"));
     }
 
+    public Order getOrderById(long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found"));
+    }
+
     public Page<Order> getOrdersBySpec(Specification<Order> spec, Pageable pageable) {
         return orderRepository.findAll(spec, pageable);
     }

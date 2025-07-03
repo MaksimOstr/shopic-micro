@@ -2,12 +2,8 @@ package com.orderservice.service;
 
 import com.orderservice.dto.AdminOrderDto;
 import com.orderservice.dto.AdminOrderSummaryDto;
-import com.orderservice.dto.OrderDto;
-import com.orderservice.dto.OrderItemDto;
 import com.orderservice.dto.request.AdminOrderParams;
 import com.orderservice.entity.Order;
-import com.orderservice.entity.OrderItem;
-import com.orderservice.mapper.OrderClassMapper;
 import com.orderservice.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.orderservice.utils.SpecificationUtils.*;
+
 
 @Service
 @RequiredArgsConstructor
@@ -45,4 +42,6 @@ public class AdminOrderService {
 
         return new PageImpl<>(orderDtoList, pageable, orderPage.getTotalElements());
     }
+
+
 }
