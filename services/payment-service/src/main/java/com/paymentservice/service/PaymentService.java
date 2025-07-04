@@ -53,6 +53,11 @@ public class PaymentService {
         }
     }
 
+    public Payment getPaymentById(long id) {
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(PAYMENT_NOT_FOUND));
+    }
+
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void checkUnpaidPayments() {

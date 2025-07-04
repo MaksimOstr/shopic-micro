@@ -48,6 +48,11 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: reason
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_at
                   type: timestamptz
                   defaultValueComputed: CURRENT_TIMESTAMP

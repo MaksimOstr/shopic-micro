@@ -2,14 +2,16 @@ package com.paymentservice.service;
 
 import com.paymentservice.entity.Payment;
 import com.paymentservice.entity.PaymentStatus;
+import com.paymentservice.entity.RefundStatus;
 import com.paymentservice.exception.NotFoundException;
 import com.stripe.model.Event;
+import com.stripe.model.Refund;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Slf4j
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class WebhookService {
     private final KafkaService kafkaService;
     private final PaymentService paymentService;
+    private final RefundService refundService;
 
     public void handleWebhookEvent(Event event) {
         switch (event.getType()) {
@@ -27,7 +30,26 @@ public class WebhookService {
             case "charge.failed":
                 handleChargeFailed(event);
                 break;
+            case "charge.refund.updated":
+                handleRefundUpdated(event);
         }
+    }
+
+
+    private void handleRefundUpdated(Event event) {
+        Refund refund = getRefundFromEvent(event);
+
+        switch (refund.getStatus()) {
+            case "succeeded":
+                handleRefundSuccess(event, refund);
+        }
+    }
+
+    private void handleRefundSuccess(Event event, Refund refund) {
+        com.paymentservice.entity.Refund refundEntity = refundService.getRefundByStripeRefundId(refund.getId());
+
+        refundEntity.setStatus(RefundStatus.SUCCEEDED);
+        refundEntity.getPayment().setStatus(PaymentStatus.SUCCEEDED);
     }
 
     public void handleCheckoutSuccess(Event event) {
@@ -35,7 +57,7 @@ public class WebhookService {
         String sessionId = session.getId();
         Payment payment = paymentService.getPaymentBySessionId(sessionId);
 
-        payment.setPaymentId(session.getPaymentIntent());
+        payment.setStripePaymentId(session.getPaymentIntent());
         payment.setStatus(PaymentStatus.SUCCEEDED);
 
         paymentService.save(payment);
@@ -56,6 +78,16 @@ public class WebhookService {
         } else {
             log.error("Checkout session not found");
             throw new NotFoundException("Checkout session not found");
+        }
+    }
+
+    private Refund getRefundFromEvent(Event event) {
+        Optional<StripeObject> optionalSession = event.getDataObjectDeserializer().getObject();
+        if (optionalSession.isPresent()) {
+            return (Refund) optionalSession.get();
+        } else {
+            log.error("Refund not found");
+            throw new NotFoundException("Refund not found");
         }
     }
 }

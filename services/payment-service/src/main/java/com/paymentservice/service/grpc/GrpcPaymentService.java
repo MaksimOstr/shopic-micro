@@ -3,7 +3,7 @@ package com.paymentservice.service.grpc;
 
 import com.paymentservice.dto.CreateCheckoutSessionDto;
 import com.paymentservice.mapper.GrpcMapper;
-import com.paymentservice.service.StripeService;
+import com.paymentservice.service.StripeCheckoutService;
 import com.shopic.grpc.paymentservice.CreatePaymentRequest;
 import com.shopic.grpc.paymentservice.CreatePaymentResponse;
 import com.shopic.grpc.paymentservice.PaymentServiceGrpc;
@@ -16,7 +16,7 @@ import org.springframework.grpc.server.service.GrpcService;
 @GrpcService
 @RequiredArgsConstructor
 public class GrpcPaymentService extends PaymentServiceGrpc.PaymentServiceImplBase {
-    private final StripeService stripeService;
+    private final StripeCheckoutService stripeService;
     private final GrpcMapper grpcMapper;
 
 

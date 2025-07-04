@@ -3,28 +3,35 @@ package com.paymentservice.service;
 import com.paymentservice.dto.CheckoutItem;
 import com.paymentservice.dto.CreateCheckoutSessionDto;
 import com.paymentservice.dto.CreatePaymentDto;
+import com.paymentservice.dto.CreateRefundDto;
+import com.paymentservice.dto.request.RefundRequest;
+import com.paymentservice.entity.Payment;
+import com.paymentservice.entity.RefundReason;
 import com.paymentservice.exception.InternalException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
+import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.paymentservice.utils.Utils.toSmallestUnit;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StripeService {
+public class StripeCheckoutService {
     private final PaymentService paymentService;
+    private final RefundService refundService;
 
     @Value("${STRIPE_SECRET_KEY}")
     private String stripeSecretKey;
@@ -33,6 +40,7 @@ public class StripeService {
     public void init() {
         Stripe.apiKey = stripeSecretKey;
     }
+
 
     public String createCheckoutSession(CreateCheckoutSessionDto dto) {
         try {
@@ -67,7 +75,7 @@ public class StripeService {
                     SessionCreateParams.LineItem.builder()
                             .setPriceData(
                                     SessionCreateParams.LineItem.PriceData.builder()
-                                            .setUnitAmountDecimal(convertToCents(item.price()))
+                                            .setUnitAmountDecimal(toSmallestUnit(item.price()))
                                             .setCurrency("USD")
                                             .setProductData(
                                                     SessionCreateParams.LineItem.PriceData.ProductData.builder()
@@ -82,10 +90,6 @@ public class StripeService {
             );
         }
         return lineItems;
-    }
-
-    private BigDecimal convertToCents(BigDecimal price) {
-        return price.multiply(new BigDecimal(100));
     }
 
     private void savePayment(long userId, String sessionId, long orderId, String currency, Long totalInSmallestUnit, BigDecimal amount) {

@@ -1,39 +1,28 @@
 package com.orderservice.service;
 
 import com.orderservice.dto.OrderDto;
-import com.orderservice.dto.OrderItemDto;
 import com.orderservice.dto.OrderSummaryDto;
 import com.orderservice.dto.request.OrderParams;
 import com.orderservice.entity.Order;
-import com.orderservice.entity.OrderItem;
-import com.orderservice.entity.OrderStatusEnum;
-import com.orderservice.exception.NotFoundException;
 import com.orderservice.mapper.OrderMapper;
-import com.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.orderservice.utils.SpecificationUtils.*;
-import static net.bytebuddy.matcher.ElementMatchers.hasChild;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
-    private final OrderRepository orderRepository;
     private final OrderQueryService queryService;
     private final OrderMapper orderMapper;
 

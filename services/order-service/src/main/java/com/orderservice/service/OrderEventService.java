@@ -4,7 +4,6 @@ import com.orderservice.config.statemachine.OrderEvents;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderStatusEnum;
 import com.orderservice.exception.StateTransitionException;
-import com.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -19,47 +18,46 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class OrderEventService {
-    private final OrderRepository orderRepository;
     private final OrderQueryService orderQueryService;
     private final StateMachineFactory<OrderStatusEnum, OrderEvents> stateMachineFactory;
 
     @Transactional
-    public Order payOrder(long orderId) {
-        return processEvent(orderId, OrderEvents.PAY);
+    public void payOrder(long orderId) {
+        processEvent(orderId, OrderEvents.PAY);
     }
 
     @Transactional
-    public Order processOrder(long orderId) {
-        return processEvent(orderId, OrderEvents.PROCESS);
+    public void processOrder(long orderId) {
+        processEvent(orderId, OrderEvents.PROCESS);
     }
 
     @Transactional
-    public Order shipOrder(long orderId) {
-        return processEvent(orderId, OrderEvents.SHIP);
+    public void shipOrder(long orderId) {
+        processEvent(orderId, OrderEvents.SHIP);
     }
 
     @Transactional
-    public Order pickupReadyOrder(long orderId) {
-        return processEvent(orderId, OrderEvents.PICKUP_READY);
+    public void pickupReadyOrder(long orderId) {
+        processEvent(orderId, OrderEvents.PICKUP_READY);
     }
 
     @Transactional
-    public Order completeOrder(long orderId) {
-        return processEvent(orderId, OrderEvents.COMPLETE);
+    public void completeOrder(long orderId) {
+        processEvent(orderId, OrderEvents.COMPLETE);
     }
 
     @Transactional
-    public Order cancelOrder(long orderId) {
-        return processEvent(orderId, OrderEvents.CANCEL);
+    public void cancelOrder(long orderId) {
+        processEvent(orderId, OrderEvents.CANCEL);
     }
 
     @Transactional
-    public Order failOrder(long orderId) {
-        return processEvent(orderId, OrderEvents.FAIL);
+    public void failOrder(long orderId) {
+        processEvent(orderId, OrderEvents.FAIL);
     }
 
 
-    protected Order processEvent(Long orderId, OrderEvents event) {
+    protected void processEvent(Long orderId, OrderEvents event) {
         log.info("Processing order event: {}", event);
         Order order = orderQueryService.getOrderById(orderId);
 
@@ -82,7 +80,6 @@ public class OrderEventService {
         }
 
         order.setStatus(sm.getState().getId());
-        return orderRepository.save(order);
     }
 
     private StateMachine<OrderStatusEnum, OrderEvents> build(Order order) {

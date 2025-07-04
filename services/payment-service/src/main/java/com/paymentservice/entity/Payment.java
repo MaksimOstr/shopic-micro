@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "payments")
@@ -27,8 +28,8 @@ public class Payment {
     @Column(name = "order_id", nullable = false)
     private long orderId;
 
-    @Column(name = "payment_id", unique = true)
-    private String paymentId;
+    @Column(name = "stripe_payment_id", unique = true)
+    private String stripePaymentId;
 
     @Column(name = "session_id", nullable = false, unique = true)
     private String sessionId;
@@ -38,6 +39,9 @@ public class Payment {
     @Column(name = "total_in_smallest_unit", nullable = false)
     private Long totalInSmallestUnit;
 
+    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Refund> refunds;
+
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -46,4 +50,8 @@ public class Payment {
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
+    public BigDecimal getTotalRefundedAmount() {
+        return refunds.stream().map(Refund::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }

@@ -2,6 +2,7 @@ package com.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
@@ -31,9 +32,13 @@ public class Refund {
 
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
+    private RefundReason reason;
+
     @Column(name = "stripe_refund_id", nullable = false, unique = true)
     private String stripeRefundId;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 }

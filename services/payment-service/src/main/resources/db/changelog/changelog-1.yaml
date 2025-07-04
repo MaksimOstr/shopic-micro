@@ -44,7 +44,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: payment_id
+                  name: stripe_payment_id
                   type: text
                   constraints:
                     unique: true
