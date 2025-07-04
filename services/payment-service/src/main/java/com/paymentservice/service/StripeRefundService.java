@@ -37,9 +37,9 @@ public class StripeRefundService {
     }
 
 
-    public void processRefund(RefundRequest dto) {
+    public void processRefund(RefundRequest dto, long paymentId) {
         try {
-            Payment payment = paymentService.getPaymentById(dto.paymentId());
+            Payment payment = paymentService.getPaymentById(paymentId);
 
             validateRefundRequest(payment, dto.amount());
 

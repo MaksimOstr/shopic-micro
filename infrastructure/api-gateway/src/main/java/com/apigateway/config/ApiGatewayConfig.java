@@ -118,7 +118,8 @@ public class ApiGatewayConfig {
         return route("payment-service-route")
                 .filter(lb("payment-service"))
                 .path("/payments", request -> request
-                        .POST("/webhook", http()))
+                        .POST("/webhook", http())
+                        .POST("/{id}/refund", http()))
                 .build();
     }
 }

@@ -6,6 +6,5 @@ import java.math.BigDecimal;
 
 public record RefundRequest(
         BigDecimal amount,
-        long paymentId,
         RefundReason reason
 ) {}

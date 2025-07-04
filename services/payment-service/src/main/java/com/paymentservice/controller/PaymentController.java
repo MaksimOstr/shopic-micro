@@ -1,11 +1,14 @@
 package com.paymentservice.controller;
 
+import com.paymentservice.dto.request.RefundRequest;
+import com.paymentservice.service.StripeRefundService;
 import com.paymentservice.service.WebhookService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +20,17 @@ public class PaymentController {
     private String STRIPE_WEBHOOK_SECRET;
 
     private final WebhookService webhookService;
+    private final StripeRefundService stripeRefundService;
+
+    @PostMapping("/{id}/refund")
+    public ResponseEntity<Void> refund(
+            @PathVariable("id") Long id,
+            @RequestBody RefundRequest body
+    ) {
+        stripeRefundService.processRefund(body, id);
+
+        return ResponseEntity.ok().build();
+    }
 
 
     @PostMapping("/webhook")

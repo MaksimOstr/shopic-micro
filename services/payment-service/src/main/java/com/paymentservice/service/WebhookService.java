@@ -22,6 +22,7 @@ public class WebhookService {
     private final PaymentService paymentService;
     private final RefundService refundService;
 
+    @Async
     public void handleWebhookEvent(Event event) {
         switch (event.getType()) {
             case "checkout.session.completed":
