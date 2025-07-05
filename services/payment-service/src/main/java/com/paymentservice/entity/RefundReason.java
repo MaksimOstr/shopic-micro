@@ -6,11 +6,7 @@ import com.paymentservice.exception.NotFoundException;
 public enum RefundReason {
     DUPLICATE,
     FRAUDULENT,
-    REQUESTED_BY_CUSTOMER,
-    PRODUCT_UNACCEPTABLE,
-    PRODUCT_NOT_DELIVERED,
-    ORDER_CANCELLATION,
-    OTHER;
+    REQUESTED_BY_CUSTOMER;
 
     @JsonCreator
     public static RefundReason fromString(String name) {

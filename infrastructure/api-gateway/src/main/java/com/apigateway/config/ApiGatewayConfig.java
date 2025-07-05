@@ -79,7 +79,7 @@ public class ApiGatewayConfig {
                         .PATCH("/{id}/image", http())
                         .PATCH("/{id}", http())
                         .DELETE("/{id}", http()))
-                        .build();
+                .build();
     }
 
     @Bean
@@ -117,12 +117,15 @@ public class ApiGatewayConfig {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> paymentServiceRoute() {
+    public RouterFunction<ServerResponse> paymentServiceRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("payment-service-route")
                 .filter(lb("payment-service"))
                 .path("/payments", request -> request
-                        .POST("/webhook", http())
-                        .POST("/{id}/refund", http()))
+                        .POST("/webhook", http()))
+                .path("/payments", request -> request
+                        .filter(jwtHandlerFilter)
+                        .POST("/{orderId}/full-refund", http())
+                        .POST("/{orderId}/partial-refund", http()))
                 .build();
     }
 }

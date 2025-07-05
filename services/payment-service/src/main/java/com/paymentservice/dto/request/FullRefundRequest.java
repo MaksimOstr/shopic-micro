@@ -1,10 +1,9 @@
 package com.paymentservice.dto.request;
 
 import com.paymentservice.entity.RefundReason;
+import jakarta.validation.constraints.NotNull;
 
-import java.math.BigDecimal;
-
-public record RefundRequest(
-        BigDecimal amount,
+public record FullRefundRequest(
+        @NotNull
         RefundReason reason
 ) {}

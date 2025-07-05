@@ -1,11 +1,13 @@
 package com.paymentservice.controller;
 
-import com.paymentservice.dto.request.RefundRequest;
+import com.paymentservice.dto.request.FullRefundRequest;
+import com.paymentservice.dto.request.PartialRefundRequest;
 import com.paymentservice.service.StripeRefundService;
 import com.paymentservice.service.WebhookService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,26 @@ public class PaymentController {
 
     private final WebhookService webhookService;
     private final StripeRefundService stripeRefundService;
+
+    @PostMapping("/{orderId}/full-refund")
+    public ResponseEntity<Void> fullRefund(
+            @PathVariable("orderId") long orderId,
+            @RequestBody @Valid FullRefundRequest body
+    ) {
+        stripeRefundService.processFullRefund(orderId, body.reason());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/partial-refund")
+    public ResponseEntity<Void> partialRefund(
+            @PathVariable("orderId") long orderId,
+            @RequestBody @Valid PartialRefundRequest body
+    ) {
+        stripeRefundService.processPartialRefund(orderId, body.reason(), body.amount());
+
+        return ResponseEntity.ok().build();
+    }
 
 
     @PostMapping("/webhook")

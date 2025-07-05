@@ -3,16 +3,10 @@ package com.paymentservice.service;
 import com.paymentservice.dto.CheckoutItem;
 import com.paymentservice.dto.CreateCheckoutSessionDto;
 import com.paymentservice.dto.CreatePaymentDto;
-import com.paymentservice.dto.CreateRefundDto;
-import com.paymentservice.dto.request.RefundRequest;
-import com.paymentservice.entity.Payment;
-import com.paymentservice.entity.RefundReason;
 import com.paymentservice.exception.InternalException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
-import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +25,7 @@ import static com.paymentservice.utils.Utils.toSmallestUnit;
 @RequiredArgsConstructor
 public class StripeCheckoutService {
     private final PaymentService paymentService;
-    private final RefundService refundService;
+
 
     @Value("${STRIPE_SECRET_KEY}")
     private String stripeSecretKey;

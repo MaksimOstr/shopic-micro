@@ -25,7 +25,7 @@ public class KafkaListenerService {
         try {
             OrderCanceledEvent event = objectMapper.readValue(payload, OrderCanceledEvent.class);
 
-            stripeRefundService.processFullRefund(event.orderId(), RefundReason.ORDER_CANCELLATION);
+            stripeRefundService.processFullRefund(event.orderId(), RefundReason.REQUESTED_BY_CUSTOMER);
 
             ack.acknowledge();
         } catch (JsonProcessingException e) {

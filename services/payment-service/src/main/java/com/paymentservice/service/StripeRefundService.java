@@ -1,7 +1,6 @@
 package com.paymentservice.service;
 
 import com.paymentservice.dto.CreateRefundDto;
-import com.paymentservice.dto.request.RefundRequest;
 import com.paymentservice.entity.Payment;
 import com.paymentservice.entity.PaymentStatus;
 import com.paymentservice.entity.RefundReason;
@@ -16,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -37,6 +37,7 @@ public class StripeRefundService {
     }
 
 
+    @Transactional
     public void processFullRefund(long orderId, RefundReason reason) {
         log.info("processFullRefund");
         Payment payment = paymentService.getPaymentByOrderId(orderId);
@@ -49,6 +50,7 @@ public class StripeRefundService {
         );
     }
 
+    @Transactional
     public void processPartialRefund(long orderId, RefundReason reason, BigDecimal refundAmount) {
         Payment payment = paymentService.getPaymentByOrderId(orderId);
         processRefund(payment, reason, refundAmount);
@@ -58,19 +60,17 @@ public class StripeRefundService {
     private void processRefund(Payment payment, RefundReason reason, BigDecimal refundAmount) {
         try {
             validateRefundRequest(payment, refundAmount);
-            System.out.println(payment.getStripePaymentId());
             RefundCreateParams params = RefundCreateParams.builder()
                     .setPaymentIntent(payment.getStripePaymentId())
-                    .setCurrency("usd")
                     .setAmount(toSmallestUnit(refundAmount).longValue())
-                    .setReason(RefundCreateParams.Reason.valueOf(reason.name()))
+                    .setReason(RefundCreateParams.Reason.valueOf(reason.toString()))
                     .build();
 
             Refund refund = Refund.create(params);
 
             saveRefund(payment, refund.getCurrency(), refundAmount, reason, refund.getId());
         } catch (StripeException e) {
-            log.error("Stripe error", e);
+            log.error("Stripe error {}", e.getMessage());
             throw new InternalException("Internal refund error");
         }
     }

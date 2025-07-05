@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Slf4j
@@ -23,6 +26,7 @@ public class WebhookService {
     private final RefundService refundService;
 
     @Async
+    @Transactional
     public void handleWebhookEvent(Event event) {
         switch (event.getType()) {
             case "checkout.session.completed":
@@ -46,11 +50,18 @@ public class WebhookService {
         }
     }
 
+
     private void handleRefundSuccess(Event event, Refund refund) {
         com.paymentservice.entity.Refund refundEntity = refundService.getRefundByStripeRefundId(refund.getId());
+        Payment payment = refundEntity.getPayment();
 
         refundEntity.setStatus(RefundStatus.SUCCEEDED);
-        refundEntity.getPayment().setStatus(PaymentStatus.SUCCEEDED);
+
+        if (payment.getAmount().subtract(payment.getTotalRefundedAmount()).compareTo(BigDecimal.ZERO) == 0) {
+            payment.setStatus(PaymentStatus.FULLY_REFUNDED);
+        } else {
+            payment.setStatus(PaymentStatus.PARTIALLY_REFUNDED);
+        }
     }
 
     public void handleCheckoutSuccess(Event event) {
