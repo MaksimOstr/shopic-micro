@@ -39,7 +39,7 @@ public class WebhookService {
 
     private void handleRefundUpdated(Event event) {
         Refund refund = getRefundFromEvent(event);
-
+        log.info("RefundStatus: {}", refund.getStatus());
         switch (refund.getStatus()) {
             case "succeeded":
                 handleRefundSuccess(event, refund);

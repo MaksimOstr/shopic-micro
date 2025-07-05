@@ -21,6 +21,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: payment_id
+                  type: bigint
                   constraints:
                     nullable: false
                     foreignKeyName: fk_refund_payment

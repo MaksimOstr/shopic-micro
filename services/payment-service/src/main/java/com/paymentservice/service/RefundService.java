@@ -1,13 +1,10 @@
 package com.paymentservice.service;
 
 import com.paymentservice.dto.CreateRefundDto;
-import com.paymentservice.dto.request.RefundRequest;
-import com.paymentservice.entity.Payment;
 import com.paymentservice.entity.Refund;
 import com.paymentservice.entity.RefundStatus;
 import com.paymentservice.exception.NotFoundException;
 import com.paymentservice.repository.RefundRepository;
-import com.stripe.param.RefundCreateParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

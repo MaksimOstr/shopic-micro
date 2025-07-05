@@ -53,15 +53,15 @@ public class PaymentService {
         }
     }
 
-    public Payment getPaymentById(long id) {
-        return paymentRepository.findById(id)
+    public Payment getPaymentByOrderId(long orderId) {
+        return paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new NotFoundException(PAYMENT_NOT_FOUND));
     }
 
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void checkUnpaidPayments() {
-        Instant thirtyMinutesAgo = Instant.now().minus(Duration.ofMinutes(1));
+        Instant thirtyMinutesAgo = Instant.now().minus(Duration.ofMinutes(30));
         paymentRepository.findByStatusAndCreatedAtBefore(PaymentStatus.PENDING, thirtyMinutesAgo)
                 .forEach(payment -> {
                     payment.setStatus(PaymentStatus.FAILED);

@@ -22,16 +22,6 @@ public class PaymentController {
     private final WebhookService webhookService;
     private final StripeRefundService stripeRefundService;
 
-    @PostMapping("/{id}/refund")
-    public ResponseEntity<Void> refund(
-            @PathVariable("id") Long id,
-            @RequestBody RefundRequest body
-    ) {
-        stripeRefundService.processRefund(body, id);
-
-        return ResponseEntity.ok().build();
-    }
-
 
     @PostMapping("/webhook")
     public String handleWebhook(

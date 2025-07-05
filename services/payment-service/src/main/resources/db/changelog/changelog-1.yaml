@@ -22,6 +22,7 @@ databaseChangeLog:
                   name: order_id
                   type: bigint
                   constraints:
+                    unique: true
                     nullable: false
               - column:
                   name: user_id

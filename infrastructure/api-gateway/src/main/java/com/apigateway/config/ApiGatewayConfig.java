@@ -109,7 +109,10 @@ public class ApiGatewayConfig {
                         .GET("{id}", http())
                         .GET("", http())
                         .PATCH("/{id}/complete", http())
-                        .PATCH("/{id}/cancel", http()))
+                        .PATCH("/{id}/cancel", http())
+                        .PATCH("/{id}/process", http())
+                        .PATCH("/{id}/ship", http())
+                        .PATCH("/{id}/pickup-ready", http()))
                 .build();
     }
 

@@ -21,5 +21,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("UPDATE Payment p SET p.status = :paymentStatus WHERE p.sessionId = :sessionId")
     int updatePaymentStatus(String sessionId, PaymentStatus paymentStatus);
 
+    Optional<Payment> findByOrderId(long orderId);
+
     List<Payment> findByStatusAndCreatedAtBefore(PaymentStatus status, Instant date);
 }

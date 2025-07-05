@@ -25,7 +25,7 @@ public class Payment {
     @Column(name = "user_id", nullable = false)
     private long userId;
 
-    @Column(name = "order_id", nullable = false)
+    @Column(name = "order_id", nullable = false, unique = true)
     private long orderId;
 
     @Column(name = "stripe_payment_id", unique = true)
@@ -35,6 +35,8 @@ public class Payment {
     private String sessionId;
 
     private String currency;
+
+
 
     @Column(name = "total_in_smallest_unit", nullable = false)
     private Long totalInSmallestUnit;

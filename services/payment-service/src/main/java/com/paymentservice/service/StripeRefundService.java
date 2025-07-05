@@ -37,28 +37,43 @@ public class StripeRefundService {
     }
 
 
-    public void processRefund(RefundRequest dto, long paymentId) {
+    public void processFullRefund(long orderId, RefundReason reason) {
+        log.info("processFullRefund");
+        Payment payment = paymentService.getPaymentByOrderId(orderId);
+        BigDecimal refundAmount = payment.getAmount().subtract(payment.getTotalRefundedAmount());
+
+        processRefund(
+                payment,
+                reason,
+                refundAmount
+        );
+    }
+
+    public void processPartialRefund(long orderId, RefundReason reason, BigDecimal refundAmount) {
+        Payment payment = paymentService.getPaymentByOrderId(orderId);
+        processRefund(payment, reason, refundAmount);
+    }
+
+
+    private void processRefund(Payment payment, RefundReason reason, BigDecimal refundAmount) {
         try {
-            Payment payment = paymentService.getPaymentById(paymentId);
-
-            validateRefundRequest(payment, dto.amount());
-
+            validateRefundRequest(payment, refundAmount);
+            System.out.println(payment.getStripePaymentId());
             RefundCreateParams params = RefundCreateParams.builder()
                     .setPaymentIntent(payment.getStripePaymentId())
                     .setCurrency("usd")
-                    .setAmount(toSmallestUnit(dto.amount()).longValue())
-                    .setReason(RefundCreateParams.Reason.valueOf(dto.reason().name()))
+                    .setAmount(toSmallestUnit(refundAmount).longValue())
+                    .setReason(RefundCreateParams.Reason.valueOf(reason.name()))
                     .build();
 
             Refund refund = Refund.create(params);
 
-            saveRefund(payment, refund.getCurrency(), dto.amount(), dto.reason(), refund.getId());
+            saveRefund(payment, refund.getCurrency(), refundAmount, reason, refund.getId());
         } catch (StripeException e) {
             log.error("Stripe error", e);
             throw new InternalException("Internal refund error");
         }
     }
-
 
     private void validateRefundRequest(Payment payment, BigDecimal amount) {
         if(payment.getStatus() != PaymentStatus.SUCCEEDED) {

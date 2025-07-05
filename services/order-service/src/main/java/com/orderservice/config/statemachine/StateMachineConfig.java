@@ -5,9 +5,7 @@ import com.orderservice.config.statemachine.action.CompleteAction;
 import com.orderservice.entity.OrderStatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
@@ -53,13 +51,26 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
                     .and()
                 .withExternal()
                     .source(OrderStatusEnum.CREATED)
+                    .target(OrderStatusEnum.CANCELLED)
+                    .action(cancelAction)
+                    .event(OrderEvents.CANCEL)
+                    .and()
+                .withExternal()
+                    .source(OrderStatusEnum.CREATED)
                     .target(OrderStatusEnum.FAILED)
                     .event(OrderEvents.FAIL)
                     .and()
+
                 .withExternal()
                     .source(OrderStatusEnum.PAID)
                     .target(OrderStatusEnum.PROCESSING)
                     .event(OrderEvents.PROCESS)
+                    .and()
+                .withExternal()
+                    .source(OrderStatusEnum.PAID)
+                    .target(OrderStatusEnum.CANCELLED)
+                    .action(cancelAction)
+                    .event(OrderEvents.CANCEL)
                     .and()
 
                 .withExternal()
