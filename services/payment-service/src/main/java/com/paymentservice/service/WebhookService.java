@@ -84,7 +84,6 @@ public class WebhookService {
         payment.setStatus(PaymentStatus.SUCCEEDED);
         payment.setPaymentMethod(paymentMethod);
 
-        paymentService.save(payment);
         kafkaService.sendCheckoutSessionSuccess(payment.getOrderId());
     }
 

@@ -7,5 +7,8 @@ public record FullRefundRequest(
         @NotNull
         RefundReason reason,
 
+        @NotNull
+        long orderId,
+
         String description
 ) {}

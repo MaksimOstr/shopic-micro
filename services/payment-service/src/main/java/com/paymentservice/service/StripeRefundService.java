@@ -41,9 +41,9 @@ public class StripeRefundService {
 
 
     @Transactional
-    public void processFullRefund(FullRefundRequest dto, long orderId) {
+    public void processFullRefund(FullRefundRequest dto) {
         log.info("processFullRefund");
-        Payment payment = paymentService.getPaymentWithRefundsByOrderId(orderId);
+        Payment payment = paymentService.getPaymentWithRefundsByOrderId(dto.orderId());
         processRefund(
                 payment,
                 dto.reason(),
@@ -53,9 +53,9 @@ public class StripeRefundService {
     }
 
     @Transactional
-    public void processPartialRefund(long orderId, PartialRefundRequest dto) {
+    public void processPartialRefund(PartialRefundRequest dto) {
         log.info("processPartialRefund");
-        Payment payment = paymentService.getPaymentWithRefundsByOrderId(orderId);
+        Payment payment = paymentService.getPaymentWithRefundsByOrderId(dto.orderId());
         processRefund(payment, dto.reason(), dto.amount(), dto.description());
     }
 

@@ -14,6 +14,9 @@ public record PartialRefundRequest(
         @DecimalMin("1")
         BigDecimal amount,
 
+        @NotNull
+        long orderId,
+
         String description
 ) {
 }

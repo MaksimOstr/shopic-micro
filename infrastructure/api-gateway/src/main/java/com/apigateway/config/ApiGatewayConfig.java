@@ -120,12 +120,18 @@ public class ApiGatewayConfig {
     public RouterFunction<ServerResponse> paymentServiceRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("payment-service-route")
                 .filter(lb("payment-service"))
-                .path("/payments", request -> request
+                .path("/stripe", request -> request
                         .POST("/webhook", http()))
                 .path("/payments", request -> request
                         .filter(jwtHandlerFilter)
-                        .POST("/{orderId}/full-refund", http())
-                        .POST("/{orderId}/partial-refund", http()))
+                        .GET("", http())
+                        .GET("/{id}", http()))
+                .path("/refunds", request -> request
+                        .filter(jwtHandlerFilter)
+                        .POST("/full-refund", http())
+                        .POST("/partial-refund", http()))
+                        .GET("", http())
+                        .GET("/{id}", http())
                 .build();
     }
 }

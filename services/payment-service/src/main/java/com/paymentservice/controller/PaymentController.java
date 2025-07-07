@@ -1,15 +1,17 @@
 package com.paymentservice.controller;
 
-import com.paymentservice.dto.request.FullRefundRequest;
-import com.paymentservice.dto.request.PartialRefundRequest;
-import com.paymentservice.service.StripeRefundService;
-import com.paymentservice.service.WebhookService;
-import com.stripe.exception.SignatureVerificationException;
-import com.stripe.model.Event;
-import com.stripe.net.Webhook;
-import jakarta.validation.Valid;
+import com.paymentservice.dto.PaymentDto;
+import com.paymentservice.dto.PaymentSummaryDto;
+import com.paymentservice.dto.RefundDto;
+import com.paymentservice.dto.RefundSummaryDto;
+import com.paymentservice.dto.request.PaymentParams;
+import com.paymentservice.dto.request.RefundParams;
+import com.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,46 +20,28 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    @Value("${STRIPE_WEBHOOK_SECRET}")
-    private String STRIPE_WEBHOOK_SECRET;
+    private final PaymentService paymentService;
 
-    private final WebhookService webhookService;
-    private final StripeRefundService stripeRefundService;
-
-    @PostMapping("/{orderId}/full-refund")
-    public ResponseEntity<Void> fullRefund(
-            @PathVariable("orderId") long orderId,
-            @RequestBody @Valid FullRefundRequest body
+    @GetMapping("/{id}")
+    public ResponseEntity<PaymentDto> getPaymentById(
+            @PathVariable int id
     ) {
-        stripeRefundService.processFullRefund(body, orderId);
+        PaymentDto refund = paymentService.getPayment(id);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(refund);
     }
 
-    @PostMapping("/{orderId}/partial-refund")
-    public ResponseEntity<Void> partialRefund(
-            @PathVariable("orderId") long orderId,
-            @RequestBody @Valid PartialRefundRequest body
+    @GetMapping
+    public ResponseEntity<Page<PaymentSummaryDto>> getPayments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestBody PaymentParams params
     ) {
-        stripeRefundService.processPartialRefund(orderId, body);
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+        Pageable pageable = PageRequest.of(page, size, direction, "createdAt");
+        Page<PaymentSummaryDto> refunds = paymentService.getPayments(params, pageable);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(refunds);
     }
-
-
-    @PostMapping("/webhook")
-    public String handleWebhook(
-            @RequestBody String payload,
-            @RequestHeader("Stripe-Signature") String sigHeader
-    ) {
-        try {
-            Event event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
-            System.out.println(event.getType());
-            webhookService.handleWebhookEvent(event);
-
-            return "OK";
-        } catch (SignatureVerificationException e) {
-            return "Error: " + e.getMessage();
-        }
-    };
 }
