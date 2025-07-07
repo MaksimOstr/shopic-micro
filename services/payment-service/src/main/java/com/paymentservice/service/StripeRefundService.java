@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 
 import static com.paymentservice.utils.Utils.toSmallestUnit;
 
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -40,19 +41,17 @@ public class StripeRefundService {
     @Transactional
     public void processFullRefund(long orderId, RefundReason reason) {
         log.info("processFullRefund");
-        Payment payment = paymentService.getPaymentByOrderId(orderId);
-        BigDecimal refundAmount = payment.getAmount().subtract(payment.getTotalRefundedAmount());
-
+        Payment payment = paymentService.getPaymentWithRefundsByOrderId(orderId);
         processRefund(
                 payment,
                 reason,
-                refundAmount
+                payment.getAmount()
         );
     }
 
     @Transactional
     public void processPartialRefund(long orderId, RefundReason reason, BigDecimal refundAmount) {
-        Payment payment = paymentService.getPaymentByOrderId(orderId);
+        Payment payment = paymentService.getPaymentWithRefundsByOrderId(orderId);
         processRefund(payment, reason, refundAmount);
     }
 

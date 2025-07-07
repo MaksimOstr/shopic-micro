@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 public class RefundService {
     private final RefundRepository refundRepository;
 
+    private static final String REFUND_NOT_FOUND = "Refund Not Found";
+
+
     public void createRefund(CreateRefundDto dto) {
         Refund refund = Refund.builder()
                 .currency(dto.currency())
@@ -28,6 +31,11 @@ public class RefundService {
 
     public Refund getRefundByStripeRefundId(String stripeRefundId) {
         return refundRepository.findRefundByStripeRefundId(stripeRefundId)
-                .orElseThrow(() -> new NotFoundException("Refund not found"));
+                .orElseThrow(() -> new NotFoundException(REFUND_NOT_FOUND));
+    }
+
+    public Refund getRefundWithPaymentByStripeRefundId(String stripeRefundId) {
+        return refundRepository.findRefundWithPaymentByStripeRefundId(stripeRefundId)
+                .orElseThrow(() -> new NotFoundException(REFUND_NOT_FOUND));
     }
 }

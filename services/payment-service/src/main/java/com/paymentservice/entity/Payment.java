@@ -36,8 +36,6 @@ public class Payment {
 
     private String currency;
 
-
-
     @Column(name = "total_in_smallest_unit", nullable = false)
     private Long totalInSmallestUnit;
 

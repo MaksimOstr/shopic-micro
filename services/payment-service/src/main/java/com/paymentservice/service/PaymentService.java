@@ -53,8 +53,8 @@ public class PaymentService {
         }
     }
 
-    public Payment getPaymentByOrderId(long orderId) {
-        return paymentRepository.findByOrderId(orderId)
+    public Payment getPaymentWithRefundsByOrderId(long orderId) {
+        return paymentRepository.findByOrderIdWithRefunds(orderId)
                 .orElseThrow(() -> new NotFoundException(PAYMENT_NOT_FOUND));
     }
 

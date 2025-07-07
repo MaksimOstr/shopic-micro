@@ -2,7 +2,9 @@ package com.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
@@ -38,7 +40,17 @@ public class Refund {
     @Column(name = "stripe_refund_id", nullable = false, unique = true)
     private String stripeRefundId;
 
+    @Column(name = "failureReason")
+    private String failureReason;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
+    @Column(name = "refunded_at")
+    private Instant refundedAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 
 @Slf4j
@@ -46,16 +47,25 @@ public class WebhookService {
         log.info("RefundStatus: {}", refund.getStatus());
         switch (refund.getStatus()) {
             case "succeeded":
-                handleRefundSuccess(event, refund);
+                handleRefundSuccess(refund);
+            case "failed":
+                handleRefundFailed(refund);
         }
     }
 
-
-    private void handleRefundSuccess(Event event, Refund refund) {
+    private void handleRefundFailed(Refund refund) {
         com.paymentservice.entity.Refund refundEntity = refundService.getRefundByStripeRefundId(refund.getId());
+
+        refundEntity.setStatus(RefundStatus.FAILED);
+        refundEntity.setFailureReason(refund.getFailureReason());
+    }
+
+    private void handleRefundSuccess(Refund refund) {
+        com.paymentservice.entity.Refund refundEntity = refundService.getRefundWithPaymentByStripeRefundId(refund.getId());
         Payment payment = refundEntity.getPayment();
 
         refundEntity.setStatus(RefundStatus.SUCCEEDED);
+        refundEntity.setRefundedAt(Instant.now());
 
         if (payment.getAmount().subtract(payment.getTotalRefundedAmount()).compareTo(BigDecimal.ZERO) == 0) {
             payment.setStatus(PaymentStatus.FULLY_REFUNDED);

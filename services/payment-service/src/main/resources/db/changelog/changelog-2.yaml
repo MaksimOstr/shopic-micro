@@ -54,6 +54,21 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: failure_reason
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
+                  name: refunded_at
+                  type: timestamptz
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_at
                   type: timestamptz
                   defaultValueComputed: CURRENT_TIMESTAMP
