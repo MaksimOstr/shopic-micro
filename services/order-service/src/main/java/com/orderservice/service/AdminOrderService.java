@@ -63,4 +63,8 @@ public class AdminOrderService {
     public void pickupOrder(long orderId) {
         orderEventService.pickupReadyOrder(orderId);
     }
+
+    public void returnOrder(long orderId) {
+        orderEventService.returnOrder(orderId);
+    }
 }

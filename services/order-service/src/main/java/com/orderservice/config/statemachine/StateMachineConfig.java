@@ -68,7 +68,8 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
                     .and()
                 .withExternal()
                     .source(OrderStatusEnum.PAID)
-                    .target(OrderStatusEnum.CANCELLED)
+                    .target(OrderStatusEnum.CANCELLED_PAID)
+                    .action(cancelAction)
                     .event(OrderEvents.CANCEL)
                     .and()
 
@@ -91,8 +92,8 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
                     .and()
                 .withExternal()
                     .source(OrderStatusEnum.READY_FOR_PICKUP)
-                    .target(OrderStatusEnum.CANCELLED)
-                    .event(OrderEvents.CANCEL)
+                    .target(OrderStatusEnum.RETURNED)
+                    .event(OrderEvents.RETURN)
                     .and();
 
     }

@@ -83,4 +83,12 @@ public class AdminOrderController {
         adminOrderService.pickupOrder(id);
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/{id}/return")
+    public ResponseEntity<Void> returnOrder(
+            @PathVariable long id
+    ) {
+        adminOrderService.returnOrder(id);
+        return ResponseEntity.ok().build();
+    }
 }

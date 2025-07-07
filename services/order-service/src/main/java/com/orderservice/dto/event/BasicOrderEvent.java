@@ -1,6 +1,5 @@
 package com.orderservice.dto.event;
 
-
-public record OrderCanceledEvent(
+public record BasicOrderEvent(
         long orderId
 ) {}

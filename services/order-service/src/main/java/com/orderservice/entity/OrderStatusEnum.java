@@ -6,11 +6,13 @@ import com.orderservice.exception.NotFoundException;
 public enum OrderStatusEnum {
     CREATED,
     PAID,
+    CANCELLED_PAID,
     PROCESSING,
     SHIPPED,
     READY_FOR_PICKUP,
     COMPLETED,
     CANCELLED,
+    RETURNED,
     FAILED;
 
     @JsonCreator

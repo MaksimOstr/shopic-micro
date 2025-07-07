@@ -47,9 +47,6 @@ public class Order {
     @CreatedDate
     private Instant createdAt;
 
-    @Column(name = "cancel_reason")
-    private String cancelReason;
-
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     private Instant updatedAt;

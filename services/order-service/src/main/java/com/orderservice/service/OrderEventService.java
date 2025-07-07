@@ -42,6 +42,11 @@ public class OrderEventService {
     }
 
     @Transactional
+    public void returnOrder(long orderId) {
+        processEvent(orderId, OrderEvents.RETURN);
+    }
+
+    @Transactional
     public void completeOrder(long orderId) {
         processEvent(orderId, OrderEvents.COMPLETE);
     }

@@ -10,6 +10,7 @@ public record CreateRefundDto(
         String currency,
         BigDecimal amount,
         RefundReason reason,
-        String stripeRefundId
+        String stripeRefundId,
+        String description
 ) {
 }

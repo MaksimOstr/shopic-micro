@@ -22,6 +22,7 @@ public class RefundService {
                 .amount(dto.amount())
                 .reason(dto.reason())
                 .status(RefundStatus.PENDING)
+                .description(dto.description())
                 .stripeRefundId(dto.stripeRefundId())
                 .payment(dto.payment())
                 .build();

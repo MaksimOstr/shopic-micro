@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CancelAction implements Action<OrderStatusEnum, OrderEvents> {
+public class ReturnAction implements Action<OrderStatusEnum, OrderEvents> {
     private final KafkaService kafkaService;
 
     @Override
     public void execute(StateContext<OrderStatusEnum, OrderEvents> context) {
         Order order = context.getMessage().getHeaders().get("order", Order.class);
         if(order != null) {
-            kafkaService.sendOrderCanceledEvent(order.getId());
+            kafkaService.sendOrderReturnEvent(order.getId());
         } else {
             throw new NotFoundException("Order not found");
         }

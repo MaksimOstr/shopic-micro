@@ -33,6 +33,32 @@ public class KafkaListenerService {
     }
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
+    @KafkaListener(topics = "order.canceled", groupId = "product-service")
+    public void listenCanceledOrder(String data, Acknowledgment ack) {
+        try {
+            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
+
+            reservationService.cancelReservation(event.orderId());
+            ack.acknowledge();
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
+    @KafkaListener(topics = "order.returned", groupId = "product-service")
+    public void listenReturnedOrder(String data, Acknowledgment ack) {
+        try {
+            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
+
+            reservationService.cancelReservation(event.orderId());
+            ack.acknowledge();
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
     @KafkaListener(topics = "order.completed", groupId = "product-service")
     public void listenCompletedOrder(String data, Acknowledgment ack) {
 

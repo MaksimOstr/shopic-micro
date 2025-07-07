@@ -29,7 +29,7 @@ public class PaymentController {
             @PathVariable("orderId") long orderId,
             @RequestBody @Valid FullRefundRequest body
     ) {
-        stripeRefundService.processFullRefund(orderId, body.reason(), body.description());
+        stripeRefundService.processFullRefund(body, orderId);
 
         return ResponseEntity.ok().build();
     }
@@ -39,7 +39,7 @@ public class PaymentController {
             @PathVariable("orderId") long orderId,
             @RequestBody @Valid PartialRefundRequest body
     ) {
-        stripeRefundService.processPartialRefund(orderId, body.reason(), body.amount(), body.description());
+        stripeRefundService.processPartialRefund(orderId, body);
 
         return ResponseEntity.ok().build();
     }

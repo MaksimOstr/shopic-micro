@@ -1,6 +1,8 @@
 package com.paymentservice.service;
 
 import com.paymentservice.dto.CreateRefundDto;
+import com.paymentservice.dto.request.FullRefundRequest;
+import com.paymentservice.dto.request.PartialRefundRequest;
 import com.paymentservice.entity.Payment;
 import com.paymentservice.entity.PaymentStatus;
 import com.paymentservice.entity.RefundReason;
@@ -39,24 +41,26 @@ public class StripeRefundService {
 
 
     @Transactional
-    public void processFullRefund(long orderId, RefundReason reason, String description) {
+    public void processFullRefund(FullRefundRequest dto, long orderId) {
         log.info("processFullRefund");
         Payment payment = paymentService.getPaymentWithRefundsByOrderId(orderId);
         processRefund(
                 payment,
-                reason,
-                payment.getAmount()
+                dto.reason(),
+                payment.getAmount(),
+                dto.description()
         );
     }
 
     @Transactional
-    public void processPartialRefund(long orderId, RefundReason reason, BigDecimal refundAmount, String description) {
+    public void processPartialRefund(long orderId, PartialRefundRequest dto) {
+        log.info("processPartialRefund");
         Payment payment = paymentService.getPaymentWithRefundsByOrderId(orderId);
-        processRefund(payment, reason, refundAmount);
+        processRefund(payment, dto.reason(), dto.amount(), dto.description());
     }
 
 
-    private void processRefund(Payment payment, RefundReason reason, BigDecimal refundAmount) {
+    private void processRefund(Payment payment, RefundReason reason, BigDecimal refundAmount, String description) {
         try {
             validateRefundRequest(payment, refundAmount);
             RefundCreateParams params = RefundCreateParams.builder()
@@ -67,7 +71,7 @@ public class StripeRefundService {
 
             Refund refund = Refund.create(params);
 
-            saveRefund(payment, refund.getCurrency(), refundAmount, reason, refund.getId());
+            saveRefund(payment, refund.getCurrency(), refundAmount, reason, refund.getId(), description);
         } catch (StripeException e) {
             log.error("Stripe error {}", e.getMessage());
             throw new InternalException("Internal refund error");
@@ -90,13 +94,14 @@ public class StripeRefundService {
         }
     }
 
-    private void saveRefund(Payment payment, String currency, BigDecimal amount, RefundReason reason, String stripeRefundId) {
+    private void saveRefund(Payment payment, String currency, BigDecimal amount, RefundReason reason, String stripeRefundId, String description) {
         CreateRefundDto dto = new CreateRefundDto(
                 payment,
                 currency,
                 amount,
                 reason,
-                stripeRefundId
+                stripeRefundId,
+                description
         );
 
         refundService.createRefund(dto);
