@@ -31,6 +31,9 @@ public class Payment {
     @Column(name = "stripe_payment_id", unique = true)
     private String stripePaymentId;
 
+    @Column(name = "payment_method", nullable = false)
+    private String paymentMethod;
+
     @Column(name = "session_id", nullable = false, unique = true)
     private String sessionId;
 

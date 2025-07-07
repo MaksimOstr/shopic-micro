@@ -5,5 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record FullRefundRequest(
         @NotNull
-        RefundReason reason
+        RefundReason reason,
+
+        String description
 ) {}

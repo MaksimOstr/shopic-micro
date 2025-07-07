@@ -49,6 +49,11 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
                   name: reason
                   type: varchar(30)
                   constraints:

@@ -35,6 +35,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: cancel_reason
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
                   name: customer_phone_number
                   type: varchar(30)
                   constraints:

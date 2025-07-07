@@ -32,6 +32,8 @@ public class Refund {
 
     private String currency;
 
+    private String description;
+
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)

@@ -12,6 +12,8 @@ public record PartialRefundRequest(
 
         @NotNull
         @DecimalMin("1")
-        BigDecimal amount
+        BigDecimal amount,
+
+        String description
 ) {
 }

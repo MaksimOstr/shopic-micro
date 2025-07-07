@@ -39,7 +39,7 @@ public class StripeRefundService {
 
 
     @Transactional
-    public void processFullRefund(long orderId, RefundReason reason) {
+    public void processFullRefund(long orderId, RefundReason reason, String description) {
         log.info("processFullRefund");
         Payment payment = paymentService.getPaymentWithRefundsByOrderId(orderId);
         processRefund(
@@ -50,7 +50,7 @@ public class StripeRefundService {
     }
 
     @Transactional
-    public void processPartialRefund(long orderId, RefundReason reason, BigDecimal refundAmount) {
+    public void processPartialRefund(long orderId, RefundReason reason, BigDecimal refundAmount, String description) {
         Payment payment = paymentService.getPaymentWithRefundsByOrderId(orderId);
         processRefund(payment, reason, refundAmount);
     }

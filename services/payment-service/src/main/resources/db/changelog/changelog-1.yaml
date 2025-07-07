@@ -40,6 +40,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: payment_method
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
                   name: amount
                   type: decimal(10, 2)
                   constraints:

@@ -78,9 +78,11 @@ public class WebhookService {
         Session session = getSessionFromEvent(event);
         String sessionId = session.getId();
         Payment payment = paymentService.getPaymentBySessionId(sessionId);
+        String paymentMethod = session.getPaymentIntentObject().getPaymentMethod();
 
         payment.setStripePaymentId(session.getPaymentIntent());
         payment.setStatus(PaymentStatus.SUCCEEDED);
+        payment.setPaymentMethod(paymentMethod);
 
         paymentService.save(payment);
         kafkaService.sendCheckoutSessionSuccess(payment.getOrderId());
