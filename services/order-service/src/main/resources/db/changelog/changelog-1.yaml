@@ -50,6 +50,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: comment
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
                   name: total_price
                   type: decimal(10, 2)
                   constraints:

@@ -12,7 +12,24 @@ public record CreateOrderRequest(
 
         @NotBlank
         @Pattern(regexp="(^$|[0-9]{10})")
-        String phoneNumber
+        String phoneNumber,
+
+        @NotBlank
+        String country,
+
+        @NotBlank
+        String city,
+
+        @NotBlank
+        String postalCode,
+
+        @NotBlank
+        String street,
+
+        @NotBlank
+        String houseNumber,
+
+        String comment
 ) {
 
 }

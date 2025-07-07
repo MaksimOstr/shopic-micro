@@ -1,10 +1,7 @@
 package com.orderservice.service;
 
 import com.orderservice.dto.request.CreateOrderRequest;
-import com.orderservice.entity.Order;
-import com.orderservice.entity.OrderCustomer;
-import com.orderservice.entity.OrderItem;
-import com.orderservice.entity.OrderStatusEnum;
+import com.orderservice.entity.*;
 import com.orderservice.mapper.OrderItemClassMapper;
 import com.orderservice.repository.OrderRepository;
 import com.orderservice.service.grpc.CartGrpcService;
@@ -55,10 +52,19 @@ public class OrderCreationService {
                 dto.lastName(),
                 dto.phoneNumber()
         );
+        Address address = new Address(
+                dto.country(),
+                dto.street(),
+                dto.city(),
+                dto.postalCode(),
+                dto.houseNumber()
+        );
         Order order = Order.builder()
                 .customer(customer)
+                .comment(dto.comment())
                 .status(OrderStatusEnum.CREATED)
                 .userId(userId)
+                .address(address)
                 .build();
         List<OrderItem> orderItems = orderItemClassMapper.mapToOrderItems(order, productInfoList, productQuantityMap);
 

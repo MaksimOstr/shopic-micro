@@ -32,6 +32,11 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
+    private String comment;
+
+    @Embedded
+    private Address address;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "firstName", column = @Column(name = "customer_first_name", nullable = false)),
