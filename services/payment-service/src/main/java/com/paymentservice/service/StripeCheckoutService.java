@@ -51,9 +51,9 @@ public class StripeCheckoutService {
             String sessionId = session.getId();
             long amountInCents = session.getAmountTotal();
             BigDecimal amountInDollars = BigDecimal.valueOf(amountInCents).divide(BigDecimal.valueOf(100));
-            System.out.println("before");
+
             savePayment(dto.userId(), sessionId, dto.orderId(), session.getCurrency(), amountInCents, amountInDollars);
-            System.out.println("after");
+
             return session.getUrl();
         } catch (StripeException e) {
             log.error(e.getMessage());

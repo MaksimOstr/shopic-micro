@@ -2,6 +2,7 @@ package com.orderservice.service.grpc;
 
 import com.google.protobuf.Empty;
 import com.orderservice.exception.InsufficientStockException;
+import com.orderservice.mapper.GrpcMapper;
 import com.shopic.grpc.cartservice.CartItem;
 import com.shopic.grpc.productservice.*;
 import io.grpc.StatusRuntimeException;
@@ -14,10 +15,11 @@ import java.util.List;
 @GrpcService
 @RequiredArgsConstructor
 public class ProductGrpcService {
+    private final GrpcMapper grpcMapper;
     private final ProductServiceGrpc.ProductServiceBlockingStub productGrpcService;
 
     public Empty reserveProduct(List<CartItem> cartItems, long orderId) {
-        List<ReservationItem> reservationItems = mapToReservationItems(cartItems);
+        List<ReservationItem> reservationItems = grpcMapper.toReservationItemList(cartItems);
         ReserveProductsRequest request = ReserveProductsRequest.newBuilder()
                 .setOrderId(orderId)
                 .addAllReservationItems(reservationItems).build();
@@ -38,12 +40,5 @@ public class ProductGrpcService {
                 .addAllProductId(productIds).build();
 
         return productGrpcService.getActualProductInfo(request);
-    }
-
-    private List<ReservationItem> mapToReservationItems(List<CartItem> cartItems) {
-        return cartItems.stream().map(item -> ReservationItem.newBuilder()
-                .setProductId(item.getProductId())
-                .setQuantity(item.getQuantity())
-                .build()).toList();
     }
 }

@@ -24,7 +24,7 @@ public class GrpcCartService extends CartServiceGrpc.CartServiceImplBase {
     @Override
     public void getCart(GetCartRequest request, StreamObserver<CartResponse> responseObserver) {
         List<CartItemForOrderProjection> cartItems = cartService.getCartItemsForOrder(request.getUserId());
-        List<CartItem> cartItemList = mapToOrderCartItem(cartItems);
+        List<CartItem> cartItemList = grpcMapper.toOrderCartItems(cartItems);
 
         CartResponse response = CartResponse.newBuilder()
                 .addAllCartItems(cartItemList)
@@ -34,10 +34,4 @@ public class GrpcCartService extends CartServiceGrpc.CartServiceImplBase {
         responseObserver.onCompleted();
     }
 
-
-    private List<CartItem> mapToOrderCartItem(List<CartItemForOrderProjection> cartItems) {
-        return cartItems.stream()
-                .map(grpcMapper::toOrderCartItem)
-                .toList();
-    }
 }

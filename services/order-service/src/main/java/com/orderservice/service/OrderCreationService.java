@@ -2,7 +2,7 @@ package com.orderservice.service;
 
 import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.entity.*;
-import com.orderservice.mapper.OrderItemClassMapper;
+import com.orderservice.mapper.OrderItemMapper;
 import com.orderservice.repository.OrderRepository;
 import com.orderservice.service.grpc.CartGrpcService;
 import com.orderservice.service.grpc.PaymentGrpcService;
@@ -26,7 +26,7 @@ public class OrderCreationService {
     private final OrderRepository orderRepository;
     private final CartGrpcService cartGrpcService;
     private final ProductGrpcService productGrpcService;
-    private final OrderItemClassMapper orderItemClassMapper;
+    private final OrderItemMapper orderItemMapper;
     private final PaymentGrpcService paymentGrpcService;
 
 
@@ -66,7 +66,7 @@ public class OrderCreationService {
                 .userId(userId)
                 .address(address)
                 .build();
-        List<OrderItem> orderItems = orderItemClassMapper.mapToOrderItems(order, productInfoList, productQuantityMap);
+        List<OrderItem> orderItems = orderItemMapper.toOrderItemList(order, productInfoList, productQuantityMap);
 
         order.setOrderItems(orderItems);
         order.setTotalPrice(order.calculateTotalPrice());

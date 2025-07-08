@@ -42,7 +42,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void reserveProducts(ReserveProductsRequest request, StreamObserver<Empty> responseObserver) {
-        List<ItemForReservation> itemsForReservation = mapToItemForReservation(request.getReservationItemsList());
+        List<ItemForReservation> itemsForReservation = grpcMapper.toItemForReservationList(request.getReservationItemsList());
         CreateReservationDto dto = new CreateReservationDto(itemsForReservation, request.getOrderId());
 
         reservationCreationService.createReservation(dto);
@@ -61,10 +61,5 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
-    }
-
-
-    private List<ItemForReservation> mapToItemForReservation(List<ReservationItem> reservationItems) {
-        return reservationItems.stream().map(grpcMapper::toItemForReservation).toList();
     }
 }

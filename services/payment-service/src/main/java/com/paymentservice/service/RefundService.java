@@ -11,6 +11,8 @@ import com.paymentservice.mapper.RefundMapper;
 import com.paymentservice.repository.RefundRepository;
 import com.paymentservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.InternalException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,7 @@ import java.util.List;
 
 import static com.paymentservice.utils.SpecificationUtils.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RefundService {
@@ -41,7 +44,12 @@ public class RefundService {
                 .payment(dto.payment())
                 .build();
 
-        refundRepository.save(refund);
+        try {
+            refundRepository.save(refund);
+        } catch (Exception e) {
+            log.error("Refund service error: {}", e.getMessage());
+            throw new InternalException("Database constraint violation");
+        }
     }
 
     public RefundDto getRefund(long id) {

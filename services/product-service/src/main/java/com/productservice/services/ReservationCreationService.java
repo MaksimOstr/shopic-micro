@@ -29,7 +29,7 @@ public class ReservationCreationService {
 
 
     @Transactional
-    public long createReservation(CreateReservationDto dto) {
+    public void createReservation(CreateReservationDto dto) {
         List<ItemForReservation> reservationItems = dto.reservationItems();
 
         checkAndDecreaseStockQuantity(reservationItems);
@@ -38,8 +38,6 @@ public class ReservationCreationService {
         long reservationId = reservation.getId();
 
         mapToReservationItemDtoAndSave(reservationItems, reservationId);
-
-        return reservationId;
     }
 
     private void checkAndDecreaseStockQuantity(List<ItemForReservation> reservationItems) {
