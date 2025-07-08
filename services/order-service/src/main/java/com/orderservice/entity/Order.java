@@ -35,6 +35,13 @@ public class Order {
     private String comment;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "country", column = @Column(name = "address_country", nullable = false)),
+            @AttributeOverride(name = "street", column = @Column(name = "address_street", nullable = false)),
+            @AttributeOverride(name = "city", column = @Column(name = "address_city", nullable = false)),
+            @AttributeOverride(name = "postalCode", column = @Column(name = "address_postalCode", nullable = false)),
+            @AttributeOverride(name = "houseNumber", column = @Column(name = "address_houseNumber", nullable = false)),
+    })
     private Address address;
 
     @Embedded

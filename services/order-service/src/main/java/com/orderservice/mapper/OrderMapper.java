@@ -15,9 +15,19 @@ public interface OrderMapper {
 
     List<OrderSummaryDto> toOrderSummaryDto(List<Order> orders);
 
+    @Mapping(target = "country", source = "address.country")
+    @Mapping(target = "street", source = "address.street")
+    @Mapping(target = "city", source = "address.city")
+    @Mapping(target = "postalCode", source = "address.postalCode")
+    @Mapping(target = "houseNumber", source = "address.houseNumber")
     @Mapping(source = "id", target = "orderId")
     AdminOrderDto toAdminOrderDto(Order order);
 
+    @Mapping(target = "country", source = "address.country")
+    @Mapping(target = "street", source = "address.street")
+    @Mapping(target = "city", source = "address.city")
+    @Mapping(target = "postalCode", source = "address.postalCode")
+    @Mapping(target = "houseNumber", source = "address.houseNumber")
     @Mapping(source = "id", target = "orderId")
     OrderDto toOrderDto(Order order);
 

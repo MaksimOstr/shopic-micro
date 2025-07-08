@@ -108,6 +108,7 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .GET("{id}", http())
                         .GET("", http())
+                        .PATCH("/{id}/update-contact-info", http())
                         .PATCH("/{id}/complete", http())
                         .PATCH("/{id}/cancel", http())
                         .PATCH("/{id}/process", http())

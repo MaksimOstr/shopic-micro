@@ -3,7 +3,9 @@ package com.orderservice.controller;
 import com.orderservice.dto.AdminOrderDto;
 import com.orderservice.dto.AdminOrderSummaryDto;
 import com.orderservice.dto.request.AdminOrderParams;
+import com.orderservice.dto.request.UpdateContactInfoRequest;
 import com.orderservice.service.AdminOrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/orders")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminOrderController {
     private final AdminOrderService adminOrderService;
 
@@ -42,6 +44,16 @@ public class AdminOrderController {
         Page<AdminOrderSummaryDto> orders = adminOrderService.getOrders(body, pageable);
 
         return ResponseEntity.ok().body(orders);
+    }
+
+    @PatchMapping("/{id}/update-contact-info")
+    public ResponseEntity<AdminOrderDto> updateContactInfo(
+            @PathVariable long id,
+            @RequestBody @Valid UpdateContactInfoRequest body
+    ) {
+        AdminOrderDto order = adminOrderService.updateOrderContactInfo(id, body);
+
+        return ResponseEntity.ok().body(order);
     }
 
     @PatchMapping("/{id}/complete")

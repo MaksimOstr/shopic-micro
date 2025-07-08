@@ -28,6 +28,7 @@ public class StripeController {
     ) {
         try {
             Event event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
+            System.out.println(event.getType());
             webhookService.handleWebhookEvent(event);
 
             return "OK";

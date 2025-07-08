@@ -15,8 +15,13 @@ import java.util.List;
 public class OrderDto {
     private final long orderId;
     private final OrderStatusEnum status;
-    private final BigDecimal price;
+    private final BigDecimal totalPrice;
     private final Instant updatedAt;
     private final Instant createdAt;
     private final List<OrderItemDto> orderItems;
+    private final String country;
+    private final String street;
+    private final String city;
+    private final String postalCode;
+    private final String houseNumber;
 }

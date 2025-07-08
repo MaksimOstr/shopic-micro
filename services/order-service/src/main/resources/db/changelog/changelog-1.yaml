@@ -40,6 +40,31 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: address_country
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address_street
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address_city
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address_postal_code
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address_house_number
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
                   name: user_id
                   type: bigint
                   constraints:

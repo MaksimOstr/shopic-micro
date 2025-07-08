@@ -1,11 +1,16 @@
 package com.orderservice.entity;
 
 import jakarta.persistence.Embeddable;
+import lombok.*;
 
 @Embeddable
-public record OrderCustomer(
-        String firstName,
-        String lastName,
-        String phoneNumber
-) {
+@Builder
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderCustomer {
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
 }

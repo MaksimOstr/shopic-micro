@@ -12,8 +12,33 @@ import java.util.List;
 public class AdminOrderDto extends OrderDto {
     private final long userId;
 
-    public AdminOrderDto(long orderId, OrderStatusEnum status, BigDecimal price, Instant updatedAt, Instant createdAt, List<OrderItemDto> orderItems, long userId) {
-        super(orderId, status, price, updatedAt, createdAt, orderItems);
+    public AdminOrderDto(
+            long orderId,
+            OrderStatusEnum status,
+            BigDecimal totalPrice,
+            Instant updatedAt,
+            Instant createdAt,
+            List<OrderItemDto> orderItems,
+            long userId,
+            String country,
+            String street,
+            String city,
+            String postalCode,
+            String houseNumber
+    ) {
+        super(
+                orderId,
+                status,
+                totalPrice,
+                updatedAt,
+                createdAt,
+                orderItems,
+                country,
+                street,
+                city,
+                postalCode,
+                houseNumber
+        );
         this.userId = userId;
     }
 

@@ -32,7 +32,7 @@ public class OrderController {
     public ResponseEntity<String> createOrder(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid CreateOrderRequest body
-            ) {
+    ) {
         String redirectUrl = orderCreationService.createOrder(principal.getId(), body);
 
         return ResponseEntity.ok(redirectUrl);

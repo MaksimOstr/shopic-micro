@@ -35,40 +35,10 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: address_country
-                  type: text
-                  constraints:
-                    nullable: false
-              - column:
-                  name: address_street
-                  type: text
-                  constraints:
-                    nullable: false
-              - column:
-                  name: address_city
-                  type: text
-                  constraints:
-                    nullable: false
-              - column:
-                  name: address_postal_code
-                  type: text
-                  constraints:
-                    nullable: false
-              - column:
-                  name: address_house_number
-                  type: text
-                  constraints:
-                    nullable: false
-              - column:
                   name: total_in_smallest_unit
                   type: bigint
                   constraints:
                     nullable: false
-              - column:
-                  name: payment_method
-                  type: varchar(20)
-                  constraints:
-                    nullable: false2
               - column:
                   name: amount
                   type: decimal(10, 2)
