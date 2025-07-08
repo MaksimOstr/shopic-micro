@@ -37,6 +37,10 @@ public class ProductQueryService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
+    public boolean isProductExist(long id) {
+        return productRepository.existsById(id);
+    }
+
     public Product getEnabledProductById(long id) {
         return productRepository.getEnabledProduct(id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));

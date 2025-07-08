@@ -62,4 +62,16 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void isProductExists(IsProductExistsRequest request, StreamObserver<IsProductExistsResponse> responseObserver) {
+        boolean isExists = productQueryService.isProductExist(request.getProductId());
+
+        IsProductExistsResponse response = IsProductExistsResponse.newBuilder()
+                .setIsExists(isExists)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 }

@@ -1,2 +1,95 @@
 databaseChangeLog:
-  - 
+  - changeSet:
+      id: 1
+      author: Maksim Ostroginskiy
+      changes:
+        - createSequence:
+            sequenceName: reviews_seq
+            startValue: 1
+            cacheSize: 50
+            incrementBy: 50
+        - createSequence:
+            sequenceName: review_comments_seq
+            startValue: 1
+            cacheSize: 50
+            incrementBy: 50
+
+        - createTable:
+            tableName: reviews
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: reviews_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rating
+                  type: decimal(2, 1)
+                  constraints:
+                    nullable: false
+                    checkConstraint: "rating BETWEEN 1.0 AND 5.0"
+              - column:
+                  name: comment
+                  type: varchar(2000)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: review_comments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: review_comments_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: review_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    deleteCascade: true
+                    foreignKeyName: fk_review_comment_review
+                    references: reviews(id)
+              - column:
+                  name: comment
+                  type: varchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+

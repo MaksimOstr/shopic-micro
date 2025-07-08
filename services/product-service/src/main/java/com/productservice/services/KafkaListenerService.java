@@ -1,9 +1,9 @@
 package com.productservice.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.productservice.dto.event.BaseOrderEvent;
+import com.productservice.services.products.ProductQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class KafkaListenerService {
     private final ObjectMapper objectMapper;
     private final ReservationService reservationService;
+    private final ProductQueryService productQueryService;
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
     @KafkaListener(topics = {"payment.unpaid", "order.canceled"}, groupId = "product-service")
