@@ -19,8 +19,6 @@ public class StripeController {
     private final WebhookService webhookService;
 
 
-
-
     @PostMapping("/webhook")
     public String handleWebhook(
             @RequestBody String payload,

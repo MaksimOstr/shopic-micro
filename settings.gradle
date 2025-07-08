@@ -36,4 +36,7 @@ project(':cart-service').projectDir = new File('services/cart-service')
 include ':payment-service'
 project(':payment-service').projectDir = new File('services/payment-service')
 
+include ':review-service'
+project(':review-service').projectDir = new File('services/review-service')
+
 include(":proto")

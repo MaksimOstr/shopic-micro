@@ -83,6 +83,18 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${PAYMENT_DB_NAME}
 
+  review-service-db:
+    image: postgres
+    restart: always
+    ports:
+      - "${REVIEW_DB_PORT}:5432"
+    volumes:
+      - /postgres/review-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${REVIEW_DB_NAME}
+
   kafka:
     image: apache/kafka:latest
     restart: always
