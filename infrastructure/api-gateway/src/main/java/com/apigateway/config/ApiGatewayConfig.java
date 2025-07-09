@@ -135,4 +135,17 @@ public class ApiGatewayConfig {
                         .GET("/{id}", http())
                 .build();
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> reviewServiceRoute(JwtHandlerFilter jwtHandlerFilter) {
+        return route("review-service-route")
+                .filter(lb("review-service"))
+                .path("/reviews", request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("", http())
+                        .POST("", http())
+                        .POST("/{id}/comment", http())
+                        .GET("/{id}/comments", http()))
+                .build();
+    }
 }

@@ -36,7 +36,7 @@ public class Review {
     @Column(length = 2000)
     private String comment;
 
-    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReviewComment> reviewComments;
 
     @CreatedDate
@@ -44,6 +44,6 @@ public class Review {
     private Instant createdAt;
 
     @LastModifiedDate
-    @Column(name = "update_at", nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 }

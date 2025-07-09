@@ -39,7 +39,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
+        log.info("Filtering authentication");
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
