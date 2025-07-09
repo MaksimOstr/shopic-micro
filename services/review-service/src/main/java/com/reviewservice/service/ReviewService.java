@@ -5,6 +5,7 @@ import com.reviewservice.dto.request.CreateReviewRequest;
 import com.reviewservice.entity.Review;
 import com.reviewservice.exception.NotFoundException;
 import com.reviewservice.mapper.ReviewMapper;
+import com.reviewservice.projection.ReviewForRating;
 import com.reviewservice.repository.ReviewRepository;
 import com.reviewservice.service.grpc.GrpcProductService;
 import com.shopic.grpc.productservice.IsProductExistsResponse;
@@ -23,7 +24,7 @@ import java.util.List;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final GrpcProductService grpcProductService;
-    private ReviewMapper reviewMapper;
+    private final ReviewMapper reviewMapper;
 
     @Transactional
     public void createReview(CreateReviewRequest dto, long userId) {
@@ -54,5 +55,9 @@ public class ReviewService {
     public Review getReview(long reviewId) {
         return reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new NotFoundException("Review not found"));
+    }
+
+    public List<ReviewForRating> getReviewsForRating(List<Long> productIds) {
+        return reviewRepository.findReviewsForRatingByProductId(productIds);
     }
 }

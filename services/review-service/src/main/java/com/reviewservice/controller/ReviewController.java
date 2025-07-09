@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
 @PreAuthorize("hasRole('USER')")
-
 public class ReviewController {
     private final ReviewService reviewService;
     private final ReviewCommentService reviewCommentService;
