@@ -23,4 +23,10 @@ public class ProductDto {
 
     @Setter
     private boolean isLiked;
+
+    @Setter
+    private BigDecimal rating;
+
+    @Setter
+    private int reviewCount;
 }

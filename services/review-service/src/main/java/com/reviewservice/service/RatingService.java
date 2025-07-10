@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +19,11 @@ public class RatingService {
 
     public List<RatingDto> getProductRating(List<Long> productIds) {
         List<ReviewForRating> reviewsForRating = reviewService.getReviewsForRating(productIds);
+
+        if(reviewsForRating == null || reviewsForRating.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         Map<Long, List<ReviewForRating>> reviewMap = getReviewMap(reviewsForRating);
 
         return productIds.stream()
@@ -26,8 +32,8 @@ public class RatingService {
 
                     return new RatingDto(
                             productId,
-                            calculateAverage(productReviews),
-                            productReviews.size()
+                            productReviews == null ? BigDecimal.ZERO : calculateAverage(productReviews),
+                            productReviews == null ? 0 : productReviews.size()
                     );
                 }).toList();
     }

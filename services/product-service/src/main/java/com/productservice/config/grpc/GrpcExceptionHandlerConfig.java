@@ -1,4 +1,4 @@
-package com.productservice.config;
+package com.productservice.config.grpc;
 
 import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;

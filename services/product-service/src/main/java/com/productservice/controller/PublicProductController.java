@@ -25,7 +25,7 @@ public class PublicProductController {
     private final UserProductFacade productFacade;
 
 
-    @GetMapping("/filter")
+    @GetMapping
     public ResponseEntity<Page<ProductDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -34,18 +34,6 @@ public class PublicProductController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<ProductDto> products = productFacade.getProductsByFilters(body, pageable, principal.getId());
-
-        return ResponseEntity.ok(products);
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<ProductDto>> getPageOfProducts(
-            @AuthenticationPrincipal CustomPrincipal principal,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProductDto> products = productFacade.getProductPage(pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }

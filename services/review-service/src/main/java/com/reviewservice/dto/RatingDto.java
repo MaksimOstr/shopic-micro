@@ -4,6 +4,6 @@ import java.math.BigDecimal;
 
 public record RatingDto(
         long productId,
-        BigDecimal average,
-        int count
+        BigDecimal rating,
+        Integer reviewCount
 ) {}

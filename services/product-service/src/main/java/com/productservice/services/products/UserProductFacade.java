@@ -32,10 +32,6 @@ public class UserProductFacade {
         return productSearchService.getPageOfProductsByFilters(spec, pageable, userId);
     }
 
-    public Page<ProductDto> getProductPage(Pageable pageable, long userId) {
-        return productSearchService.getPageOfProducts(pageable, userId);
-    }
-
     public List<ProductDto> getLikedProducts(long userId) {
         return productSearchService.getLikedProducts(userId);
     }

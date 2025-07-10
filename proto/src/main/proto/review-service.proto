@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package com.shopic.grpc.reviewservice;
+
+
+option java_multiple_files = true;
+option java_package = "com.shopic.grpc.reviewservice";
+
+
+
+
+message ProductRatingsRequest {
+  repeated int64 product_id = 1;
+}
+
+message ProductRatingsResponse {
+  repeated ProductRating product_rating = 1;
+}
+
+message ProductRating {
+  int64 product_id = 1;
+  string rating = 2;
+  int32 review_count = 3;
+}
+
+
+
+
+service ReviewService {
+  rpc getProductRatings(ProductRatingsRequest) returns (ProductRatingsResponse);
+}
