@@ -1,13 +1,10 @@
 package com.reviewservice.controller;
 
 import com.reviewservice.config.security.model.CustomPrincipal;
-import com.reviewservice.dto.ReviewCommentDto;
 import com.reviewservice.dto.ReviewDto;
-import com.reviewservice.dto.request.CreateReviewCommentRequest;
 import com.reviewservice.dto.request.CreateReviewRequest;
-import com.reviewservice.service.ReviewCommentService;
+import com.reviewservice.dto.request.UpdateReviewRequest;
 import com.reviewservice.service.ReviewService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('USER')")
 public class ReviewController {
     private final ReviewService reviewService;
-    private final ReviewCommentService reviewCommentService;
 
     @PostMapping
     public ResponseEntity<Void> createReview(
@@ -33,17 +29,6 @@ public class ReviewController {
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         reviewService.createReview(body, principal.getId());
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @PostMapping("/{id}/comment")
-    public ResponseEntity<Void> createReviewComment(
-            @PathVariable Long id,
-            @AuthenticationPrincipal CustomPrincipal principal,
-            @RequestBody @Valid CreateReviewCommentRequest body
-    ) {
-        reviewCommentService.createReviewComment(body, principal.getId(), id);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -60,15 +45,24 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/{id}/comments")
-    public ResponseEntity<Page<ReviewCommentDto>> getReviewComments(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @PathVariable long id
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updateReview(
+            @RequestBody UpdateReviewRequest body,
+            @AuthenticationPrincipal CustomPrincipal principal,
+            @PathVariable Long id
     ) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ReviewCommentDto> reviews = reviewCommentService.getReviewComments(id, pageable);
+        reviewService.updateReview(body, principal.getId(), id);
 
-        return ResponseEntity.ok(reviews);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        reviewService.deleteReview(id, principal.getId());
+
+        return ResponseEntity.ok().build();
     }
 }

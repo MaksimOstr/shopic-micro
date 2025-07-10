@@ -143,8 +143,22 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .GET("", http())
                         .POST("", http())
-                        .POST("/{id}/comment", http())
-                        .GET("/{id}/comments", http()))
+                        .PATCH("/{id}", http())
+                        .DELETE("/{id}", http()))
+                .path("/review-comments", request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("", http())
+                        .POST("", http())
+                        .PATCH("/{id}", http())
+                        .DELETE("/{id}", http()))
+                .path("/admin/reviews", request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("", http())
+                        .DELETE("/{id}", http()))
+                .path("/admin/review-comments", request -> request
+                        .filter(jwtHandlerFilter)
+                        .DELETE("/{id}", http())
+                        .GET("", http()))
                 .build();
     }
 }
