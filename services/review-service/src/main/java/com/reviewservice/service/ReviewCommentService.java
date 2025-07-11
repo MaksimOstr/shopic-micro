@@ -86,6 +86,11 @@ public class ReviewCommentService {
         }
     }
 
+    public ReviewComment getReviewComment(long commentId) {
+        return reviewCommentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Review not found"));
+    }
+
     public void adminDeleteReviewComment(long commentId) {
         int deleted = reviewCommentRepository.deleteById(commentId);
 

@@ -159,6 +159,9 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .DELETE("/{id}", http())
                         .GET("", http()))
+                .path("/reports", request -> request
+                        .POST("/comment", http())
+                        .POST("/review", http()))
                 .build();
     }
 }
