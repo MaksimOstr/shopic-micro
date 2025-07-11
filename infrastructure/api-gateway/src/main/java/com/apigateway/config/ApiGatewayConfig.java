@@ -160,8 +160,16 @@ public class ApiGatewayConfig {
                         .DELETE("/{id}", http())
                         .GET("", http()))
                 .path("/reports", request -> request
+                        .filter(jwtHandlerFilter)
                         .POST("/comment", http())
-                        .POST("/review", http()))
+                        .POST("/review", http())
+                        .GET("", http())
+                        .GET("/{id}", http()))
+                .path("admin/reports", request -> request
+                    .filter(jwtHandlerFilter)
+                        .PATCH("/{id}/status", http())
+                        .GET("", http())
+                        .GET("/{id}", http()))
                 .build();
     }
 }

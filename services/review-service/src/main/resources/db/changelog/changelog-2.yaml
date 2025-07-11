@@ -51,13 +51,19 @@ databaseChangeLog:
                   constraints:
                     references: reviews(id)
                     foreignKeyName: fk_reports_review
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
         - sql:
             sql: >
-              ALTER TABLE report
+              ALTER TABLE reports
               ADD CONSTRAINT chk_report_target
               CHECK (
                   (report_type = 'REVIEW' AND review_id IS NOT NULL AND comment_id IS NULL)
-                  OR (report_type = 'COMMENT' AND comment_id IS NOT NULL AND review_id IS NULL
+                  OR (report_type = 'COMMENT' AND comment_id IS NOT NULL AND review_id IS NULL)
               )
 
 
