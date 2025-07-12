@@ -26,7 +26,7 @@ public class Report {
     @Enumerated(EnumType.STRING)
     private ReportStatus status;
 
-    @Column(name = "report_type", nullable = false)
+    @Column(name = "report_type", nullable = false, insertable=false, updatable=false)
     private String reportType;
 
     private Long reporter;

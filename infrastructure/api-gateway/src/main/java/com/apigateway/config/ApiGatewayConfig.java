@@ -163,8 +163,7 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .POST("/comment", http())
                         .POST("/review", http())
-                        .GET("", http())
-                        .GET("/{id}", http()))
+                        .GET("", http()))
                 .path("admin/reports", request -> request
                     .filter(jwtHandlerFilter)
                         .PATCH("/{id}/status", http())

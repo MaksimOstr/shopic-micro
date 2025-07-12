@@ -3,7 +3,6 @@ package com.reviewservice.controller;
 import com.reviewservice.dto.ReportDto;
 import com.reviewservice.dto.request.AdminReportParams;
 import com.reviewservice.dto.request.ReportStatusUpdateRequest;
-import com.reviewservice.entity.Report;
 import com.reviewservice.service.ReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ public class AdminReportController {
     private final ReportService reportService;
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> approveReport(
+    public ResponseEntity<Void> changeReportStatus(
             @PathVariable int id,
             @RequestBody @Valid ReportStatusUpdateRequest body
     ) {

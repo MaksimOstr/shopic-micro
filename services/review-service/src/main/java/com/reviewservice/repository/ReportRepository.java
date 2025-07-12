@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface ReportRepository extends JpaRepository<Report, Long>, JpaSpecificationExecutor<Report> {
 
     Optional<Report> findByIdAndReporter(long id, long reporter);
+
+
 }

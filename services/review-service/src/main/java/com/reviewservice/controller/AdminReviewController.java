@@ -2,7 +2,6 @@ package com.reviewservice.controller;
 
 import com.reviewservice.dto.ReviewDto;
 import com.reviewservice.dto.request.ReviewParams;
-import com.reviewservice.entity.Review;
 import com.reviewservice.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,7 +22,7 @@ public class AdminReviewController {
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long id
     ) {
-        reviewService.adminDeleteReview(id);
+        reviewService.deleteReview(id);
 
         return ResponseEntity.ok().build();
     }

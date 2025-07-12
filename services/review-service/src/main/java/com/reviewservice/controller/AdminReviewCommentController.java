@@ -24,7 +24,7 @@ public class AdminReviewCommentController {
     public ResponseEntity<Void> deleteReviewComment(
             @PathVariable long id
     ) {
-        reviewCommentService.adminDeleteReviewComment(id);
+        reviewCommentService.deleteReviewComment(id);
 
         return ResponseEntity.ok().build();
     }

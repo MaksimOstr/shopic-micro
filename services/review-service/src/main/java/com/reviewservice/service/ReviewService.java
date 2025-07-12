@@ -70,14 +70,6 @@ public class ReviewService {
         return new PageImpl<>(reviewDtoList, pageable, reviews.getTotalElements());
     }
 
-    public void adminDeleteReview(long reviewId) {
-        int deleted = reviewRepository.deleteById(reviewId);
-
-        if(deleted == 0) {
-            throw new NotFoundException("Review was not found");
-        }
-    }
-
     public Page<ReviewDto> getReviewsBySpec(Pageable pageable, ReviewParams params) {
         Specification<Review> spec = SpecificationUtils.<Review> equalsLong("userId", params.userId())
                 .and(equalsLong("productId", params.productId()))
@@ -95,6 +87,14 @@ public class ReviewService {
 
     public void deleteReview(long reviewId, long userId) {
         int deleted = reviewRepository.deleteByIdAndUserId(reviewId, userId);
+
+        if(deleted == 0) {
+            throw new NotFoundException("Review was not found");
+        }
+    }
+
+    public void deleteReview(long reviewId) {
+        int deleted = reviewRepository.deleteById(reviewId);
 
         if(deleted == 0) {
             throw new NotFoundException("Review was not found");

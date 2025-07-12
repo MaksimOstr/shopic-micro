@@ -7,7 +7,9 @@ import com.reviewservice.dto.request.CreateCommentReport;
 import com.reviewservice.dto.request.CreateReviewReport;
 import com.reviewservice.dto.request.UserReportParams;
 import com.reviewservice.entity.Report;
+import com.reviewservice.service.CommentReportService;
 import com.reviewservice.service.ReportService;
+import com.reviewservice.service.ReviewReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/reports")
@@ -26,6 +27,8 @@ import java.util.List;
 @PreAuthorize("hasRole('USER')")
 public class ReportController {
     private final ReportService reportService;
+    private final ReviewReportService reviewReportService;
+    private final CommentReportService commentReportService;
 
 
     @PostMapping("/comment")
@@ -33,7 +36,7 @@ public class ReportController {
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid CreateCommentReport body
     ) {
-        reportService.reportComment(body, principal.getId());
+        commentReportService.reportComment(body, principal.getId());
 
         return ResponseEntity.ok().build();
     }
@@ -43,21 +46,10 @@ public class ReportController {
             @RequestBody @Valid CreateReviewReport body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        reportService.reportReview(body, principal.getId());
+        reviewReportService.reportReview(body, principal.getId());
 
         return ResponseEntity.ok().build();
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ReportDto> getReport(
-            @PathVariable long id,
-            @AuthenticationPrincipal CustomPrincipal principal
-    ) {
-        ReportDto report = reportService.getReportDto(id, principal.getId());
-
-        return ResponseEntity.ok(report);
-    }
-
 
     @GetMapping
     public ResponseEntity<Page<ReportStatusDto>> getReports(

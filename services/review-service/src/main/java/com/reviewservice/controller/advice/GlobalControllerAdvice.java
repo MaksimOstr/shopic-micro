@@ -1,6 +1,7 @@
 package com.reviewservice.controller.advice;
 
 import com.reviewservice.dto.response.ErrorResponseDto;
+import com.reviewservice.exception.ForbiddenException;
 import com.reviewservice.exception.InternalException;
 import com.reviewservice.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -39,5 +40,14 @@ public class GlobalControllerAdvice {
             errors.put(error.getField(), error.getDefaultMessage());
         });
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    private ResponseEntity<ErrorResponseDto> handleForbiddenException(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponseDto(
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                HttpStatus.FORBIDDEN.value(),
+                e.getMessage()
+        ));
     }
 }
