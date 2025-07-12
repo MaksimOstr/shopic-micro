@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReviewReportRepository extends CrudRepository<ReviewReport, Long> {
-
+    boolean existsByReview_IdAndReporter(Long reviewId, Long reporter);
 }

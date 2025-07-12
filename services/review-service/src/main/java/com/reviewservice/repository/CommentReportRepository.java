@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentReportRepository extends JpaRepository<ReviewCommentReport, Long> {
+    boolean existsByComment_IdAndReporter(Long commentId, Long reporter);
 }

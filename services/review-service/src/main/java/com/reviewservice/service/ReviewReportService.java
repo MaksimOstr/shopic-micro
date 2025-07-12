@@ -17,6 +17,12 @@ public class ReviewReportService {
     private final ReviewService reviewService;
 
     public void reportReview(CreateReviewReport dto, long userId) {
+        boolean isReportExist = reviewReportRepository.existsByReview_IdAndReporter(dto.reviewId(), userId);
+
+        if(isReportExist) {
+            throw new ForbiddenException("You are already reported a review");
+        }
+
         Review review = reviewService.getReview(dto.reviewId());
 
         if(review.getUserId() == userId) {

@@ -17,6 +17,12 @@ public class CommentReportService {
 
 
     public void reportComment(CreateCommentReport dto, long userId) {
+        boolean isReportExist = commentReportRepository.existsByComment_IdAndReporter(dto.commentId(), userId);
+
+        if(isReportExist) {
+            throw new ForbiddenException("You are already reported a comment");
+        }
+
         ReviewComment comment = reviewCommentService.getReviewComment(dto.commentId());
 
         if(comment.getUserId() == userId) {
