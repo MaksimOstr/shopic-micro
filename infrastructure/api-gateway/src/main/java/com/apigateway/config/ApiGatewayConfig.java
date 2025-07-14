@@ -56,7 +56,8 @@ public class ApiGatewayConfig {
                         .PATCH("", http()))
                 .path("/bans", request -> request
                         .filter(jwtHandlerFilter)
-                        .POST("", http()))
+                        .POST("", http())
+                        .PATCH("/{id}/unban", http()))
                 .build();
     }
 

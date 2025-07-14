@@ -36,11 +36,14 @@ public class Ban {
     @JoinColumn(name = "banned_by", nullable = false)
     private User bannedBy;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "unbanned_by")
+    private User unbannedBy;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
-
-    public boolean isActive() {
-        return banTo.isAfter(Instant.now());
-    }
 }

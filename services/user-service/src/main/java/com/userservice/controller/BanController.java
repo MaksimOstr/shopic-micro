@@ -26,4 +26,14 @@ public class BanController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/{id}/unban")
+    public ResponseEntity<Void> unbanUser(
+            @AuthenticationPrincipal CustomPrincipal principal,
+            @PathVariable long id
+    ) {
+        banService.unbanUser(id, principal.getId());
+
+        return ResponseEntity.ok().build();
+    }
 }

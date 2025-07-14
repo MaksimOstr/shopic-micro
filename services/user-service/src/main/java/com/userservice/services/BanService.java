@@ -1,14 +1,18 @@
 package com.userservice.services;
 
 import com.userservice.dto.request.BanRequest;
+import com.userservice.dto.request.UnbanRequest;
 import com.userservice.entity.Ban;
 import com.userservice.entity.User;
+import com.userservice.exceptions.NotFoundException;
 import com.userservice.repositories.BanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Objects;
 
 @Slf4j
@@ -41,5 +45,23 @@ public class BanService {
         kafkaEventProducer.sendUserBanned(user.getEmail(), dto.reason());
 
         log.info("User {} banned successfully", dto.userId());
+    }
+
+    @Transactional
+    public void unbanUser(long banId, long unbannerId) {
+        Ban ban = banRepository.findById(banId)
+                .orElseThrow(() -> new NotFoundException("Ban not found"));
+        User unbanner = queryUserService.findById(unbannerId);
+
+        ban.setUnbannedBy(unbanner);
+        ban.setActive(false);
+        ban.setBanTo(Instant.now());
+    }
+
+
+    @Scheduled(fixedRate = 1000 * 60)
+    public void updateExpiredBans() {
+        banRepository.deactivateExpiredBans();
+        log.info("Expired bans have been updated");
     }
 }

@@ -73,6 +73,18 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
+                  name: is_active
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: unbanned_by
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    references: users(id)
+                    foreignKeyName: fk_bans_unbanned_by_user
+              - column:
                   name: reason
                   type: text
                   constraints:
