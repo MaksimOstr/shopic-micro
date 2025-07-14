@@ -17,10 +17,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Time;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.reviewservice.utils.SpecificationUtils.*;
 
@@ -72,5 +78,12 @@ public class ReportService {
     private Report getReport(long reportId) {
         return reportRepository.findById(reportId)
                 .orElseThrow(() -> new NotFoundException("Report not found"));
+    }
+
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void deleteOldReports() {
+        Instant deleteTime = Instant.now().minus(Duration.ofDays(30));
+
+        reportRepository.deleteByCreatedAtBefore(deleteTime);
     }
 }

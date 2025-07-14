@@ -30,7 +30,7 @@ public class ReviewCommentService {
     private final ReviewService reviewService;
     private final ReviewCommentMapper reviewCommentMapper;
 
-
+    @Transactional
     public void createReviewComment(CreateReviewCommentRequest dto, long userId) {
         Review review = reviewService.getReview(dto.reviewId());
 
@@ -44,6 +44,7 @@ public class ReviewCommentService {
         reviewCommentRepository.save(reviewComment);
     }
 
+    @Transactional(readOnly = true)
     public Page<ReviewCommentDto> getReviewComments(long reviewId, Pageable pageable) {
         Page<ReviewComment> comments = reviewCommentRepository.findByReviewId(reviewId, pageable);
         List<ReviewComment> commentList = comments.getContent();
@@ -66,6 +67,7 @@ public class ReviewCommentService {
         reviewComment.setComment(dto.comment());
     }
 
+    @Transactional(readOnly = true)
     public Page<ReviewCommentDto> getReviewCommentsBySpec(ReviewCommentParams params, Pageable pageable) {
         Specification<ReviewComment> spec = SpecificationUtils.<ReviewComment>equalsLong("userId", params.userId())
                 .and(hasChild("review", params.reviewId()))

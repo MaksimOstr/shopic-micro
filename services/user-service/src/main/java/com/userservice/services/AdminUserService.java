@@ -23,7 +23,6 @@ import static com.userservice.utils.SpecificationUtils.*;
 @Service
 @RequiredArgsConstructor
 public class AdminUserService {
-    private final UserRepository userRepository;
     private final QueryUserService queryUserService;
     private final UserMapper userMapper;
 

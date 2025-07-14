@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,6 +29,9 @@ public class User {
 
     @Column(name = "account_non_locked", nullable = false)
     private Boolean isAccountNonLocked;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Ban> bans;
 
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified;

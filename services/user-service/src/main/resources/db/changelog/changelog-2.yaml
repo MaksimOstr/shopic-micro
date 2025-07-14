@@ -7,6 +7,11 @@ databaseChangeLog:
             sequenceName: email_change_requests_seq
             startValue: 1
             incrementBy: 50
+        - createSequence:
+            sequenceName: bans_seq
+            startValue: 1
+            incrementBy: 50
+
         - createTable:
             tableName: email_change_requests
             columns:
@@ -37,3 +42,39 @@ databaseChangeLog:
                   defaultValueComputed: CURRENT_TIMESTAMP
                   constraints:
                     nullable: false
+
+        - createTable:
+            tableName: bans
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: bans_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    references: users(id)
+              - column:
+                  name: ban_to
+                  type: timestamptz
+                  constraints:
+                    nullable: true
+              - column:
+                  name: reason
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+
+

@@ -25,7 +25,6 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.isVerified = isVerified;
         this.userId = userId;
         this.authorities = mapToAuthorities(roleNames);
-        System.out.println(this.authorities);
     }
 
     @Override

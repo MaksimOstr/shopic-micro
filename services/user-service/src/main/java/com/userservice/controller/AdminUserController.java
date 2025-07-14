@@ -2,8 +2,10 @@ package com.userservice.controller;
 
 import com.userservice.dto.UserDetailsDto;
 import com.userservice.dto.UserSummaryDto;
+import com.userservice.dto.request.BanRequest;
 import com.userservice.dto.request.UserParams;
 import com.userservice.services.AdminUserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +39,14 @@ public class AdminUserController {
         Page<UserSummaryDto> userPage = adminUserService.getUserPage(params, pageable);
 
         return ResponseEntity.ok(userPage);
+    }
+
+    @PatchMapping("/{id}/ban")
+    public ResponseEntity<Void> banUser(
+            @PathVariable Long id,
+            @RequestBody @Valid BanRequest body
+    ) {
+
     }
 
 
