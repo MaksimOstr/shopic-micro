@@ -22,7 +22,7 @@ public class EmailController {
     public ResponseEntity<Void> requestEmailChange(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid ChangeEmailRequest body
-    ) throws JsonProcessingException {
+    ) {
         emailChangeRequestService.createRequest(body, principal.getId());
 
         return ResponseEntity.ok().build();

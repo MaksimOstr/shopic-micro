@@ -38,12 +38,6 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
-                  name: account_non_locked
-                  type: boolean
-                  defaultValueBoolean: true
-                  constraints:
-                    nullable: false
-              - column:
                   name: is_verified
                   type: boolean
                   defaultValueBoolean: false

@@ -3,6 +3,7 @@ package com.mailservice.services;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mailservice.dto.event.SendCodeEvent;
+import com.mailservice.dto.event.UserBannedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -51,6 +52,26 @@ public class KafkaListenerService {
 
         acknowledgment.acknowledge();
     }
+
+    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 1000))
+    @KafkaListener(topics = {"user.banned"}, groupId = "mail-service")
+    public void listenUserBanned(String data, Acknowledgment acknowledgment) {
+        try {
+            UserBannedEvent event = objectMapper.readValue(data, UserBannedEvent.class);
+
+            String subject = "Your account was banned";
+
+            String text = "Your account was banned: " + event.reason();
+
+            mailService.send(event.email(), subject, text);
+
+            acknowledgment.acknowledge();
+        } catch (JacksonException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+
 
     private void sendCode(String data, String subject, String text) {
         try {

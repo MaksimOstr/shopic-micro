@@ -22,7 +22,7 @@ public class ForgotPasswordService {
     private final PasswordService  passwordService;
     private final QueryUserService queryUserService;
 
-    public void requestResetPassword(ForgotPasswordRequest dto) throws JsonProcessingException {
+    public void requestResetPassword(ForgotPasswordRequest dto) {
         ResetPasswordProjection user = queryUserService.getUserForResetPassword(dto.email());
 
         if(user.getAuthProvider() != AuthProviderEnum.LOCAL) {

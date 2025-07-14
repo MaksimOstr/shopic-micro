@@ -26,7 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query("SELECT u.id as id, u.isVerified as verified FROM User u WHERE u.email = :email")
     Optional<EmailVerifyProjection> findUserForEmailVerify(String email);
 
-    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.email = :email")
+    @Query("SELECT u FROM User u JOIN FETCH u.roles LEFT JOIN FETCH u.bans WHERE u.email = :email")
     Optional<User> getUserForAuth(String email);
 
     @EntityGraph(attributePaths = {"roles"})

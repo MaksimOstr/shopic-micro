@@ -31,9 +31,8 @@ public interface GrpcMapper {
     @Mapping(target = "roleNamesList", ignore = true)
     @Mapping(target = "provider", source = "authProvider")
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "isAccountNonLocked", source = "accountNonLocked")
     UserForAuthGrpcResponse toAuthResponse(User user);
-
-
 
     @AfterMapping
     default void afterMapping(@MappingTarget UserForAuthGrpcResponse.Builder builder, User user) {

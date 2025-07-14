@@ -30,7 +30,7 @@ public class EmailChangeRequestService {
     private final EntityManager entityManager;
 
     @Transactional
-    public void createRequest(ChangeEmailRequest dto, long userId) throws JsonProcessingException {
+    public void createRequest(ChangeEmailRequest dto, long userId) {
         boolean isUserExists = queryUserService.isUserExist(dto.email());
         if (isUserExists) {
             throw new EntityAlreadyExistsException("This email already exists");

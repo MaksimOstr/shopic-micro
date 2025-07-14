@@ -26,7 +26,7 @@ public class VerificationController {
     @PostMapping("/request")
     public ResponseEntity<String> requestVerificationCode(
             @RequestBody @Valid EmailVerifyRequestDto body
-    ) throws JsonProcessingException {
+    ) {
         verificationService.requestVerifyEmail(body.email());
         return ResponseEntity.ok("Verification code sent to: " + body.email());
     }

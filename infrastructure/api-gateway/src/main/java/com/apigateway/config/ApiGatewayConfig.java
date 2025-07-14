@@ -54,6 +54,9 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .GET("", http())
                         .PATCH("", http()))
+                .path("/bans", request -> request
+                        .filter(jwtHandlerFilter)
+                        .POST("", http()))
                 .build();
     }
 

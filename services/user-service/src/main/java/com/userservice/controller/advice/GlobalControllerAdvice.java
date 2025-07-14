@@ -59,4 +59,13 @@ public class GlobalControllerAdvice {
                 e.getMessage()
         ));
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponseDto> handleIllegalStateException(IllegalStateException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDto(
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                HttpStatus.CONFLICT.value(),
+                e.getMessage()
+        ));
+    }
 }

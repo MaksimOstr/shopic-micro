@@ -59,6 +59,14 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     references: users(id)
+                    foreignKeyName: fk_bans_user
+              - column:
+                  name: banned_by
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    references: users(id)
+                    foreignKeyName: fk_bans_banned_by_user
               - column:
                   name: ban_to
                   type: timestamptz

@@ -11,6 +11,9 @@ public record BanRequest(
         @Future
         Instant banTo,
 
+        @NotNull
+        Long userId,
+
         @NotBlank
         String reason
 ) {}

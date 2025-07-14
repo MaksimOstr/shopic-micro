@@ -19,7 +19,7 @@ public class ForgotPasswordController {
     @PostMapping("/request")
     public ResponseEntity<Void> forgotPasswordRequest(
             @RequestBody @Valid ForgotPasswordRequest body
-    ) throws JsonProcessingException {
+    ) {
         forgotPasswordService.requestResetPassword(body);
 
         return ResponseEntity.ok().build();

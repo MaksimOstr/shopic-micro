@@ -27,9 +27,6 @@ public class User {
 
     private String password;
 
-    @Column(name = "account_non_locked", nullable = false)
-    private Boolean isAccountNonLocked;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Ban> bans;
 
@@ -55,6 +52,11 @@ public class User {
     )
     private Set<Role> roles;
 
+    @Transient
+    public Boolean isAccountNonLocked() {
+        return bans.stream().noneMatch(Ban::isActive);
+    }
+
     public User(String email, String password, Set<Role> roles) {
         this.email = email;
         this.password = password;
@@ -64,9 +66,6 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
-        if(isAccountNonLocked == null) {
-            isAccountNonLocked = true;
-        }
         if(isVerified == null) {
             isVerified = true;
         }

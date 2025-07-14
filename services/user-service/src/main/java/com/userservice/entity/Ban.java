@@ -3,6 +3,7 @@ package com.userservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -29,6 +30,11 @@ public class Ban {
     private Instant banTo;
 
     private String reason;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @CreatedBy
+    @JoinColumn(name = "banned_by", nullable = false)
+    private User bannedBy;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

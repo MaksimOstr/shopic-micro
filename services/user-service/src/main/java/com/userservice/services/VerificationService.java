@@ -22,7 +22,7 @@ public class VerificationService {
     private final QueryUserService queryUserService;
 
     @Transactional
-    public void requestVerifyEmail(String email) throws JsonProcessingException {
+    public void requestVerifyEmail(String email) {
         EmailVerifyProjection user = queryUserService.getUserForEmailVerify(email);
 
         if (user.getVerified()) {
