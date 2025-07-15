@@ -5,6 +5,7 @@ import com.userservice.dto.response.CreateOAuthUserResponse;
 import com.userservice.entity.AuthProviderEnum;
 import com.userservice.entity.Role;
 import com.userservice.entity.User;
+import com.userservice.mapper.UserMapper;
 import com.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
-import static com.userservice.utils.UserUtils.userRolesToRoleNames;
 
 
 @Service
@@ -22,12 +22,12 @@ public class OAuthUserService {
     private final RoleService roleService;
     private final ProfileService profileService;
     private final QueryUserService queryUserService;
+    private final UserMapper userMapper;
 
     @Transactional
     public CreateOAuthUserResponse createOrGetOAuthUser(CreateOAuthUserRequest dto) {
-        System.out.println(dto.email());
         return queryUserService.findOptionalByEmail(dto.email())
-                .map(this::mapToOAuthResponse)
+                .map(userMapper::toCreateOAuthUserResponse)
                 .orElseGet(() -> createOAuthUser(dto));
     }
 
@@ -43,15 +43,6 @@ public class OAuthUserService {
 
         profileService.createProfile(dto.profile(), savedUser);
 
-        return mapToOAuthResponse(savedUser);
-    }
-
-    private CreateOAuthUserResponse mapToOAuthResponse(User user) {
-        return new CreateOAuthUserResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getAuthProvider(),
-                userRolesToRoleNames(user.getRoles())
-        );
+        return userMapper.toCreateOAuthUserResponse(savedUser);
     }
 }

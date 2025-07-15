@@ -1,6 +1,5 @@
 package com.userservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.userservice.dto.request.ForgotPasswordRequest;
 import com.userservice.dto.request.ResetPasswordRequest;
 import com.userservice.services.ForgotPasswordService;

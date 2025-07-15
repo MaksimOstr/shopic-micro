@@ -1,10 +1,16 @@
 package com.userservice.controller;
 
 import com.userservice.config.security.model.CustomPrincipal;
+import com.userservice.dto.BanDto;
+import com.userservice.dto.request.BanParams;
 import com.userservice.dto.request.BanRequest;
 import com.userservice.services.BanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +27,7 @@ public class BanController {
     public ResponseEntity<Void> banUser(
             @RequestBody @Valid BanRequest body,
             @AuthenticationPrincipal CustomPrincipal principal
-            ) {
+    ) {
         banService.banUser(body, principal.getId());
 
         return ResponseEntity.ok().build();
@@ -35,5 +41,28 @@ public class BanController {
         banService.unbanUser(id, principal.getId());
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<BanDto>> getBans(
+            @RequestBody BanParams body,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+        Pageable pageable = PageRequest.of(page, size, direction, "createdAt");
+        Page<BanDto> bans = banService.getBans(body, pageable);
+
+        return ResponseEntity.ok(bans);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BanDto> getBan(
+            @PathVariable long id
+    ) {
+        BanDto ban = banService.getBan(id);
+
+        return ResponseEntity.ok(ban);
     }
 }

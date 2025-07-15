@@ -3,6 +3,7 @@ package com.userservice.mapper;
 import com.userservice.dto.UserDetailsDto;
 import com.userservice.dto.UserSummaryDto;
 import com.userservice.dto.response.CreateLocalUserResponse;
+import com.userservice.dto.response.CreateOAuthUserResponse;
 import com.userservice.entity.Profile;
 import com.userservice.entity.User;
 import org.mapstruct.*;
@@ -12,15 +13,20 @@ import org.mapstruct.*;
 public interface UserMapper {
 
     @Mapping(target = "userId", source = "user.id")
-    CreateLocalUserResponse toCreateUserResponseDto(User user, Profile profile);
+    CreateLocalUserResponse toCreateLocalUserResponse(User user, Profile profile);
 
     @Mapping(target = "firstName", source = "user.profile.firstName")
     @Mapping(target = "lastName", source = "user.profile.lastName")
-    @Mapping(target = "phoneNumber", source = "user.profile.phoneNumber")
     UserDetailsDto toUserDetailsDto(User user);
+
+    @Mapping(target = "roleNames", source = "roles")
+    @Mapping(target = "userId", source = "id")
+    @Mapping(target = "provider", source = "authProvider")
+    CreateOAuthUserResponse toCreateOAuthUserResponse(User user);
 
     @Mapping(target = "firstName", source = "user.profile.firstName")
     @Mapping(target = "lastName", source = "user.profile.lastName")
     UserSummaryDto toUserSummaryDto(User user);
+
 
 }

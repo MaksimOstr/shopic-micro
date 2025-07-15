@@ -82,11 +82,6 @@ databaseChangeLog:
                   type: varchar(50)
                   constraints:
                     nullable: false
-              - column:
-                  name: phone_number
-                  type: varchar(30)
-                  constraints:
-                    nullable: true
         - addForeignKeyConstraint:
             baseTableName: profiles
             baseColumnNames: user_id

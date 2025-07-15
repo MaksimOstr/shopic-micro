@@ -6,13 +6,14 @@ import com.userservice.dto.request.CreateLocalUserRequest;
 import com.userservice.dto.request.CreateOAuthUserRequest;
 import com.userservice.dto.response.CreateLocalUserResponse;
 import com.userservice.dto.response.CreateOAuthUserResponse;
+import com.userservice.entity.Role;
 import com.userservice.entity.User;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import static com.userservice.utils.UserUtils.userRolesToRoleNames;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
@@ -36,7 +37,8 @@ public interface GrpcMapper {
 
     @AfterMapping
     default void afterMapping(@MappingTarget UserForAuthGrpcResponse.Builder builder, User user) {
-        builder.addAllRoleNames(userRolesToRoleNames(user.getRoles()));
+        List<String> roleNames = user.getRoles().stream().map(Role::getName).toList();
+        builder.addAllRoleNames(roleNames);
     }
 
     @AfterMapping

@@ -1,6 +1,6 @@
 package com.userservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.userservice.config.security.model.CustomPrincipal;
 import com.userservice.dto.request.ChangeEmailRequest;
 import com.userservice.services.EmailChangeRequestService;

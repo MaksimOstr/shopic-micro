@@ -38,7 +38,7 @@ public class LocalUserService {
         User savedUser = userRepository.save(user);
         Profile profile = profileService.createProfile(dto.profile(), savedUser);
 
-        return userMapper.toCreateUserResponseDto(savedUser, profile);
+        return userMapper.toCreateLocalUserResponse(savedUser, profile);
     }
 
     private User createLocalUserEntity(CreateLocalUserRequest dto) {

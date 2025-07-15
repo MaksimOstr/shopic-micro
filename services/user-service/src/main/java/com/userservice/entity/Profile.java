@@ -26,7 +26,4 @@ public class Profile {
 
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
-
-    @Column(name = "phone_number", length = 30)
-    private String phoneNumber;
 }

@@ -3,6 +3,7 @@ package com.userservice.dto;
 import com.userservice.entity.AuthProviderEnum;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 public record UserDetailsDto(
@@ -15,5 +16,5 @@ public record UserDetailsDto(
         Boolean isVerified,
         Instant createdAt,
         String phoneNumber,
-        Set<String> roles
+        List<String> roles
 ) {}

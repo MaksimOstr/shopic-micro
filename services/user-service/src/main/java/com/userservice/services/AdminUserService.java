@@ -6,6 +6,7 @@ import com.userservice.dto.request.UserParams;
 import com.userservice.entity.User;
 import com.userservice.mapper.UserMapper;
 import com.userservice.repositories.UserRepository;
+import com.userservice.utils.SpecificationUtils;
 import jakarta.persistence.criteria.JoinType;
 import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class AdminUserService {
 
     public Page<UserSummaryDto> getUserPage(UserParams params, Pageable pageable) {
 
-        Specification<User> spec = is("isAccountNonLocked", params.isAccountNonLocked())
+        Specification<User> spec = SpecificationUtils.<User>is("isAccountNonLocked", params.isAccountNonLocked())
                 .and(is("isVerified", params.isVerified()))
                 .and(iLike("email", params.email()))
                 .and(equalsId(params.id()))
