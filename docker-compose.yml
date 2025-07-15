@@ -58,6 +58,10 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${PRODUCT_DB_NAME}
+    command: >
+      -c wal_level=logical
+      -c max_wal_senders=8
+      -c max_replication_slots=8
 
   cart-service-db:
     image: postgres
@@ -100,6 +104,8 @@ services:
     restart: always
     container_name: kafka
     hostname: kafka
+    volumes:
+      - /kafka/data
     ports:
       - "9092:9092"
       - "9094:9094"
@@ -119,6 +125,35 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_NUM_PARTITIONS: 3
+
+  debezium:
+    image: debezium/connect:2.7.3.Final
+    depends_on:
+      - kafka
+      - product-service-db
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: connectors
+      CONNECT_STATUS_STORAGE_TOPIC: connector-status
+      CONFIG_STORAGE_TOPIC: debezium_configs
+      OFFSET_STORAGE_TOPIC: debezium_offsets
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+    ports:
+      - "8083:8083"
+
+  elasticsearch:
+    image: elasticsearch:9.0.3
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - /esdata/usr/share/elasticsearch/data
 
   redis:
     image: redis:latest
@@ -147,3 +182,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PG_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PG_PASSWORD}
+
+networks:
+  kafka_net:
+    driver: bridge
