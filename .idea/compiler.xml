@@ -25,6 +25,7 @@
         <module name="shopic.review-service.main" />
         <module name="shopic.cart-service.main" />
         <module name="shopic.code-service.main" />
+        <module name="shopic.profile-service.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="23">
@@ -46,6 +47,9 @@
       <module name="product-service" target="24" />
       <module name="product-service.main" target="24" />
       <module name="product-service.test" target="24" />
+      <module name="profile-service" target="24" />
+      <module name="profile-service.main" target="24" />
+      <module name="profile-service.test" target="24" />
       <module name="review-service" target="24" />
       <module name="review-service.main" target="24" />
       <module name="review-service.test" target="24" />
@@ -92,6 +96,9 @@
       <module name="product-service" options="-parameters" />
       <module name="product-service.main" options="-parameters" />
       <module name="product-service.test" options="-parameters" />
+      <module name="profile-service" options="-parameters" />
+      <module name="profile-service.main" options="-parameters" />
+      <module name="profile-service.test" options="-parameters" />
       <module name="review-service" options="-parameters" />
       <module name="review-service.main" options="-parameters" />
       <module name="review-service.test" options="-parameters" />
@@ -122,6 +129,9 @@
       <module name="shopic.payment-service" options="-parameters" />
       <module name="shopic.payment-service.main" options="-parameters" />
       <module name="shopic.payment-service.test" options="-parameters" />
+      <module name="shopic.profile-service" options="-parameters" />
+      <module name="shopic.profile-service.main" options="-parameters" />
+      <module name="shopic.profile-service.test" options="-parameters" />
       <module name="shopic.review-service" options="-parameters" />
       <module name="shopic.review-service.main" options="-parameters" />
       <module name="shopic.review-service.test" options="-parameters" />

@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Maksim Ostroginskiy
+      changes:
+        - createSequence:
+            sequenceName: profiles_seq
+            startValue: 1
+            incrementBy: 50
+
+        - createTable:
+            tableName: profiles
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: profiles_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: first_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false

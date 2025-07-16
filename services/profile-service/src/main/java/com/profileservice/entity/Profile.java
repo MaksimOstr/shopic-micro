@@ -1,0 +1,29 @@
+package com.profileservice.entity;
+
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+@Entity
+@Table(name = "profiles")
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+public class Profile {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profiles_seq")
+    private Long id;
+
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private Long userId;
+
+    @Column(name = "first_name", nullable = false, length = 50)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 50)
+    private String lastName;
+}

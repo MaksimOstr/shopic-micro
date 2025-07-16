@@ -10,6 +10,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/mail-service/shopic.mail-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/mail-service/shopic.mail-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/order-service/shopic.order-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/order-service/shopic.order-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/payment-service/shopic.payment-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/payment-service/shopic.payment-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/review-service/shopic.review-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/review-service/shopic.review-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/services/user-service/shopic.user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/services/user-service/shopic.user-service.main.iml" />
     </modules>
   </component>
