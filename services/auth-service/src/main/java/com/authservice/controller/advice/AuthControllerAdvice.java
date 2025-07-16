@@ -2,12 +2,10 @@ package com.authservice.controller.advice;
 
 import com.authservice.controller.AuthController;
 import com.authservice.dto.response.ErrorResponseDto;
-import com.authservice.exceptions.EntityAlreadyExistsException;
+import com.authservice.exceptions.AlreadyExistsException;
 import com.authservice.exceptions.NotFoundException;
 import com.authservice.exceptions.TokenValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,8 +30,8 @@ public class AuthControllerAdvice {
     }
 
 
-    @ExceptionHandler(EntityAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handleRegisterException(EntityAlreadyExistsException e) {
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDto> handleRegisterException(AlreadyExistsException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.CONFLICT.getReasonPhrase(),
                 HttpStatus.CONFLICT.value(),

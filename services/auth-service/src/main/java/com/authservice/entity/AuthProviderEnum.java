@@ -1,4 +1,4 @@
-package com.authservice.enums;
+package com.authservice.entity;
 
 import com.authservice.exceptions.NotFoundException;
 

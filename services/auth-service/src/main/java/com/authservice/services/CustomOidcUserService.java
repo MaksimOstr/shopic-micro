@@ -1,18 +1,16 @@
 package com.authservice.services;
 
 import com.authservice.config.security.model.CustomOidcUser;
-import com.authservice.dto.request.OAuthRegisterRequest;
-import com.authservice.dto.response.OAuthRegisterResponse;
-import com.authservice.enums.AuthProviderEnum;
-import com.authservice.exceptions.NotFoundException;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.authservice.dto.CreateProfileDto;
+import com.authservice.dto.request.CreateOAuthUserRequest;
+import com.authservice.dto.response.CreateOAuthUserResponse;
+import com.authservice.services.user.OAuthUserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
 
-    private final AuthService authService;
+    private final OAuthUserService oAuthUserService;
 
 
     @Override
@@ -36,24 +34,16 @@ public class CustomOidcUserService extends OidcUserService {
         String email = idToken.getEmail();
         String username = idToken.getClaimAsString("name");
 
-        OAuthRegisterResponse response;
-        try {
-            OAuthRegisterRequest request = new OAuthRegisterRequest(email, username, username, AuthProviderEnum.fromString(provider));
-            response = authService.oAuthRegister(request);
-        } catch (JsonProcessingException | NotFoundException e) {
-            throw new OAuth2AuthenticationException(e.getMessage());
-        }
+        CreateProfileDto profileDto = new CreateProfileDto(username, username);
+        CreateOAuthUserRequest request = new CreateOAuthUserRequest(provider, email, profileDto);
+        CreateOAuthUserResponse response = oAuthUserService.createOrGetOAuthUser(request);
 
-        if(response.getAuthProvider() != AuthProviderEnum.fromString(provider)) {
-            OAuth2Error oauth2Error = new OAuth2Error("This account was created by another provider");
-            throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
-        }
 
         return new CustomOidcUser(
                 userRequest.getIdToken(),
                 List.of(),
-                response.getUserId(),
-                response.getRoleNames()
+                response.userId(),
+                response.roleNames()
         );
     }
 }

@@ -23,8 +23,9 @@ public class RefreshToken {
     @Column(name = "token", nullable = false, unique = true)
     private String token;
 
-    @Column(name = "user_id", nullable = false)
-    private long userId;
+    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private User user;
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
@@ -36,10 +37,10 @@ public class RefreshToken {
     @Column(name = "device_id", nullable = false, unique = true)
     private String deviceId;
 
-    public RefreshToken(String token, Instant expiresAt, long userId, String deviceId) {
+    public RefreshToken(String token, Instant expiresAt, User user, String deviceId) {
         this.token = token;
         this.expiresAt = expiresAt;
-        this.userId = userId;
+        this.user = user;
         this.deviceId = deviceId;
     }
 }

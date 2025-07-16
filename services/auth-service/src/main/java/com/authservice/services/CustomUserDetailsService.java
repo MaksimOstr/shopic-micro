@@ -1,10 +1,10 @@
 package com.authservice.services;
 
 import com.authservice.config.security.model.CustomUserDetails;
-import com.authservice.enums.AuthProviderEnum;
+import com.authservice.entity.AuthProviderEnum;
 import com.authservice.exceptions.NotFoundException;
-import com.authservice.services.grpc.UserGrpcService;
-import com.shopic.grpc.userservice.UserForAuthGrpcResponse;
+import com.authservice.entity.User;
+import com.authservice.services.user.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,27 +17,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserGrpcService userServiceGrpc;
+    private final UserQueryService userQueryService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
             log.info("Loading user by email {}", email);
-            UserForAuthGrpcResponse response = userServiceGrpc.getUserForAuth(email);
-            AuthProviderEnum provider = AuthProviderEnum.fromString(response.getProvider());
+            User user = userQueryService.getUserForAuth(email);
 
-            if(provider != AuthProviderEnum.LOCAL || !response.hasPassword()) {
+            if(user.getAuthProvider() != AuthProviderEnum.LOCAL) {
                 throw new UsernameNotFoundException("User was registered with another provider");
             }
 
-            return new CustomUserDetails(
-                    response.getEmail(),
-                    response.getPassword(),
-                    response.getIsAccountNonLocked(),
-                    response.getIsVerified(),
-                    response.getUserId(),
-                    response.getRoleNamesList()
-            );
+            return new CustomUserDetails(user);
         } catch (NotFoundException e) {
             log.error("User with email {} not found", email);
             throw new UsernameNotFoundException("test");

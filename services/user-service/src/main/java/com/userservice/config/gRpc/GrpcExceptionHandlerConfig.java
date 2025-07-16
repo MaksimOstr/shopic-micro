@@ -1,6 +1,6 @@
 package com.userservice.config.gRpc;
 
-import com.userservice.exceptions.EntityAlreadyExistsException;
+import com.userservice.exceptions.AlreadyExistsException;
 import com.userservice.exceptions.NotFoundException;
 import io.grpc.Status;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ public class GrpcExceptionHandlerConfig {
     GrpcExceptionHandler userServiceExceptionHandler() {
         return exception -> switch (exception) {
             case DataIntegrityViolationException e -> Status.ALREADY_EXISTS.withDescription(e.getMessage()).asException();
-            case EntityAlreadyExistsException e -> Status.ALREADY_EXISTS.withDescription(e.getMessage()).asException();
+            case AlreadyExistsException e -> Status.ALREADY_EXISTS.withDescription(e.getMessage()).asException();
             case NotFoundException e -> Status.NOT_FOUND.withDescription(e.getMessage()).asException();
             default -> null;
         };

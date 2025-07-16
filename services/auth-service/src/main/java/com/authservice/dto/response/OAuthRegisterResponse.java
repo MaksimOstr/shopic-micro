@@ -1,6 +1,6 @@
 package com.authservice.dto.response;
 
-import com.authservice.enums.AuthProviderEnum;
+import com.authservice.entity.AuthProviderEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

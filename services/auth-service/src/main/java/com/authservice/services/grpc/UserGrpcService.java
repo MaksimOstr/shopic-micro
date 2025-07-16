@@ -2,7 +2,7 @@ package com.authservice.services.grpc;
 
 import com.authservice.dto.request.LocalRegisterRequest;
 import com.authservice.dto.request.OAuthRegisterRequest;
-import com.authservice.exceptions.EntityAlreadyExistsException;
+import com.authservice.exceptions.AlreadyExistsException;
 import com.authservice.exceptions.NotFoundException;
 import com.shopic.grpc.userservice.*;
 import io.grpc.Status;
@@ -44,7 +44,7 @@ public class UserGrpcService {
             return userServiceGrpc.createLocalUser(request);
         } catch (StatusRuntimeException e) {
             if (e.getStatus().getCode() == Status.Code.ALREADY_EXISTS) {
-                throw new EntityAlreadyExistsException("User with email " + request.getEmail() + " already exists");
+                throw new AlreadyExistsException("User with email " + request.getEmail() + " already exists");
             }
             throw e;
         }

@@ -1,12 +1,11 @@
 package com.userservice.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shopic.grpc.codeservice.CreateCodeResponse;
 import com.shopic.grpc.codeservice.ValidateCodeResponse;
 import com.userservice.dto.request.ChangeEmailRequest;
 import com.userservice.entity.EmailChangeRequest;
 import com.userservice.entity.User;
-import com.userservice.exceptions.EntityAlreadyExistsException;
+import com.userservice.exceptions.AlreadyExistsException;
 import com.userservice.exceptions.NotFoundException;
 import com.userservice.projection.UserEmailAndPasswordProjection;
 import com.userservice.repositories.EmailChangeRequestRepository;
@@ -33,7 +32,7 @@ public class EmailChangeRequestService {
     public void createRequest(ChangeEmailRequest dto, long userId) {
         boolean isUserExists = queryUserService.isUserExist(dto.email());
         if (isUserExists) {
-            throw new EntityAlreadyExistsException("This email already exists");
+            throw new AlreadyExistsException("This email already exists");
         }
 
         UserEmailAndPasswordProjection user = queryUserService.getUserEmailAndPassword(userId);

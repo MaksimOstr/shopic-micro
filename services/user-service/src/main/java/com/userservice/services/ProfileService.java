@@ -4,7 +4,7 @@ import com.userservice.dto.CreateProfileDto;
 import com.userservice.dto.request.ProfileParams;
 import com.userservice.entity.Profile;
 import com.userservice.entity.User;
-import com.userservice.exceptions.EntityAlreadyExistsException;
+import com.userservice.exceptions.AlreadyExistsException;
 import com.userservice.mapper.ProfileMapper;
 import com.userservice.repositories.ProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,7 +23,7 @@ public class ProfileService {
     @Transactional
     public Profile createProfile(CreateProfileDto dto, User user) {
         if(isProfileExist(user.getId())) {
-            throw new EntityAlreadyExistsException("Profile already exists");
+            throw new AlreadyExistsException("Profile already exists");
         }
 
         Profile profile = profileMapper.toProfile(dto, user);
