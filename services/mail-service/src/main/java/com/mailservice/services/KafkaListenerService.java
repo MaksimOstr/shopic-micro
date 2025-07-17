@@ -21,7 +21,7 @@ public class KafkaListenerService {
 
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 1000))
-    @KafkaListener(topics = {"user-created", "email-verification-requested"}, groupId = "mail-service")
+    @KafkaListener(topics = {"user.local.registered", "email-verification-requested"}, groupId = "mail-service")
     public void sendEmailVerificationCode(String data, Acknowledgment acknowledgment) {
         String subject = "Email verification";
         String text = "Your verification code is: ";

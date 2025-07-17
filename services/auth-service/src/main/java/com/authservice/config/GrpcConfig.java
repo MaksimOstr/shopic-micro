@@ -9,11 +9,6 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 @Configuration(proxyBeanMethods = false)
 public class GrpcConfig {
     @Bean
-    UserServiceGrpc.UserServiceBlockingStub userServiceGrpc(GrpcChannelFactory channels) {
-        return UserServiceGrpc.newBlockingStub(channels.createChannel("user-service"));
-    }
-
-    @Bean
     CodeServiceGrpc.CodeServiceBlockingStub codeServiceBlockingStub(GrpcChannelFactory channels) {
         return CodeServiceGrpc.newBlockingStub(channels.createChannel("code-service"));
     }

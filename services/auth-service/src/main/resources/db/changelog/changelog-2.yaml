@@ -87,3 +87,22 @@ databaseChangeLog:
                     foreignKeyName: fk_role_users
                     nullable: false
                     deleteCascade: true
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: role_name
+                  value: ROLE_USER
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: role_name
+                  value: ROLE_ADMIN

@@ -8,50 +8,6 @@ option java_multiple_files = true;
 option java_package = "com.shopic.grpc.userservice";
 
 
-message ProfileGrpcRequest {
-  string first_name = 11;
-  string last_name = 12;
-}
-
-message CreateLocalUserGrpcRequest {
-  string email = 1;
-  string password = 2;
-  ProfileGrpcRequest profile = 3;
-}
-
-message CreateLocalUserGrpcResponse {
-  int64 user_id = 1;
-  string email = 2;
-  string first_name = 3;
-  string last_name = 4;
-}
-
-message CreateOAuthUserGrpcRequest {
-  string email = 1;
-  string provider = 2;
-  ProfileGrpcRequest profile = 3;
-}
-
-message CreateOAuthUserGrpcResponse {
-  int64 user_id = 1;
-  string provider = 3;
-  repeated string role_names = 4;
-}
-
-message UserForAuthGrpcRequest {
-  string email = 1;
-}
-
-message UserForAuthGrpcResponse {
-  int64 user_id = 1;
-  string email = 2;
-  optional string password = 3;
-  repeated string role_names = 4;
-  bool is_verified = 5;
-  bool is_account_non_locked = 6;
-  string provider = 7;
-}
-
 message UserRolesRequest {
   int64 userId = 1;
 }
@@ -61,11 +17,5 @@ message UserRolesResponse {
 }
 
 service UserService {
-  rpc createLocalUser (CreateLocalUserGrpcRequest) returns (CreateLocalUserGrpcResponse);
-
-  rpc createOAuthUser (CreateOAuthUserGrpcRequest) returns (CreateOAuthUserGrpcResponse);
-
-  rpc getUserForAuth (UserForAuthGrpcRequest) returns (UserForAuthGrpcResponse);
-
   rpc getUserRoles (UserRolesRequest) returns (UserRolesResponse);
 }

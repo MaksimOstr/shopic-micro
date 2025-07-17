@@ -1,6 +1,8 @@
 package com.authservice.services;
 
-import com.authservice.dto.event.UserCreatedEvent;
+import com.authservice.dto.event.LocalUserCreatedEvent;
+import com.authservice.dto.event.OAuthUserCreated;
+import com.authservice.exceptions.InternalServiceException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +18,32 @@ public class KafkaEventProducer {
     private final ObjectMapper objectMapper;
 
 
-    public void sendLocalUserCreatedEvent(String email, String code) throws JsonProcessingException {
-        UserCreatedEvent event = new UserCreatedEvent(email, code);
-        kafkaTemplate.send("user-created", objectMapper.writeValueAsString(event));
+    public void sendLocalUserCreated(String email, String code, String firstName, long userId, String lastName) {
+        try {
+            LocalUserCreatedEvent event = new LocalUserCreatedEvent(
+                    email,
+                    code,
+                    userId,
+                    firstName,
+                    lastName
+            );
+            kafkaTemplate.send("user.local.registered", objectMapper.writeValueAsString(event));
+        } catch (JsonProcessingException e) {
+            throw new InternalServiceException("Something went wrong");
+        }
+    }
+
+    public void sendOAuthUserCreated(String firstName, long userId, String lastName) {
+        try {
+            OAuthUserCreated event = new OAuthUserCreated(
+                    userId,
+                    firstName,
+                    lastName
+            );
+            kafkaTemplate.send("user.oauth.registered", objectMapper.writeValueAsString(event));
+        } catch (JsonProcessingException e) {
+            throw new InternalServiceException("Something went wrong");
+        }
     }
 
 

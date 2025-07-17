@@ -24,7 +24,6 @@ public class CustomOidcUserService extends OidcUserService {
 
     private final OAuthUserService oAuthUserService;
 
-
     @Override
     @Transactional
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
@@ -34,8 +33,7 @@ public class CustomOidcUserService extends OidcUserService {
         String email = idToken.getEmail();
         String username = idToken.getClaimAsString("name");
 
-        CreateProfileDto profileDto = new CreateProfileDto(username, username);
-        CreateOAuthUserRequest request = new CreateOAuthUserRequest(provider, email, profileDto);
+        CreateOAuthUserRequest request = new CreateOAuthUserRequest(provider, email, username, username);
         CreateOAuthUserResponse response = oAuthUserService.createOrGetOAuthUser(request);
 
 

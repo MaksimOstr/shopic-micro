@@ -8,6 +8,9 @@ import com.authservice.entity.User;
 import com.authservice.exceptions.AlreadyExistsException;
 import com.authservice.mapper.UserMapper;
 import com.authservice.repositories.UserRepository;
+import com.authservice.services.KafkaEventProducer;
+import com.authservice.services.grpc.CodeGrpcService;
+import com.shopic.grpc.codeservice.CreateCodeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,9 +23,10 @@ import java.util.Set;
 public class LocalUserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
-    private final UserMapper userMapper;
     private final PasswordService passwordService;
     private final UserQueryService userQueryService;
+    private final KafkaEventProducer kafkaEventProducer;
+    private final CodeGrpcService codeGrpcService;
 
     private static final String USER_ALREADY_EXISTS = "User with such an email already exists";
 
@@ -32,22 +36,40 @@ public class LocalUserService {
             throw new AlreadyExistsException(USER_ALREADY_EXISTS);
         }
 
-        User user = createLocalUserEntity(dto);
-        User savedUser = userRepository.save(user);
-        Profile profile = profileService.createProfile(dto.profile(), savedUser);
+        User user = createAndSaveUser(dto);
 
-        return userMapper.toCreateLocalUserResponse(savedUser, profile);
+        getCodeAndSendEvent(user, dto);
+
+        return new CreateLocalUserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getCreatedAt()
+        );
     }
 
-    private User createLocalUserEntity(LocalRegisterRequest dto) {
+    private User createAndSaveUser(LocalRegisterRequest dto) {
         Role defaultRole = roleService.getDefaultUserRole();
         String hashedPassword = passwordService.encode(dto.password());
 
-        return User.builder()
+        User user = User.builder()
                 .email(dto.email())
                 .password(hashedPassword)
                 .roles(Set.of(defaultRole))
                 .authProvider(AuthProviderEnum.LOCAL)
                 .build();
+
+        return userRepository.save(user);
+    }
+
+    private void getCodeAndSendEvent(User user, LocalRegisterRequest dto) {
+        CreateCodeResponse response = codeGrpcService.getEmailVerificationCode(user.getId());
+
+        kafkaEventProducer.sendLocalUserCreated(
+                user.getEmail(),
+                response.getCode(),
+                dto.firstName(),
+                user.getId(),
+                dto.lastName()
+        );
     }
 }

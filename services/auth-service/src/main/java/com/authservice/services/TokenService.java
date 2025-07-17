@@ -4,14 +4,13 @@ import com.authservice.dto.TokenPairDto;
 import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
-import com.authservice.services.grpc.UserGrpcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+
 
 
 @Service
@@ -19,7 +18,6 @@ import java.util.Set;
 public class TokenService {
     private final RefreshTokenManager refreshTokenManager;
     private final JwtTokenService jwtTokenService;
-    private final UserGrpcService userGrpcService;
     private final RefreshTokenValidationService refreshTokenValidationService;
     private final RoleMapper roleMapper;
 
