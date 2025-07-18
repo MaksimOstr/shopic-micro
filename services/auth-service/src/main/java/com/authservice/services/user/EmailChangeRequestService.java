@@ -1,21 +1,21 @@
-package com.userservice.services;
+package com.authservice.services.user;
 
+import com.authservice.dto.request.ChangeEmailRequest;
+import com.authservice.entity.EmailChangeRequest;
+import com.authservice.entity.User;
+import com.authservice.exceptions.AlreadyExistsException;
+import com.authservice.exceptions.NotFoundException;
+import com.authservice.projection.user.UserEmailAndPasswordProjection;
+import com.authservice.repositories.EmailChangeRequestRepository;
+import com.authservice.services.KafkaEventProducer;
+import com.authservice.services.grpc.GrpcCodeService;
 import com.shopic.grpc.codeservice.CreateCodeResponse;
 import com.shopic.grpc.codeservice.ValidateCodeResponse;
-import com.userservice.dto.request.ChangeEmailRequest;
-import com.userservice.entity.EmailChangeRequest;
-import com.userservice.entity.User;
-import com.userservice.exceptions.AlreadyExistsException;
-import com.userservice.exceptions.NotFoundException;
-import com.userservice.projection.UserEmailAndPasswordProjection;
-import com.userservice.repositories.EmailChangeRequestRepository;
-import com.userservice.services.grpc.GrpcCodeService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 @Slf4j
@@ -23,19 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailChangeRequestService {
     private final EmailChangeRequestRepository emailChangeRequestRepository;
     private final GrpcCodeService grpcCodeService;
-    private final QueryUserService queryUserService;
+    private final UserQueryService userQueryService;
     private final PasswordService passwordService;
     private final KafkaEventProducer kafkaEventProducer;
     private final EntityManager entityManager;
 
     @Transactional
     public void createRequest(ChangeEmailRequest dto, long userId) {
-        boolean isUserExists = queryUserService.isUserExist(dto.email());
+        boolean isUserExists = userQueryService.isUserExist(dto.email());
         if (isUserExists) {
             throw new AlreadyExistsException("This email already exists");
         }
 
-        UserEmailAndPasswordProjection user = queryUserService.getUserEmailAndPassword(userId);
+        UserEmailAndPasswordProjection user = userQueryService.getUserEmailAndPassword(userId);
         boolean isPasswordEqual = passwordService.comparePassword(user.getPassword(), dto.password());
 
         if (!isPasswordEqual) {
@@ -52,7 +52,7 @@ public class EmailChangeRequestService {
     @Transactional
     public void changeEmail(String code) {
         ValidateCodeResponse response = grpcCodeService.validateEmailChangeCode(code);
-        User user = queryUserService.findById(response.getUserId());
+        User user = userQueryService.findById(response.getUserId());
         EmailChangeRequest changeRequest = emailChangeRequestRepository.findByUser_Id(response.getUserId())
                 .orElseThrow(() -> new NotFoundException("No email change request found"));
 

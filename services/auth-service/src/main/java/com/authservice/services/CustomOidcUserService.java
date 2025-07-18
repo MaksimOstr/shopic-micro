@@ -1,7 +1,6 @@
 package com.authservice.services;
 
 import com.authservice.config.security.model.CustomOidcUser;
-import com.authservice.dto.CreateProfileDto;
 import com.authservice.dto.request.CreateOAuthUserRequest;
 import com.authservice.dto.response.CreateOAuthUserResponse;
 import com.authservice.services.user.OAuthUserService;
@@ -35,7 +34,6 @@ public class CustomOidcUserService extends OidcUserService {
 
         CreateOAuthUserRequest request = new CreateOAuthUserRequest(provider, email, username, username);
         CreateOAuthUserResponse response = oAuthUserService.createOrGetOAuthUser(request);
-
 
         return new CustomOidcUser(
                 userRequest.getIdToken(),

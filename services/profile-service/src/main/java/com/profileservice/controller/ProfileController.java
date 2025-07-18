@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasRole('USER')")
 public class ProfileController {
     private final ProfileService profileService;
+
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<Profile> getProfile(
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        Profile profile = profileService.getProfileByUserId(principal.getId());
+
+        return ResponseEntity.ok(profile);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Profile> getProfileById(
+            @RequestParam Long userId
+    ) {
+        Profile profile = profileService.getProfileByUserId(userId);
+
+        return ResponseEntity.ok(profile);
+    }
 
     @PatchMapping
     public ResponseEntity<Void> updateProfile(
