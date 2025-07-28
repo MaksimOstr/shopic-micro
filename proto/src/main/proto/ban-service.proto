@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+
+package com.shopic.grpc.banservice;
+
+option java_multiple_files = true;
+option java_package = "com.shopic.grpc.banservice";
+
+
+message CheckUserBanRequest {
+  int64 userId = 1;
+}
+
+message CheckUserBanResponse {
+  bool isBanned = 1;
+}
+
+service BanService {
+  rpc checkUserBan(CheckUserBanRequest) returns (CheckUserBanResponse);
+}

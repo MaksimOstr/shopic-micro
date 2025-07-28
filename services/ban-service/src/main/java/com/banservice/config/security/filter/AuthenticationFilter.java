@@ -1,8 +1,6 @@
-package com.cartservice.config.security.filter;
+package com.banservice.config.security.filter;
 
-
-
-import com.cartservice.config.security.model.CustomPrincipal;
+import com.banservice.config.security.model.CustomPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -97,4 +95,3 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 }
-

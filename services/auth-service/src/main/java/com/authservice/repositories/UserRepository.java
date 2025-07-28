@@ -4,6 +4,7 @@ import com.authservice.entity.User;
 import com.authservice.projection.user.EmailVerifyProjection;
 import com.authservice.projection.user.ResetPasswordProjection;
 import com.authservice.projection.user.UserEmailAndPasswordProjection;
+import com.authservice.projection.user.UserForBanProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
@@ -38,4 +39,11 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query("SELECT u.id as id, u.authProvider as authProvider FROM User u WHERE u.email = :email")
     Optional<ResetPasswordProjection> findUserForResetPassword(String email);
+
+    @Query("SELECT new com.authservice.projection.user.UserForBanProjection(" +
+            "u.isVerified," +
+            "u.email" +
+            ")" +
+            "FROM User u WHERE u.id = :id")
+    Optional<UserForBanProjection> findUserForBan(long id);
 }

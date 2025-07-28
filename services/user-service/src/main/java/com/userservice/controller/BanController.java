@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class BanController {
     private final BanService banService;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Void> banUser(
             @RequestBody @Valid BanRequest body,
             @AuthenticationPrincipal CustomPrincipal principal

@@ -20,10 +20,10 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     @Getter
     private final long userId;
 
-    public CustomUserDetails(User user) {
+    public CustomUserDetails(User user, boolean isNonBlocked) {
         this.email = user.getEmail();
         this.password = user.getPassword();
-        this.isNonBlocked = true;
+        this.isNonBlocked = isNonBlocked;
         this.isVerified = user.getIsVerified();
         this.userId = user.getId();
         this.authorities = mapToAuthorities(user.getRoles());
