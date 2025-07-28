@@ -6,10 +6,9 @@ import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Role;
 import com.authservice.entity.User;
 import com.authservice.exceptions.AlreadyExistsException;
-import com.authservice.mapper.UserMapper;
 import com.authservice.repositories.UserRepository;
 import com.authservice.services.KafkaEventProducer;
-import com.authservice.services.grpc.CodeGrpcService;
+import com.authservice.services.grpc.GrpcCodeService;
 import com.shopic.grpc.codeservice.CreateCodeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ public class LocalUserService {
     private final PasswordService passwordService;
     private final UserQueryService userQueryService;
     private final KafkaEventProducer kafkaEventProducer;
-    private final CodeGrpcService codeGrpcService;
+    private final GrpcCodeService grpcCodeService;
 
     private static final String USER_ALREADY_EXISTS = "User with such an email already exists";
 
@@ -62,7 +61,7 @@ public class LocalUserService {
     }
 
     private void getCodeAndSendEvent(User user, LocalRegisterRequest dto) {
-        CreateCodeResponse response = codeGrpcService.getEmailVerificationCode(user.getId());
+        CreateCodeResponse response = grpcCodeService.getEmailVerificationCode(user.getId());
 
         kafkaEventProducer.sendLocalUserCreated(
                 user.getEmail(),

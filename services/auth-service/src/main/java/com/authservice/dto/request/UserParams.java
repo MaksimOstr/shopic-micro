@@ -1,11 +1,11 @@
-package com.authservice.dto;
+package com.authservice.dto.request;
 
 import com.authservice.entity.AuthProviderEnum;
 
-public record UserSummaryDto(
+public record UserParams (
         Long id,
         String email,
-        AuthProviderEnum authProvider,
         Boolean isAccountNonLocked,
-        Boolean isVerified
+        Boolean isVerified,
+        AuthProviderEnum provider
 ) {}

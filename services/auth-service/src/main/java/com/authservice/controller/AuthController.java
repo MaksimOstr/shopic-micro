@@ -32,7 +32,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<CreateLocalUserResponse> registerLocalUser(
             @Valid @RequestBody LocalRegisterRequest body
-    ) throws JsonProcessingException {
+    ) {
         CreateLocalUserResponse response = authService.localRegister(body);
 
         return ResponseEntity.ok(response);

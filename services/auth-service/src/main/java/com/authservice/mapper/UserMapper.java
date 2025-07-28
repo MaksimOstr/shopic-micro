@@ -1,5 +1,7 @@
 package com.authservice.mapper;
 
+import com.authservice.dto.UserDetailsDto;
+import com.authservice.dto.UserSummaryDto;
 import com.authservice.dto.response.CreateOAuthUserResponse;
 import com.authservice.entity.User;
 import org.mapstruct.Mapper;
@@ -13,6 +15,7 @@ public interface UserMapper {
     @Mapping(target = "provider", source = "authProvider")
     CreateOAuthUserResponse toCreateOAuthUserResponse(User user);
 
+    UserSummaryDto toUserSummaryDto(User user);
 
-
+    UserDetailsDto toUserDetailsDto(User user);
 }
