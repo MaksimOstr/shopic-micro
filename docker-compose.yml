@@ -23,6 +23,18 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${USER_DB_NAME}
 
+  ban-service-db:
+    image: postgres
+    restart: always
+    ports:
+      - "${BAN_DB_PORT}:5432"
+    volumes:
+      - /postgres/ban-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${BAN_DB_NAME}
+
   profile-service-db:
     image: postgres
     restart: always

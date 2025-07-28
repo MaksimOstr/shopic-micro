@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/infrastructure/discovery-server" />
             <option value="$PROJECT_DIR$/proto" />
             <option value="$PROJECT_DIR$/services/auth-service" />
+            <option value="$PROJECT_DIR$/services/ban-service" />
             <option value="$PROJECT_DIR$/services/cart-service" />
             <option value="$PROJECT_DIR$/services/code-service" />
             <option value="$PROJECT_DIR$/services/mail-service" />

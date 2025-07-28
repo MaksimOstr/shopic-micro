@@ -42,5 +42,8 @@ project(':review-service').projectDir = new File('services/review-service')
 include ':profile-service'
 project(':profile-service').projectDir = new File('services/profile-service')
 
+include ':ban-service'
+project(':ban-service').projectDir = new File('services/ban-service')
+
 
 include(":proto")
