@@ -38,7 +38,7 @@ public class Ban {
     private Long unbannerId;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    private Boolean isActive;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

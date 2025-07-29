@@ -3,7 +3,11 @@ package com.profileservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "profiles")
@@ -26,4 +30,12 @@ public class Profile {
 
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
+
+    @Column(name = "created_at", nullable = false)
+    @CreatedDate
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    @LastModifiedDate
+    private Instant updatedAt;
 }

@@ -12,5 +12,6 @@ public record UserDetailsDto(
         Boolean isAccountNonLocked,
         Boolean isVerified,
         Instant createdAt,
+        Instant updatedAt,
         List<String> roles
 ) {}

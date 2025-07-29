@@ -28,5 +28,13 @@ public class SpecificationUtils {
         }
         return (root, query, cb) -> cb.equal(root.get("id"), value);
     }
+
+    public static <T> Specification<T> is(String field, Boolean value) {
+        if (value == null) {
+            return Specification.where(null);
+        }
+
+        return (root, query, cb) -> cb.equal(root.get(field), value);
+    }
 }
 

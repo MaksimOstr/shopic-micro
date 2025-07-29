@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface BanRepository extends JpaRepository<Ban, Long>, JpaSpecificationExecutor<Ban> {
 
-    boolean existsByUserIdAndActive(Long userId, boolean active);
+    boolean existsByUserIdAndIsActive(long userId, boolean isActive);
 
     @Transactional
     @Modifying

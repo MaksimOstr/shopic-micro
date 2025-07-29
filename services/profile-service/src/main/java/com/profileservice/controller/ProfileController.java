@@ -1,10 +1,16 @@
 package com.profileservice.controller;
 
 import com.profileservice.config.security.model.CustomPrincipal;
+import com.profileservice.dto.ProfileDto;
+import com.profileservice.dto.request.ProfileParams;
 import com.profileservice.dto.request.UpdateProfileRequest;
 import com.profileservice.entity.Profile;
 import com.profileservice.service.ProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +24,6 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @GetMapping("/me")
-    @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<Profile> getProfile(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
@@ -27,14 +32,30 @@ public class ProfileController {
         return ResponseEntity.ok(profile);
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Profile> getProfileById(
-            @RequestParam Long userId
+    public ResponseEntity<ProfileDto> getProfileByUserId(
+            @PathVariable Long id
     ) {
-        Profile profile = profileService.getProfileByUserId(userId);
+        ProfileDto profile = profileService.getProfileDtoById(id);
 
         return ResponseEntity.ok(profile);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<ProfileDto>> getProfileDtoPage(
+            @RequestBody ProfileParams params,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "desc") String sortDirection
+
+    ) {
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+        Pageable pageable = PageRequest.of(page, size, direction, "createdAt");
+        Page<ProfileDto> profilePage = profileService.getProfileDtoPage(params, pageable);
+
+        return ResponseEntity.ok(profilePage);
     }
 
     @PatchMapping

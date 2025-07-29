@@ -16,9 +16,6 @@ import java.util.HashMap;
 public class CacheConfig {
     @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
-        HashMap<?, ?> test = new HashMap<>();
-
-        test.get()
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig())
                 .transactionAware()

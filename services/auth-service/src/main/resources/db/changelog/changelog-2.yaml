@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 1
-      author: Maksim Ostroginskiy
+      author: Maksim
       changes:
         - createSequence:
             sequenceName: users_seq
@@ -45,6 +45,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: updated_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_at
                   type: timestamptz
                   defaultValueComputed: CURRENT_TIMESTAMP
@@ -75,18 +81,30 @@ databaseChangeLog:
                   name: user_id
                   type: bigint
                   constraints:
-                    references: users(id)
-                    foreignKeyName: fk_user_roles
                     nullable: false
                     deleteCascade: true
               - column:
                   name: role_id
                   type: int
                   constraints:
-                    references: roles(id)
-                    foreignKeyName: fk_role_users
                     nullable: false
                     deleteCascade: true
+        - addPrimaryKey:
+            tableName: user_roles
+            columnNames: user_id, role_id
+            constraintName: pk_user_roles
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: user_id
+            constraintName: fk_user_roles_user
+            referencedTableName: users
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: role_id
+            constraintName: fk_user_roles_role
+            referencedTableName: roles
+            referencedColumnNames: id
 
         - insert:
             tableName: roles

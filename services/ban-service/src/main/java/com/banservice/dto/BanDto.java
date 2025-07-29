@@ -6,9 +6,9 @@ public record BanDto(
         long id,
         long userId,
         Instant banTo,
-        long bannedBy,
+        long bannerId,
         String reason,
-        long unbannedBy,
+        long unbannerId,
         boolean isActive,
         Instant createdAt
 ) {}

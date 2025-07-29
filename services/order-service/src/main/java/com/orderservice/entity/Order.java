@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
@@ -60,7 +62,7 @@ public class Order {
     private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    @UpdateTimestamp
+    @LastModifiedDate
     private Instant updatedAt;
 
     public BigDecimal calculateTotalPrice() {

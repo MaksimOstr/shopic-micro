@@ -56,8 +56,10 @@ public class BanService {
 
         Ban ban = Ban.builder()
                 .banTo(dto.banTo())
+                .bannerId(bannerId)
                 .userId(dto.userId())
                 .reason(dto.reason())
+                .isActive(true)
                 .build();
 
         banRepository.save(ban);
@@ -67,7 +69,7 @@ public class BanService {
     }
 
     public boolean isUserBanned(long userId) {
-        return banRepository.existsByUserIdAndActive(userId, true);
+        return banRepository.existsByUserIdAndIsActive(userId, true);
     }
 
     public Page<BanDto> getBans(BanParams params, Pageable pageable) {
@@ -96,7 +98,7 @@ public class BanService {
         Ban ban = findById(banId);
 
         ban.setUnbannerId(unbannerId);
-        ban.setActive(false);
+        ban.setIsActive(false);
         ban.setBanTo(Instant.now());
     }
 
