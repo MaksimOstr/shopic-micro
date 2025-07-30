@@ -6,6 +6,5 @@ public record UserSummaryDto(
         Long id,
         String email,
         AuthProviderEnum authProvider,
-        Boolean isAccountNonLocked,
         Boolean isVerified
 ) {}

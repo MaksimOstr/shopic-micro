@@ -20,18 +20,18 @@ public class SpecificationUtils {
         return (root, query, cb) -> cb.lessThanOrEqualTo(root.get(field), value);
     }
 
-    public static <T> Specification<T> hasChild(String field, Long value) {
-        if (value == null) {
-            return Specification.where(null);
-        }
-        return (root, query, cb) -> cb.equal(root.get(field).get("id"), value);
-    }
-
     public static <T> Specification<T> is(String field, Boolean value) {
         if (value == null) {
             return Specification.where(null);
         }
 
+        return (root, query, cb) -> cb.equal(root.get(field), value);
+    }
+
+    public static <T> Specification<T> equalsLong(String field, Long value) {
+        if (value == null) {
+            return Specification.where(null);
+        }
         return (root, query, cb) -> cb.equal(root.get(field), value);
     }
 }

@@ -73,11 +73,11 @@ public class BanService {
     }
 
     public Page<BanDto> getBans(BanParams params, Pageable pageable) {
-        Specification<Ban> spec = SpecificationUtils.<Ban>hasChild("user", params.userId())
+        Specification<Ban> spec = SpecificationUtils.<Ban>equalsLong("userId", params.userId())
                 .and(gte("banTo", params.bannedFrom()))
                 .and(lte("banTo", params.bannedTo()))
-                .and(hasChild("bannedBy", params.bannerId()))
-                .and(hasChild("unbannedBy", params.unbannerId()))
+                .and(equalsLong("bannerId", params.bannerId()))
+                .and(equalsLong("unbannerId", params.unbannerId()))
                 .and(is("isActive", params.isActive()));
 
         Page<Ban> banPage = banRepository.findAll(spec, pageable);

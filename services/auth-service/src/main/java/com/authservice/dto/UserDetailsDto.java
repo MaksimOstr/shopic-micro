@@ -9,7 +9,6 @@ public record UserDetailsDto(
         Long id,
         String email,
         AuthProviderEnum authProvider,
-        Boolean isAccountNonLocked,
         Boolean isVerified,
         Instant createdAt,
         Instant updatedAt,
