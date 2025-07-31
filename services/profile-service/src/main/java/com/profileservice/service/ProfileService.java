@@ -10,6 +10,8 @@ import com.profileservice.mapper.ProfileMapper;
 import com.profileservice.repository.ProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -45,10 +47,20 @@ public class ProfileService {
 
     @Transactional
     public void editProfile(UpdateProfileRequest dto, long userId) {
-        Profile profile = getProfileByUserId(userId);
+        try {
+            Profile profile = getProfileByUserId(userId);
 
-        Optional.ofNullable(dto.firstName()).ifPresent(profile::setFirstName);
-        Optional.ofNullable(dto.lastName()).ifPresent(profile::setLastName);
+            Optional.ofNullable(dto.firstName()).ifPresent(profile::setFirstName);
+            Optional.ofNullable(dto.lastName()).ifPresent(profile::setLastName);
+        } catch (NotFoundException e) {
+            CreateProfileDto profileDto = new CreateProfileDto(
+                    dto.firstName(),
+                    dto.lastName(),
+                    userId
+            );
+
+            createProfile(profileDto);
+        }
     }
 
     public Page<ProfileDto> getProfileDtoPage(ProfileParams params, Pageable pageable) {

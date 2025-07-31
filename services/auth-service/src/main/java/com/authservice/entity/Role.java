@@ -1,9 +1,7 @@
 package com.authservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -12,6 +10,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "roles_seq")
@@ -22,8 +22,4 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     private Set<User> user;
-
-    public Role(String roleName) {
-        this.name = roleName;
-    }
 }

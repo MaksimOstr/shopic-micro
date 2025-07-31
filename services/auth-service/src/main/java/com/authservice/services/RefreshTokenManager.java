@@ -71,12 +71,12 @@ public class RefreshTokenManager {
     private String createNewRefreshToken(long userId, String deviceId) {
         String newToken = generateToken();
         User user = entityManager.getReference(User.class, userId);
-        RefreshToken refreshToken = new RefreshToken(
-                hashedToken(newToken),
-                getExpireTime(),
-                user,
-                deviceId
-        );
+        RefreshToken refreshToken = RefreshToken.builder()
+                .token(hashedToken(newToken))
+                .deviceId(deviceId)
+                .user(user)
+                .expiresAt(getExpireTime())
+                .build();
 
         saveRefreshToken(refreshToken);
 

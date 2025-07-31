@@ -33,7 +33,6 @@ public class EmailController {
     public ResponseEntity<Void> changeEmail(
             @RequestParam String code
     ) {
-
         emailChangeRequestService.changeEmail(code);
 
         return ResponseEntity.ok().build();

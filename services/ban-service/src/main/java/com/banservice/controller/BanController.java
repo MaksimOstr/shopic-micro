@@ -58,6 +58,15 @@ public class BanController {
         return ResponseEntity.ok(bans);
     }
 
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> getIsUserBanned(
+            @RequestParam("userId") Long userId
+    ) {
+        boolean isBanned = banService.isUserBanned(userId);
+
+        return ResponseEntity.ok(isBanned);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<BanDto> getBan(
             @PathVariable long id

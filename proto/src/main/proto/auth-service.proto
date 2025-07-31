@@ -8,12 +8,13 @@ option java_package = "com.shopic.grpc.authservice";
 
 
 message UserForBanRequest {
-  int64 userId = 1;
+  int64 user_id = 1;
 }
 
 message UserForBanResponse {
-  bool isVerified = 1;
+  bool is_verified = 1;
   string email = 2;
+  repeated string role_name = 3;
 }
 
 service AuthService {

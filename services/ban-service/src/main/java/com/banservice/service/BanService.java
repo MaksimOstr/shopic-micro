@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.font.TextHitInfo;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +46,10 @@ public class BanService {
         }
 
         UserForBanResponse response = grpcAuthService.getUserForBan(dto.userId());
+
+        if(response.getRoleNameList().contains("ROLE_ADMIN")) {
+            throw new IllegalStateException("You can't ban admins");
+        }
 
         if(!response.getIsVerified()) {
             throw new IllegalStateException("User is not verified");
@@ -96,6 +101,10 @@ public class BanService {
     @Transactional
     public void unbanUser(long banId, long unbannerId) {
         Ban ban = findById(banId);
+
+        if(ban.getIsActive() == false) {
+            throw new IllegalStateException("Ban is already inactive");
+        }
 
         ban.setUnbannerId(unbannerId);
         ban.setIsActive(false);

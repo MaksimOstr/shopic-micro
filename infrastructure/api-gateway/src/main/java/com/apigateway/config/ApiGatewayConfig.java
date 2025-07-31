@@ -55,7 +55,8 @@ public class ApiGatewayConfig {
                         .POST("", http())
                         .PATCH("/{id}/unban", http())
                         .GET("", http())
-                        .GET("/{id}", http()))
+                        .GET("/{id}", http())
+                        .GET("/check", http()))
                 .build();
     }
 

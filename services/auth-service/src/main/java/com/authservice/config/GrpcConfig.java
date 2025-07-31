@@ -3,7 +3,6 @@ package com.authservice.config;
 import com.authservice.exceptions.NotFoundException;
 import com.shopic.grpc.banservice.BanServiceGrpc;
 import com.shopic.grpc.codeservice.CodeServiceGrpc;
-import com.shopic.grpc.userservice.UserServiceGrpc;
 import io.grpc.Status;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
