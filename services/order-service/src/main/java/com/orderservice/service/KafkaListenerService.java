@@ -10,9 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -21,31 +24,38 @@ public class KafkaListenerService {
     private final ObjectMapper objectMapper;
     private final OrderEventService orderEventService;
 
-    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
-    @KafkaListener(topics = "checkout-session-success", groupId = "order-service")
-    @Transactional
-    public void listenCheckoutSessionSuccess(String payload, Acknowledgment ack) {
-        try {
-            CheckoutSuccessEvent event = objectMapper.readValue(payload, CheckoutSuccessEvent.class);
 
-            orderEventService.payOrder(event.orderId());
+    @KafkaListener(topics = "checkout-session-success", containerFactory = "batchFactory", batch = "true")
+    @Transactional
+    public void listenCheckoutSessionSuccess(@Payload List<String> messages, Acknowledgment ack) {
+        try {
+            for (String message : messages) {
+                CheckoutSuccessEvent event = objectMapper.readValue(message, CheckoutSuccessEvent.class);
+
+                orderEventService.payOrder(event.orderId());
+            }
+
             ack.acknowledge();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
         }
     }
 
-    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
-    @KafkaListener(topics = "payment.unpaid", groupId = "order-service")
-    @Transactional
-    public void listenUnpaidPayment(String payload, Acknowledgment ack) {
-        try {
-            UnpaidPaymentEvent event = objectMapper.readValue(payload, UnpaidPaymentEvent.class);
 
-            orderEventService.failOrder(event.orderId());
+    @KafkaListener(topics = "payment.unpaid", containerFactory = "batchFactory", batch = "true")
+    @Transactional
+    public void listenUnpaidPayment(@Payload List<String> messages, Acknowledgment ack) {
+        try {
+            for (String message : messages) {
+                UnpaidPaymentEvent event = objectMapper.readValue(message, UnpaidPaymentEvent.class);
+
+                orderEventService.failOrder(event.orderId());
+            }
+
             ack.acknowledge();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
         }
+
     }
 }
