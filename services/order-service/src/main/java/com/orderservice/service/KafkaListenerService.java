@@ -29,6 +29,7 @@ public class KafkaListenerService {
     @Transactional
     public void listenCheckoutSessionSuccess(@Payload List<String> messages, Acknowledgment ack) {
         try {
+            log.info("listenCheckoutSessionSuccess");
             for (String message : messages) {
                 CheckoutSuccessEvent event = objectMapper.readValue(message, CheckoutSuccessEvent.class);
 
@@ -45,6 +46,7 @@ public class KafkaListenerService {
     @KafkaListener(topics = "payment.unpaid", containerFactory = "batchFactory", batch = "true")
     @Transactional
     public void listenUnpaidPayment(@Payload List<String> messages, Acknowledgment ack) {
+        log.info("listenUnpaidPayment");
         try {
             for (String message : messages) {
                 UnpaidPaymentEvent event = objectMapper.readValue(message, UnpaidPaymentEvent.class);

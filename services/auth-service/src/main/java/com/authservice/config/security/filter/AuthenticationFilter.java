@@ -79,7 +79,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 "/public-keys",
                 "/auth/oauth2/authorization/google",
                 "/auth/login/oauth2/code/google",
-                "/favicon.ico"
+                "/favicon.ico",
+                "/forgot-password/request",
+                "/forgot-password/reset",
+                "/verify",
+                "/verify/request",
+                "/users/request-email-verify"
         );
 
         return whiteList.contains(request.getRequestURI());

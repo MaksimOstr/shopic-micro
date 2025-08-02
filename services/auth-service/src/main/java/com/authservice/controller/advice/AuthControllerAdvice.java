@@ -18,37 +18,14 @@ import java.util.Map;
 
 @RestControllerAdvice(assignableTypes = {AuthController.class})
 public class AuthControllerAdvice {
-
-
-    @ExceptionHandler(JsonProcessingException.class)
-    public ResponseEntity<ErrorResponseDto> handleJsonProcessingException(JsonProcessingException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponseDto(
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                e.getMessage()
-        ));
-    }
-
-
     @ExceptionHandler(AlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handleRegisterException(AlreadyExistsException e) {
+    public ResponseEntity<ErrorResponseDto> handleAlreadyExistsException(AlreadyExistsException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.CONFLICT.getReasonPhrase(),
                 HttpStatus.CONFLICT.value(),
                 e.getMessage()
         ));
     }
-
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleNotValidMethodArguments(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
-        return ResponseEntity.badRequest().body(errors);
-    }
-
 
     @ExceptionHandler(TokenValidationException.class)
     public ResponseEntity<ErrorResponseDto> handleTokenValidationException(TokenValidationException e) {
@@ -60,19 +37,10 @@ public class AuthControllerAdvice {
     }
 
     @ExceptionHandler(MissingRequestCookieException.class)
-    public ResponseEntity<ErrorResponseDto> test(Exception e) {
+    public ResponseEntity<ErrorResponseDto> handleMissingCookieException(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),
-                e.getMessage()
-        ));
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                HttpStatus.NOT_FOUND.value(),
                 e.getMessage()
         ));
     }
