@@ -49,9 +49,15 @@
       <module name="review-service" target="24" />
       <module name="review-service.main" target="24" />
       <module name="review-service.test" target="24" />
+      <module name="shopic.ban-service" target="24" />
+      <module name="shopic.ban-service.main" target="24" />
+      <module name="shopic.ban-service.test" target="24" />
       <module name="shopic.buildSrc" target="23" />
       <module name="shopic.buildSrc.main" target="23" />
       <module name="shopic.buildSrc.test" target="23" />
+      <module name="shopic.profile-service" target="24" />
+      <module name="shopic.profile-service.main" target="24" />
+      <module name="shopic.profile-service.test" target="24" />
       <module name="user-service" target="24" />
       <module name="user-service.main" target="24" />
       <module name="user-service.test" target="24" />
