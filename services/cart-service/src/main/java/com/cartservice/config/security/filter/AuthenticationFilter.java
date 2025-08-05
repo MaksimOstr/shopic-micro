@@ -43,11 +43,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if (shouldExclude(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
@@ -85,13 +80,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             log.info("Failed to generate HMAC", e);
             throw new RuntimeException("Failed to generate HMAC", e);
         }
-    }
-
-    private boolean shouldExclude(HttpServletRequest request) {
-        List<String> whiteList = List.of(
-        );
-
-        return whiteList.contains(request.getRequestURI());
     }
 
     private List<SimpleGrantedAuthority> toSimpleGrantedAuthorities(String roles) {

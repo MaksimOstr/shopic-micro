@@ -3,23 +3,21 @@ package com.authservice.services;
 import com.authservice.config.security.model.CustomUserDetails;
 import com.authservice.dto.TokenPairDto;
 import com.authservice.dto.request.LocalRegisterRequest;
-import com.authservice.dto.request.OAuthRegisterRequest;
 import com.authservice.dto.request.SignInRequestDto;
-import com.authservice.dto.response.LocalRegisterResponse;
-import com.authservice.dto.response.OAuthRegisterResponse;
-import com.authservice.services.impl.LocalAuthProvider;
-import com.authservice.services.impl.OAuthProvider;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.authservice.dto.response.CreateLocalUserResponse;
+import com.authservice.mapper.RoleMapper;
+import com.authservice.services.user.LocalUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
+import java.util.List;
 
-import static com.authservice.utils.AuthUtils.mapUserRoles;
+
 
 
 @Slf4j
@@ -28,26 +26,21 @@ import static com.authservice.utils.AuthUtils.mapUserRoles;
 public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final LocalAuthProvider localAuthProvider;
-    private final OAuthProvider oAuthProvider;
+    private final LocalUserService localUserService;
+    private final RoleMapper roleMapper;
 
-
-    public LocalRegisterResponse localRegister(LocalRegisterRequest dto) throws JsonProcessingException {
-        return localAuthProvider.register(dto);
+    @Transactional
+    public CreateLocalUserResponse localRegister(LocalRegisterRequest dto){
+        return localUserService.createLocalUser(dto);
     }
 
-    public OAuthRegisterResponse oAuthRegister(OAuthRegisterRequest dto) throws JsonProcessingException {
-        return oAuthProvider.handleOAuth(dto);
-    }
-
+    @Transactional
     public TokenPairDto signIn(SignInRequestDto dto) {
         Authentication authReq = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
         Authentication authenticatedUser = authenticationManager.authenticate(authReq);
         CustomUserDetails customUserDetails = (CustomUserDetails) authenticatedUser.getPrincipal();
-        long userId = customUserDetails.getUserId();
-        Set<String> roles = mapUserRoles(customUserDetails.getAuthorities());
 
-        return tokenService.getTokenPair(userId, roles, dto.deviceId());
+        return getTokenPair(customUserDetails, dto.deviceId());
     }
 
     public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
@@ -56,5 +49,13 @@ public class AuthService {
 
     public void logout(String refreshToken, String deviceId) {
         tokenService.logout(refreshToken, deviceId);
+    }
+
+
+    private TokenPairDto getTokenPair(CustomUserDetails customUserDetails, String deviceId) {
+        long userId = customUserDetails.getUserId();
+        List<String> roles = roleMapper.toRoleNames(customUserDetails.getAuthorities());
+
+        return tokenService.getTokenPair(userId, roles, deviceId);
     }
 }

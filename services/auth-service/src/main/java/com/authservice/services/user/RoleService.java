@@ -1,0 +1,25 @@
+package com.authservice.services.user;
+
+import com.authservice.entity.Role;
+import com.authservice.exceptions.NotFoundException;
+import com.authservice.repositories.RoleRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class RoleService {
+    private final RoleRepository roleRepository;
+
+    public Role getDefaultUserRole() {
+        return roleRepository.findById(1)
+                .orElseThrow(() -> new NotFoundException("User role not found"));
+    }
+
+    public List<String> getUserRoleNames(long userId) {
+        return roleRepository.findRoleNamesByUserId(userId);
+    }
+
+}

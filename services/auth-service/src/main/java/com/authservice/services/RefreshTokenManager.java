@@ -1,8 +1,10 @@
 package com.authservice.services;
 
 import com.authservice.entity.RefreshToken;
-import com.authservice.exceptions.EntityAlreadyExistsException;
+import com.authservice.entity.User;
+import com.authservice.exceptions.AlreadyExistsException;
 import com.authservice.repositories.RefreshTokenRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,7 @@ import static com.authservice.utils.CryptoUtils.createHmac;
 public class RefreshTokenManager {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EntityManager entityManager;
 
     @Value("${REFRESH_TOKEN_SECRET}")
     private String refreshSecret;
@@ -67,12 +70,13 @@ public class RefreshTokenManager {
 
     private String createNewRefreshToken(long userId, String deviceId) {
         String newToken = generateToken();
-        RefreshToken refreshToken = new RefreshToken(
-                hashedToken(newToken),
-                getExpireTime(),
-                userId,
-                deviceId
-        );
+        User user = entityManager.getReference(User.class, userId);
+        RefreshToken refreshToken = RefreshToken.builder()
+                .token(hashedToken(newToken))
+                .deviceId(deviceId)
+                .user(user)
+                .expiresAt(getExpireTime())
+                .build();
 
         saveRefreshToken(refreshToken);
 
@@ -89,7 +93,7 @@ public class RefreshTokenManager {
         try {
             refreshTokenRepository.save(refreshToken);
         } catch (DataIntegrityViolationException e) {
-            throw new EntityAlreadyExistsException("Refresh token was not created");
+            throw new AlreadyExistsException("Refresh token was not created");
         }
     }
 

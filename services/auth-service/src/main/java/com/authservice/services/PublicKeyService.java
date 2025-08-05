@@ -25,6 +25,9 @@ public class PublicKeyService {
     @Value("${PUBLIC_KEY_EXPIRATION}")
     private int expiration;
 
+    @Value("${KEY_ALGORITHM}")
+    private String keyAlgorithm;
+
     public void savePublicKey(RSAKey publicKey) {
         PublicKey key = new PublicKey();
         key.setKeyId(publicKey.getKeyID());
@@ -40,14 +43,13 @@ public class PublicKeyService {
                 .map(entity -> {
                     try {
                         JWK jwk = JWK.parse(entity.getPublicKey());
-                        System.out.println(jwk);
+
                         if (jwk instanceof RSAKey) {
-                            System.out.println("is a jwk test");
                             RSAKey.Builder builder = new RSAKey.Builder((RSAKey) jwk);
                             if (entity.getKeyId() != null) {
                                 builder.keyID(entity.getKeyId());
                             }
-                            builder.algorithm(Algorithm.parse("RS256"));
+                            builder.algorithm(Algorithm.parse(keyAlgorithm));
                             return builder.build();
                         }
 

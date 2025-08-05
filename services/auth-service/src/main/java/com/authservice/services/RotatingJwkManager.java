@@ -6,6 +6,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.grpc.server.service.GrpcService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -22,8 +23,7 @@ public class RotatingJwkManager {
     private final KafkaEventProducer authEventProducer;
 
     private final List<RSAKey> keys = new CopyOnWriteArrayList<>();
-
-
+    
     @Scheduled(fixedDelay = 1000 * 60 * 60 * 3)
     public void init() {
         try {

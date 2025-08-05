@@ -1,30 +1,32 @@
 package com.authservice.config.security.model;
 
+import com.authservice.entity.Role;
+import com.authservice.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     private final String email;
     private String password;
-    private final boolean isBlocked;
+    private final boolean isNonBlocked;
     private final boolean isVerified;
     private final Collection<? extends GrantedAuthority> authorities;
     @Getter
     private final long userId;
 
-    public CustomUserDetails(String email, String password, boolean isBlocked, boolean isVerified, long userId, List<String> roleNames) {
-        this.email = email;
-        this.password = password;
-        this.isBlocked = isBlocked;
-        this.isVerified = isVerified;
-        this.userId = userId;
-        this.authorities = mapToAuthorities(roleNames);
+    public CustomUserDetails(User user, boolean isNonBlocked) {
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+        this.isNonBlocked = isNonBlocked;
+        this.isVerified = user.getIsVerified();
+        this.userId = user.getId();
+        this.authorities = mapToAuthorities(user.getRoles());
     }
 
     @Override
@@ -44,7 +46,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     @Override
     public boolean isAccountNonLocked() {
-        return isBlocked;
+        return isNonBlocked;
     }
 
     @Override
@@ -57,7 +59,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.password = null;
     }
 
-    private Collection<? extends GrantedAuthority> mapToAuthorities(List<String> roles) {
-            return roles.stream().map(SimpleGrantedAuthority::new).toList();
+    private Collection<? extends GrantedAuthority> mapToAuthorities(Set<Role> roles) {
+            return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList();
     }
 }
