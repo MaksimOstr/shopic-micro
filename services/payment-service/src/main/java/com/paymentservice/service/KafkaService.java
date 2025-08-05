@@ -25,10 +25,6 @@ public class KafkaService {
         this.objectMapper = objectMapper;
     }
 
-
-
-
-
     public void sendCheckoutSessionSuccess(long orderId) {
         try {
             CheckoutSuccessEvent event = new CheckoutSuccessEvent(orderId);

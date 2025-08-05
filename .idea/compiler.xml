@@ -18,7 +18,6 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.6.3/52e345c907fbf173b376586c7f8b131d53fa5867/mapstruct-processor-1.6.3.jar" />
         </processorPath>
         <module name="shopic.ban-service.main" />
-        <module name="shopic.user-service.main" />
         <module name="shopic.payment-service.main" />
         <module name="shopic.order-service.main" />
         <module name="shopic.auth-service.main" />
@@ -60,6 +59,8 @@
       <module name="shopic.buildSrc" target="23" />
       <module name="shopic.buildSrc.main" target="23" />
       <module name="shopic.buildSrc.test" target="23" />
+      <module name="shopic.user-service.main" target="24" />
+      <module name="shopic.user-service.test" target="24" />
       <module name="user-service" target="24" />
       <module name="user-service.main" target="24" />
       <module name="user-service.test" target="24" />
@@ -145,7 +146,6 @@
       <module name="shopic.review-service" options="-parameters" />
       <module name="shopic.review-service.main" options="-parameters" />
       <module name="shopic.review-service.test" options="-parameters" />
-      <module name="shopic.user-service" options="-parameters" />
       <module name="shopic.user-service.main" options="-parameters" />
       <module name="shopic.user-service.test" options="-parameters" />
       <module name="user-service" options="-parameters" />

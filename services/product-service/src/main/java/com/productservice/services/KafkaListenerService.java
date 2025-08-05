@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class KafkaListenerService {
     private final ObjectMapper objectMapper;
     private final ReservationService reservationService;
-    private final ProductQueryService productQueryService;
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
     @KafkaListener(topics = {"payment.unpaid", "order.canceled"}, groupId = "product-service")
