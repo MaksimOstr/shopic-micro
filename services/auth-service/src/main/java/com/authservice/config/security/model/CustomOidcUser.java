@@ -6,14 +6,15 @@ import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 public class CustomOidcUser extends DefaultOidcUser {
     private final long id;
-    private final Set<String> roleNames;
+    private final List<String> roleNames;
 
-    public CustomOidcUser(OidcIdToken idToken, Collection<? extends GrantedAuthority> authorities, long userId, Set<String> roleNames) {
+    public CustomOidcUser(OidcIdToken idToken, Collection<? extends GrantedAuthority> authorities, long userId, List<String> roleNames) {
         super(authorities, idToken, "email");
 
         this.id = userId;

@@ -38,7 +38,7 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, optional = false)
     private Brand brand;
 
-    private boolean enabled;
+    private Boolean enabled;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

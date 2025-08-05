@@ -26,13 +26,10 @@ public class ApiGatewayConfig {
                 .path("/auth", request -> request
                         .filter(jwtHandlerFilter)
                         .POST("/logout", http()))
-                .build();
-    }
-
-    @Bean
-    public RouterFunction<ServerResponse> userRoute(JwtHandlerFilter jwtHandlerFilter) {
-        return route("user-service-route")
-                .filter(lb("user-service"))
+                .path("/admin/users", request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("/{id}", http())
+                        .GET("", http()))
                 .path("/verify", request -> request
                         .POST("/request", http())
                         .PATCH("", http()))
@@ -46,22 +43,36 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .POST("/change-request", http())
                         .PATCH("/change", http()))
-                .path("/admin/users", request -> request
-                        .filter(jwtHandlerFilter)
-                        .GET("/{id}", http())
-                        .GET("", http()))
-                .path("/profiles", request -> request
-                        .filter(jwtHandlerFilter)
-                        .GET("", http())
-                        .PATCH("", http()))
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> banRoute(JwtHandlerFilter jwtHandlerFilter) {
+        return route("ban-service-route")
+                .filter(lb("ban-service"))
                 .path("/bans", request -> request
                         .filter(jwtHandlerFilter)
                         .POST("", http())
                         .PATCH("/{id}/unban", http())
                         .GET("", http())
-                        .GET("/{id}", http()))
+                        .GET("/{id}", http())
+                        .GET("/check", http()))
                 .build();
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> profileRoute(JwtHandlerFilter jwtHandlerFilter) {
+        return route("profile-service-route")
+                .filter(lb("profile-service"))
+                .path("/profiles", request -> request
+                        .filter(jwtHandlerFilter)
+                        .GET("/me", http())
+                        .GET("/{id}", http())
+                        .GET("", http())
+                        .PATCH("", http()))
+                .build();
+    }
+
 
     @Bean
     public RouterFunction<ServerResponse> productRoute(JwtHandlerFilter jwtHandlerFilter) {

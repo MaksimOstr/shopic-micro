@@ -1,11 +1,10 @@
 package com.authservice.services;
 
 import com.authservice.config.security.model.CustomOidcUser;
-import com.authservice.dto.request.OAuthRegisterRequest;
-import com.authservice.dto.response.OAuthRegisterResponse;
-import com.authservice.enums.AuthProviderEnum;
-import com.authservice.exceptions.NotFoundException;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.authservice.dto.request.CreateOAuthUserRequest;
+import com.authservice.dto.response.CreateOAuthUserResponse;
+import com.authservice.entity.AuthProviderEnum;
+import com.authservice.services.user.OAuthUserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +23,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
 
-    private final AuthService authService;
-
+    private final OAuthUserService oAuthUserService;
+    private static final OAuth2Error error = new OAuth2Error(
+            "account_linked_to_another_provider",
+            "This account was registered via another provider",
+            null
+    );
 
     @Override
     @Transactional
@@ -34,26 +37,22 @@ public class CustomOidcUserService extends OidcUserService {
         OidcIdToken idToken = userRequest.getIdToken();
         String provider = userRequest.getClientRegistration().getRegistrationId();
         String email = idToken.getEmail();
-        String username = idToken.getClaimAsString("name");
+        String firstName = idToken.getGivenName();
+        String lastName = idToken.getFamilyName();
 
-        OAuthRegisterResponse response;
-        try {
-            OAuthRegisterRequest request = new OAuthRegisterRequest(email, username, username, AuthProviderEnum.fromString(provider));
-            response = authService.oAuthRegister(request);
-        } catch (JsonProcessingException | NotFoundException e) {
-            throw new OAuth2AuthenticationException(e.getMessage());
-        }
+        CreateOAuthUserRequest request = new CreateOAuthUserRequest(provider, email, firstName, lastName);
+        CreateOAuthUserResponse response = oAuthUserService.createOrGetOAuthUser(request);
 
-        if(response.getAuthProvider() != AuthProviderEnum.fromString(provider)) {
-            OAuth2Error oauth2Error = new OAuth2Error("This account was created by another provider");
-            throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
+        if(response.provider().equals(AuthProviderEnum.LOCAL)) {
+            log.error("User has been registered via another provider: {}", response.provider());
+            throw new OAuth2AuthenticationException(error);
         }
 
         return new CustomOidcUser(
                 userRequest.getIdToken(),
                 List.of(),
-                response.getUserId(),
-                response.getRoleNames()
+                response.userId(),
+                response.roleNames()
         );
     }
 }

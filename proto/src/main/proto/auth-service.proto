@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+
+package com.shopic.grpc.authservice;
+
+option java_multiple_files = true;
+option java_package = "com.shopic.grpc.authservice";
+
+
+message UserForBanRequest {
+  int64 user_id = 1;
+}
+
+message UserForBanResponse {
+  bool is_verified = 1;
+  string email = 2;
+  repeated string role_name = 3;
+}
+
+service AuthService {
+  rpc getUserForBan (UserForBanRequest) returns (UserForBanResponse);
+}
