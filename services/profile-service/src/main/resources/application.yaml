@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: profile-service
+  profiles:
+    active: dev
+server:
+  port: 0

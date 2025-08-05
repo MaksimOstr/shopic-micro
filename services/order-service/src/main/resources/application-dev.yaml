@@ -1,0 +1,28 @@
+spring:
+  cloud:
+    config:
+      label: services
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+  config:
+    import: "optional:configserver:"
+
+  grpc:
+    client:
+      channels:
+        product-service:
+          address: 0.0.0.0:1013
+        cart-service:
+          address: 0.0.0.0:1014
+        payment-service:
+          address: 0.0.0.0:1015
+
+  jpa:
+    properties:
+      hibernate:
+        order_inserts: true
+        jdbc:
+          batch_size: 20
+        generate_statistics: true

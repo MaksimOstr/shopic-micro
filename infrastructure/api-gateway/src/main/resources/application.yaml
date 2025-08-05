@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: dev
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          authorities-claim-name: roles
+
+server:
+  port: 3030
+
+
+
+

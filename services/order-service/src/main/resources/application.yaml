@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: order-service
+  profiles:
+    active: dev
+
+server:
+  port: 0

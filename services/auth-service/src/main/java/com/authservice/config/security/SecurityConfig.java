@@ -61,6 +61,8 @@ public class SecurityConfig {
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/verify/**").permitAll()
+                        .requestMatchers("/auth/register", "/auth/refresh", "/auth/sign-in").permitAll()
+                        .requestMatchers("/public-keys/**").permitAll()
                         .requestMatchers("/password/forgot-password", "/password/change").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2

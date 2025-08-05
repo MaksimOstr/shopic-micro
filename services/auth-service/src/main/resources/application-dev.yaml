@@ -1,0 +1,58 @@
+spring:
+  cloud:
+    config:
+      label: services
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+  config:
+    import: "optional:configserver:"
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/auth/login/oauth2/code/{registrationId}"
+            scope:
+              - profile
+              - email
+              - openid
+
+  grpc:
+    client:
+      channels:
+        user-service:
+          address: 0.0.0.0:1010
+        code-service:
+          address: 0.0.0.0:1011
+        ban-service:
+          address: 0.0.0.0:1020
+    server:
+      port: 1019
+
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      auto-offset-reset: latest
+      enable-auto-commit: false
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: manual_immediate
+  pulsar:
+    consumer:
+      retry-enable: true
+
+
+logging:
+  level:
+    org:
+      springframework:
+        security:
+          authentication: debug
+          oauth2: debug
+

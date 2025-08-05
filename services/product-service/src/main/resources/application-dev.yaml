@@ -1,0 +1,44 @@
+spring:
+  cloud:
+    config:
+      label: services
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region:
+        static: ${AWS_REGION}
+
+  config:
+    import: "optional:configserver:"
+
+  grpc:
+    client:
+      channels:
+        review-service:
+          address: 0.0.0.0:1016
+    server:
+      port: 1013
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+
+
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      auto-offset-reset: latest
+      enable-auto-commit: false
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: manual_immediate
+  pulsar:
+    consumer:
+      retry-enable: true

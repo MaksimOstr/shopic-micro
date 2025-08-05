@@ -1,0 +1,28 @@
+spring:
+  data:
+    redis:
+      password: ${REDIS_PASSWORD}
+      repositories:
+        enabled: false
+      port: 6379
+      host: localhost
+
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      auto-offset-reset: latest
+      enable-auto-commit: false
+    listener:
+      ack-mode: manual_immediate
+  pulsar:
+    consumer:
+      retry-enable: true
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: debug
+        security:
+          gateway: debug

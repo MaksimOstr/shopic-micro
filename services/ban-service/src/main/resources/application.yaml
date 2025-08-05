@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: ban-service
+  profiles:
+    active: dev
+
+server:
+  port: 0
+

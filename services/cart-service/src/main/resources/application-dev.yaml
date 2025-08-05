@@ -1,0 +1,18 @@
+spring:
+  cloud:
+    config:
+      label: services
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+  config:
+    import: "optional:configserver:"
+
+  grpc:
+    server:
+      port: 1014
+    client:
+      channels:
+        product-service:
+          address: 0.0.0.0:1013

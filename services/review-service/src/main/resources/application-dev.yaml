@@ -1,0 +1,31 @@
+spring:
+  cloud:
+    config:
+      label: services
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+  config:
+    import: "optional:configserver:"
+
+  grpc:
+    client:
+      channels:
+        product-service:
+          address: 0.0.0.0:1013
+    server:
+     port: 1016
+
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      auto-offset-reset: latest
+      enable-auto-commit: false
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: manual_immediate
+  pulsar:
+    consumer:
+      retry-enable: true
