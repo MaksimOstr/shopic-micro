@@ -26,6 +26,7 @@ grpc = { module = "org.springframework.grpc:spring-grpc-spring-boot-starter" }
 kafka = { module = "org.springframework.kafka:spring-kafka" }
 kafka-test = { module = "org.springframework.kafka:spring-kafka-test" }
 circuit-breaker = { module = "org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j" }
+actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 
 [plugins]
 spring-framework-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -34,7 +35,7 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 
 [bundles]
 core = ["spring-boot-starter-test", "spring-boot-starter", "junit"]
-business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc", "spring-security", "circuit-breaker"]
+business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc", "spring-security", "circuit-breaker", "actuator"]
 business-service-additional = ["postgreSQL-driver", "liquidBase", "liquidBase", "data-jpa"]
 
 

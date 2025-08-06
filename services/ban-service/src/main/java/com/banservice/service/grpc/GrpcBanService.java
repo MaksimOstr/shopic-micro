@@ -24,6 +24,7 @@ public class GrpcBanService extends BanServiceGrpc.BanServiceImplBase {
                 .setIsBanned(isUserBanned)
                 .build();
 
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

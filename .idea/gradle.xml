@@ -24,7 +24,6 @@
             <option value="$PROJECT_DIR$/services/product-service" />
             <option value="$PROJECT_DIR$/services/profile-service" />
             <option value="$PROJECT_DIR$/services/review-service" />
-            <option value="$PROJECT_DIR$/services/user-service" />
           </set>
         </option>
       </GradleProjectSettings>

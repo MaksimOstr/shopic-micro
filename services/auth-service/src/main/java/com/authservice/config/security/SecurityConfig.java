@@ -60,6 +60,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/verify/**").permitAll()
                         .requestMatchers("/auth/register", "/auth/refresh", "/auth/sign-in").permitAll()
                         .requestMatchers("/public-keys/**").permitAll()

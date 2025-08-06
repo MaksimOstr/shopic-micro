@@ -15,9 +15,6 @@ project(':discovery-server').projectDir = new File('infrastructure/discovery-ser
 include ':auth-service'
 project(':auth-service').projectDir = new File('services/auth-service')
 
-include ':user-service'
-project(':user-service').projectDir = new File('services/user-service')
-
 include ':order-service'
 project(':order-service').projectDir = new File('services/order-service')
 

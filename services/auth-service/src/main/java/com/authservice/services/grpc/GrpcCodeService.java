@@ -1,13 +1,17 @@
 package com.authservice.services.grpc;
 
 import com.authservice.exceptions.CodeVerificationException;
+import com.authservice.exceptions.ExternalServiceAccessException;
 import com.authservice.exceptions.InternalServiceException;
 import com.authservice.exceptions.NotFoundException;
 import com.shopic.grpc.codeservice.*;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
+
+import static io.grpc.Status.Code.*;
 
 
 @Slf4j
@@ -19,74 +23,63 @@ public class GrpcCodeService {
     private static final String INTERNAL_SERVICE_ERROR = "Internal code service error";
 
 
+    @CircuitBreaker(name = "code-service", fallbackMethod = "getCodeFallbackMethod")
     public CreateCodeResponse getEmailVerificationCode(long userId) {
-        try {
-            return codeGrpcService.getEmailVerificationCode(getCreateCodeRequest(userId));
-        } catch (StatusRuntimeException e) {
-            getCodeExceptionHandler(e);
-            throw e;
-        }
+        return codeGrpcService.getEmailVerificationCode(getCreateCodeRequest(userId));
     }
 
+    @CircuitBreaker(name = "code-service", fallbackMethod = "getCodeFallbackMethod")
     public CreateCodeResponse getResetPasswordCode(long userId) {
-        try {
-            return codeGrpcService.getResetPasswordCode(getCreateCodeRequest(userId));
-        } catch (StatusRuntimeException e) {
-            getCodeExceptionHandler(e);
-            throw e;
-        }
+        return codeGrpcService.getResetPasswordCode(getCreateCodeRequest(userId));
     }
 
+    @CircuitBreaker(name = "code-service", fallbackMethod = "getCodeFallbackMethod")
     public CreateCodeResponse getEmailChangeCode(long userId) {
-        try {
-            return codeGrpcService.getEmailChangeCode(getCreateCodeRequest(userId));
-        } catch (StatusRuntimeException e) {
-            getCodeExceptionHandler(e);
-            throw e;
-        }
+        return codeGrpcService.getEmailChangeCode(getCreateCodeRequest(userId));
     }
 
+    @CircuitBreaker(name = "code-service", fallbackMethod = "validateCodeFallbackMethod")
     public ValidateCodeResponse validateEmailCode(String code) {
-        try {
-            return codeGrpcService.validateEmailCode(getValidateCodeRequest(code));
-        } catch (StatusRuntimeException e) {
-            codeVerifyExceptionHandler(e);
-            throw e;
-        }
+        return codeGrpcService.validateEmailCode(getValidateCodeRequest(code));
     }
 
+    @CircuitBreaker(name = "code-service", fallbackMethod = "validateCodeFallbackMethod")
     public ValidateCodeResponse validateResetPasswordCode(String code) {
-        try {
-            return codeGrpcService.validateResetPasswordCode(getValidateCodeRequest(code));
-        } catch (StatusRuntimeException e) {
-            codeVerifyExceptionHandler(e);
-            throw e;
-        }
+        return codeGrpcService.validateResetPasswordCode(getValidateCodeRequest(code));
     }
 
+    @CircuitBreaker(name = "code-service", fallbackMethod = "validateCodeFallbackMethod")
     public ValidateCodeResponse validateEmailChangeCode(String code) {
-        try {
-            return codeGrpcService.validateEmailChangeCode(getValidateCodeRequest(code));
-        } catch (StatusRuntimeException e) {
-            codeVerifyExceptionHandler(e);
-            throw e;
+        return codeGrpcService.validateEmailChangeCode(getValidateCodeRequest(code));
+    }
+
+    public CreateCodeResponse getCodeFallbackMethod(long userId, Throwable e) {
+        log.error("getCodeFallbackMethod error = {}", e.getClass());
+
+        if(e instanceof StatusRuntimeException statusRuntimeException){
+
+            switch (statusRuntimeException.getStatus().getCode()) {
+                case ALREADY_EXISTS -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
+                default -> throw statusRuntimeException;
+            }
+        } else {
+            throw new ExternalServiceAccessException("Ban service is not available");
         }
     }
 
+    public ValidateCodeResponse validateCodeFallbackMethod(String code, Throwable e) {
+        log.error("validateCodeFallbackMethod error = {}", e.getClass());
 
-    private void getCodeExceptionHandler(StatusRuntimeException e) {
-        switch (e.getStatus().getCode()) {
-            case ALREADY_EXISTS -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
-            default -> throw e;
-        }
-    }
+        if(e instanceof StatusRuntimeException statusRuntimeException) {
 
-    private void codeVerifyExceptionHandler(StatusRuntimeException e) {
-        switch (e.getStatus().getCode()) {
-            case NOT_FOUND -> throw new NotFoundException(e.getStatus().getDescription());
-            case INVALID_ARGUMENT -> throw new CodeVerificationException(e.getStatus().getDescription());
-            case INTERNAL -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
-            default -> throw new CodeVerificationException("Unexpected error from code service" + e.getMessage());
+            switch (statusRuntimeException.getStatus().getCode()) {
+                case NOT_FOUND -> throw new NotFoundException(statusRuntimeException.getStatus().getDescription());
+                case INVALID_ARGUMENT -> throw new CodeVerificationException(statusRuntimeException.getStatus().getDescription());
+                case INTERNAL -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
+                default -> throw statusRuntimeException;
+            }
+        } else {
+            throw new ExternalServiceAccessException("Ban service is not available");
         }
     }
 

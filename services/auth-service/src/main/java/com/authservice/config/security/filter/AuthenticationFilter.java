@@ -73,6 +73,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     private boolean shouldExclude(HttpServletRequest request) {
         List<String> whiteList = List.of(
+                "/actuator/health",
                 "/auth/register",
                 "/auth/sign-in",
                 "/auth/refresh",

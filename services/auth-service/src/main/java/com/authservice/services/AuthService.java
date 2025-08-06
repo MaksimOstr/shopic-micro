@@ -29,6 +29,7 @@ public class AuthService {
     private final LocalUserService localUserService;
     private final RoleMapper roleMapper;
 
+
     @Transactional
     public CreateLocalUserResponse localRegister(LocalRegisterRequest dto){
         return localUserService.createLocalUser(dto);

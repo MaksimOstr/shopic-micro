@@ -2,10 +2,7 @@ package com.authservice.controller.advice;
 
 
 import com.authservice.dto.response.ErrorResponseDto;
-import com.authservice.exceptions.CodeVerificationException;
-import com.authservice.exceptions.InternalServiceException;
-import com.authservice.exceptions.NotFoundException;
-import com.authservice.exceptions.ResetPasswordException;
+import com.authservice.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -44,12 +41,13 @@ public class GlobalControllerAdvice {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(InternalServiceException.class)
-    public ResponseEntity<ErrorResponseDto> handleInternalServiceException(InternalServiceException e) {
+    @ExceptionHandler({InternalServiceException.class, ExternalServiceAccessException.class})
+    public ResponseEntity<ErrorResponseDto> handleInternalServiceException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()
         ));
     }
+
 }
