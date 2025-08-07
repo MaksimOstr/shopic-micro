@@ -1,6 +1,7 @@
 package com.reviewservice.controller.advice;
 
 import com.reviewservice.dto.response.ErrorResponseDto;
+import com.reviewservice.exception.ExternalServiceUnavailableException;
 import com.reviewservice.exception.ForbiddenException;
 import com.reviewservice.exception.InternalException;
 import com.reviewservice.exception.NotFoundException;
@@ -15,8 +16,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
-    @ExceptionHandler(InternalException.class)
-    public ResponseEntity<ErrorResponseDto> handleInternalException(InternalException e) {
+    @ExceptionHandler({InternalException.class, ExternalServiceUnavailableException.class})
+    public ResponseEntity<ErrorResponseDto> handleInternalException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

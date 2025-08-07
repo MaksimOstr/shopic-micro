@@ -34,8 +34,8 @@ protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
 
 [bundles]
-core = ["spring-boot-starter-test", "spring-boot-starter", "junit"]
-business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc", "spring-security", "circuit-breaker", "actuator"]
+core = ["spring-boot-starter-test", "spring-boot-starter", "junit", "actuator"]
+business-service = ["eureka-client", "spring-boot-starter-web", "config-server", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc", "spring-security", "circuit-breaker"]
 business-service-additional = ["postgreSQL-driver", "liquidBase", "liquidBase", "data-jpa"]
 
 

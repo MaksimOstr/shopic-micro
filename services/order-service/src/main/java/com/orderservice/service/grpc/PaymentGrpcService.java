@@ -1,6 +1,7 @@
 package com.orderservice.service.grpc;
 
 
+import com.orderservice.exception.ExternalServiceUnavailableException;
 import com.orderservice.exception.InternalException;
 import com.orderservice.mapper.GrpcMapper;
 import com.shopic.grpc.paymentservice.CreatePaymentRequest;
@@ -8,6 +9,7 @@ import com.shopic.grpc.paymentservice.CreatePaymentResponse;
 import com.shopic.grpc.paymentservice.OrderLineItem;
 import com.shopic.grpc.paymentservice.PaymentServiceGrpc;
 import com.shopic.grpc.productservice.ProductInfo;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +26,10 @@ public class PaymentGrpcService {
     private final PaymentServiceGrpc.PaymentServiceBlockingStub paymentGrpcService;
     private final GrpcMapper grpcMapper;
 
+    @CircuitBreaker(name = "payment-service", fallbackMethod = "createPaymentFallback")
     public CreatePaymentResponse createPayment(long orderId, long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap) {
+        log.info("Create payment gRpc request");
+
         List<OrderLineItem> orderLineItemList = grpcMapper.toOrderLineItemList(productInfoList, productQuantityMap);
 
         CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
@@ -33,15 +38,20 @@ public class PaymentGrpcService {
                 .addAllLineItems(orderLineItemList)
                 .build();
 
-        log.info("Create payment request: {}", request);
-        try {
-            return paymentGrpcService.createPaymentForOrder(request);
-        } catch (StatusRuntimeException e) {
-            log.error(e.getMessage(), e);
+        return paymentGrpcService.createPaymentForOrder(request);
+    }
+
+    public CreatePaymentResponse createPaymentFallback(long orderId, long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap, Throwable exception) {
+        log.error(exception.getMessage(), exception);
+        if (exception instanceof StatusRuntimeException e) {
             switch (e.getStatus().getCode()) {
-                case INTERNAL, UNKNOWN, FAILED_PRECONDITION: throw new InternalException(e.getStatus().getDescription());
-                default: throw e;
+                case INTERNAL, FAILED_PRECONDITION:
+                    throw new InternalException(e.getStatus().getDescription());
+                default:
+                    throw e;
             }
+        } else {
+            throw new ExternalServiceUnavailableException("Something went wrong. Please try again later");
         }
     }
 }

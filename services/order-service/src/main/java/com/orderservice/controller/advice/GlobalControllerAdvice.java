@@ -1,13 +1,10 @@
 package com.orderservice.controller.advice;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.orderservice.dto.response.ErrorResponseDto;
-import com.orderservice.exception.InsufficientStockException;
-import com.orderservice.exception.NotFoundException;
-import com.orderservice.exception.StateTransitionException;
+import com.orderservice.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.statemachine.StateMachineException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,8 +14,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
-    @ExceptionHandler(JsonProcessingException.class)
-    public ResponseEntity<ErrorResponseDto> handleJsonProcessingException(JsonProcessingException e) {
+    @ExceptionHandler({InternalException.class, ExternalServiceUnavailableException.class})
+    public ResponseEntity<ErrorResponseDto> handleJsonProcessingException(ExternalServiceUnavailableException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

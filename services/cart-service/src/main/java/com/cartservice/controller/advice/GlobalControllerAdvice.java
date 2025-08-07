@@ -1,6 +1,7 @@
 package com.cartservice.controller.advice;
 
 import com.cartservice.dto.response.ErrorResponseDto;
+import com.cartservice.exception.ExternalServiceUnavailableException;
 import com.cartservice.exception.InsufficientProductStockException;
 import com.cartservice.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,15 @@ public class GlobalControllerAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),
+                e.getMessage()
+        ));
+    }
+
+    @ExceptionHandler({ExternalServiceUnavailableException.class})
+    public ResponseEntity<ErrorResponseDto> handleInternalException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()
         ));
     }

@@ -2,6 +2,8 @@ package com.banservice.controller.advice;
 
 
 import com.banservice.dto.response.ErrorResponseDto;
+import com.banservice.exception.ExternalServiceUnavailableException;
+import com.banservice.exception.InternalServiceException;
 import com.banservice.exception.NotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
@@ -24,8 +26,8 @@ public class GlobalControllerAdvice {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(JsonProcessingException.class)
-    public ResponseEntity<ErrorResponseDto> handleJsonProcessingException(JsonProcessingException e) {
+    @ExceptionHandler({InternalServiceException.class, ExternalServiceUnavailableException.class})
+    public ResponseEntity<ErrorResponseDto> handleInternalException(Exception e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

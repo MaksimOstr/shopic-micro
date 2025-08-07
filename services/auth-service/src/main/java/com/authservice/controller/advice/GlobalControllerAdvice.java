@@ -41,8 +41,8 @@ public class GlobalControllerAdvice {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler({InternalServiceException.class, ExternalServiceAccessException.class})
-    public ResponseEntity<ErrorResponseDto> handleInternalServiceException(Exception e) {
+    @ExceptionHandler({InternalServiceException.class, ExternalServiceUnavailableException.class})
+    public ResponseEntity<ErrorResponseDto> handleInternalException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

@@ -1,7 +1,7 @@
 package com.authservice.services.grpc;
 
 
-import com.authservice.exceptions.ExternalServiceAccessException;
+import com.authservice.exceptions.ExternalServiceUnavailableException;
 import com.shopic.grpc.banservice.BanServiceGrpc;
 import com.shopic.grpc.banservice.CheckUserBanRequest;
 import com.shopic.grpc.banservice.CheckUserBanResponse;
@@ -29,6 +29,6 @@ public class GrpcBanService {
 
     public CheckUserBanResponse fallbackMethod(long userId, Throwable e) {
         log.error("fallbackMethod: ban-service is unavailable");
-        throw new ExternalServiceAccessException("Ban service is not available");
+        throw new ExternalServiceUnavailableException("Something went wrong. Try again later");
     }
 }

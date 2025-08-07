@@ -1,7 +1,7 @@
 package com.authservice.services.grpc;
 
 import com.authservice.exceptions.CodeVerificationException;
-import com.authservice.exceptions.ExternalServiceAccessException;
+import com.authservice.exceptions.ExternalServiceUnavailableException;
 import com.authservice.exceptions.InternalServiceException;
 import com.authservice.exceptions.NotFoundException;
 import com.shopic.grpc.codeservice.*;
@@ -63,7 +63,7 @@ public class GrpcCodeService {
                 default -> throw statusRuntimeException;
             }
         } else {
-            throw new ExternalServiceAccessException("Ban service is not available");
+            throw new ExternalServiceUnavailableException("Something went wrong. Try again later");
         }
     }
 
@@ -79,7 +79,7 @@ public class GrpcCodeService {
                 default -> throw statusRuntimeException;
             }
         } else {
-            throw new ExternalServiceAccessException("Ban service is not available");
+            throw new ExternalServiceUnavailableException("Something went wrong. Try again later");
         }
     }
 

@@ -2,6 +2,7 @@ package com.productservice.controller.advice;
 
 import com.productservice.dto.response.ErrorResponseDto;
 import com.productservice.exceptions.AlreadyExistsException;
+import com.productservice.exceptions.ExternalServiceUnavailableException;
 import com.productservice.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,15 @@ public class GlobalControllerAdvice {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDto(
                 HttpStatus.CONFLICT.getReasonPhrase(),
                 HttpStatus.CONFLICT.value(),
+                e.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(ExternalServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponseDto> handleInternalException(ExternalServiceUnavailableException e) {
+        return ResponseEntity.badRequest().body(new ErrorResponseDto(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()
         ));
     }

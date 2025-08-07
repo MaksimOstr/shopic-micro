@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+//refactor
 @Slf4j
 @Service
-
 public class KafkaService {
     private final KafkaTemplate<String, String> atLeastOnceBatchTemplate;
     private final ObjectMapper objectMapper;
