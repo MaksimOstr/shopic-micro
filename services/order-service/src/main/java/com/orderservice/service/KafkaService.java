@@ -4,20 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderservice.dto.event.BasicOrderEvent;
 import com.orderservice.exception.InternalException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-//refactor
+
 @Slf4j
 @Service
 public class KafkaService {
     private final KafkaTemplate<String, String> atLeastOnceBatchTemplate;
     private final ObjectMapper objectMapper;
 
-    public KafkaService (
+    public KafkaService(
             @Qualifier("atLeastOnceBatchTemplate") KafkaTemplate<String, String> atLeastOnceBatchTemplate,
             ObjectMapper objectMapper
     ) {
@@ -26,35 +25,25 @@ public class KafkaService {
     }
 
     public void sendOrderCompletedEvent(long orderId) {
-        try {
-            BasicOrderEvent event = new BasicOrderEvent(orderId);
-
-            atLeastOnceBatchTemplate.send("order.completed", objectMapper.writeValueAsString(event));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-            throw new InternalException("Error while sending order completed event");
-        }
+        sendEvent("order.completed", orderId);
     }
 
     public void sendOrderCanceledEvent(long orderId) {
-        try {
-            BasicOrderEvent event = new BasicOrderEvent(orderId);
-
-            atLeastOnceBatchTemplate.send("order.canceled", objectMapper.writeValueAsString(event));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-            throw new InternalException("Error while sending order completed event");
-        }
+        sendEvent("order.canceled", orderId);
     }
 
     public void sendOrderReturnEvent(long orderId) {
+        sendEvent("order.returned", orderId);
+    }
+
+    private void sendEvent(String topic, long orderId) {
         try {
             BasicOrderEvent event = new BasicOrderEvent(orderId);
-
-            atLeastOnceBatchTemplate.send("order.returned", objectMapper.writeValueAsString(event));
+            String message = objectMapper.writeValueAsString(event);
+            atLeastOnceBatchTemplate.send(topic, message);
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-            throw new InternalException("Error while sending order completed event");
+            log.error("Error while sending event to topic {}: {}", topic, e.getMessage());
+            throw new InternalException("Error while sending event to Kafka");
         }
     }
 }

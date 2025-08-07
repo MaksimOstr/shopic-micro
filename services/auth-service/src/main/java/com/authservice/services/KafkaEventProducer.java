@@ -18,6 +18,8 @@ public class KafkaEventProducer {
     private final KafkaTemplate<Object, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
+    private static final String SOMETHING_WENT_WRONG = "Something went wrong. Please try again later.";
+
 
     public void sendLocalUserCreated(String email, String code, String firstName, long userId, String lastName) {
         try {
@@ -30,7 +32,7 @@ public class KafkaEventProducer {
             );
             kafkaTemplate.send("user.local.registered", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
-            throw new InternalServiceException("Something went wrong");
+            throw new InternalServiceException(SOMETHING_WENT_WRONG);
         }
     }
 
@@ -43,7 +45,7 @@ public class KafkaEventProducer {
             );
             kafkaTemplate.send("user.oauth.registered", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
-            throw new InternalServiceException("Something went wrong");
+            throw new InternalServiceException(SOMETHING_WENT_WRONG);
         }
     }
 
@@ -70,7 +72,7 @@ public class KafkaEventProducer {
             kafkaTemplate.send(topic, objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
-            throw new InternalServiceException("Something went wrong");
+            throw new InternalServiceException(SOMETHING_WENT_WRONG);
         }
     }
 }

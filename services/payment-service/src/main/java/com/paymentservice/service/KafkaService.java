@@ -17,6 +17,8 @@ public class KafkaService {
     private final KafkaTemplate<String, String> atLeastOnceBatchTemplate;
     private final ObjectMapper objectMapper;
 
+    private static final String SOMETHING_WENT_WRONG = "Something went wrong. Please try again later";
+
     public KafkaService (
             @Qualifier("atLeastOnceBatchTemplate") KafkaTemplate<String, String> atLeastOnceBatchTemplate,
             ObjectMapper objectMapper
@@ -25,17 +27,14 @@ public class KafkaService {
         this.objectMapper = objectMapper;
     }
 
-
-
-
-
     public void sendCheckoutSessionSuccess(long orderId) {
         try {
             CheckoutSuccessEvent event = new CheckoutSuccessEvent(orderId);
 
             atLeastOnceBatchTemplate.send("checkout-session-success", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
-            throw new InternalException(e.getMessage());
+            log.error(e.getMessage(), e);
+            throw new InternalException(SOMETHING_WENT_WRONG);
         }
     }
 
@@ -45,7 +44,8 @@ public class KafkaService {
 
             atLeastOnceBatchTemplate.send("payment.unpaid", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
+            throw new InternalException(SOMETHING_WENT_WRONG);
         }
     }
 }
