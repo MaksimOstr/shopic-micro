@@ -5,6 +5,7 @@ import com.orderservice.dto.AdminOrderSummaryDto;
 import com.orderservice.dto.request.AdminOrderParams;
 import com.orderservice.dto.request.UpdateContactInfoRequest;
 import com.orderservice.service.AdminOrderService;
+import com.orderservice.service.OrderEventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminOrderController {
     private final AdminOrderService adminOrderService;
+    private final OrderEventService orderEventService;
 
 
     @GetMapping("/{id}")
@@ -60,15 +62,7 @@ public class AdminOrderController {
     public ResponseEntity<Void> completeOrder(
             @PathVariable long id
     ) {
-        adminOrderService.completeOrder(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelOrder(
-            @PathVariable long id
-    ) {
-        adminOrderService.cancelOrder(id);
+        orderEventService.completeOrder(id);
         return ResponseEntity.ok().build();
     }
 
@@ -76,7 +70,7 @@ public class AdminOrderController {
     public ResponseEntity<Void> processOrder(
             @PathVariable long id
     ) {
-        adminOrderService.processOrder(id);
+        orderEventService.processOrder(id);
         return ResponseEntity.ok().build();
     }
 
@@ -84,7 +78,7 @@ public class AdminOrderController {
     public ResponseEntity<Void> shipOrder(
             @PathVariable long id
     ) {
-        adminOrderService.shipOrder(id);
+        orderEventService.shipOrder(id);
         return ResponseEntity.ok().build();
     }
 
@@ -92,7 +86,7 @@ public class AdminOrderController {
     public ResponseEntity<Void> pickupReadyOrder(
             @PathVariable long id
     ) {
-        adminOrderService.pickupOrder(id);
+        orderEventService.pickupReadyOrder(id);
         return ResponseEntity.ok().build();
     }
 
@@ -100,7 +94,7 @@ public class AdminOrderController {
     public ResponseEntity<Void> returnOrder(
             @PathVariable long id
     ) {
-        adminOrderService.returnOrder(id);
+        orderEventService.returnOrder(id);
         return ResponseEntity.ok().build();
     }
 }

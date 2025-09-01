@@ -38,6 +38,7 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
                 .initial(OrderStatusEnum.CREATED)
                 .states(EnumSet.allOf(OrderStatusEnum.class))
                 .end(OrderStatusEnum.CANCELLED)
+                .end(OrderStatusEnum.RETURNED)
                 .end(OrderStatusEnum.COMPLETED);
     }
 
@@ -66,23 +67,11 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
                     .target(OrderStatusEnum.PROCESSING)
                     .event(OrderEvents.PROCESS)
                     .and()
-                .withExternal()
-                    .source(OrderStatusEnum.PAID)
-                    .target(OrderStatusEnum.CANCELLED_PAID)
-                    .action(cancelAction)
-                    .event(OrderEvents.CANCEL)
-                    .and()
 
                 .withExternal()
                     .source(OrderStatusEnum.PROCESSING)
                     .target(OrderStatusEnum.SHIPPED)
                     .event(OrderEvents.SHIP)
-                    .and()
-                .withExternal()
-                    .source(OrderStatusEnum.PROCESSING)
-                    .target(OrderStatusEnum.CANCELLED_PAID)
-                    .event(OrderEvents.CANCEL)
-                    .action(cancelAction)
                     .and()
 
                 .withExternal()

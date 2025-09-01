@@ -6,6 +6,7 @@ import com.orderservice.dto.OrderSummaryDto;
 import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.dto.request.OrderParams;
 import com.orderservice.service.OrderCreationService;
+import com.orderservice.service.OrderEventService;
 import com.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +19,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/orders")
 public class OrderController {
     private final OrderCreationService orderCreationService;
     private final OrderService orderService;
+    private final OrderEventService orderEventService;
+
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
@@ -66,8 +67,9 @@ public class OrderController {
 
     @PutMapping("/{id}/cancel")
     public ResponseEntity<?> cancelOrder(
-            @PathVariable String id
+            @PathVariable long id
     ) {
+        orderEventService.cancelOrder(id);
 
         return ResponseEntity.ok().build();
     }

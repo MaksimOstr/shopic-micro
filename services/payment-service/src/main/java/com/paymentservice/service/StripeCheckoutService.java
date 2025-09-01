@@ -26,6 +26,11 @@ import static com.paymentservice.utils.Utils.toSmallestUnit;
 public class StripeCheckoutService {
     private final PaymentService paymentService;
 
+    @Value("${STRIPE_SUCCESS_URL}")
+    private String stripeSuccessUrl;
+
+    @Value("${STRIPE_CANCEL_URL}")
+    private String stripeCancelUrl;
 
     @Value("${STRIPE_SECRET_KEY}")
     private String stripeSecretKey;
@@ -43,8 +48,8 @@ public class StripeCheckoutService {
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .setCurrency("USD")
                     .addAllLineItem(lineItems)
-                    .setSuccessUrl("https://stripe.com")
-                    .setCancelUrl("https://stripe.com")
+                    .setSuccessUrl(stripeSuccessUrl)
+                    .setCancelUrl(stripeCancelUrl)
                     .putMetadata("order_id", String.valueOf(dto.orderId()))
                     .build();
             Session session = Session.create(params);
