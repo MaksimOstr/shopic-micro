@@ -30,7 +30,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: reporter
+                  name: reporter_id
                   type: bigint
                   constraints:
                     nullable: false
@@ -73,7 +73,7 @@ databaseChangeLog:
               - column:
                   name: review_id
               - column:
-                  name: reporter
+                  name: reporter_id
         - createIndex:
             tableName: reports
             indexName: idx_reports_comment_reporter
@@ -82,5 +82,5 @@ databaseChangeLog:
               - column:
                   name: comment_id
               - column:
-                  name: reporter
+                  name: reporter_id
 

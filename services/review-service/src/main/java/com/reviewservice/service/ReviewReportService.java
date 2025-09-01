@@ -32,7 +32,7 @@ public class ReviewReportService {
         ReviewReport report = new ReviewReport();
 
         report.setDescription(dto.description());
-        report.setReporter(userId);
+        report.setReporterId(userId);
         report.setReview(review);
         report.setStatus(ReportStatus.PENDING);
 

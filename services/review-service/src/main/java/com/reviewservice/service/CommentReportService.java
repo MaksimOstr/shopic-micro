@@ -32,7 +32,7 @@ public class CommentReportService {
         ReviewCommentReport report = new ReviewCommentReport();
 
         report.setComment(comment);
-        report.setReporter(userId);
+        report.setReporterId(userId);
         report.setDescription(dto.description());
         report.setStatus(ReportStatus.PENDING);
 

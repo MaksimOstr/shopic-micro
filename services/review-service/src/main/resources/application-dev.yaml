@@ -14,6 +14,8 @@ spring:
       channels:
         product-service:
           address: 0.0.0.0:1013
+        profile-service:
+          address: 0.0.0.0:2020
     server:
      port: 1016
 

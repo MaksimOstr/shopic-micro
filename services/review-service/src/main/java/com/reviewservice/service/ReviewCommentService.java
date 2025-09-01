@@ -9,7 +9,9 @@ import com.reviewservice.entity.ReviewComment;
 import com.reviewservice.exception.NotFoundException;
 import com.reviewservice.mapper.ReviewCommentMapper;
 import com.reviewservice.repository.ReviewCommentRepository;
+import com.reviewservice.service.grpc.GrpcProfileService;
 import com.reviewservice.utils.SpecificationUtils;
+import com.shopic.grpc.profileservice.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -29,13 +31,17 @@ public class ReviewCommentService {
     private final ReviewCommentRepository reviewCommentRepository;
     private final ReviewService reviewService;
     private final ReviewCommentMapper reviewCommentMapper;
+    private final GrpcProfileService grpcProfileService;
 
     @Transactional
     public void createReviewComment(CreateReviewCommentRequest dto, long userId) {
         Review review = reviewService.getReview(dto.reviewId());
+        ProfileResponse profile = grpcProfileService.getUserProfile(userId);
 
         ReviewComment reviewComment = ReviewComment.builder()
                 .review(review)
+                .lastName(profile.getLastName())
+                .firstName(profile.getFirstName())
                 .comment(dto.comment())
                 .userId(userId)
                 .build();

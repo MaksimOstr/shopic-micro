@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package com.shopic.grpc.profileservice;
+
+option java_multiple_files = true;
+option java_package = "com.shopic.grpc.profileservice";
+
+message ProfileRequest {
+  int64 user_id = 1;
+}
+
+message ProfileResponse {
+  string first_name = 1;
+  string last_name = 2;
+}
+
+service ProfileService {
+  rpc getUserProfile(ProfileRequest) returns (ProfileResponse);
+}

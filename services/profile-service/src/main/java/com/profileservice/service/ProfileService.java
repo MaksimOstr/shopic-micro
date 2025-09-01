@@ -81,13 +81,13 @@ public class ProfileService {
 
     public Profile getProfileByUserId(long userId) {
         return profileRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+                .orElseThrow(() -> new NotFoundException("Profile not found"));
     }
 
 
     private Profile getProfileById(long id) {
         return profileRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+                .orElseThrow(() -> new NotFoundException("Profile not found"));
     }
 
 

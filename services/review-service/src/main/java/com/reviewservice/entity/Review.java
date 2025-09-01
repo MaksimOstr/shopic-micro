@@ -30,6 +30,12 @@ public class Review {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     @Column(precision = 2, scale = 1)
     private BigDecimal rating;
 

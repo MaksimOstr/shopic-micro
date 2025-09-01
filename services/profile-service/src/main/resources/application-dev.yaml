@@ -9,6 +9,12 @@ spring:
   config:
     import: "optional:configserver:"
 
+  grpc:
+    client:
+      channels:
+        review-service:
+          address: 0.0.0.0:2020
+
   kafka:
     bootstrap-servers: localhost:9094
     consumer:

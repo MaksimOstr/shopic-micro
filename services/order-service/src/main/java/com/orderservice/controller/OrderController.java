@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('USER')")
 @RequestMapping("/orders")
 public class OrderController {
     private final OrderCreationService orderCreationService;
@@ -29,7 +30,6 @@ public class OrderController {
 
 
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> createOrder(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid CreateOrderRequest body
@@ -40,7 +40,6 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderDto> getOrder(
             @PathVariable Long id
     ) {
@@ -50,7 +49,6 @@ public class OrderController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<OrderSummaryDto>> getUserOrders(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody OrderParams body,
