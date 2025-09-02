@@ -117,7 +117,11 @@ public class ReviewService {
         return reviewRepository.existsById(reviewId);
     }
 
+    public List<ReviewForRating> getReviewsForRating(long productId) {
+        return reviewRepository.findReviewsForRatingByProductId(productId);
+    }
+
     public List<ReviewForRating> getReviewsForRating(List<Long> productIds) {
-        return reviewRepository.findReviewsForRatingByProductId(productIds);
+        return reviewRepository.findReviewsForRatingByProductsId(productIds);
     }
 }

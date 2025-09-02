@@ -1,9 +1,7 @@
 package com.productservice.services.grpc;
 
 import com.productservice.exceptions.ExternalServiceUnavailableException;
-import com.shopic.grpc.reviewservice.ProductRatingsRequest;
-import com.shopic.grpc.reviewservice.ProductRatingsResponse;
-import com.shopic.grpc.reviewservice.ReviewServiceGrpc;
+import com.shopic.grpc.reviewservice.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +22,15 @@ public class GrpcReviewService {
                 .build();
 
         return gRpcReviewService.getProductRatings(request);
+    }
+
+    @CircuitBreaker(name = "review-service", fallbackMethod = "getProductRatingsFallback")
+    public ProductRatingResponse getProductRating(long productId) {
+        ProductRatingRequest request = ProductRatingRequest.newBuilder()
+                .setProductId(productId)
+                .build();
+
+        return gRpcReviewService.getProductRating(request);
     }
 
     public ProductRatingsResponse getProductRatingsFallback(List<Long> productIds, Throwable throwable) {

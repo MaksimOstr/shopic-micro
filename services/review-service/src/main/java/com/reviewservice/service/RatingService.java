@@ -17,7 +17,13 @@ import java.util.stream.Collectors;
 public class RatingService {
     private final ReviewService reviewService;
 
-    public List<RatingDto> getProductRating(List<Long> productIds) {
+    public BigDecimal getRatingByProductId(long productId) {
+        List<ReviewForRating> reviews = reviewService.getReviewsForRating(productId);
+
+        return calculateAverage(reviews);
+    }
+
+    public List<RatingDto> getProductRatings(List<Long> productIds) {
         List<ReviewForRating> reviewsForRating = reviewService.getReviewsForRating(productIds);
 
         if(reviewsForRating == null || reviewsForRating.isEmpty()) {

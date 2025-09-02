@@ -6,6 +6,8 @@ import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
+import com.productservice.services.grpc.GrpcReviewService;
+import com.shopic.grpc.reviewservice.ProductRatingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,6 +29,7 @@ public class AdminProductFacade {
     private final ProductQueryService productQueryService;
     private final ProductSearchService productSearchService;
     private final ProductCommandService productCommandService;
+    private final GrpcReviewService grpcReviewService;
 
 
     public CompletableFuture<Product> createProduct(CreateProductRequest dto, MultipartFile productImage) {
@@ -37,7 +41,12 @@ public class AdminProductFacade {
     }
 
     public AdminProductDto getAdminProduct(long id) {
-        return productQueryService.getAdminProductById(id);
+        AdminProductDto product = productQueryService.getAdminProductById(id);
+        ProductRatingResponse rating = grpcReviewService.getProductRating(product.getId());
+
+        product.setRating(new BigDecimal(rating.getRating()));
+
+        return product;
     }
 
     public Product updateProduct(UpdateProductRequest dto, long productId) {

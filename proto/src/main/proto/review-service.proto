@@ -7,7 +7,9 @@ option java_multiple_files = true;
 option java_package = "com.shopic.grpc.reviewservice";
 
 
-
+message ProductRatingRequest {
+  int64 product_id = 1;
+}
 
 message ProductRatingsRequest {
   repeated int64 product_id = 1;
@@ -23,9 +25,15 @@ message ProductRating {
   int32 review_count = 3;
 }
 
+message ProductRatingResponse {
+  string rating = 1;
+}
+
 
 
 
 service ReviewService {
+  rpc getProductRating(ProductRatingRequest) returns (ProductRatingResponse);
+
   rpc getProductRatings(ProductRatingsRequest) returns (ProductRatingsResponse);
 }

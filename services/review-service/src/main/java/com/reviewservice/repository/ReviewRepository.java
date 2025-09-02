@@ -28,5 +28,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecif
             "r.rating" +
             ")" +
             "FROM Review r WHERE r.productId IN :productIds")
-    List<ReviewForRating> findReviewsForRatingByProductId(List<Long> productIds);
+    List<ReviewForRating> findReviewsForRatingByProductsId(List<Long> productIds);
+
+    @Query("SELECT new com.reviewservice.projection.ReviewForRating(" +
+            "r.productId," +
+            "r.rating" +
+            ")" +
+            "FROM Review r WHERE r.productId = :productId")
+    List<ReviewForRating> findReviewsForRatingByProductId(long productId);
 }

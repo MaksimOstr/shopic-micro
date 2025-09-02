@@ -5,12 +5,15 @@ import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.ProductParams;
 import com.productservice.entity.Product;
+import com.productservice.services.grpc.GrpcReviewService;
+import com.shopic.grpc.reviewservice.ProductRatingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.productservice.utils.SpecificationUtils.*;
@@ -22,6 +25,7 @@ import static com.productservice.utils.SpecificationUtils.hasChild;
 public class UserProductFacade {
     private final ProductSearchService productSearchService;
     private final ProductQueryService productQueryService;
+    private final GrpcReviewService grpcReviewService;
 
     public Page<ProductUserPreviewDto> getProductsByFilters(ProductParams params, Pageable pageable, long userId) {
         Specification<Product> spec = iLike("name", params.getName())
@@ -39,6 +43,11 @@ public class UserProductFacade {
     }
 
     public UserProductDto getProduct(long productId) {
-        return productQueryService.getUserProductById(productId);
+        UserProductDto product = productQueryService.getUserProductById(productId);
+        ProductRatingResponse rating = grpcReviewService.getProductRating(productId);
+
+        product.setRating(new BigDecimal(rating.getRating()));
+
+        return product;
     }
 }
