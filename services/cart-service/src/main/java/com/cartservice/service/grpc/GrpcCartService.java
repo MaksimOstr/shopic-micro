@@ -33,5 +33,4 @@ public class GrpcCartService extends CartServiceGrpc.CartServiceImplBase {
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
-
 }

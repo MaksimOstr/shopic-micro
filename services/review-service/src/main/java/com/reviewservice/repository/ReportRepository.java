@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long>, JpaSpecificationExecutor<Report> {
 
-    Optional<Report> findByIdAndReporter(long id, long reporter);
+    Optional<Report> findByIdAndReporterId(long id, long reporter);
 
     void deleteByCreatedAtBefore(Instant before);
 }

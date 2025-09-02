@@ -1,6 +1,6 @@
 services:
   auth-service-db:
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - "${AUTH_DB_PORT}:5432"
@@ -24,7 +24,7 @@ services:
       POSTGRES_DB: ${BAN_DB_NAME}
 
   profile-service-db:
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - "${PROFILE_DB_PORT}:5432"
@@ -36,7 +36,7 @@ services:
       POSTGRES_DB: ${PROFILE_DB_NAME}
 
   order-service-db:
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - "${ORDER_DB_PORT}:5432"
@@ -48,7 +48,7 @@ services:
       POSTGRES_DB: ${ORDER_DB_NAME}
 
   code-service-db:
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - "${CODE_DB_PORT}:5432"
@@ -60,7 +60,7 @@ services:
       POSTGRES_DB: ${CODE_DB_NAME}
 
   product-service-db:
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - "${PRODUCT_DB_PORT}:5432"
@@ -72,7 +72,7 @@ services:
       POSTGRES_DB: ${PRODUCT_DB_NAME}
 
   cart-service-db:
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - "${CART_DB_PORT}:5432"
@@ -84,7 +84,7 @@ services:
       POSTGRES_DB: ${CART_DB_NAME}
 
   payment-service-db:
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - "${PAYMENT_DB_PORT}:5432"
@@ -96,7 +96,7 @@ services:
       POSTGRES_DB: ${PAYMENT_DB_NAME}
 
   review-service-db:
-    image: postgres
+    image: postgres:latest
     restart: always
     ports:
       - "${REVIEW_DB_PORT}:5432"

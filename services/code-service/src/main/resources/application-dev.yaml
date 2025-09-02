@@ -9,6 +9,15 @@ spring:
   config:
     import: "optional:configserver:"
 
+resilience4j:
+  retry:
+    instances:
+      codeGenerationRetry:
+        max-attempts: 3
+        wait-duration: 100ms
+        retry-exceptions:
+          - org.springframework.dao.DataIntegrityViolationException
+
   grpc:
     server:
       port: 1011

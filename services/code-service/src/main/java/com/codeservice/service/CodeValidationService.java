@@ -30,15 +30,13 @@ public class CodeValidationService {
                         throw new CodeValidationException(CODE_VALIDATION_FAILED);
                     }
 
-                    deleteCode(code);
+                    codeRepository.deleteCodeByCode(code);
+
                     return foundCode.getUserId();
                 })
                 .orElseThrow(() -> new NotFoundException(CODE_VALIDATION_FAILED));
     }
 
-    private void deleteCode(String code) {
-        codeRepository.deleteCodeByCode(code);
-    }
 
     private boolean isCodeExpired(Code code) {
         return code.getExpiresAt().isBefore(Instant.now());

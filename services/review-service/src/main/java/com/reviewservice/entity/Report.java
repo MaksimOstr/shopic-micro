@@ -29,6 +29,7 @@ public class Report {
     @Column(name = "report_type", nullable = false, insertable=false, updatable=false)
     private String reportType;
 
+    @Column(name = "reporter_id", nullable = false)
     private Long reporterId;
 
     @CreatedDate

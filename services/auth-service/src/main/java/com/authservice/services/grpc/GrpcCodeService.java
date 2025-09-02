@@ -57,9 +57,10 @@ public class GrpcCodeService {
         log.error("getCodeFallbackMethod error = {}", e.getClass());
 
         if(e instanceof StatusRuntimeException statusRuntimeException){
+            String description = statusRuntimeException.getStatus().getDescription();
 
             switch (statusRuntimeException.getStatus().getCode()) {
-                case ALREADY_EXISTS -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
+                case INTERNAL -> throw new InternalServiceException(description);
                 default -> throw statusRuntimeException;
             }
         } else {
@@ -71,10 +72,11 @@ public class GrpcCodeService {
         log.error("validateCodeFallbackMethod error = {}", e.getClass());
 
         if(e instanceof StatusRuntimeException statusRuntimeException) {
+            String description = statusRuntimeException.getStatus().getDescription();
 
             switch (statusRuntimeException.getStatus().getCode()) {
-                case NOT_FOUND -> throw new NotFoundException(statusRuntimeException.getStatus().getDescription());
-                case INVALID_ARGUMENT -> throw new CodeVerificationException(statusRuntimeException.getStatus().getDescription());
+                case NOT_FOUND -> throw new NotFoundException(description);
+                case INVALID_ARGUMENT -> throw new CodeVerificationException(description);
                 case INTERNAL -> throw new InternalServiceException(INTERNAL_SERVICE_ERROR);
                 default -> throw statusRuntimeException;
             }

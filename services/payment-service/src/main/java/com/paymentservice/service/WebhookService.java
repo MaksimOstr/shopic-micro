@@ -5,7 +5,6 @@ import com.paymentservice.entity.PaymentStatus;
 import com.paymentservice.entity.RefundStatus;
 import com.paymentservice.exception.NotFoundException;
 import com.stripe.model.Event;
-import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;

@@ -8,7 +8,6 @@ spring:
       fail-fast: true
   config:
     import: "optional:configserver:"
-
   security:
     oauth2:
       client:

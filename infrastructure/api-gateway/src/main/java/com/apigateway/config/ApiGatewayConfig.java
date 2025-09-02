@@ -1,11 +1,8 @@
 package com.apigateway.config;
 
 import com.apigateway.filters.JwtHandlerFilter;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -17,7 +14,7 @@ import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFuncti
 @Configuration
 public class ApiGatewayConfig {
     @Bean
-    public RouterFunction<ServerResponse> authRoute(JwtHandlerFilter jwtHandlerFilter, CircuitBreakerRegistry registry) {
+    public RouterFunction<ServerResponse> authRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("auth-service-route")
                 .filter(lb("auth-service"))
                 .path("/auth", request -> request

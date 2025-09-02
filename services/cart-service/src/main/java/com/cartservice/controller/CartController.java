@@ -18,11 +18,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/carts")
+@PreAuthorize("hasRole('USER')")
 public class CartController {
     private final CartService cartService;
 
     @GetMapping("/items")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<CartItemProjection>> getCartItems(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
@@ -32,7 +32,6 @@ public class CartController {
     }
 
     @PostMapping("/items")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CartItem> addCartItem(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid AddItemToCartRequest body
@@ -43,10 +42,8 @@ public class CartController {
     }
 
     @DeleteMapping("/items/{id}")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> deleteCartItem(
             @PathVariable long id
-
     ) {
         cartService.removeItemFromCart(id);
 
@@ -54,7 +51,6 @@ public class CartController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> deleteCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
@@ -64,7 +60,6 @@ public class CartController {
     }
 
     @PatchMapping("/items/quantity")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> changeCartItemQuantity(
             @RequestBody @Valid ChangeCartItemQuantity body
     ) {

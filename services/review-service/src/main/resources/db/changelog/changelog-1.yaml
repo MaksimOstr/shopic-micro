@@ -52,6 +52,16 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: first_name
+                  type: varchar
+                  constraints:
+                    nullable: true
+              - column:
+                  name: last_name
+                  type: varchar
+                  constraints:
+                    nullable: true
+              - column:
                   name: updated_at
                   type: timestamptz
                   constraints:
@@ -80,6 +90,16 @@ databaseChangeLog:
                     deleteCascade: true
                     foreignKeyName: fk_review_comment_review
                     references: reviews(id)
+              - column:
+                  name: first_name
+                  type: varchar
+                  constraints:
+                    nullable: true
+              - column:
+                  name: last_name
+                  type: varchar
+                  constraints:
+                    nullable: true
               - column:
                   name: comment
                   type: varchar(2000)

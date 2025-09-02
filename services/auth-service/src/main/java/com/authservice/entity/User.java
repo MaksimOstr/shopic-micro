@@ -53,7 +53,7 @@ public class User {
     @PrePersist
     protected void onCreate() {
         if(isVerified == null) {
-            isVerified = true;
+            isVerified = false;
         }
     }
 }
