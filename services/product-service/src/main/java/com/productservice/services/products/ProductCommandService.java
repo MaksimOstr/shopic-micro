@@ -45,9 +45,9 @@ public class ProductCommandService {
 
     @Transactional
     public Product updateProduct(UpdateProductRequest dto, long productId) {
-        Product product = productQueryService.getProductById(productId);
+        Product product = productQueryService.getProductWithCategoryAndBrand(productId);
 
-        updateProductFieldsIfExists(product, dto);
+        updateProductFields(product, dto);
 
         return product;
     }
@@ -85,7 +85,7 @@ public class ProductCommandService {
                 .build();
     }
 
-    private void updateProductFieldsIfExists(Product product, UpdateProductRequest dto) {
+    private void updateProductFields(Product product, UpdateProductRequest dto) {
         Optional.ofNullable(dto.name()).ifPresent(product::setName);
         Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
         Optional.ofNullable(dto.price()).ifPresent(product::setPrice);

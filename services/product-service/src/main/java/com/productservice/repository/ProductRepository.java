@@ -1,5 +1,8 @@
 package com.productservice.repository;
 
+import com.productservice.dto.AdminProductDto;
+import com.productservice.dto.LikedProductDto;
+import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
 import com.productservice.projection.ProductDto;
 import com.productservice.projection.ProductForCartDto;
@@ -26,11 +29,38 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("SELECT p.imageUrl FROM Product p WHERE p.id = :id")
     Optional<String> getProductImageUrl(long id);
 
-    @Query("SELECT p FROM Product p JOIN FETCH p.category JOIN FETCH  p.brand WHERE p.id = :id AND p.enabled = true")
-    Optional<Product> getEnabledProduct(long id);
+    @Query("SELECT new com.productservice.dto.UserProductDto(" +
+            "p.id, " +
+            "p.name, " +
+            "p.description, " +
+            "p.imageUrl," +
+            "p.sku," +
+            "p.price, " +
+            "b.name, " +
+            "c.name) " +
+            "FROM Product p " +
+            "JOIN p.brand b " +
+            "JOIN p.category c WHERE p.id = :id AND p.enabled = true")
+    Optional<UserProductDto> getUserProduct(long id);
 
-    @EntityGraph(attributePaths = {"category", "brand"})
-    Optional<Product> findById(long id);
+    @Query("SELECT new com.productservice.dto.AdminProductDto(" +
+            "p.id, " +
+            "p.name, " +
+            "p.description, " +
+            "p.imageUrl," +
+            "p.sku," +
+            "p.price, " +
+            "b.name, " +
+            "c.name," +
+            "p.enabled," +
+            "p.createdAt) " +
+            "FROM Product p " +
+            "JOIN p.brand b " +
+            "JOIN p.category c WHERE p.id = :id AND p.enabled = true")
+    Optional<AdminProductDto> getAdminProduct(long id);
+
+    @Query("SELECT p FROM Product p JOIN FETCH p.category c JOIN FETCH p.brand b WHERE p.id = :id")
+    Optional<Product> getProductWithCategoryAndBrand(long id);
 
     @Transactional
     @Modifying
@@ -48,37 +78,14 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "FROM Product p WHERE p.id IN :ids")
     List<ProductInfoDto> findProductPrices(List<Long> ids);
 
-    @Query("SELECT new com.productservice.projection.ProductDto(" +
+    @Query("SELECT new com.productservice.dto.LikedProductDto(" +
             "p.id, " +
             "p.name, " +
-            "p.description, " +
             "p.imageUrl," +
-            "p.sku," +
-            "p.price, " +
-            "b.name, " +
-            "c.name, " +
-            "p.stockQuantity," +
-            "p.enabled) " +
+            "p.price) " +
             "FROM Product p " +
-            "JOIN p.brand b " +
-            "JOIN p.category c")
-    Page<ProductDto> getPageOfProducts(Pageable pageable);
-
-    @Query("SELECT new com.productservice.projection.ProductDto(" +
-            "p.id, " +
-            "p.name, " +
-            "p.description, " +
-            "p.imageUrl," +
-            "p.sku," +
-            "p.price, " +
-            "b.name, " +
-            "c.name, " +
-            "p.stockQuantity," +
-            "p.enabled) " +
-            "FROM Product p " +
-            "JOIN p.brand b " +
-            "JOIN p.category c WHERE p.id IN :productIds")
-    List<ProductDto> findProductsByIds(@Param("productIds") Set<Long> productIds);
+            "WHERE p.id IN :productIds")
+    List<LikedProductDto> findProductsByIds(@Param("productIds") Set<Long> productIds);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Product p WHERE p.id IN :productIds")

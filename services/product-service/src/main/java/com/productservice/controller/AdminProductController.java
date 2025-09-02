@@ -2,6 +2,8 @@ package com.productservice.controller;
 
 
 import com.productservice.config.security.model.CustomPrincipal;
+import com.productservice.dto.AdminProductDto;
+import com.productservice.dto.ProductAdminPreviewDto;
 import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
@@ -52,10 +54,10 @@ public class AdminProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProduct(
+    public ResponseEntity<AdminProductDto> getProduct(
             @PathVariable long id
     ) {
-        Product product = adminProductFacade.getProduct(id);
+        AdminProductDto product = adminProductFacade.getAdminProduct(id);
 
         return ResponseEntity.ok(product);
     }
@@ -72,14 +74,14 @@ public class AdminProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductDto>> getPageOfProductsByFilter(
+    public ResponseEntity<Page<ProductAdminPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestBody AdminProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProductDto> products = adminProductFacade.getProductsByFilters(body, pageable, principal.getId());
+        Page<ProductAdminPreviewDto> products = adminProductFacade.getProductsByFilters(body, pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }

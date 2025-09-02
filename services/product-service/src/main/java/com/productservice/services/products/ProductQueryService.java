@@ -1,5 +1,8 @@
 package com.productservice.services.products;
 
+import com.productservice.dto.AdminProductDto;
+import com.productservice.dto.LikedProductDto;
+import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.projection.ProductDto;
@@ -13,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,13 +45,18 @@ public class ProductQueryService {
         return productRepository.existsById(id);
     }
 
-    public Product getEnabledProductById(long id) {
-        return productRepository.getEnabledProduct(id)
+    public UserProductDto getUserProductById(long id) {
+        return productRepository.getUserProduct(id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public Product getProductById(long id) {
-        return productRepository.findById(id)
+    public Product getProductWithCategoryAndBrand(long id) {
+        return productRepository.getProductWithCategoryAndBrand(id)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+    }
+
+    public AdminProductDto getAdminProductById(long id) {
+        return productRepository.getAdminProduct(id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
@@ -56,13 +65,10 @@ public class ProductQueryService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public List<ProductDto> getProductsByIds(Set<Long> productIds) {
+    public List<LikedProductDto> getProductsByIds(Set<Long> productIds) {
         return productRepository.findProductsByIds(productIds);
     }
 
-    public Page<ProductDto> getProductPage(Pageable pageable) {
-        return productRepository.getPageOfProducts(pageable);
-    }
 
     public Page<Product> getProductPageBySpec(Specification<Product> spec, Pageable pageable) {
         return productRepository.findAll(spec, pageable);

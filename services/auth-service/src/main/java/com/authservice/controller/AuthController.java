@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -55,10 +56,14 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshTokens(
-            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
-            @CookieValue(value = DEVICE_ID_COOKIE_NAME) String deviceId,
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken,
+            @CookieValue(value = DEVICE_ID_COOKIE_NAME, required = false) String deviceId,
             HttpServletResponse response
     ) {
+        if(refreshToken == null || deviceId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         TokenPairDto tokenPair = authService.refreshTokens(refreshToken, deviceId);
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(tokenPair.refreshToken());
 

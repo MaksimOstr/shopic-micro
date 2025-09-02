@@ -1,8 +1,8 @@
 package com.productservice.services.products;
 
+import com.productservice.dto.*;
 import com.productservice.entity.Product;
 import com.productservice.mapper.ProductMapper;
-import com.productservice.projection.ProductDto;
 import com.productservice.services.LikeService;
 import com.productservice.services.grpc.GrpcReviewService;
 import com.shopic.grpc.reviewservice.ProductRating;
@@ -31,38 +31,58 @@ public class ProductSearchService {
     private final GrpcReviewService grpcReviewService;
 
 
-    public List<ProductDto> getLikedProducts(long userId) {
+    public List<LikedProductDto> getLikedProducts(long userId) {
         Set<Long> likedProducts = likeService.getLikedProductIds(userId);
 
         return productQueryService.getProductsByIds(likedProducts);
     }
 
-    public Page<ProductDto> getPageOfProductsByFilters(Specification<Product> spec, Pageable pageable, long userId) {
+    public Page<ProductUserPreviewDto> getPageOfUserProductsByFilters(Specification<Product> spec,
+                                                                      Pageable pageable, long userId) {
+        return createProductPage(spec, pageable, productPage -> {
+            List<ProductUserPreviewDto> dtos = productPage.getContent().stream()
+                    .map(productMapper::productToProductUserPreviewDto)
+                    .collect(Collectors.toList());
+            markLikedProducts(dtos, userId);
+            setProductRatings(dtos);
+            return dtos;
+        });
+    }
+
+    public Page<ProductAdminPreviewDto> getPageOfAdminProductsByFilters(Specification<Product> spec,
+                                                                        Pageable pageable, long userId) {
+        return createProductPage(spec, pageable, productPage -> {
+            List<ProductAdminPreviewDto> dtos = productPage.getContent().stream()
+                    .map(productMapper::productToProductAdminPreviewDto)
+                    .collect(Collectors.toList());
+            markLikedProducts(dtos, userId);
+            setProductRatings(dtos);
+            return dtos;
+        });
+    }
+
+    private <T> Page<T> createProductPage(Specification<Product> spec, Pageable pageable,
+                                          Function<Page<Product>, List<T>> dtoMapper) {
         Page<Product> productPage = productQueryService.getProductPageBySpec(spec, pageable);
-        List<Product> products = productPage.getContent();
-        List<ProductDto> productDtoList = products.stream().map(productMapper::productToProductDto).toList();
-
-        markLikedProducts(productDtoList, userId);
-        setProductRatings(productDtoList);
-
+        List<T> productDtoList = dtoMapper.apply(productPage);
         return new PageImpl<>(productDtoList, pageable, productPage.getTotalElements());
     }
 
 
-    private void markLikedProducts(List<ProductDto> products, long userId) {
+    private void markLikedProducts(List<? extends ProductReviewDto> products, long userId) {
         Set<Long> likesIds = likeService.getLikedProductIds(userId);
 
-        for (ProductDto product : products) {
+        for (ProductReviewDto product : products) {
             product.setLiked(likesIds.contains(product.getId()));
         }
     }
 
-    private void setProductRatings(List<ProductDto> products) {
-        List<Long> productIdList = products.stream().map(ProductDto::getId).toList();
+    private void setProductRatings(List<? extends ProductReviewDto> products) {
+        List<Long> productIdList = products.stream().map(ProductReviewDto::getId).toList();
         ProductRatingsResponse response = grpcReviewService.getProductRatings(productIdList);
         Map<Long, ProductRating> productRatingMap = response.getProductRatingList().stream().collect(Collectors.toMap(ProductRating::getProductId, Function.identity()));
 
-        for (ProductDto product : products) {
+        for (ProductReviewDto product : products) {
             ProductRating productRating = productRatingMap.get(product.getId());
 
             if (productRating != null) {

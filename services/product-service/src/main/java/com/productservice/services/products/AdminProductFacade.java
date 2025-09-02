@@ -1,10 +1,11 @@
 package com.productservice.services.products;
 
+import com.productservice.dto.AdminProductDto;
+import com.productservice.dto.ProductAdminPreviewDto;
 import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
-import com.productservice.projection.ProductDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,15 +36,15 @@ public class AdminProductFacade {
         productCommandService.deleteProductById(productId);
     }
 
-    public Product getProduct(long id) {
-        return productQueryService.getProductById(id);
+    public AdminProductDto getAdminProduct(long id) {
+        return productQueryService.getAdminProductById(id);
     }
 
     public Product updateProduct(UpdateProductRequest dto, long productId) {
         return productCommandService.updateProduct(dto, productId);
     }
 
-    public Page<ProductDto> getProductsByFilters(AdminProductParams params, Pageable pageable, long userId) {
+    public Page<ProductAdminPreviewDto> getProductsByFilters(AdminProductParams params, Pageable pageable, long userId) {
         Specification<Product> spec = iLike("name", params.getName())
                 .and(hasActiveStatus("enabled", params.getEnabled()))
                 .and(lte("price", params.getToPrice()))
@@ -51,7 +52,7 @@ public class AdminProductFacade {
                 .and(hasChild("category", params.getCategoryId()))
                 .and(hasChild("brand", params.getBrandId()));
 
-        return productSearchService.getPageOfProductsByFilters(spec, pageable, userId);
+        return productSearchService.getPageOfAdminProductsByFilters(spec, pageable, userId);
     }
 
     public CompletableFuture<Void> updateProductImage(long productId, MultipartFile productImage) {

@@ -1,8 +1,10 @@
 package com.productservice.services.products;
 
+import com.productservice.dto.LikedProductDto;
+import com.productservice.dto.ProductUserPreviewDto;
+import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.ProductParams;
 import com.productservice.entity.Product;
-import com.productservice.projection.ProductDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +23,7 @@ public class UserProductFacade {
     private final ProductSearchService productSearchService;
     private final ProductQueryService productQueryService;
 
-    public Page<ProductDto> getProductsByFilters(ProductParams params, Pageable pageable, long userId) {
+    public Page<ProductUserPreviewDto> getProductsByFilters(ProductParams params, Pageable pageable, long userId) {
         Specification<Product> spec = iLike("name", params.getName())
                 .and(hasActiveStatus("enabled", true))
                 .and(lte("price", params.getToPrice()))
@@ -29,14 +31,14 @@ public class UserProductFacade {
                 .and(hasChild("category", params.getCategoryId()))
                 .and(hasChild("brand", params.getBrandId()));
 
-        return productSearchService.getPageOfProductsByFilters(spec, pageable, userId);
+        return productSearchService.getPageOfUserProductsByFilters(spec, pageable, userId);
     }
 
-    public List<ProductDto> getLikedProducts(long userId) {
+    public List<LikedProductDto> getLikedProducts(long userId) {
         return productSearchService.getLikedProducts(userId);
     }
 
-    public Product getProduct(long productId) {
-        return productQueryService.getEnabledProductById(productId);
+    public UserProductDto getProduct(long productId) {
+        return productQueryService.getUserProductById(productId);
     }
 }

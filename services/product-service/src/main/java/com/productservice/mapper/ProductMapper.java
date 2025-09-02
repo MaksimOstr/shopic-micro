@@ -1,7 +1,8 @@
 package com.productservice.mapper;
 
+import com.productservice.dto.ProductAdminPreviewDto;
+import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.entity.Product;
-import com.productservice.projection.ProductDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -9,7 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
-    @Mapping(source = "category.name", target = "categoryName")
-    @Mapping(source = "brand.name", target = "brandName")
-    ProductDto productToProductDto(Product product);
+    ProductUserPreviewDto productToProductUserPreviewDto(Product product);
+
+    ProductAdminPreviewDto productToProductAdminPreviewDto(Product product);
 }

@@ -1,9 +1,11 @@
 package com.productservice.controller;
 
 import com.productservice.config.security.model.CustomPrincipal;
+import com.productservice.dto.LikedProductDto;
+import com.productservice.dto.ProductUserPreviewDto;
+import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.ProductParams;
 import com.productservice.entity.Product;
-import com.productservice.projection.ProductDto;
 import com.productservice.services.products.UserProductFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,32 +28,32 @@ public class PublicProductController {
 
 
     @GetMapping
-    public ResponseEntity<Page<ProductDto>> getPageOfProductsByFilter(
+    public ResponseEntity<Page<ProductUserPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestBody ProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ProductDto> products = productFacade.getProductsByFilters(body, pageable, principal.getId());
+        Page<ProductUserPreviewDto> products = productFacade.getProductsByFilters(body, pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/liked")
-    public ResponseEntity<List<ProductDto>> getLikedProducts(
+    public ResponseEntity<List<LikedProductDto>> getLikedProducts(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        List<ProductDto> products = productFacade.getLikedProducts(principal.getId());
+        List<LikedProductDto> products = productFacade.getLikedProducts(principal.getId());
 
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/active/{id}")
-    public ResponseEntity<Product> getActiveProduct(
+    public ResponseEntity<UserProductDto> getUserProduct(
             @PathVariable long id
     ) {
-        Product product = productFacade.getProduct(id);
+        UserProductDto product = productFacade.getProduct(id);
 
         return ResponseEntity.ok(product);
     }
