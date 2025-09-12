@@ -21,6 +21,14 @@ spring:
               - email
               - openid
 
+  mail:
+    from: noreply@gmail.com
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_SENDER_USERNAME}
+    password: ${EMAIL_SENDER_PASSWORD}
+
+
   grpc:
     client:
       channels:
@@ -86,6 +94,12 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 10
         sliding-window-size: 20
         register-health-indicator: true
-
+  retry:
+    instances:
+          codeGenerationRetry:
+            max-attempts: 3
+            wait-duration: 100ms
+            retry-exceptions:
+              - org.springframework.dao.DataIntegrityViolationException
 
 

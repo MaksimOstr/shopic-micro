@@ -32,11 +32,6 @@ public class UserQueryService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public Set<String> getUserRoleNames(long userId) {
-        return userRepository.getUserRoleNames(userId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-    }
-
     public EmailVerifyProjection getUserForEmailVerify(String email) {
         return userRepository.findUserForEmailVerify(email)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
@@ -46,13 +41,13 @@ public class UserQueryService {
         return userRepository.existsByEmail(email);
     }
 
-    public ResetPasswordProjection getUserForResetPassword(String email) {
-        return userRepository.findUserForResetPassword(email)
+    public User findById(long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public User findById(long id) {
-        return userRepository.findById(id)
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
@@ -63,11 +58,6 @@ public class UserQueryService {
 
     public Optional<User> findOptionalByEmail(String email) {
         return userRepository.findByEmail(email);
-    }
-
-    public UserEmailAndPasswordProjection getUserEmailAndPassword(long id) {
-        return userRepository.findEmailAndPasswordById(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
     public UserForBanProjection getUserForBan(long id) {

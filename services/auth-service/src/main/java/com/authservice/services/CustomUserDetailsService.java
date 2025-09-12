@@ -33,7 +33,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             }
 
             CheckUserBanResponse response = grpcBanService.checkUserBan(user.getId());
-            System.out.println(response.getIsBanned());
             return new CustomUserDetails(user, !response.getIsBanned());
         } catch (NotFoundException e) {
             log.error("User with email {} not found", email);

@@ -6,6 +6,7 @@ import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
+import com.productservice.services.LikeService;
 import com.productservice.services.grpc.GrpcReviewService;
 import com.shopic.grpc.reviewservice.ProductRatingResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class AdminProductFacade {
     private final ProductSearchService productSearchService;
     private final ProductCommandService productCommandService;
     private final GrpcReviewService grpcReviewService;
+    private final LikeService likeService;
 
 
     public CompletableFuture<Product> createProduct(CreateProductRequest dto, MultipartFile productImage) {
@@ -40,11 +42,14 @@ public class AdminProductFacade {
         productCommandService.deleteProductById(productId);
     }
 
-    public AdminProductDto getAdminProduct(long id) {
-        AdminProductDto product = productQueryService.getAdminProductById(id);
-        ProductRatingResponse rating = grpcReviewService.getProductRating(product.getId());
+    public AdminProductDto getAdminProduct(long productId, long userId) {
+        AdminProductDto product = productQueryService.getAdminProductById(productId);
+        ProductRatingResponse rating = grpcReviewService.getProductRating(productId);
+        boolean isLiked = likeService.isProductLiked(productId, userId);
 
         product.setRating(new BigDecimal(rating.getRating()));
+        product.setLiked(isLiked);
+        product.setReviewCount(rating.getReviewCount());
 
         return product;
     }

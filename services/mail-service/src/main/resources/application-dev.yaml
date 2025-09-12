@@ -15,16 +15,3 @@ spring:
     port: 587
     username: ${EMAIL_SENDER_USERNAME}
     password: ${EMAIL_SENDER_PASSWORD}
-
-  kafka:
-    bootstrap-servers: localhost:9094
-    consumer:
-      auto-offset-reset: latest
-      enable-auto-commit: false
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    listener:
-      ack-mode: manual_immediate
-  pulsar:
-    consumer:
-      retry-enable: true

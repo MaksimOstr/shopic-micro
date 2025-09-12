@@ -8,6 +8,9 @@ spring:
       fail-fast: true
   config:
     import: "optional:configserver:"
+  grpc:
+    server:
+      port: 1011
 
 resilience4j:
   retry:
@@ -17,7 +20,3 @@ resilience4j:
         wait-duration: 100ms
         retry-exceptions:
           - org.springframework.dao.DataIntegrityViolationException
-
-  grpc:
-    server:
-      port: 1011

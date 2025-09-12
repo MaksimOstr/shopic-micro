@@ -16,8 +16,6 @@ import java.util.Set;
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     boolean existsByEmail(String email);
 
-    Optional<UserEmailAndPasswordProjection> findEmailAndPasswordById(long id);
-
     @Transactional
     @Modifying
     @Query("UPDATE User u SET u.isVerified = true WHERE u.id = :userId")
@@ -36,9 +34,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<Set<String>> getUserRoleNames(long id);
 
     Optional<User> findByEmail(String email);
-
-    @Query("SELECT u.id as id, u.authProvider as authProvider FROM User u WHERE u.email = :email")
-    Optional<ResetPasswordProjection> findUserForResetPassword(String email);
 
     @Query("SELECT new com.authservice.projection.user.UserForBanProjection(" +
             "u.isVerified," +

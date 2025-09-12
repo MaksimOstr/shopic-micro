@@ -1,16 +1,15 @@
 package com.authservice.services.user;
 
 import com.authservice.dto.request.ChangeEmailRequest;
+import com.authservice.entity.Code;
+import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.EmailChangeRequest;
 import com.authservice.entity.User;
-import com.authservice.exceptions.AlreadyExistsException;
 import com.authservice.exceptions.NotFoundException;
-import com.authservice.projection.user.UserEmailAndPasswordProjection;
 import com.authservice.repositories.EmailChangeRequestRepository;
-import com.authservice.services.KafkaEventProducer;
-import com.authservice.services.grpc.GrpcCodeService;
-import com.shopic.grpc.codeservice.CreateCodeResponse;
-import com.shopic.grpc.codeservice.ValidateCodeResponse;
+import com.authservice.services.MailService;
+import com.authservice.services.code.CodeCreationService;
+import com.authservice.services.code.CodeValidationService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,20 +21,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class EmailChangeRequestService {
     private final EmailChangeRequestRepository emailChangeRequestRepository;
-    private final GrpcCodeService grpcCodeService;
+    private final CodeCreationService codeCreationService;
+    private final MailService mailService;
+    private final CodeValidationService codeValidationService;
     private final UserQueryService userQueryService;
     private final PasswordService passwordService;
-    private final KafkaEventProducer kafkaEventProducer;
     private final EntityManager entityManager;
 
     @Transactional
     public void createRequest(ChangeEmailRequest dto, long userId) {
-        boolean isUserExists = userQueryService.isUserExist(dto.email());
-        if (isUserExists) {
-            throw new AlreadyExistsException("This email already exists");
-        }
+        User user = userQueryService.findById(userId);
 
-        UserEmailAndPasswordProjection user = userQueryService.getUserEmailAndPassword(userId);
         boolean isPasswordEqual = passwordService.comparePassword(user.getPassword(), dto.password());
 
         if (!isPasswordEqual) {
@@ -43,21 +39,18 @@ public class EmailChangeRequestService {
         }
 
         createEmailChangeRequest(userId, dto.email());
-
-        CreateCodeResponse response = grpcCodeService.getEmailChangeCode(userId);
-
-        kafkaEventProducer.requestEmailChange(response.getCode(), dto.email());
+        Code code = codeCreationService.getCode(user, CodeScopeEnum.EMAIL_CHANGE);
+        mailService.sendEmailChange(user.getEmail(), code.getCode());
     }
 
     @Transactional
-    public void changeEmail(String code) {
-        ValidateCodeResponse response = grpcCodeService.validateEmailChangeCode(code);
-        User user = userQueryService.findById(response.getUserId());
-        EmailChangeRequest changeRequest = emailChangeRequestRepository.findByUser_Id(response.getUserId())
+    public void changeEmail(String providedCode) {
+        Code code = codeValidationService.validate(providedCode, CodeScopeEnum.EMAIL_CHANGE);
+        User user = code.getUser();
+        EmailChangeRequest changeRequest = emailChangeRequestRepository.findByUser_Id(user.getId())
                 .orElseThrow(() -> new NotFoundException("No email change request found"));
 
         user.setEmail(changeRequest.getNewEmail());
-
         emailChangeRequestRepository.delete(changeRequest);
     }
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,34 +18,38 @@ import java.util.stream.Collectors;
 public class RatingService {
     private final ReviewService reviewService;
 
-    public BigDecimal getRatingByProductId(long productId) {
-        List<ReviewForRating> reviews = reviewService.getReviewsForRating(productId);
-
-        return calculateAverage(reviews);
-    }
-
     public List<RatingDto> getProductRatings(List<Long> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<ReviewForRating> reviewsForRating = reviewService.getReviewsForRating(productIds);
 
-        if(reviewsForRating == null || reviewsForRating.isEmpty()) {
-            return new ArrayList<>();
+        if (reviewsForRating.isEmpty()) {
+            return productIds.stream()
+                    .map(productId -> new RatingDto(productId, BigDecimal.ZERO, 0))
+                    .toList();
         }
 
         Map<Long, List<ReviewForRating>> reviewMap = getReviewMap(reviewsForRating);
 
         return productIds.stream()
                 .map(productId -> {
-                    List<ReviewForRating> productReviews = reviewMap.get(productId);
-
-                    return new RatingDto(
-                            productId,
-                            productReviews == null ? BigDecimal.ZERO : calculateAverage(productReviews),
-                            productReviews == null ? 0 : productReviews.size()
-                    );
-                }).toList();
+                    List<ReviewForRating> productReviews = reviewMap.getOrDefault(productId, Collections.emptyList());
+                    return createRatingDto(productId, productReviews);
+                })
+                .toList();
     }
 
-    private BigDecimal calculateAverage(List<ReviewForRating> reviewsForRating) {
+    private RatingDto createRatingDto(Long productId, List<ReviewForRating> reviews) {
+        return new RatingDto(
+                productId,
+                calculateAverage(reviews),
+                reviews.size()
+        );
+    }
+
+    public BigDecimal calculateAverage(List<ReviewForRating> reviewsForRating) {
         if (reviewsForRating == null || reviewsForRating.isEmpty()) {
             return BigDecimal.ZERO;
         }

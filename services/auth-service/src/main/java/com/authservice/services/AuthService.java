@@ -5,7 +5,11 @@ import com.authservice.dto.TokenPairDto;
 import com.authservice.dto.request.LocalRegisterRequest;
 import com.authservice.dto.request.SignInRequestDto;
 import com.authservice.dto.response.CreateLocalUserResponse;
+import com.authservice.entity.Code;
+import com.authservice.entity.CodeScopeEnum;
+import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
+import com.authservice.services.code.CodeCreationService;
 import com.authservice.services.user.LocalUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +30,22 @@ public class AuthService {
     private final TokenService tokenService;
     private final LocalUserService localUserService;
     private final RoleMapper roleMapper;
+    private final CodeCreationService codeCreationService;
+    private final MailService mailService;
 
 
     @Transactional
     public CreateLocalUserResponse localRegister(LocalRegisterRequest dto){
-        return localUserService.createLocalUser(dto);
+        User user = localUserService.createLocalUser(dto);
+        Code code = codeCreationService.getCode(user, CodeScopeEnum.EMAIL_VERIFICATION);
+
+        mailService.sendEmailVerificationCode(user.getEmail(), code.getCode());
+
+        return new CreateLocalUserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getCreatedAt()
+        );
     }
 
     @Transactional

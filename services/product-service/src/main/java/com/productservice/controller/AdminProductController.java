@@ -55,9 +55,10 @@ public class AdminProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AdminProductDto> getProduct(
-            @PathVariable long id
+            @PathVariable long id,
+            @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        AdminProductDto product = adminProductFacade.getAdminProduct(id);
+        AdminProductDto product = adminProductFacade.getAdminProduct(id, principal.getId());
 
         return ResponseEntity.ok(product);
     }
