@@ -32,11 +32,6 @@ public class UserQueryService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public EmailVerifyProjection getUserForEmailVerify(String email) {
-        return userRepository.findUserForEmailVerify(email)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-    }
-
     public boolean isUserExist(String email) {
         return userRepository.existsByEmail(email);
     }

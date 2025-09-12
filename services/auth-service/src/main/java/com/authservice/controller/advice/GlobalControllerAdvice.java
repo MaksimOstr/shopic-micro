@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
-    @ExceptionHandler({CodeVerificationException.class, ResetPasswordException.class})
+    @ExceptionHandler({CodeValidationException.class, ResetPasswordException.class})
     public ResponseEntity<ErrorResponseDto> handleException(RuntimeException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),

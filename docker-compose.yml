@@ -11,18 +11,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${AUTH_DB_NAME}
 
-  ban-service-db:
-    image: postgres
-    restart: always
-    ports:
-      - "${BAN_DB_PORT}:5432"
-    volumes:
-      - /postgres/ban-service/
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${BAN_DB_NAME}
-
   profile-service-db:
     image: postgres:latest
     restart: always
@@ -46,18 +34,6 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${ORDER_DB_NAME}
-
-  code-service-db:
-    image: postgres:latest
-    restart: always
-    ports:
-      - "${CODE_DB_PORT}:5432"
-    volumes:
-      - /postgres/code-service/
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${CODE_DB_NAME}
 
   product-service-db:
     image: postgres:latest

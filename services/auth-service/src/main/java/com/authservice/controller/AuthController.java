@@ -1,9 +1,9 @@
 package com.authservice.controller;
 
+import com.authservice.dto.LocalRegisterResult;
 import com.authservice.dto.TokenPairDto;
 import com.authservice.dto.request.LocalRegisterRequest;
 import com.authservice.dto.request.SignInRequestDto;
-import com.authservice.dto.response.CreateLocalUserResponse;
 import com.authservice.services.AuthService;
 import com.authservice.services.CookieService;
 import jakarta.servlet.http.Cookie;
@@ -29,10 +29,10 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<CreateLocalUserResponse> registerLocalUser(
+    public ResponseEntity<LocalRegisterResult> registerLocalUser(
             @Valid @RequestBody LocalRegisterRequest body
     ) {
-        CreateLocalUserResponse response = authService.localRegister(body);
+        LocalRegisterResult response = authService.localRegister(body);
 
         return ResponseEntity.ok(response);
     }

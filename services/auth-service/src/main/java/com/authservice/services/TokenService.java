@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TokenService {
     private final RefreshTokenManager refreshTokenManager;
-    private final JwtTokenService jwtTokenService;
+    private final JwtService jwtTokenService;
     private final RefreshTokenValidationService refreshTokenValidationService;
     private final RoleMapper roleMapper;
 
@@ -45,6 +45,6 @@ public class TokenService {
     }
 
     private String getAccessToken(long userId, Collection<String> roleNames) {
-        return jwtTokenService.getJwsToken(roleNames, userId);
+        return jwtTokenService.generateToken(String.valueOf(userId), roleNames);
     }
 }

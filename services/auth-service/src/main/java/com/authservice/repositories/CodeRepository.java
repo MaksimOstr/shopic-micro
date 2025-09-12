@@ -20,11 +20,6 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
     @Query("DELETE FROM Code c WHERE c.expiresAt < CURRENT_TIMESTAMP")
     void deleteExpiredCodes();
 
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM Code c WHERE c.code = :code")
-    void deleteCodeByCode(String code);
-
     Optional<Code> findByScopeAndUserId(CodeScopeEnum scope, long userId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

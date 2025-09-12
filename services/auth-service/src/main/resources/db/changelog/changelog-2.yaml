@@ -40,6 +40,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: is_non_blocked
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
                   name: auth_provider
                   type: varchar(20)
                   constraints:

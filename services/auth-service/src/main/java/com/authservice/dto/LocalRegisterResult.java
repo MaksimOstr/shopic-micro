@@ -1,8 +1,8 @@
-package com.authservice.dto.response;
+package com.authservice.dto;
 
 import java.time.Instant;
 
-public record CreateLocalUserResponse (
+public record LocalRegisterResult (
         long userId,
         String email,
         Instant createdAt
