@@ -1,12 +1,14 @@
-package com.profileservice.dto;
+package com.authservice.dto;
 
 import java.time.Instant;
 
-public record ProfileDto(
+public record UserProfileResponse(
         Long id,
-        Long userId,
+        String email,
         String firstName,
         String lastName,
+        Boolean isVerified,
         Instant createdAt,
         Instant updatedAt
-) {}
+) {
+}

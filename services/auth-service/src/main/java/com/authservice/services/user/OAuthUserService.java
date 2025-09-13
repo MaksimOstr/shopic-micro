@@ -43,6 +43,8 @@ public class OAuthUserService {
         Role defaultRole = roleService.getDefaultUserRole();
         AuthProviderEnum provider = AuthProviderEnum.fromString(dto.provider());
         User user = User.builder()
+                .firstName(dto.firstName())
+                .lastName(dto.lastName())
                 .email(dto.email())
                 .authProvider(provider)
                 .roles(Set.of(defaultRole))

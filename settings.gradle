@@ -30,7 +30,4 @@ project(':payment-service').projectDir = new File('services/payment-service')
 include ':review-service'
 project(':review-service').projectDir = new File('services/review-service')
 
-include ':profile-service'
-project(':profile-service').projectDir = new File('services/profile-service')
-
 include(":proto")

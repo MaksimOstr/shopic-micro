@@ -1,6 +1,7 @@
 package com.authservice.mapper;
 
 import com.authservice.dto.UserDetailsDto;
+import com.authservice.dto.UserProfileResponse;
 import com.authservice.dto.UserSummaryDto;
 import com.authservice.dto.response.CreateOAuthUserResponse;
 import com.authservice.entity.User;
@@ -18,4 +19,6 @@ public interface UserMapper {
     UserSummaryDto toUserSummaryDto(User user);
 
     UserDetailsDto toUserDetailsDto(User user);
+
+    UserProfileResponse toUserProfileDto(User user);
 }

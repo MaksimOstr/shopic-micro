@@ -28,19 +28,6 @@ spring:
     username: ${EMAIL_SENDER_USERNAME}
     password: ${EMAIL_SENDER_PASSWORD}
 
-
-  grpc:
-    client:
-      channels:
-        user-service:
-          address: 0.0.0.0:1010
-        code-service:
-          address: 0.0.0.0:1011
-        ban-service:
-          address: 0.0.0.0:1020
-    server:
-      port: 1019
-
   kafka:
     bootstrap-servers: localhost:9094
     consumer:
@@ -73,27 +60,8 @@ management:
   health:
     circuitbreakers:
       enabled: true
+
 resilience4j:
-  circuitbreaker:
-    instances:
-      ban-service:
-        sliding-window-type: COUNT_BASED
-        failure-rate-threshold: 50
-        minimum-number-of-calls: 10
-        automatic-transition-from-open-to-half-open-enabled: true
-        wait-duration-in-open-state: 30s
-        permitted-number-of-calls-in-half-open-state: 10
-        sliding-window-size: 50
-        register-health-indicator: true
-      code-service:
-        sliding-window-type: COUNT_BASED
-        failure-rate-threshold: 50
-        minimum-number-of-calls: 10
-        automatic-transition-from-open-to-half-open-enabled: true
-        wait-duration-in-open-state: 30s
-        permitted-number-of-calls-in-half-open-state: 10
-        sliding-window-size: 20
-        register-health-indicator: true
   retry:
     instances:
           codeGenerationRetry:

@@ -22,7 +22,6 @@
         <module name="com.shopic.product-service.main" />
         <module name="shopic.review-service.main" />
         <module name="shopic.cart-service.main" />
-        <module name="shopic.profile-service.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="23">
@@ -63,6 +62,9 @@
       <module name="shopic.code-service.test" target="24" />
       <module name="shopic.mail-service.main" target="24" />
       <module name="shopic.mail-service.test" target="24" />
+      <module name="shopic.profile-service" target="24" />
+      <module name="shopic.profile-service.main" target="24" />
+      <module name="shopic.profile-service.test" target="24" />
       <module name="user-service" target="24" />
       <module name="user-service.main" target="24" />
       <module name="user-service.test" target="24" />

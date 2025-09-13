@@ -1,4 +1,4 @@
-package com.profileservice.dto.request;
+package com.authservice.dto.request;
 
 public record UpdateProfileRequest(
         String lastName,

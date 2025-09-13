@@ -19,7 +19,6 @@
             <option value="$PROJECT_DIR$/services/order-service" />
             <option value="$PROJECT_DIR$/services/payment-service" />
             <option value="$PROJECT_DIR$/services/product-service" />
-            <option value="$PROJECT_DIR$/services/profile-service" />
             <option value="$PROJECT_DIR$/services/review-service" />
           </set>
         </option>

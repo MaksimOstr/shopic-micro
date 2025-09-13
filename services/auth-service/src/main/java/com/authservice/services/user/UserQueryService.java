@@ -2,9 +2,6 @@ package com.authservice.services.user;
 
 import com.authservice.entity.User;
 import com.authservice.exceptions.NotFoundException;
-import com.authservice.projection.user.EmailVerifyProjection;
-import com.authservice.projection.user.ResetPasswordProjection;
-import com.authservice.projection.user.UserEmailAndPasswordProjection;
 import com.authservice.projection.user.UserForBanProjection;
 import com.authservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +12,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Service

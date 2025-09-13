@@ -37,6 +37,8 @@ public class LocalUserService {
         String hashedPassword = passwordService.encode(dto.password());
 
         User user = User.builder()
+                .firstName(dto.firstName())
+                .lastName(dto.lastName())
                 .email(dto.email())
                 .password(hashedPassword)
                 .roles(Set.of(defaultRole))

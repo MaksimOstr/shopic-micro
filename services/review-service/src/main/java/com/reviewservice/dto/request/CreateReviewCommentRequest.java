@@ -7,6 +7,12 @@ public record CreateReviewCommentRequest(
         @NotBlank
         String comment,
 
+        @NotBlank
+        String firstName,
+
+        @NotBlank
+        String lastName,
+
         @NotNull
         long reviewId
 ) {}

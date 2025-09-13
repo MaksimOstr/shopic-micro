@@ -10,10 +10,8 @@ import com.reviewservice.mapper.ReviewMapper;
 import com.reviewservice.projection.ReviewForRating;
 import com.reviewservice.repository.ReviewRepository;
 import com.reviewservice.service.grpc.GrpcProductService;
-import com.reviewservice.service.grpc.GrpcProfileService;
 import com.reviewservice.utils.SpecificationUtils;
 import com.shopic.grpc.productservice.IsProductExistsResponse;
-import com.shopic.grpc.profileservice.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,7 +32,6 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final GrpcProductService grpcProductService;
     private final ReviewMapper reviewMapper;
-    private final GrpcProfileService grpcProfileService;
 
     @Transactional
     public void createReview(CreateReviewRequest dto, long userId) {
@@ -44,13 +41,11 @@ public class ReviewService {
             throw new NotFoundException("Product does not exist");
         }
 
-        ProfileResponse profile = grpcProfileService.getUserProfile(userId);
-
         Review review = Review.builder()
                 .comment(dto.comment())
                 .productId(dto.productId())
-                .lastName(profile.getLastName())
-                .firstName(profile.getFirstName())
+                .lastName(dto.lastName())
+                .firstName(dto.firstName())
                 .userId(userId)
                 .rating(dto.rating())
                 .build();
