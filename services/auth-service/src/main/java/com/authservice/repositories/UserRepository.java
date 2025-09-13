@@ -1,7 +1,6 @@
 package com.authservice.repositories;
 
 import com.authservice.entity.User;
-import com.authservice.projection.user.UserForBanProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
@@ -25,11 +24,4 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findWithProfileAndRolesById(Long id);
 
     Optional<User> findByEmail(String email);
-
-    @Query("SELECT new com.authservice.projection.user.UserForBanProjection(" +
-            "u.isVerified," +
-            "u.email" +
-            ")" +
-            "FROM User u WHERE u.id = :id")
-    Optional<UserForBanProjection> findUserForBan(long id);
 }

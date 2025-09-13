@@ -1,4 +1,4 @@
-package com.authservice.services;
+package com.authservice.config.security.service;
 
 import com.authservice.config.security.model.CustomOidcUser;
 import com.authservice.dto.request.CreateOAuthUserRequest;

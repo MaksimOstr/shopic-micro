@@ -42,7 +42,7 @@ public class CartController {
     }
 
     @DeleteMapping("/items/{id}")
-    public ResponseEntity<String> deleteCartItem(
+    public ResponseEntity<Void> deleteCartItem(
             @PathVariable long id
     ) {
         cartService.removeItemFromCart(id);
@@ -51,7 +51,7 @@ public class CartController {
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteCart(
+    public ResponseEntity<Void> deleteCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         cartService.deleteCartByUserId(principal.getId());
@@ -60,7 +60,7 @@ public class CartController {
     }
 
     @PatchMapping("/items/quantity")
-    public ResponseEntity<String> changeCartItemQuantity(
+    public ResponseEntity<Void> changeCartItemQuantity(
             @RequestBody @Valid ChangeCartItemQuantity body
     ) {
         cartService.changeCartItemQuantity(body);

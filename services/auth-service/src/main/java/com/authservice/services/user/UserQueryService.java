@@ -2,7 +2,6 @@ package com.authservice.services.user;
 
 import com.authservice.entity.User;
 import com.authservice.exceptions.NotFoundException;
-import com.authservice.projection.user.UserForBanProjection;
 import com.authservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,11 +48,6 @@ public class UserQueryService {
 
     public Optional<User> findOptionalByEmail(String email) {
         return userRepository.findByEmail(email);
-    }
-
-    public UserForBanProjection getUserForBan(long id) {
-        return userRepository.findUserForBan(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
     public Page<User> getUserPageBySpec(Pageable pageable, Specification<User> spec) {
