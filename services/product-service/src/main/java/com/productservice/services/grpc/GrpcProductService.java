@@ -3,9 +3,7 @@ package com.productservice.services.grpc;
 import com.google.protobuf.Empty;
 import com.productservice.dto.request.ItemForReservation;
 import com.productservice.dto.request.CreateReservationDto;
-import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.mapper.GrpcMapper;
-import com.productservice.projection.ProductForCartDto;
 import com.productservice.projection.ProductInfoDto;
 import com.productservice.services.ReservationCreationService;
 import com.productservice.services.products.ProductQueryService;
@@ -27,14 +25,10 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     private final GrpcMapper grpcMapper;
 
     @Override
-    public void getProductPriceAndStock(GetProductDetailsRequest request, StreamObserver<ProductDetailsResponse> responseObserver) {
-        ProductForCartDto productDto = productQueryService.getProductInfoForCart(request.getProductId());
+    public void getProductInfo(ProductInfoRequest request, StreamObserver<ProductInfo> responseObserver) {
+        ProductInfoDto productDto = productQueryService.getProductInfo(request.getProductId());
 
-        if(productDto.stockQuantity() < request.getQuantity()) {
-            throw new InsufficientStockException("Insufficient stock");
-        }
-
-        ProductDetailsResponse response = grpcMapper.toProductDetails(productDto);
+        ProductInfo response = grpcMapper.toProductInfo(productDto);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -52,10 +46,10 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     }
 
     @Override
-    public void getActualProductInfo(GetActualProductInfoRequest request, StreamObserver<ActualProductInfoResponse> responseObserver) {
+    public void getProductInfoList(ProductInfoListRequest request, StreamObserver<ProductInfoList> responseObserver) {
         List<ProductInfoDto> productPrices = productQueryService.getProductInfo(request.getProductIdList());
         List<ProductInfo> productInfoList = productPrices.stream().map(grpcMapper::toProductInfo).toList();
-        ActualProductInfoResponse response = ActualProductInfoResponse.newBuilder()
+        ProductInfoList response = ProductInfoList.newBuilder()
                 .addAllProducts(productInfoList)
                 .build();
 
@@ -69,6 +63,18 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
         IsProductExistsResponse response = IsProductExistsResponse.newBuilder()
                 .setIsExists(isExists)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void checkProductAvailability(CheckProductAvailabilityRequest request, StreamObserver<CheckProductAvailabilityResponse> responseObserver) {
+        int availableQuantity = productQueryService.getAvailableQuantity(request.getProductId());
+        CheckProductAvailabilityResponse response = CheckProductAvailabilityResponse.newBuilder()
+                .setAvailable(availableQuantity >= request.getQuantity())
+                .setAvailableQuantity(availableQuantity)
                 .build();
 
         responseObserver.onNext(response);

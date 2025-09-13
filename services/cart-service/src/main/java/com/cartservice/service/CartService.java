@@ -7,11 +7,13 @@ import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.dto.request.ChangeCartItemQuantity;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
+import com.cartservice.exception.InsufficientProductStockException;
 import com.cartservice.exception.NotFoundException;
 import com.cartservice.mapper.CartItemMapper;
 import com.cartservice.repository.CartRepository;
 import com.cartservice.service.grpc.GrpcProductService;
-import com.shopic.grpc.productservice.ProductDetailsResponse;
+import com.shopic.grpc.productservice.CheckProductAvailabilityResponse;
+import com.shopic.grpc.productservice.ProductInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +40,13 @@ public class CartService {
 
         if(cartItemOptional.isPresent()) {
             CartItem item = cartItemOptional.get();
+            checkProductAvailability(dto.productId(), item.getQuantity() + dto.quantity());
             item.setQuantity(item.getQuantity() + dto.quantity());
         } else {
             CartItem item = createCartItem(dto, cart);
+            if (cart.getCartItems() == null) {
+                cart.setCartItems(new ArrayList<>());
+            }
             cart.getCartItems().add(item);
         }
     }
@@ -116,7 +122,9 @@ public class CartService {
     }
 
     private CartItem createCartItem(AddItemToCartRequest dto, Cart cart) {
-        ProductDetailsResponse response = grpcProductService.getProductInfoForCart(dto.productId(), dto.quantity());
+
+        checkProductAvailability(dto.productId(), dto.quantity());
+        ProductInfo response = grpcProductService.getProductInfoForCart(dto.productId());
 
         return CartItem.builder()
                 .productId(dto.productId())
@@ -124,7 +132,18 @@ public class CartService {
                 .productImageUrl(response.getProductImageUrl())
                 .cart(cart)
                 .quantity(dto.quantity())
-                .priceAtAdd(new BigDecimal(response.getProductPrice()))
+                .priceAtAdd(new BigDecimal(response.getPrice()))
                 .build();
+    }
+
+    private void checkProductAvailability(long productId, int quantity) {
+        CheckProductAvailabilityResponse availability = grpcProductService.checkProductAvailability(productId, quantity);
+
+        if(!availability.getAvailable()) {
+            throw new InsufficientProductStockException(
+                    "Insufficient stock for product. Requested: %d, Available: %d"
+                            .formatted(quantity, availability.getAvailableQuantity())
+            );
+        }
     }
 }

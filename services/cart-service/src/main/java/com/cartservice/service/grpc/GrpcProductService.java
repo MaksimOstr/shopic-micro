@@ -3,16 +3,14 @@ package com.cartservice.service.grpc;
 import com.cartservice.exception.ExternalServiceUnavailableException;
 import com.cartservice.exception.InsufficientProductStockException;
 import com.cartservice.exception.NotFoundException;
-import com.shopic.grpc.productservice.GetProductDetailsRequest;
-import com.shopic.grpc.productservice.ProductDetailsResponse;
-import com.shopic.grpc.productservice.ProductServiceGrpc;
+import com.shopic.grpc.productservice.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
-import org.springframework.stereotype.Service;
 
 
 @Slf4j
@@ -22,16 +20,25 @@ public class GrpcProductService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productServiceGrpc;
 
     @CircuitBreaker(name = "product-service", fallbackMethod = "getProductInfoForCartFallback")
-    public ProductDetailsResponse getProductInfoForCart(long productId, int quantity) {
-        GetProductDetailsRequest request = GetProductDetailsRequest.newBuilder()
+    public ProductInfo getProductInfoForCart(long productId) {
+        ProductInfoRequest request = ProductInfoRequest.newBuilder()
                 .setProductId(productId)
-                .setQuantity(quantity)
                 .build();
 
-        return productServiceGrpc.getProductPriceAndStock(request);
+        return productServiceGrpc.getProductInfo(request);
     }
 
-    public ProductDetailsResponse getProductInfoForCartFallback(long productId, int quantity, Throwable e) {
+    @CircuitBreaker(name = "product-service")
+    public CheckProductAvailabilityResponse checkProductAvailability(long productId, int requestedQuantity) {
+        CheckProductAvailabilityRequest request = CheckProductAvailabilityRequest.newBuilder()
+                .setProductId(productId)
+                .setQuantity(requestedQuantity)
+                .build();
+
+        return productServiceGrpc.checkProductAvailability(request);
+    }
+
+    public ProductInfo getProductInfoForCartFallback(long productId, Throwable e) {
         if (e instanceof StatusRuntimeException exception) {
             Status.Code code = exception.getStatus().getCode();
 

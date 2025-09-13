@@ -4,8 +4,6 @@ import com.productservice.dto.AdminProductDto;
 import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
-import com.productservice.projection.ProductDto;
-import com.productservice.projection.ProductForCartDto;
 import com.productservice.projection.ProductInfoDto;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
@@ -43,6 +41,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "JOIN p.category c WHERE p.id = :id AND p.enabled = true")
     Optional<UserProductDto> getUserProduct(long id);
 
+    @Query("SELECT p.stockQuantity FROM Product p WHERE p.id = :id")
+    int getAvailableQuantity(long id);
+
     @Query("SELECT new com.productservice.dto.AdminProductDto(" +
             "p.id, " +
             "p.name, " +
@@ -76,7 +77,17 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.name" +
             ")" +
             "FROM Product p WHERE p.id IN :ids")
-    List<ProductInfoDto> findProductPrices(List<Long> ids);
+    List<ProductInfoDto> findProductInfoList(List<Long> ids);
+
+    @Query("SELECT new com.productservice.projection.ProductInfoDto(" +
+            "p.id," +
+            "p.price," +
+            "p.imageUrl," +
+            "p.name" +
+            ")" +
+            "FROM Product p WHERE p.id = :ids")
+    ProductInfoDto findProductInfo(Long ids);
+
 
     @Query("SELECT new com.productservice.dto.LikedProductDto(" +
             "p.id, " +
@@ -91,14 +102,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("SELECT p FROM Product p WHERE p.id IN :productIds")
     List<Product> findProductsForUpdate(List<Long> productIds);
 
-    @Query("SELECT new com.productservice.projection.ProductForCartDto(" +
-            "p.price," +
-            "p.stockQuantity," +
-            "p.name," +
-            "p.imageUrl" +
-            ")" +
-            "FROM Product p WHERE p.id = :id AND p.enabled = true")
-    Optional<ProductForCartDto> getProductForCartById(long id);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

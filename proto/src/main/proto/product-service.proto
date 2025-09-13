@@ -9,22 +9,12 @@ option java_multiple_files = true;
 option java_package = "com.shopic.grpc.productservice";
 
 
-message GetProductDetailsRequest {
+message ProductInfoRequest {
   int64 product_id = 1;
-  int32 quantity = 2;
 }
-
-message ProductDetailsResponse {
-  string product_price = 1;
-  string product_image_url = 2;
-  string product_name = 3;
-}
-
-
 
 message ReserveProductsRequest {
   int64 order_id = 2;
-
   repeated ReservationItem reservation_items = 3;
 }
 
@@ -41,11 +31,13 @@ message ProductInfo {
   string price = 4;
 }
 
-message GetActualProductInfoRequest {
+
+
+message ProductInfoListRequest {
   repeated int64 product_id = 1;
 }
 
-message ActualProductInfoResponse {
+message ProductInfoList {
   repeated ProductInfo products = 2;
 }
 
@@ -57,16 +49,27 @@ message IsProductExistsResponse {
   bool isExists = 1;
 }
 
+message CheckProductAvailabilityRequest {
+  int64 product_id = 1;
+  int32 quantity = 2;
+}
+
+message CheckProductAvailabilityResponse {
+  bool available = 1;
+  int32 availableQuantity = 2;
+}
 
 
 
 service ProductService {
-  rpc getProductPriceAndStock(GetProductDetailsRequest) returns (ProductDetailsResponse);
+  rpc getProductInfo(ProductInfoRequest) returns (ProductInfo);
 
   rpc reserveProducts(ReserveProductsRequest) returns (google.protobuf.Empty);
 
-  rpc getActualProductInfo(GetActualProductInfoRequest) returns (ActualProductInfoResponse);
+  rpc getProductInfoList(ProductInfoListRequest) returns (ProductInfoList);
 
   rpc isProductExists(IsProductExistsRequest) returns (IsProductExistsResponse);
+
+  rpc checkProductAvailability(CheckProductAvailabilityRequest) returns (CheckProductAvailabilityResponse);
 }
 
