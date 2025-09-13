@@ -1,7 +1,6 @@
 package com.cartservice.dto;
 
-public record CreateCartItemDto(
+public record CartItemDtoForOrder (
         long productId,
-        long cartId,
         int quantity
 ) {}

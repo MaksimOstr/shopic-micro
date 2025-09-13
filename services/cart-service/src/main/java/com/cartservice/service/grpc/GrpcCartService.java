@@ -1,7 +1,7 @@
 package com.cartservice.service.grpc;
 
+import com.cartservice.dto.CartItemDtoForOrder;
 import com.cartservice.mapper.GrpcMapper;
-import com.cartservice.projection.CartItemForOrderProjection;
 import com.cartservice.service.CartService;
 import com.shopic.grpc.cartservice.CartItem;
 import com.shopic.grpc.cartservice.CartServiceGrpc;
@@ -23,7 +23,7 @@ public class GrpcCartService extends CartServiceGrpc.CartServiceImplBase {
 
     @Override
     public void getCart(GetCartRequest request, StreamObserver<CartResponse> responseObserver) {
-        List<CartItemForOrderProjection> cartItems = cartService.getCartItemsForOrder(request.getUserId());
+        List<CartItemDtoForOrder> cartItems = cartService.getCartItemsForOrder(request.getUserId());
         List<CartItem> cartItemList = grpcMapper.toOrderCartItems(cartItems);
 
         CartResponse response = CartResponse.newBuilder()

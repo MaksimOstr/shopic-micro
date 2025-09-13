@@ -1,8 +1,8 @@
-package com.cartservice.projection;
+package com.cartservice.dto;
 
 import java.math.BigDecimal;
 
-public record CartItemProjection(
+public record CartItemDto(
         long id,
         long productId,
         int quantity,

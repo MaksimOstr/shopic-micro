@@ -1,55 +1,69 @@
 package com.cartservice.service;
 
-import com.cartservice.dto.CreateCartItemDto;
+import com.cartservice.dto.CartDto;
+import com.cartservice.dto.CartItemDto;
+import com.cartservice.dto.CartItemDtoForOrder;
 import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.dto.request.ChangeCartItemQuantity;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
 import com.cartservice.exception.NotFoundException;
-import com.cartservice.projection.CartItemForOrderProjection;
-import com.cartservice.projection.CartItemProjection;
+import com.cartservice.mapper.CartItemMapper;
 import com.cartservice.repository.CartRepository;
+import com.cartservice.service.grpc.GrpcProductService;
+import com.shopic.grpc.productservice.ProductDetailsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class CartService {
     private final CartRepository cartRepository;
     private final CartItemService cartItemService;
+    private final CartItemMapper cartItemMapper;
+    private final GrpcProductService grpcProductService;
 
     private static final String CART_NOT_FOUND = "Cart Not Found";
 
     @Transactional
     public void addItemToCart(AddItemToCartRequest dto, long userId) {
-        Long cartId = cartRepository.findCartIdByUserId(userId)
-                .orElseGet(() -> createCart(userId).getId());
+        Cart cart = cartRepository.findCartByUserId(userId)
+                .orElseGet(() -> createCart(userId));
 
-        CreateCartItemDto createCartItem = new CreateCartItemDto(
-                dto.productId(),
-                cartId,
-                dto.quantity()
-        );
+        Optional<CartItem> cartItemOptional = cartItemService.getByCartIdAndProductId(cart.getId(), dto.productId());
 
-        cartItemService.createCartItem(createCartItem);
+        if(cartItemOptional.isPresent()) {
+            CartItem item = cartItemOptional.get();
+            item.setQuantity(item.getQuantity() + dto.quantity());
+        } else {
+            CartItem item = createCartItem(dto, cart);
+            cart.getCartItems().add(item);
+        }
     }
 
     @Transactional(readOnly = true)
-    public List<CartItemProjection> getCartItemsByUserId(long userId) {
-        return cartRepository.findCartIdByUserId(userId)
-                .map(cartItemService::getCartItems)
-                .orElseGet(ArrayList::new);
+    public CartDto getCart(long userId) {
+        return cartRepository.findCartWithItemsByUserId(userId)
+                .map(cart -> {
+                    List<CartItemDto> cartItemList = cartItemMapper.toCartItemDtoList(cart.getCartItems());
+                    return new  CartDto(
+                            cartItemList,
+                            cart.calculateTotal()
+                    );
+                })
+                .orElseGet(this::createEmptyCartDto);
     }
 
     @Transactional(readOnly = true)
-    public List<CartItemForOrderProjection> getCartItemsForOrder(long userId) {
-        long cartId = getCartIdByUserId(userId);
+    public List<CartItemDtoForOrder> getCartItemsForOrder(long userId) {
+        Cart cart = cartRepository.findCartWithItemsByUserId(userId)
+                .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
 
-        return cartItemService.getCartItemsForOrder(cartId);
+        return cartItemMapper.toCartItemDtoListForOrder(cart.getCartItems());
     }
 
     public void removeItemFromCart(long cartItemId) {
@@ -79,12 +93,6 @@ public class CartService {
         }
     }
 
-
-    private long getCartIdByUserId(long userId) {
-        return cartRepository.findCartIdByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
-    }
-
     private void deleteCartIfEmpty(long cartId) {
         int cartItemsCount = cartItemService.countCartItems(cartId);
         if (cartItemsCount == 0) {
@@ -98,5 +106,25 @@ public class CartService {
                 .build();
 
         return cartRepository.save(cart);
+    }
+
+    private CartDto createEmptyCartDto() {
+        return new CartDto(
+                Collections.emptyList(),
+                BigDecimal.ZERO
+        );
+    }
+
+    private CartItem createCartItem(AddItemToCartRequest dto, Cart cart) {
+        ProductDetailsResponse response = grpcProductService.getProductInfoForCart(dto.productId(), dto.quantity());
+
+        return CartItem.builder()
+                .productId(dto.productId())
+                .productName(response.getProductName())
+                .productImageUrl(response.getProductImageUrl())
+                .cart(cart)
+                .quantity(dto.quantity())
+                .priceAtAdd(new BigDecimal(response.getProductPrice()))
+                .build();
     }
 }

@@ -1,10 +1,10 @@
 package com.cartservice.controller;
 
 import com.cartservice.config.security.model.CustomPrincipal;
+import com.cartservice.dto.CartDto;
 import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.dto.request.ChangeCartItemQuantity;
 import com.cartservice.entity.CartItem;
-import com.cartservice.projection.CartItemProjection;
 import com.cartservice.service.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,12 +21,12 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping("/items")
-    public ResponseEntity<List<CartItemProjection>> getCartItems(
+    public ResponseEntity<CartDto> getCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        List<CartItemProjection> cartItems = cartService.getCartItemsByUserId(principal.getId());
+        CartDto cart = cartService.getCart(principal.getId());
 
-        return ResponseEntity.ok(cartItems);
+        return ResponseEntity.ok(cart);
     }
 
     @PostMapping("/items")
