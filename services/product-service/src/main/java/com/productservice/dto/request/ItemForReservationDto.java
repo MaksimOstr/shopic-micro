@@ -1,6 +1,6 @@
 package com.productservice.dto.request;
 
-public record ItemForReservation(
+public record ItemForReservationDto(
         long productId,
         int quantity
 ) {

@@ -19,7 +19,7 @@ public class GrpcProductService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productServiceGrpc;
 
     @CircuitBreaker(name = "product-service", fallbackMethod = "getProductInfoForCartFallback")
-    public ProductInfo getProductInfoForCart(long productId) {
+    public ProductInfo getProductInfo(long productId) {
         ProductInfoRequest request = ProductInfoRequest.newBuilder()
                 .setProductId(productId)
                 .build();

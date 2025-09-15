@@ -30,7 +30,8 @@ public class ProductQueryService {
     }
 
     public ProductBasicInfoDto getProductInfo(long productId) {
-        return productRepository.findProductInfo(productId);
+        return productRepository.findProductInfo(productId)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
     public List<ProductBasicInfoDto> getProductInfo(List<Long> productIds) {

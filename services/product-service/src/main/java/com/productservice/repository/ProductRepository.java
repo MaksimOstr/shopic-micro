@@ -5,6 +5,7 @@ import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
 import com.productservice.dto.ProductBasicInfoDto;
+import com.shopic.grpc.productservice.ProductInfo;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,7 +86,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.stockQuantity" +
             ")" +
             "FROM Product p WHERE p.id = :ids")
-    ProductBasicInfoDto findProductInfo(Long ids);
+    Optional<ProductBasicInfoDto> findProductInfo(Long ids);
 
 
     @Query("SELECT new com.productservice.dto.LikedProductDto(" +

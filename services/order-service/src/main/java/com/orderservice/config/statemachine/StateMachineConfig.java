@@ -56,11 +56,7 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
                     .event(OrderEvents.CANCEL)
                     .action(cancelAction)
                     .and()
-                .withExternal()
-                    .source(OrderStatusEnum.CREATED)
-                    .target(OrderStatusEnum.FAILED)
-                    .event(OrderEvents.FAIL)
-                    .and()
+
 
                 .withExternal()
                     .source(OrderStatusEnum.PAID)

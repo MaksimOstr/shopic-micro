@@ -43,7 +43,7 @@ public class StripeCheckoutService {
 
     public String createCheckoutSession(CreateCheckoutSessionDto dto) {
         try {
-            List<SessionCreateParams.LineItem> lineItems = getLineItems(dto);
+            List<SessionCreateParams.LineItem> lineItems = getLineItems(dto.checkoutItems());
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .setCurrency("USD")
@@ -67,9 +67,9 @@ public class StripeCheckoutService {
     }
 
 
-    private List<SessionCreateParams.LineItem> getLineItems(CreateCheckoutSessionDto dto) {
+    private List<SessionCreateParams.LineItem> getLineItems(List<CheckoutItem> checkoutItems) {
         List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
-        for (CheckoutItem item : dto.checkoutItems()) {
+        for (CheckoutItem item : checkoutItems) {
             lineItems.add(
                     SessionCreateParams.LineItem.builder()
                             .setPriceData(

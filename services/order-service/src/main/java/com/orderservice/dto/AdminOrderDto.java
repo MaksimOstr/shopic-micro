@@ -1,46 +1,27 @@
 package com.orderservice.dto;
 
+import com.orderservice.entity.Address;
+import com.orderservice.entity.OrderCustomer;
 import com.orderservice.entity.OrderStatusEnum;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
 @Getter
-public class AdminOrderDto extends OrderDto {
-    private final long userId;
-
-    public AdminOrderDto(
-            long orderId,
-            OrderStatusEnum status,
-            BigDecimal totalPrice,
-            Instant updatedAt,
-            Instant createdAt,
-            List<OrderItemDto> orderItems,
-            long userId,
-            String country,
-            String street,
-            String city,
-            String postalCode,
-            String houseNumber
-    ) {
-        super(
-                orderId,
-                status,
-                totalPrice,
-                updatedAt,
-                createdAt,
-                orderItems,
-                country,
-                street,
-                city,
-                postalCode,
-                houseNumber
-        );
-        this.userId = userId;
-    }
-
-
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class AdminOrderDto {
+    private long orderId;
+    private long userId;
+    private OrderStatusEnum status;
+    private BigDecimal totalPrice;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private List<OrderItemDto> orderItems;
+    private Address address;
+    private OrderCustomer customer;
+    private String comment;
 }

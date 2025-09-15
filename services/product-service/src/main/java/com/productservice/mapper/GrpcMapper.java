@@ -1,6 +1,6 @@
 package com.productservice.mapper;
 
-import com.productservice.dto.request.ItemForReservation;
+import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.dto.ProductBasicInfoDto;
 import com.shopic.grpc.productservice.ProductInfo;
 import com.shopic.grpc.productservice.ReservationItem;
@@ -13,7 +13,9 @@ public interface GrpcMapper {
 
     ProductInfo toProductInfo(ProductBasicInfoDto dto);
 
-    ItemForReservation toItemForReservation(ReservationItem reservationItem);
+    List<ProductInfo> toProductInfoList(List<ProductBasicInfoDto> dtoList);
 
-    List<ItemForReservation> toItemForReservationList(List<ReservationItem> reservationItemList);
+    ItemForReservationDto toItemForReservation(ReservationItem reservationItem);
+
+    List<ItemForReservationDto> toItemForReservationList(List<ReservationItem> reservationItemList);
 }

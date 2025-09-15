@@ -1,7 +1,7 @@
 package com.orderservice.service;
 
-import com.orderservice.dto.OrderDto;
-import com.orderservice.dto.OrderSummaryDto;
+import com.orderservice.dto.UserOrderDto;
+import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.request.OrderParams;
 import com.orderservice.entity.Order;
 import com.orderservice.mapper.OrderMapper;
@@ -27,7 +27,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
 
     @Transactional
-    public Page<OrderSummaryDto> getOrdersByUserId(long userId, Pageable pageable, OrderParams params) {
+    public Page<UserOrderPreviewDto> getOrdersByUserId(long userId, Pageable pageable, OrderParams params) {
         Specification<Order> spec = equalsEnum("status", params.status())
                 .and(hasId("userId", userId))
                 .and(gte("totalPrice", params.fromPrice()))
@@ -35,12 +35,12 @@ public class OrderService {
                 .and(lte("totalPrice", params.toPrice()));
         Page<Order> orderPage = queryService.getOrdersBySpec(spec, pageable);
         List<Order> orderList = orderPage.getContent();
-        List<OrderSummaryDto> orderSummaryList = orderMapper.toOrderSummaryDto(orderList);
+        List<UserOrderPreviewDto> orderSummaryList = orderMapper.toOrderSummaryDto(orderList);
 
         return new PageImpl<>(orderSummaryList, pageable, orderPage.getTotalElements());
     }
 
-    public OrderDto getOrderById(long orderId) {
+    public UserOrderDto getOrderById(long orderId) {
         Order order = queryService.getOrderWithItems(orderId);
 
         return orderMapper.toOrderDto(order);

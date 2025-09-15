@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Getter
-public abstract class ProductReviewDto {
+public abstract class ProductPreviewDto {
     private final long id;
     private final String name;
     private final String imageUrl;
@@ -21,7 +21,7 @@ public abstract class ProductReviewDto {
     @Setter
     private int reviewCount;
 
-    public ProductReviewDto(long id, String name, String imageUrl, BigDecimal price, boolean isLiked, BigDecimal rating, int reviewCount) {
+    public ProductPreviewDto(long id, String name, String imageUrl, BigDecimal price, boolean isLiked, BigDecimal rating, int reviewCount) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;

@@ -1,7 +1,7 @@
 package com.orderservice.service;
 
 import com.orderservice.dto.AdminOrderDto;
-import com.orderservice.dto.AdminOrderSummaryDto;
+import com.orderservice.dto.AdminOrderPreviewDto;
 import com.orderservice.dto.request.AdminOrderParams;
 import com.orderservice.dto.request.UpdateContactInfoRequest;
 import com.orderservice.entity.Order;
@@ -34,13 +34,13 @@ public class AdminOrderService {
     }
 
     @Transactional
-    public Page<AdminOrderSummaryDto> getOrders(AdminOrderParams params, Pageable pageable) {
+    public Page<AdminOrderPreviewDto> getOrders(AdminOrderParams params, Pageable pageable) {
         Specification<Order> spec = iLikeNested("firstName", "customer" , params.firstName())
                 .and(iLikeNested("lastName", "customer", params.lastName()))
                 .and(equalsEnum("status", params.status()));
         Page<Order> orderPage = queryService.getOrdersBySpec(spec, pageable);
         List<Order> orderList = orderPage.getContent();
-        List<AdminOrderSummaryDto> orderDtoList = orderMapper.toAdminOrderSummaryDto(orderList);
+        List<AdminOrderPreviewDto> orderDtoList = orderMapper.toAdminOrderSummaryDto(orderList);
 
         return new PageImpl<>(orderDtoList, pageable, orderPage.getTotalElements());
     }

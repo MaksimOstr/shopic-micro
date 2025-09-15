@@ -115,7 +115,7 @@ public class CartService {
     }
 
     private ProductInfo getProductInfoAndCheckQuantity(long productId, int quantity) {
-        ProductInfo productInfo = grpcProductService.getProductInfoForCart(productId);
+        ProductInfo productInfo = grpcProductService.getProductInfo(productId);
 
         if(productInfo.getAvailableQuantity() < quantity) {
             throw new InsufficientProductStockException(

@@ -56,12 +56,6 @@ public class OrderEventService {
         processEvent(orderId, OrderEvents.CANCEL);
     }
 
-    @Transactional
-    public void failOrder(long orderId) {
-        processEvent(orderId, OrderEvents.FAIL);
-    }
-
-
     protected void processEvent(Long orderId, OrderEvents event) {
         log.info("Processing order event: {}", event);
         Order order = orderQueryService.getOrderById(orderId);

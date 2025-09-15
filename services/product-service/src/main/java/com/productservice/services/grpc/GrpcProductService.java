@@ -1,7 +1,7 @@
 package com.productservice.services.grpc;
 
 import com.google.protobuf.Empty;
-import com.productservice.dto.request.ItemForReservation;
+import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.dto.request.CreateReservationDto;
 import com.productservice.mapper.GrpcMapper;
 import com.productservice.dto.ProductBasicInfoDto;
@@ -36,7 +36,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void reserveProducts(ReserveProductsRequest request, StreamObserver<Empty> responseObserver) {
-        List<ItemForReservation> itemsForReservation = grpcMapper.toItemForReservationList(request.getReservationItemsList());
+        List<ItemForReservationDto> itemsForReservation = grpcMapper.toItemForReservationList(request.getReservationItemsList());
         CreateReservationDto dto = new CreateReservationDto(itemsForReservation, request.getOrderId());
 
         reservationCreationService.createReservation(dto);
@@ -48,7 +48,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     @Override
     public void getProductInfoList(ProductInfoListRequest request, StreamObserver<ProductInfoList> responseObserver) {
         List<ProductBasicInfoDto> productPrices = productQueryService.getProductInfo(request.getProductIdList());
-        List<ProductInfo> productInfoList = productPrices.stream().map(grpcMapper::toProductInfo).toList();
+        List<ProductInfo> productInfoList = grpcMapper.toProductInfoList(productPrices);
         ProductInfoList response = ProductInfoList.newBuilder()
                 .addAllProducts(productInfoList)
                 .build();

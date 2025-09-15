@@ -11,8 +11,7 @@ public enum OrderStatusEnum {
     READY_FOR_PICKUP,
     COMPLETED,
     CANCELLED,
-    RETURNED,
-    FAILED;
+    RETURNED;
 
     @JsonCreator
     public static OrderStatusEnum fromString(String name) {

@@ -19,7 +19,7 @@ public class KafkaListenerService {
     private final ReservationService reservationService;
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
-    @KafkaListener(topics = {"order.returned", "order.canceled", "payment.unpaid"}, groupId = "product-service")
+    @KafkaListener(topics = {"order.returned", "order.canceled"}, groupId = "product-service")
     public void listenReturnedOrder(String data, Acknowledgment ack) {
         try {
             BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
