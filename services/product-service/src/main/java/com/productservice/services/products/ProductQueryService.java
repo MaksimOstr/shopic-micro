@@ -5,7 +5,7 @@ import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
-import com.productservice.projection.ProductInfoDto;
+import com.productservice.dto.ProductBasicInfoDto;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,15 +29,11 @@ public class ProductQueryService {
         return productRepository.findProductsForUpdate(productIds);
     }
 
-    public ProductInfoDto getProductInfo(long productId) {
+    public ProductBasicInfoDto getProductInfo(long productId) {
         return productRepository.findProductInfo(productId);
     }
 
-    public int getAvailableQuantity(long productId) {
-        return productRepository.getAvailableQuantity(productId);
-    }
-
-    public List<ProductInfoDto> getProductInfo(List<Long> productIds) {
+    public List<ProductBasicInfoDto> getProductInfo(List<Long> productIds) {
         return productRepository.findProductInfoList(productIds);
     }
 

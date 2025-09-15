@@ -34,11 +34,11 @@ public class ProductGrpcService {
     }
 
     @CircuitBreaker(name = "product-service", fallbackMethod = "getActualProductInfoFallback")
-    public ActualProductInfoResponse getActualProductInfo(List<Long> productIds) {
-        GetActualProductInfoRequest request = GetActualProductInfoRequest.newBuilder()
+    public ProductInfoList getProductInfoList(List<Long> productIds) {
+        ProductInfoListRequest request = ProductInfoListRequest.newBuilder()
                 .addAllProductId(productIds).build();
 
-        return productGrpcService.getActualProductInfo(request);
+        return productGrpcService.getProductInfoList(request);
     }
 
     public Empty reserveProductFallback(List<CartItem> cartItems, long orderId, Throwable throwable) {
@@ -58,7 +58,7 @@ public class ProductGrpcService {
         }
     }
 
-    public ActualProductInfoResponse getActualProductInfoFallback(List<Long> productIds, Throwable throwable) {
+    public ProductInfoList getActualProductInfoFallback(List<Long> productIds, Throwable throwable) {
         log.error("getActualProductInfoFallback", throwable);
         throw new ExternalServiceUnavailableException("Something went wrong. Try again later");
     }

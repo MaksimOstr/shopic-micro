@@ -4,7 +4,7 @@ import com.google.protobuf.Empty;
 import com.productservice.dto.request.ItemForReservation;
 import com.productservice.dto.request.CreateReservationDto;
 import com.productservice.mapper.GrpcMapper;
-import com.productservice.projection.ProductInfoDto;
+import com.productservice.dto.ProductBasicInfoDto;
 import com.productservice.services.ReservationCreationService;
 import com.productservice.services.products.ProductQueryService;
 import com.shopic.grpc.productservice.*;
@@ -26,7 +26,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getProductInfo(ProductInfoRequest request, StreamObserver<ProductInfo> responseObserver) {
-        ProductInfoDto productDto = productQueryService.getProductInfo(request.getProductId());
+        ProductBasicInfoDto productDto = productQueryService.getProductInfo(request.getProductId());
 
         ProductInfo response = grpcMapper.toProductInfo(productDto);
 
@@ -47,7 +47,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getProductInfoList(ProductInfoListRequest request, StreamObserver<ProductInfoList> responseObserver) {
-        List<ProductInfoDto> productPrices = productQueryService.getProductInfo(request.getProductIdList());
+        List<ProductBasicInfoDto> productPrices = productQueryService.getProductInfo(request.getProductIdList());
         List<ProductInfo> productInfoList = productPrices.stream().map(grpcMapper::toProductInfo).toList();
         ProductInfoList response = ProductInfoList.newBuilder()
                 .addAllProducts(productInfoList)
@@ -63,18 +63,6 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
         IsProductExistsResponse response = IsProductExistsResponse.newBuilder()
                 .setIsExists(isExists)
-                .build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    @Override
-    public void checkProductAvailability(CheckProductAvailabilityRequest request, StreamObserver<CheckProductAvailabilityResponse> responseObserver) {
-        int availableQuantity = productQueryService.getAvailableQuantity(request.getProductId());
-        CheckProductAvailabilityResponse response = CheckProductAvailabilityResponse.newBuilder()
-                .setAvailable(availableQuantity >= request.getQuantity())
-                .setAvailableQuantity(availableQuantity)
                 .build();
 
         responseObserver.onNext(response);

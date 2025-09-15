@@ -7,7 +7,6 @@ import com.shopic.grpc.productservice.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
@@ -26,16 +25,6 @@ public class GrpcProductService {
                 .build();
 
         return productServiceGrpc.getProductInfo(request);
-    }
-
-    @CircuitBreaker(name = "product-service")
-    public CheckProductAvailabilityResponse checkProductAvailability(long productId, int requestedQuantity) {
-        CheckProductAvailabilityRequest request = CheckProductAvailabilityRequest.newBuilder()
-                .setProductId(productId)
-                .setQuantity(requestedQuantity)
-                .build();
-
-        return productServiceGrpc.checkProductAvailability(request);
     }
 
     public ProductInfo getProductInfoForCartFallback(long productId, Throwable e) {

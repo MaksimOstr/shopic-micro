@@ -8,7 +8,6 @@ import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
-import com.productservice.projection.ProductDto;
 import com.productservice.services.products.AdminProductFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

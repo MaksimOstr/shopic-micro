@@ -4,7 +4,7 @@ import com.productservice.dto.AdminProductDto;
 import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
-import com.productservice.projection.ProductInfoDto;
+import com.productservice.dto.ProductBasicInfoDto;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,9 +41,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "JOIN p.category c WHERE p.id = :id AND p.enabled = true")
     Optional<UserProductDto> getUserProduct(long id);
 
-    @Query("SELECT p.stockQuantity FROM Product p WHERE p.id = :id")
-    int getAvailableQuantity(long id);
-
     @Query("SELECT new com.productservice.dto.AdminProductDto(" +
             "p.id, " +
             "p.name, " +
@@ -70,23 +67,25 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     Optional<Product> findBySku(UUID sku);
 
-    @Query("SELECT new com.productservice.projection.ProductInfoDto(" +
+    @Query("SELECT new com.productservice.dto.ProductBasicInfoDto(" +
             "p.id," +
             "p.price," +
             "p.imageUrl," +
-            "p.name" +
+            "p.name," +
+            "p.stockQuantity" +
             ")" +
             "FROM Product p WHERE p.id IN :ids")
-    List<ProductInfoDto> findProductInfoList(List<Long> ids);
+    List<ProductBasicInfoDto> findProductInfoList(List<Long> ids);
 
-    @Query("SELECT new com.productservice.projection.ProductInfoDto(" +
+    @Query("SELECT new com.productservice.dto.ProductBasicInfoDto(" +
             "p.id," +
             "p.price," +
             "p.imageUrl," +
-            "p.name" +
+            "p.name," +
+            "p.stockQuantity" +
             ")" +
             "FROM Product p WHERE p.id = :ids")
-    ProductInfoDto findProductInfo(Long ids);
+    ProductBasicInfoDto findProductInfo(Long ids);
 
 
     @Query("SELECT new com.productservice.dto.LikedProductDto(" +

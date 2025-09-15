@@ -9,8 +9,8 @@ import com.orderservice.service.grpc.PaymentGrpcService;
 import com.orderservice.service.grpc.ProductGrpcService;
 import com.shopic.grpc.cartservice.CartResponse;
 import com.shopic.grpc.cartservice.CartItem;
-import com.shopic.grpc.productservice.ActualProductInfoResponse;
 import com.shopic.grpc.productservice.ProductInfo;
+import com.shopic.grpc.productservice.ProductInfoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,7 @@ public class OrderCreationService {
     public String createOrder(long userId, CreateOrderRequest dto) {
         CartResponse cartInfo = cartGrpcService.getCartInfo(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
-        ActualProductInfoResponse response = productGrpcService.getActualProductInfo(
+        ProductInfoList response = productGrpcService.getProductInfoList(
                 cartItems.stream().map(CartItem::getProductId).toList()
         );
         List<ProductInfo> productInfoList = response.getProductsList();

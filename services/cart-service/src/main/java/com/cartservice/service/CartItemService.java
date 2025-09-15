@@ -22,13 +22,13 @@ public class CartItemService {
                 .orElseThrow(() -> new NotFoundException(CART_ITEM_NOT_FOUND));
     }
 
-    public Optional<CartItem> getByCartIdAndProductId(long cartId, long productId) {
-        return cartItemRepository.findByCart_IdAndProductId(cartId, productId);
-    }
-
     public CartItem getCartItemById(long cartItemId) {
         return cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new NotFoundException(CART_ITEM_NOT_FOUND));
+    }
+
+    public CartItem save(CartItem cartItem) {
+        return cartItemRepository.save(cartItem);
     }
 
     public int countCartItems(long cartId) {
@@ -41,6 +41,10 @@ public class CartItemService {
         if(deleted == 0) {
             throw new NotFoundException(CART_ITEM_NOT_FOUND);
         }
+    }
+
+    public Optional<CartItem> getOptionalByCartIdAndProductId(long cartId, long productId) {
+        return cartItemRepository.findByCart_IdAndProductId(cartId, productId);
     }
 
 }
