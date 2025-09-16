@@ -27,6 +27,7 @@ message ProductRating {
 
 message ProductRatingResponse {
   string rating = 1;
+  int32 review_count = 2;
 }
 
 

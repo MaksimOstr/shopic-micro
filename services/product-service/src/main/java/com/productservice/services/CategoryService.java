@@ -19,6 +19,7 @@ import java.util.Optional;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
+    @Transactional
     public Category create(CreateCategoryRequest dto) {
         if(existsByName(dto.name())) {
             throw new AlreadyExistsException("Category name already exists");

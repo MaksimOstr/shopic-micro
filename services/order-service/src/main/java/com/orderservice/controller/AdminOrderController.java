@@ -1,7 +1,7 @@
 package com.orderservice.controller;
 
 import com.orderservice.dto.AdminOrderDto;
-import com.orderservice.dto.AdminOrderSummaryDto;
+import com.orderservice.dto.AdminOrderPreviewDto;
 import com.orderservice.dto.request.AdminOrderParams;
 import com.orderservice.dto.request.UpdateContactInfoRequest;
 import com.orderservice.service.AdminOrderService;
@@ -35,7 +35,7 @@ public class AdminOrderController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<AdminOrderSummaryDto>> getAllOrders(
+    public ResponseEntity<Page<AdminOrderPreviewDto>> getAllOrders(
             @RequestBody AdminOrderParams body,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -43,7 +43,7 @@ public class AdminOrderController {
     ) {
         Sort.Direction direction = Sort.Direction.fromString(sortDirection);
         Pageable pageable = PageRequest.of(page, size, direction, "createdAt");
-        Page<AdminOrderSummaryDto> orders = adminOrderService.getOrders(body, pageable);
+        Page<AdminOrderPreviewDto> orders = adminOrderService.getOrders(body, pageable);
 
         return ResponseEntity.ok().body(orders);
     }
@@ -95,6 +95,14 @@ public class AdminOrderController {
             @PathVariable long id
     ) {
         orderEventService.returnOrder(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable long id
+    ) {
+        orderEventService.cancelOrder(id);
         return ResponseEntity.ok().build();
     }
 }

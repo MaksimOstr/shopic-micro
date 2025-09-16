@@ -47,20 +47,6 @@ public class ApiGatewayConfig {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> banRoute(JwtHandlerFilter jwtHandlerFilter) {
-        return route("ban-service-route")
-                .filter(lb("ban-service"))
-                .path("/bans", request -> request
-                        .filter(jwtHandlerFilter)
-                        .POST("", http())
-                        .PATCH("/{id}/unban", http())
-                        .GET("", http())
-                        .GET("/{id}", http())
-                        .GET("/check", http()))
-                .build();
-    }
-
-    @Bean
     public RouterFunction<ServerResponse> profileRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("profile-service-route")
                 .filter(lb("profile-service"))

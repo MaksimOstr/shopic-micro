@@ -15,14 +15,10 @@
             <option value="$PROJECT_DIR$/infrastructure/discovery-server" />
             <option value="$PROJECT_DIR$/proto" />
             <option value="$PROJECT_DIR$/services/auth-service" />
-            <option value="$PROJECT_DIR$/services/ban-service" />
             <option value="$PROJECT_DIR$/services/cart-service" />
-            <option value="$PROJECT_DIR$/services/code-service" />
-            <option value="$PROJECT_DIR$/services/mail-service" />
             <option value="$PROJECT_DIR$/services/order-service" />
             <option value="$PROJECT_DIR$/services/payment-service" />
             <option value="$PROJECT_DIR$/services/product-service" />
-            <option value="$PROJECT_DIR$/services/profile-service" />
             <option value="$PROJECT_DIR$/services/review-service" />
           </set>
         </option>

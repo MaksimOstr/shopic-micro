@@ -27,8 +27,17 @@ public class User {
 
     private String password;
 
+    @Column(name = "first_name", length = 50)
+    private String firstName;
+
+    @Column(name = "last_name", length = 50)
+    private String lastName;
+
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified;
+
+    @Column(name = "is_non_blocked", nullable = false)
+    private Boolean isNonBlocked;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider", nullable = false)
@@ -54,6 +63,10 @@ public class User {
     protected void onCreate() {
         if(isVerified == null) {
             isVerified = false;
+        }
+
+        if(isNonBlocked == null) {
+            isNonBlocked = true;
         }
     }
 }

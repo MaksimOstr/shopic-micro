@@ -8,7 +8,6 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.38/57f8f5e02e92a30fd21b80cbd426a4172b5f8e29/lombok-1.18.38.jar" />
         </processorPath>
-        <module name="shopic.mail-service.main" />
         <module name="shopic.api-gateway.main" />
       </profile>
       <profile name="Gradle Imported" enabled="true">
@@ -17,15 +16,12 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.38/57f8f5e02e92a30fd21b80cbd426a4172b5f8e29/lombok-1.18.38.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.6.3/52e345c907fbf173b376586c7f8b131d53fa5867/mapstruct-processor-1.6.3.jar" />
         </processorPath>
-        <module name="shopic.ban-service.main" />
         <module name="shopic.payment-service.main" />
         <module name="shopic.order-service.main" />
         <module name="shopic.auth-service.main" />
         <module name="com.shopic.product-service.main" />
         <module name="shopic.review-service.main" />
         <module name="shopic.cart-service.main" />
-        <module name="shopic.code-service.main" />
-        <module name="shopic.profile-service.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="23">
@@ -56,9 +52,19 @@
       <module name="review-service" target="24" />
       <module name="review-service.main" target="24" />
       <module name="review-service.test" target="24" />
+      <module name="shopic.ban-service" target="24" />
+      <module name="shopic.ban-service.main" target="24" />
+      <module name="shopic.ban-service.test" target="24" />
       <module name="shopic.buildSrc" target="23" />
       <module name="shopic.buildSrc.main" target="23" />
       <module name="shopic.buildSrc.test" target="23" />
+      <module name="shopic.code-service.main" target="24" />
+      <module name="shopic.code-service.test" target="24" />
+      <module name="shopic.mail-service.main" target="24" />
+      <module name="shopic.mail-service.test" target="24" />
+      <module name="shopic.profile-service" target="24" />
+      <module name="shopic.profile-service.main" target="24" />
+      <module name="shopic.profile-service.test" target="24" />
       <module name="user-service" target="24" />
       <module name="user-service.main" target="24" />
       <module name="user-service.test" target="24" />
@@ -120,7 +126,6 @@
       <module name="shopic.cart-service" options="-parameters" />
       <module name="shopic.cart-service.main" options="-parameters" />
       <module name="shopic.cart-service.test" options="-parameters" />
-      <module name="shopic.code-service" options="-parameters" />
       <module name="shopic.code-service.main" options="-parameters" />
       <module name="shopic.code-service.test" options="-parameters" />
       <module name="shopic.config-server" options="-parameters" />
@@ -129,7 +134,6 @@
       <module name="shopic.discovery-server" options="-parameters" />
       <module name="shopic.discovery-server.main" options="-parameters" />
       <module name="shopic.discovery-server.test" options="-parameters" />
-      <module name="shopic.mail-service" options="-parameters" />
       <module name="shopic.mail-service.main" options="-parameters" />
       <module name="shopic.mail-service.test" options="-parameters" />
       <module name="shopic.order-service" options="-parameters" />

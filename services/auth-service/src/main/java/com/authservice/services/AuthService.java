@@ -1,11 +1,15 @@
 package com.authservice.services;
 
 import com.authservice.config.security.model.CustomUserDetails;
+import com.authservice.dto.LocalRegisterResult;
 import com.authservice.dto.TokenPairDto;
 import com.authservice.dto.request.LocalRegisterRequest;
 import com.authservice.dto.request.SignInRequestDto;
-import com.authservice.dto.response.CreateLocalUserResponse;
+import com.authservice.entity.Code;
+import com.authservice.entity.CodeScopeEnum;
+import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
+import com.authservice.services.code.CodeCreationService;
 import com.authservice.services.user.LocalUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +30,22 @@ public class AuthService {
     private final TokenService tokenService;
     private final LocalUserService localUserService;
     private final RoleMapper roleMapper;
+    private final CodeCreationService codeCreationService;
+    private final MailService mailService;
 
 
     @Transactional
-    public CreateLocalUserResponse localRegister(LocalRegisterRequest dto){
-        return localUserService.createLocalUser(dto);
+    public LocalRegisterResult localRegister(LocalRegisterRequest dto){
+        User user = localUserService.createLocalUser(dto);
+        Code code = codeCreationService.getCode(user, CodeScopeEnum.EMAIL_VERIFICATION);
+
+        mailService.sendEmailVerificationCode(user.getEmail(), code.getCode());
+
+        return new LocalRegisterResult(
+                user.getId(),
+                user.getEmail(),
+                user.getCreatedAt()
+        );
     }
 
     @Transactional
@@ -38,8 +53,10 @@ public class AuthService {
         Authentication authReq = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
         Authentication authenticatedUser = authenticationManager.authenticate(authReq);
         CustomUserDetails customUserDetails = (CustomUserDetails) authenticatedUser.getPrincipal();
+        long userId = customUserDetails.getUserId();
+        List<String> roles = roleMapper.toRoleNames(customUserDetails.getAuthorities());
 
-        return getTokenPair(customUserDetails, dto.deviceId());
+        return tokenService.getTokenPair(userId, roles, dto.deviceId());
     }
 
     public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
@@ -48,13 +65,5 @@ public class AuthService {
 
     public void logout(String refreshToken, String deviceId) {
         tokenService.logout(refreshToken, deviceId);
-    }
-
-
-    private TokenPairDto getTokenPair(CustomUserDetails customUserDetails, String deviceId) {
-        long userId = customUserDetails.getUserId();
-        List<String> roles = roleMapper.toRoleNames(customUserDetails.getAuthorities());
-
-        return tokenService.getTokenPair(userId, roles, deviceId);
     }
 }

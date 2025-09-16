@@ -1,8 +1,8 @@
 package com.orderservice.controller;
 
 import com.orderservice.config.security.model.CustomPrincipal;
-import com.orderservice.dto.OrderDto;
-import com.orderservice.dto.OrderSummaryDto;
+import com.orderservice.dto.UserOrderDto;
+import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.dto.request.OrderParams;
 import com.orderservice.service.OrderCreationService;
@@ -40,16 +40,16 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDto> getOrder(
+    public ResponseEntity<UserOrderDto> getOrder(
             @PathVariable Long id
     ) {
-        OrderDto order = orderService.getOrderById(id);
+        UserOrderDto order = orderService.getOrderById(id);
 
         return ResponseEntity.ok().body(order);
     }
 
     @GetMapping
-    public ResponseEntity<Page<OrderSummaryDto>> getUserOrders(
+    public ResponseEntity<Page<UserOrderPreviewDto>> getUserOrders(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody OrderParams body,
             @RequestParam(defaultValue = "0") int page,
@@ -58,7 +58,7 @@ public class OrderController {
     ) {
         Sort.Direction direction = Sort.Direction.fromString(sortDirection);
         Pageable pageable = PageRequest.of(page, size, direction, "createdAt");
-        Page<OrderSummaryDto> orders = orderService.getOrdersByUserId(principal.getId(), pageable, body);
+        Page<UserOrderPreviewDto> orders = orderService.getOrdersByUserId(principal.getId(), pageable, body);
 
         return ResponseEntity.ok().body(orders);
     }

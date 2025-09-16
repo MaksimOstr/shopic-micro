@@ -17,9 +17,4 @@ public class RoleService {
         return roleRepository.findById(1)
                 .orElseThrow(() -> new NotFoundException("User role not found"));
     }
-
-    public List<String> getUserRoleNames(long userId) {
-        return roleRepository.findRoleNamesByUserId(userId);
-    }
-
 }

@@ -11,3 +11,11 @@ spring:
   grpc:
     server:
       port: 1015
+
+  jpa:
+    properties:
+      hibernate:
+        order_inserts: true
+        jdbc:
+          batch_size: 20
+        generate_statistics: true

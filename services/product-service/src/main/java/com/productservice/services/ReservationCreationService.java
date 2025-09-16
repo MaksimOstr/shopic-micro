@@ -2,7 +2,7 @@ package com.productservice.services;
 
 import com.productservice.dto.request.CreateReservationDto;
 import com.productservice.dto.request.CreateReservationItem;
-import com.productservice.dto.request.ItemForReservation;
+import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.exceptions.InsufficientStockException;
@@ -30,7 +30,7 @@ public class ReservationCreationService {
 
     @Transactional
     public void createReservation(CreateReservationDto dto) {
-        List<ItemForReservation> reservationItems = dto.reservationItems();
+        List<ItemForReservationDto> reservationItems = dto.reservationItems();
 
         checkAndDecreaseStockQuantity(reservationItems);
 
@@ -40,11 +40,11 @@ public class ReservationCreationService {
         mapToReservationItemDtoAndSave(reservationItems, reservationId);
     }
 
-    private void checkAndDecreaseStockQuantity(List<ItemForReservation> reservationItems) {
+    private void checkAndDecreaseStockQuantity(List<ItemForReservationDto> reservationItems) {
         List<Long> productIds = extractIds(reservationItems);
         Map<Long, Product> productMap = getProductQuantityMap(productIds);
 
-        for (ItemForReservation reservationItem : reservationItems) {
+        for (ItemForReservationDto reservationItem : reservationItems) {
             Integer stockQuantity = productMap.get(reservationItem.productId()).getStockQuantity();
 
             if (stockQuantity == null) {
@@ -59,7 +59,7 @@ public class ReservationCreationService {
         decreaseStockQuantity(reservationItems, productMap);
     }
 
-    private void mapToReservationItemDtoAndSave(List<ItemForReservation> reservationItems, long reservationId) {
+    private void mapToReservationItemDtoAndSave(List<ItemForReservationDto> reservationItems, long reservationId) {
         List<CreateReservationItem> dtoList = reservationItems.stream()
                 .map(item -> new CreateReservationItem(
                         item.productId(),
@@ -70,8 +70,8 @@ public class ReservationCreationService {
         reservationItemService.saveReservationItems(dtoList);
     }
 
-    private void decreaseStockQuantity(List<ItemForReservation> reservationItems, Map<Long, Product> productMap) {
-        for (ItemForReservation reservationItem : reservationItems) {
+    private void decreaseStockQuantity(List<ItemForReservationDto> reservationItems, Map<Long, Product> productMap) {
+        for (ItemForReservationDto reservationItem : reservationItems) {
             Product product = productMap.get(reservationItem.productId());
 
             product.setStockQuantity(product.getStockQuantity() - reservationItem.quantity());

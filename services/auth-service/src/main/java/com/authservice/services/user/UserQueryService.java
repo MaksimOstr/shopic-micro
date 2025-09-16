@@ -2,10 +2,6 @@ package com.authservice.services.user;
 
 import com.authservice.entity.User;
 import com.authservice.exceptions.NotFoundException;
-import com.authservice.projection.user.EmailVerifyProjection;
-import com.authservice.projection.user.ResetPasswordProjection;
-import com.authservice.projection.user.UserEmailAndPasswordProjection;
-import com.authservice.projection.user.UserForBanProjection;
 import com.authservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +11,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -32,27 +27,17 @@ public class UserQueryService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public Set<String> getUserRoleNames(long userId) {
-        return userRepository.getUserRoleNames(userId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-    }
-
-    public EmailVerifyProjection getUserForEmailVerify(String email) {
-        return userRepository.findUserForEmailVerify(email)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-    }
-
     public boolean isUserExist(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    public ResetPasswordProjection getUserForResetPassword(String email) {
-        return userRepository.findUserForResetPassword(email)
+    public User findById(long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public User findById(long id) {
-        return userRepository.findById(id)
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
@@ -63,16 +48,6 @@ public class UserQueryService {
 
     public Optional<User> findOptionalByEmail(String email) {
         return userRepository.findByEmail(email);
-    }
-
-    public UserEmailAndPasswordProjection getUserEmailAndPassword(long id) {
-        return userRepository.findEmailAndPasswordById(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-    }
-
-    public UserForBanProjection getUserForBan(long id) {
-        return userRepository.findUserForBan(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
     public Page<User> getUserPageBySpec(Pageable pageable, Specification<User> spec) {

@@ -51,9 +51,10 @@ public class PublicProductController {
 
     @GetMapping("/active/{id}")
     public ResponseEntity<UserProductDto> getUserProduct(
-            @PathVariable long id
+            @PathVariable long id,
+            @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        UserProductDto product = productFacade.getProduct(id);
+        UserProductDto product = productFacade.getProduct(id, principal.getId());
 
         return ResponseEntity.ok(product);
     }

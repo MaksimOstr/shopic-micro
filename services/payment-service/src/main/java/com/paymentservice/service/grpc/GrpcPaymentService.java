@@ -19,7 +19,6 @@ public class GrpcPaymentService extends PaymentServiceGrpc.PaymentServiceImplBas
     private final StripeCheckoutService stripeService;
     private final GrpcMapper grpcMapper;
 
-
     @Override
     public void createPaymentForOrder(CreatePaymentRequest request, StreamObserver<CreatePaymentResponse> responseObserver) {
         log.info("Create payment for order {}", request);
@@ -27,7 +26,7 @@ public class GrpcPaymentService extends PaymentServiceGrpc.PaymentServiceImplBas
         CreateCheckoutSessionDto dto = new CreateCheckoutSessionDto(
                 request.getOrderId(),
                 request.getCustomerId(),
-                request.getLineItemsList().stream().map(grpcMapper::toCheckoutItem).toList()
+                grpcMapper.toCheckoutItemList(request.getLineItemsList())
         );
 
         String redirectUrl = stripeService.createCheckoutSession(dto);

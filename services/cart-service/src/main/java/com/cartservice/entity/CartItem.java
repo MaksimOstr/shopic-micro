@@ -42,4 +42,5 @@ public class CartItem {
     @Column(name = "price_at_add", nullable = false)
     @DecimalMin(value = "0.0", message = "Price cannot be negative")
     private BigDecimal priceAtAdd;
+
 }

@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: Maksim
+      changes:
+        - createSequence:
+            sequenceName: codes_seq
+            incrementBy: 50
+            cacheSize: 50
+            startValue: 1
+
+        - createTable:
+            tableName: codes
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: codes_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: used
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    deleteCascade: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: varchar(20)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: expires_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: scope
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: codes
+            columnNames: user_id, scope
+            constraintName: uc_user_id_scope
+        - addForeignKeyConstraint:
+            baseTableName: codes
+            baseColumnNames: user_id
+            constraintName: fk_codes_user
+            referencedTableName: users
+            referencedColumnNames: id
+

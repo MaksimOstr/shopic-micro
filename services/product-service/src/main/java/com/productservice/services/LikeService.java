@@ -20,7 +20,7 @@ public class LikeService {
 
 
     public void toggleLike(long productId, long userId) {
-        boolean isExists = likeRepository.existsByProduct_IdAndUserId(productId, userId);
+        boolean isExists = isProductLiked(productId, userId);
         if (isExists) {
             likeRepository.deleteByProduct_IdAndUserId(productId, userId);
         } else {
@@ -43,6 +43,10 @@ public class LikeService {
 
     public Set<Long> getLikedProductIds(long userId) {
         return likeRepository.findLikedProductIds(userId);
+    }
+
+    public boolean isProductLiked(long productId, long userId) {
+        return likeRepository.existsByProduct_IdAndUserId(productId, userId);
     }
 
     public int getLikeCount(long productId) {

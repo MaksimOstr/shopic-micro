@@ -22,7 +22,6 @@ public class OAuthUserService {
     private final RoleService roleService;
     private final UserQueryService userQueryService;
     private final UserMapper userMapper;
-    private final KafkaEventProducer kafkaEventProducer;
 
     @Transactional
     public CreateOAuthUserResponse createOrGetOAuthUser(@Valid CreateOAuthUserRequest dto) {
@@ -34,8 +33,6 @@ public class OAuthUserService {
     private CreateOAuthUserResponse createOAuthUser(CreateOAuthUserRequest dto) {
         User user = createAndSaveUser(dto);
 
-        kafkaEventProducer.sendOAuthUserCreated(dto.firstName(), user.getId(), dto.lastName());
-
         return userMapper.toCreateOAuthUserResponse(user);
     }
 
@@ -43,6 +40,8 @@ public class OAuthUserService {
         Role defaultRole = roleService.getDefaultUserRole();
         AuthProviderEnum provider = AuthProviderEnum.fromString(dto.provider());
         User user = User.builder()
+                .firstName(dto.firstName())
+                .lastName(dto.lastName())
                 .email(dto.email())
                 .authProvider(provider)
                 .roles(Set.of(defaultRole))

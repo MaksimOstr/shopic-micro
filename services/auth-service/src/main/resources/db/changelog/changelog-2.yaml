@@ -40,6 +40,21 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: is_non_blocked
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: last_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: true
+              - column:
                   name: auth_provider
                   type: varchar(20)
                   constraints:

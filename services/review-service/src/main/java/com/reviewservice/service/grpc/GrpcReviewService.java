@@ -2,7 +2,9 @@ package com.reviewservice.service.grpc;
 
 import com.reviewservice.dto.RatingDto;
 import com.reviewservice.mapper.GrpcMapper;
+import com.reviewservice.projection.ReviewForRating;
 import com.reviewservice.service.RatingService;
+import com.reviewservice.service.ReviewService;
 import com.shopic.grpc.reviewservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GrpcReviewService extends ReviewServiceGrpc.ReviewServiceImplBase {
     private final RatingService ratingService;
+    private final ReviewService reviewService;
     private final GrpcMapper grpcMapper;
 
     @Override
@@ -39,9 +42,12 @@ public class GrpcReviewService extends ReviewServiceGrpc.ReviewServiceImplBase {
     @Override
     public void getProductRating(ProductRatingRequest request, StreamObserver<ProductRatingResponse> responseObserver) {
         try {
-            BigDecimal rating = ratingService.getRatingByProductId(request.getProductId());
-
-            ProductRatingResponse response = ProductRatingResponse.newBuilder().setRating(rating.toString()).build();
+            List<ReviewForRating> reviews = reviewService.getReviewsForRating(request.getProductId());
+            BigDecimal rating = ratingService.calculateAverage(reviews);
+            ProductRatingResponse response = ProductRatingResponse.newBuilder()
+                    .setReviewCount(reviews.size())
+                    .setRating(rating.toString())
+                    .build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();

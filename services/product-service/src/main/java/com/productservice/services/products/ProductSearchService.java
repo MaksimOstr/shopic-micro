@@ -69,20 +69,20 @@ public class ProductSearchService {
     }
 
 
-    private void markLikedProducts(List<? extends ProductReviewDto> products, long userId) {
+    private void markLikedProducts(List<? extends ProductPreviewDto> products, long userId) {
         Set<Long> likesIds = likeService.getLikedProductIds(userId);
 
-        for (ProductReviewDto product : products) {
+        for (ProductPreviewDto product : products) {
             product.setLiked(likesIds.contains(product.getId()));
         }
     }
 
-    private void setProductRatings(List<? extends ProductReviewDto> products) {
-        List<Long> productIdList = products.stream().map(ProductReviewDto::getId).toList();
+    private void setProductRatings(List<? extends ProductPreviewDto> products) {
+        List<Long> productIdList = products.stream().map(ProductPreviewDto::getId).toList();
         ProductRatingsResponse response = grpcReviewService.getProductRatings(productIdList);
         Map<Long, ProductRating> productRatingMap = response.getProductRatingList().stream().collect(Collectors.toMap(ProductRating::getProductId, Function.identity()));
 
-        for (ProductReviewDto product : products) {
+        for (ProductPreviewDto product : products) {
             ProductRating productRating = productRatingMap.get(product.getId());
 
             if (productRating != null) {

@@ -1,9 +1,7 @@
 package com.productservice.mapper;
 
-import com.productservice.dto.request.ItemForReservation;
-import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductInfoDto;
-import com.shopic.grpc.productservice.ProductDetailsResponse;
+import com.productservice.dto.request.ItemForReservationDto;
+import com.productservice.dto.ProductBasicInfoDto;
 import com.shopic.grpc.productservice.ProductInfo;
 import com.shopic.grpc.productservice.ReservationItem;
 import org.mapstruct.Mapper;
@@ -13,11 +11,11 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
 
-    ProductDetailsResponse toProductDetails(ProductForCartDto dto);
+    ProductInfo toProductInfo(ProductBasicInfoDto dto);
 
-    ProductInfo toProductInfo(ProductInfoDto dto);
+    List<ProductInfo> toProductInfoList(List<ProductBasicInfoDto> dtoList);
 
-    ItemForReservation toItemForReservation(ReservationItem reservationItem);
+    ItemForReservationDto toItemForReservation(ReservationItem reservationItem);
 
-    List<ItemForReservation> toItemForReservationList(List<ReservationItem> reservationItemList);
+    List<ItemForReservationDto> toItemForReservationList(List<ReservationItem> reservationItemList);
 }

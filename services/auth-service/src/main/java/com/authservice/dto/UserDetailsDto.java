@@ -9,7 +9,10 @@ public record UserDetailsDto(
         Long id,
         String email,
         AuthProviderEnum authProvider,
+        String firstName,
+        String lastName,
         Boolean isVerified,
+        Boolean isNonBlocked,
         Instant createdAt,
         Instant updatedAt,
         List<String> roles

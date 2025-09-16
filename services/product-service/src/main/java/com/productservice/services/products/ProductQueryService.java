@@ -5,9 +5,7 @@ import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
 import com.productservice.exceptions.NotFoundException;
-import com.productservice.projection.ProductDto;
-import com.productservice.projection.ProductForCartDto;
-import com.productservice.projection.ProductInfoDto;
+import com.productservice.dto.ProductBasicInfoDto;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +14,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,8 +29,13 @@ public class ProductQueryService {
         return productRepository.findProductsForUpdate(productIds);
     }
 
-    public List<ProductInfoDto> getProductInfo(List<Long> productIds) {
-        return productRepository.findProductPrices(productIds);
+    public ProductBasicInfoDto getProductInfo(long productId) {
+        return productRepository.findProductInfo(productId)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+    }
+
+    public List<ProductBasicInfoDto> getProductInfo(List<Long> productIds) {
+        return productRepository.findProductInfoList(productIds);
     }
 
     public Product getProductBySku(UUID sku) {
@@ -57,11 +59,6 @@ public class ProductQueryService {
 
     public AdminProductDto getAdminProductById(long id) {
         return productRepository.getAdminProduct(id)
-                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
-    }
-
-    public ProductForCartDto getProductInfoForCart(long productId) {
-        return productRepository.getProductForCartById(productId)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 

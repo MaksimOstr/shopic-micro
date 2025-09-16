@@ -50,8 +50,7 @@ public class KafkaListenerService {
         try {
             for (String message : messages) {
                 UnpaidPaymentEvent event = objectMapper.readValue(message, UnpaidPaymentEvent.class);
-
-                orderEventService.failOrder(event.orderId());
+                orderEventService.cancelOrder(event.orderId());
             }
 
             ack.acknowledge();
