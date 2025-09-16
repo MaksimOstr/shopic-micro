@@ -13,8 +13,12 @@ import com.authservice.services.code.CodeValidationService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Slf4j
@@ -38,7 +42,7 @@ public class EmailChangeRequestService {
             throw new IllegalArgumentException("Password doesn't match");
         }
 
-        createEmailChangeRequest(userId, dto.email());
+        createOrUpdateEmailChangeRequest(userId, dto.newEmail());
         Code code = codeCreationService.getCode(user, CodeScopeEnum.EMAIL_CHANGE);
         mailService.sendEmailChange(user.getEmail(), code.getCode());
     }
@@ -54,15 +58,25 @@ public class EmailChangeRequestService {
         emailChangeRequestRepository.delete(changeRequest);
     }
 
-    private void createEmailChangeRequest(long userId, String newEmail) {
+    private void createOrUpdateEmailChangeRequest(long userId, String newEmail) {
         emailChangeRequestRepository.findByUser_Id(userId)
-                .ifPresent(emailChangeRequestRepository::delete);
+                .ifPresentOrElse(existing -> {
+                    existing.setNewEmail(newEmail);
+                }, () -> {
+                    EmailChangeRequest newEmailChangeRequest = EmailChangeRequest.builder()
+                            .newEmail(newEmail)
+                            .user(entityManager.getReference(User.class, userId))
+                            .build();
+                    emailChangeRequestRepository.save(newEmailChangeRequest);
+                });
+    }
 
-        EmailChangeRequest newEmailChangeRequest = EmailChangeRequest.builder()
-                .newEmail(newEmail)
-                .user(entityManager.getReference(User.class, userId))
-                .build();
-
-        emailChangeRequestRepository.save(newEmailChangeRequest);
+    @Scheduled(fixedDelay = 60 * 60 * 1000)
+    public void cleanupOldRequests() {
+        Instant cutoff = Instant.now().minus(2, ChronoUnit.HOURS);
+        int deletedCount = emailChangeRequestRepository.deleteAllByCreatedAtBefore(cutoff);
+        if (deletedCount > 0) {
+            log.info("Deleted {} expired email change requests", deletedCount);
+        }
     }
 }

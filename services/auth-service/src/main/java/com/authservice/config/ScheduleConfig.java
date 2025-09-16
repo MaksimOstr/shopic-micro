@@ -14,7 +14,7 @@ public class ScheduleConfig {
     @Bean
     public ThreadPoolTaskScheduler taskScheduler(TaskSchedulingProperties properties) {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(3);
+        scheduler.setPoolSize(5);
         scheduler.setThreadNamePrefix(properties.getThreadNamePrefix());
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         return scheduler;
