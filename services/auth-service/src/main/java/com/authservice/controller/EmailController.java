@@ -2,7 +2,7 @@ package com.authservice.controller;
 
 import com.authservice.config.security.model.CustomPrincipal;
 import com.authservice.dto.request.ChangeEmailRequest;
-import com.authservice.services.user.EmailChangeRequestService;
+import com.authservice.services.user.EmailChangeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/email")
 @RequiredArgsConstructor
 public class EmailController {
-    private final EmailChangeRequestService emailChangeRequestService;
+    private final EmailChangeService emailChangeRequestService;
 
     @PostMapping("/change-request")
     @PreAuthorize("hasRole('USER')")

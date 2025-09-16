@@ -7,24 +7,21 @@ import com.authservice.entity.EmailChangeRequest;
 import com.authservice.entity.User;
 import com.authservice.exceptions.CodeValidationException;
 import com.authservice.exceptions.NotFoundException;
-import com.authservice.repositories.EmailChangeRequestRepository;
+import com.authservice.services.EmailChangeRequestService;
 import com.authservice.services.MailService;
 import com.authservice.services.code.CodeCreationService;
 import com.authservice.services.code.CodeValidationService;
-import com.authservice.services.user.EmailChangeRequestService;
+import com.authservice.services.user.EmailChangeService;
 import com.authservice.services.user.PasswordService;
 import com.authservice.services.user.UserQueryService;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.Optional;
 
 import static com.authservice.unit.service.user.EmailChangeRequestServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +34,7 @@ import static org.mockito.Mockito.*;
 public class EmailChangeRequestServiceTest {
 
     @Mock
-    private EmailChangeRequestRepository emailChangeRequestRepository;
+    private EmailChangeRequestService emailChangeRequestService;
 
     @Mock
     private CodeCreationService codeCreationService;
@@ -54,11 +51,8 @@ public class EmailChangeRequestServiceTest {
     @Mock
     private PasswordService passwordService;
 
-    @Mock
-    private EntityManager entityManager;
-
     @InjectMocks
-    private EmailChangeRequestService emailChangeRequestService;
+    private EmailChangeService emailChangeService;
 
     private User user;
     private Code code;
@@ -87,64 +81,31 @@ public class EmailChangeRequestServiceTest {
 
     @Test
     public void testCreateRequest_whenCalledWithWrongPassword_thenThrowException() {
-        when(passwordService.comparePassword(anyString(), anyString())).thenReturn(false);
         when(userQueryService.findById(anyLong())).thenReturn(user);
+        when(passwordService.comparePassword(anyString(), anyString())).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            emailChangeRequestService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
+            emailChangeService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
         });
 
         verify(userQueryService).findById(USER_ID);
         verify(passwordService).comparePassword(HASHED_PASSWORD, PASSWORD);
-        verifyNoInteractions(emailChangeRequestRepository, codeCreationService, mailService);
+        verifyNoInteractions(emailChangeRequestService, codeCreationService, mailService);
     }
 
     @Test
     public void testCreateRequest_whenCalledWithValidPassword_thenCreateRequest() {
-        ArgumentCaptor<EmailChangeRequest> changeEmailRequestArgumentCaptor = ArgumentCaptor.forClass(EmailChangeRequest.class);
-
         when(userQueryService.findById(anyLong())).thenReturn(user);
         when(passwordService.comparePassword(anyString(), anyString())).thenReturn(true);
-        when(emailChangeRequestRepository.findByUser_Id(anyLong())).thenReturn(Optional.empty());
         when(codeCreationService.getCode(any(User.class), any(CodeScopeEnum.class))).thenReturn(code);
-        when(entityManager.getReference(eq(User.class), anyLong())).thenReturn(user);
 
-        emailChangeRequestService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
+        emailChangeService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
 
         verify(userQueryService).findById(USER_ID);
         verify(passwordService).comparePassword(HASHED_PASSWORD, PASSWORD);
-        verify(emailChangeRequestRepository).findByUser_Id(USER_ID);
-        verify(entityManager).getReference(User.class, USER_ID);
-        verify(emailChangeRequestRepository).save(changeEmailRequestArgumentCaptor.capture());
+        verify(emailChangeRequestService).createOrUpdateEmailChangeRequest(user, NEW_EMAIL);
         verify(codeCreationService).getCode(user, CodeScopeEnum.EMAIL_CHANGE);
-
-        EmailChangeRequest emailChangeRequest = changeEmailRequestArgumentCaptor.getValue();
-
-        assertEquals(NEW_EMAIL, emailChangeRequest.getNewEmail());
-        assertEquals(user, emailChangeRequest.getUser());
-    }
-
-    @Test
-    public void testCreateRequest_whenCalledWithExistingEmailChangeRequest_thenShouldUpdateEmailChangeRequest() {
-        EmailChangeRequest emailChangeRequestWithOldEmail = EmailChangeRequest.builder()
-                .newEmail(EMAIL)
-                .createdAt(Instant.now())
-                .user(user)
-                .build();
-
-        when(userQueryService.findById(anyLong())).thenReturn(user);
-        when(passwordService.comparePassword(anyString(), anyString())).thenReturn(true);
-        when(emailChangeRequestRepository.findByUser_Id(anyLong())).thenReturn(Optional.of(emailChangeRequestWithOldEmail));
-        when(codeCreationService.getCode(any(User.class), any(CodeScopeEnum.class))).thenReturn(code);
-
-        emailChangeRequestService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
-
-        verify(userQueryService).findById(USER_ID);
-        verify(passwordService).comparePassword(HASHED_PASSWORD, PASSWORD);
-        verify(emailChangeRequestRepository).findByUser_Id(USER_ID);
-        verify(codeCreationService).getCode(user, CodeScopeEnum.EMAIL_CHANGE);
-
-        assertEquals(NEW_EMAIL, emailChangeRequestWithOldEmail.getNewEmail());
+        verify(mailService).sendEmailChange(EMAIL, CODE);
     }
 
     @Test
@@ -152,25 +113,25 @@ public class EmailChangeRequestServiceTest {
         when(userQueryService.findById(anyLong())).thenThrow(NotFoundException.class);
 
         assertThrows(NotFoundException.class, () -> {
-            emailChangeRequestService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
+            emailChangeService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
         });
 
         verify(userQueryService).findById(USER_ID);
-        verifyNoInteractions(passwordService, codeCreationService, mailService, emailChangeRequestRepository);
+        verifyNoInteractions(passwordService, codeCreationService, mailService, emailChangeRequestService);
     }
 
     @Test
     public void testChangeEmail_whenCalledWithValidCode_thenChangeEmail() {
         when(codeValidationService.validate(anyString(), any(CodeScopeEnum.class))).thenReturn(code);
-        when(emailChangeRequestRepository.findByUser_Id(anyLong())).thenReturn(Optional.of(emailChangeRequest));
+        when(emailChangeRequestService.getByUserId(anyLong())).thenReturn(emailChangeRequest);
 
-        emailChangeRequestService.changeEmail(PROVIDED_CODE);
+        emailChangeService.changeEmail(PROVIDED_CODE);
 
         verify(codeValidationService).validate(PROVIDED_CODE, CodeScopeEnum.EMAIL_CHANGE);
-        verify(emailChangeRequestRepository).findByUser_Id(USER_ID);
-        verify(emailChangeRequestRepository).delete(emailChangeRequest);
+        verify(emailChangeRequestService).getByUserId(USER_ID);
+        verify(emailChangeRequestService).deleteEmailChangeRequest(emailChangeRequest);
 
-        assertEquals(Resources.NEW_EMAIL, emailChangeRequest.getNewEmail());
+        assertEquals(NEW_EMAIL, user.getEmail());
     }
 
     @Test
@@ -178,36 +139,31 @@ public class EmailChangeRequestServiceTest {
         when(codeValidationService.validate(anyString(), any(CodeScopeEnum.class))).thenThrow(CodeValidationException.class);
 
         assertThrows(CodeValidationException.class, () -> {
-            emailChangeRequestService.changeEmail(PROVIDED_CODE);
+            emailChangeService.changeEmail(PROVIDED_CODE);
         });
 
         verify(codeValidationService).validate(PROVIDED_CODE, CodeScopeEnum.EMAIL_CHANGE);
-        verifyNoInteractions(emailChangeRequestRepository);
-    }
-
-    @Test
-    public void testChangeEmail_whenCalledWithNonExistentEmailChangeRequest_thenThrowException() {
-        when(codeValidationService.validate(anyString(), any(CodeScopeEnum.class))).thenReturn(code);
-        when(emailChangeRequestRepository.findByUser_Id(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> {
-            emailChangeRequestService.changeEmail(PROVIDED_CODE);
-        });
-
-        verify(codeValidationService).validate(PROVIDED_CODE, CodeScopeEnum.EMAIL_CHANGE);
-        verifyNoMoreInteractions(emailChangeRequestRepository);
+        verifyNoInteractions(emailChangeRequestService);
 
         assertEquals(EMAIL, user.getEmail());
     }
 
     @Test
-    public void testCleanupOldRequests() {
-        when(emailChangeRequestRepository.deleteAllByCreatedAtBefore(any(Instant.class))).thenReturn(1);
+    public void testChangeEmail_whenCalledWithNonExistentEmailChangeRequest_thenThrowException() {
+        when(codeValidationService.validate(anyString(), any(CodeScopeEnum.class))).thenReturn(code);
+        when(emailChangeRequestService.getByUserId(anyLong())).thenThrow(NotFoundException.class);
 
-        emailChangeRequestService.cleanupOldRequests();
+        assertThrows(NotFoundException.class, () -> {
+            emailChangeService.changeEmail(PROVIDED_CODE);
+        });
 
-        verify(emailChangeRequestRepository).deleteAllByCreatedAtBefore(any(Instant.class));
+        verify(codeValidationService).validate(PROVIDED_CODE, CodeScopeEnum.EMAIL_CHANGE);
+        verify(emailChangeRequestService).getByUserId(USER_ID);
+        verifyNoMoreInteractions(emailChangeRequestService);
+
+        assertEquals(EMAIL, user.getEmail());
     }
+
 
 
     static class Resources {
