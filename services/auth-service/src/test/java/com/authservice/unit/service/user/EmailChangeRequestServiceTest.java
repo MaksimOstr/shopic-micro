@@ -13,7 +13,7 @@ import com.authservice.services.code.CodeCreationService;
 import com.authservice.services.code.CodeValidationService;
 import com.authservice.services.user.EmailChangeService;
 import com.authservice.services.user.PasswordService;
-import com.authservice.services.user.UserQueryService;
+import com.authservice.services.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +46,7 @@ public class EmailChangeRequestServiceTest {
     private CodeValidationService codeValidationService;
 
     @Mock
-    private UserQueryService userQueryService;
+    private UserService userService;
 
     @Mock
     private PasswordService passwordService;
@@ -81,27 +81,27 @@ public class EmailChangeRequestServiceTest {
 
     @Test
     public void testCreateRequest_whenCalledWithWrongPassword_thenThrowException() {
-        when(userQueryService.findById(anyLong())).thenReturn(user);
+        when(userService.findById(anyLong())).thenReturn(user);
         when(passwordService.comparePassword(anyString(), anyString())).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> {
             emailChangeService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
         });
 
-        verify(userQueryService).findById(USER_ID);
+        verify(userService).findById(USER_ID);
         verify(passwordService).comparePassword(HASHED_PASSWORD, PASSWORD);
         verifyNoInteractions(emailChangeRequestService, codeCreationService, mailService);
     }
 
     @Test
     public void testCreateRequest_whenCalledWithValidPassword_thenCreateRequest() {
-        when(userQueryService.findById(anyLong())).thenReturn(user);
+        when(userService.findById(anyLong())).thenReturn(user);
         when(passwordService.comparePassword(anyString(), anyString())).thenReturn(true);
         when(codeCreationService.getCode(any(User.class), any(CodeScopeEnum.class))).thenReturn(code);
 
         emailChangeService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
 
-        verify(userQueryService).findById(USER_ID);
+        verify(userService).findById(USER_ID);
         verify(passwordService).comparePassword(HASHED_PASSWORD, PASSWORD);
         verify(emailChangeRequestService).createOrUpdateEmailChangeRequest(user, NEW_EMAIL);
         verify(codeCreationService).getCode(user, CodeScopeEnum.EMAIL_CHANGE);
@@ -110,13 +110,13 @@ public class EmailChangeRequestServiceTest {
 
     @Test
     public void testCreateRequest_whenCalledWithNonExistentUser_thenThrowException() {
-        when(userQueryService.findById(anyLong())).thenThrow(NotFoundException.class);
+        when(userService.findById(anyLong())).thenThrow(NotFoundException.class);
 
         assertThrows(NotFoundException.class, () -> {
             emailChangeService.createRequest(CHANGE_EMAIL_REQUEST, USER_ID);
         });
 
-        verify(userQueryService).findById(USER_ID);
+        verify(userService).findById(USER_ID);
         verifyNoInteractions(passwordService, codeCreationService, mailService, emailChangeRequestService);
     }
 

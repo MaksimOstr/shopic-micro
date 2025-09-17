@@ -13,8 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Transactional
     @Modifying
-    @Query("UPDATE User u SET u.isVerified = true WHERE u.id = :userId")
-    int markUserVerified(long userId);
+    @Query("UPDATE User u SET u.isVerified = :verified WHERE u.id = :userId")
+    int markUserVerified(long userId,  boolean verified);
 
 
     @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.email = :email")

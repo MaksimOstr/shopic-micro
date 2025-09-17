@@ -4,7 +4,7 @@ import com.authservice.config.security.model.CustomUserDetails;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.exceptions.NotFoundException;
 import com.authservice.entity.User;
-import com.authservice.services.user.UserQueryService;
+import com.authservice.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserQueryService userQueryService;
+    private final UserService userQueryService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

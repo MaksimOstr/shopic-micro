@@ -67,9 +67,7 @@ public class AuthServiceTest {
     private AuthService authService;
 
 
-
     private User user;
-
 
     @BeforeEach
     public void setUp() {

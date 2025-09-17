@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PasswordService {
     private final PasswordEncoder passwordEncoder;
-    private final UserQueryService userQueryService;
+    private final UserService userService;
 
     public String encode(String password) {
         return passwordEncoder.encode(password);
@@ -23,7 +23,7 @@ public class PasswordService {
 
     @Transactional
     public void changePassword(ChangePasswordRequest dto, long userId) {
-        User user = userQueryService.findById(userId);
+        User user = userService.findById(userId);
         boolean isEqual = comparePassword(user.getPassword(), dto.oldPassword());
 
         if(!isEqual) {

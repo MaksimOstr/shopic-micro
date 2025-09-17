@@ -4,8 +4,6 @@ import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.User;
 import com.authservice.exceptions.EmailVerifyException;
-import com.authservice.exceptions.NotFoundException;
-import com.authservice.repositories.UserRepository;
 import com.authservice.services.MailService;
 import com.authservice.services.code.CodeCreationService;
 import com.authservice.services.code.CodeValidationService;
@@ -18,15 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class VerificationService {
-    private final UserRepository userRepository;
     private final CodeCreationService codeCreationService;
     private final MailService mailService;
     private final CodeValidationService codeValidationService;
-    private final UserQueryService userQueryService;
+    private final UserService userService;
 
     @Transactional
     public void requestVerifyEmail(String email) {
-        User user = userQueryService.findByEmail(email);
+        User user = userService.findByEmail(email);
 
         if (user.getIsVerified()) {
             log.error("User already verified");
@@ -40,15 +37,6 @@ public class VerificationService {
 
     public void verifyUser(String providedCode) {
         Code code = codeValidationService.validate(providedCode, CodeScopeEnum.EMAIL_VERIFICATION);
-        markUserVerified(code.getUser().getId());
-    }
-
-
-    private void markUserVerified(long userId) {
-        int updated = userRepository.markUserVerified(userId);
-
-        if (updated == 0) {
-            throw new NotFoundException("User not found");
-        }
+        userService.updateVerificationStatus(code.getUser().getId(), true);
     }
 }

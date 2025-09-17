@@ -23,12 +23,12 @@ public class EmailChangeService {
     private final MailService mailService;
     private final CodeValidationService codeValidationService;
     private final EmailChangeRequestService emailChangeRequestService;
-    private final UserQueryService userQueryService;
+    private final UserService userService;
     private final PasswordService passwordService;
 
     @Transactional
     public void createRequest(ChangeEmailRequest dto, long userId) {
-        User user = userQueryService.findById(userId);
+        User user = userService.findById(userId);
 
         boolean isPasswordEqual = passwordService.comparePassword(user.getPassword(), dto.password());
 

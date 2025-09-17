@@ -7,7 +7,6 @@ import com.authservice.entity.Role;
 import com.authservice.entity.User;
 import com.authservice.mapper.UserMapper;
 import com.authservice.repositories.UserRepository;
-import com.authservice.services.KafkaEventProducer;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,14 +17,13 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class OAuthUserService {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final RoleService roleService;
-    private final UserQueryService userQueryService;
     private final UserMapper userMapper;
 
     @Transactional
     public CreateOAuthUserResponse createOrGetOAuthUser(@Valid CreateOAuthUserRequest dto) {
-        return userQueryService.findOptionalByEmail(dto.email())
+        return userService.findOptionalByEmail(dto.email())
                 .map(userMapper::toCreateOAuthUserResponse)
                 .orElseGet(() -> createOAuthUser(dto));
     }
@@ -47,6 +45,6 @@ public class OAuthUserService {
                 .roles(Set.of(defaultRole))
                 .build();
 
-        return userRepository.save(user);
+        return userService.save(user);
     }
 }

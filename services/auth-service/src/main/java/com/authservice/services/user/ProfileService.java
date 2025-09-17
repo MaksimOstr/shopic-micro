@@ -13,12 +13,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
-    private final UserQueryService userQueryService;
+    private final UserService userService;
     private final UserMapper userMapper;
 
     @Transactional
     public UserProfileResponse updateProfile(UpdateProfileRequest dto, long userId) {
-        User user = userQueryService.findById(userId);
+        User user = userService.findById(userId);
 
         Optional.ofNullable(dto.firstName()).ifPresent(user::setFirstName);
         Optional.ofNullable(dto.lastName()).ifPresent(user::setLastName);
@@ -27,7 +27,7 @@ public class ProfileService {
     }
 
     public UserProfileResponse getProfile(long userId) {
-        User user = userQueryService.findById(userId);
+        User user = userService.findById(userId);
 
         return userMapper.toUserProfileDto(user);
     }

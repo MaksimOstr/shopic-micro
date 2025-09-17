@@ -15,7 +15,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserQueryService {
+public class UserService {
     private final UserRepository userRepository;
 
     private static final String USER_NOT_FOUND = "User was not found";
@@ -44,6 +44,18 @@ public class UserQueryService {
     public User findUserWithProfileAndRolesById(long id) {
         return userRepository.findWithProfileAndRolesById(id)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+    }
+
+    public void updateVerificationStatus(long userId, boolean verified) {
+        int updated = userRepository.markUserVerified(userId, verified);
+
+        if (updated == 0) {
+            throw new NotFoundException("User not found");
+        }
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
     public Optional<User> findOptionalByEmail(String email) {

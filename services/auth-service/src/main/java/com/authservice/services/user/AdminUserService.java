@@ -6,7 +6,6 @@ import com.authservice.dto.request.UserParams;
 import com.authservice.entity.User;
 import com.authservice.mapper.UserMapper;
 import com.authservice.utils.SpecificationUtils;
-import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,12 +21,12 @@ import static com.authservice.utils.SpecificationUtils.*;
 @Service
 @RequiredArgsConstructor
 public class AdminUserService {
-    private final UserQueryService userQueryService;
+    private final UserService userService;
     private final UserMapper userMapper;
 
     @Transactional
     public UserDetailsDto getUserDetailsById(long userId) {
-        User user = userQueryService.findUserWithProfileAndRolesById(userId);
+        User user = userService.findUserWithProfileAndRolesById(userId);
 
         return userMapper.toUserDetailsDto(user);
     }
@@ -40,7 +39,7 @@ public class AdminUserService {
                 .and(equalsId(params.id()))
                 .and(equalsEnum("authProvider", params.provider()));
 
-        Page<User> userPage = userQueryService.getUserPageBySpec(pageable, spec);
+        Page<User> userPage = userService.getUserPageBySpec(pageable, spec);
         List<User> userList = userPage.getContent();
         List<UserSummaryDto> summaries = userList.stream().map(userMapper::toUserSummaryDto).toList();
 

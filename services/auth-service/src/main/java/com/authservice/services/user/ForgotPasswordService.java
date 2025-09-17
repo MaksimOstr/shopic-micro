@@ -20,10 +20,10 @@ public class ForgotPasswordService {
     private final MailService mailService;
     private final CodeValidationService codeValidationService;
     private final PasswordService  passwordService;
-    private final UserQueryService userQueryService;
+    private final UserService userService;
 
     public void requestResetPassword(ForgotPasswordRequest dto) {
-        User user = userQueryService.findByEmail(dto.email());
+        User user = userService.findByEmail(dto.email());
 
         if(user.getAuthProvider() != AuthProviderEnum.LOCAL) {
             throw new ResetPasswordException("User is not a local user");
