@@ -23,6 +23,6 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
     Optional<Code> findByScopeAndUserId(CodeScopeEnum scope, long userId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT c FROM Code c WHERE c.code = :code AND c.used = false")
-    Optional<Code> findUnusedByCode(String code);
+    @Query("SELECT c FROM Code c WHERE c.code = :code AND c.used = false AND c.scope = :scope")
+    Optional<Code> findUnusedByCode(String code, CodeScopeEnum scope);
 }

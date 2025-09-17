@@ -47,6 +47,7 @@ public class CodeCreationService {
 
     private Code prepareCode(Code code) {
         String generatedCode = generateAlphanumericCode();
+        code.setUsed(false);
         code.setCode(generatedCode);
         code.setExpiresAt(getExpirationTime());
         return codeRepository.save(code);
@@ -55,7 +56,6 @@ public class CodeCreationService {
     private Code createCode(User user, CodeScopeEnum scope) {
         Code code = Code.builder()
                 .scope(scope)
-                .used(false)
                 .user(user)
                 .build();
 

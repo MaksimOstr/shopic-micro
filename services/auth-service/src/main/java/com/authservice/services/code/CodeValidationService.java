@@ -23,10 +23,10 @@ public class CodeValidationService {
 
     @Transactional
     public Code validate(String code, CodeScopeEnum scope) {
-        return codeRepository.findUnusedByCode(code)
+        return codeRepository.findUnusedByCode(code, scope)
                 .map(foundCode -> {
-                    if(isCodeExpired(foundCode) || foundCode.getScope() != scope) {
-                        log.error("Code validation failed: code is expired or scope is not valid");
+                    if(isCodeExpired(foundCode)) {
+                        log.error("Code validation failed: code is expired");
                         throw new CodeValidationException(CODE_VALIDATION_FAILED);
                     }
 
