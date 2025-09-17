@@ -36,11 +36,12 @@ public class CustomOidcUserService extends OidcUserService {
         log.info("Loading user via oidc user service");
         OidcIdToken idToken = userRequest.getIdToken();
         String provider = userRequest.getClientRegistration().getRegistrationId();
+        AuthProviderEnum authProvider = AuthProviderEnum.fromString(provider);
         String email = idToken.getEmail();
         String firstName = idToken.getGivenName();
         String lastName = idToken.getFamilyName();
 
-        CreateOAuthUserRequest request = new CreateOAuthUserRequest(provider, email, firstName, lastName);
+        CreateOAuthUserRequest request = new CreateOAuthUserRequest(authProvider, email, firstName, lastName);
         CreateOAuthUserResponse response = oAuthUserService.createOrGetOAuthUser(request);
 
         if(response.provider().equals(AuthProviderEnum.LOCAL)) {

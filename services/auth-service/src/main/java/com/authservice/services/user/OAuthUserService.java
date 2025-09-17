@@ -36,12 +36,11 @@ public class OAuthUserService {
 
     private User createAndSaveUser(CreateOAuthUserRequest dto) {
         Role defaultRole = roleService.getDefaultUserRole();
-        AuthProviderEnum provider = AuthProviderEnum.fromString(dto.provider());
         User user = User.builder()
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .email(dto.email())
-                .authProvider(provider)
+                .authProvider(dto.provider())
                 .roles(Set.of(defaultRole))
                 .build();
 
