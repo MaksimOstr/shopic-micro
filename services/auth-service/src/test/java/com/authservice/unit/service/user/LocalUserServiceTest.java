@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
-import static com.authservice.unit.service.user.LocalUserServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +38,17 @@ public class LocalUserServiceTest {
 
     @InjectMocks
     private LocalUserService localUserService;
+
+
+    private static final String EMAIL = "test@gmail.com";
+    private static final String PASSWORD = "testPassword";
+    private static final String FIRST_NAME = "testFirstName";
+    private static final String LAST_NAME = "testLastName";
+    private static final String HASHED_PASSWORD = "testHashedPassword";
+    private static final long USER_ID = 1L;
+    private static final AuthProviderEnum LOCAL_AUTH_PROVIDER = AuthProviderEnum.LOCAL;
+    private static final LocalRegisterRequest LOCAL_REGISTER_REQUEST = new LocalRegisterRequest(PASSWORD, EMAIL, FIRST_NAME, LAST_NAME);
+
 
     private User user;
     private Role userRole;
@@ -96,17 +106,5 @@ public class LocalUserServiceTest {
         verify(userService).isUserExist(EMAIL);
         verifyNoInteractions(roleService, passwordService);
         verifyNoMoreInteractions(userService);
-    }
-
-
-    static class Resources {
-        public static final String EMAIL = "test@gmail.com";
-        public static final String PASSWORD = "testPassword";
-        public static final String FIRST_NAME = "testFirstName";
-        public static final String LAST_NAME = "testLastName";
-        public static final String HASHED_PASSWORD = "testHashedPassword";
-        public static final long USER_ID = 1L;
-        public static final AuthProviderEnum LOCAL_AUTH_PROVIDER = AuthProviderEnum.LOCAL;
-        public static final LocalRegisterRequest LOCAL_REGISTER_REQUEST = new LocalRegisterRequest(PASSWORD, EMAIL, FIRST_NAME, LAST_NAME);
     }
 }

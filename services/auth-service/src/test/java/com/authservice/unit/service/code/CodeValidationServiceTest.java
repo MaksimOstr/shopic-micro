@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.Optional;
 
-import static com.authservice.unit.service.code.CodeValidationServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -32,6 +31,12 @@ public class CodeValidationServiceTest {
 
     @InjectMocks
     private CodeValidationService codeValidationService;
+
+
+    private static final String CODE = "testCode";
+    private static final CodeScopeEnum EMAIL_CHANGE_CODE_SCOPE_ENUM = CodeScopeEnum.EMAIL_CHANGE;
+    private static final String EMAIL = "test@gmail.com";
+
 
     private Code code;
     private User user;
@@ -90,11 +95,5 @@ public class CodeValidationServiceTest {
 
         verify(codeRepository).findUnusedByCode(CODE, EMAIL_CHANGE_CODE_SCOPE_ENUM);
         assertFalse(code.isUsed());
-    }
-
-    static class Resources {
-        public static final String CODE = "testCode";
-        public static final CodeScopeEnum EMAIL_CHANGE_CODE_SCOPE_ENUM = CodeScopeEnum.EMAIL_CHANGE;
-        public static final String EMAIL = "test@gmail.com";
     }
 }

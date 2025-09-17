@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.authservice.unit.service.user.OAuthUserServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -39,6 +38,27 @@ public class OAuthUserServiceTest {
 
     @InjectMocks
     private OAuthUserService oAuthUserService;
+
+
+    private static final long USER_ID = 1L;
+    private static final AuthProviderEnum GOOGLE_AUTH_PROVIDER_ENUM = AuthProviderEnum.GOOGLE;
+    private static final String EMAIL = "test@gmail.com";
+    private static final String FIRST_NAME = "testFirstName";
+    private static final String LAST_NAME = "testLastName";
+    private static final CreateOAuthUserRequest CREATE_O_AUTH_USER_REQUEST = new CreateOAuthUserRequest(
+            GOOGLE_AUTH_PROVIDER_ENUM,
+            EMAIL,
+            FIRST_NAME,
+            LAST_NAME
+    );
+
+    private static final String USER_ROLE_NAME = "ROLE_USER";
+    private static final CreateOAuthUserResponse CREATE_O_AUTH_USER_RESPONSE = new CreateOAuthUserResponse(
+            USER_ID,
+            EMAIL,
+            GOOGLE_AUTH_PROVIDER_ENUM,
+            List.of(USER_ROLE_NAME)
+    );
 
 
     private Role role;
@@ -101,27 +121,5 @@ public class OAuthUserServiceTest {
         assertEquals(Set.of(role), userForSaving.getRoles());
         assertEquals(EMAIL, userForSaving.getEmail());
         assertEquals(CREATE_O_AUTH_USER_RESPONSE, result);
-    }
-
-    static class Resources {
-        public static final long USER_ID = 1L;
-        public static final AuthProviderEnum GOOGLE_AUTH_PROVIDER_ENUM = AuthProviderEnum.GOOGLE;
-        public static final String EMAIL = "test@gmail.com";
-        public static final String FIRST_NAME = "testFirstName";
-        public static final String LAST_NAME = "testLastName";
-        public static final CreateOAuthUserRequest CREATE_O_AUTH_USER_REQUEST = new CreateOAuthUserRequest(
-                GOOGLE_AUTH_PROVIDER_ENUM,
-                EMAIL,
-                FIRST_NAME,
-                LAST_NAME
-        );
-
-        public static final String USER_ROLE_NAME = "ROLE_USER";
-        public static final CreateOAuthUserResponse CREATE_O_AUTH_USER_RESPONSE = new CreateOAuthUserResponse(
-                USER_ID,
-                EMAIL,
-                GOOGLE_AUTH_PROVIDER_ENUM,
-                List.of(USER_ROLE_NAME)
-        );
     }
 }

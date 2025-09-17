@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static com.authservice.unit.service.code.CodeCreationServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -30,6 +29,12 @@ public class CodeCreationServiceTest {
 
     @InjectMocks
     private CodeCreationService codeCreationService;
+
+
+    private static final long USER_ID = 1L;
+    private static final String CODE = "testCode";
+    private static final CodeScopeEnum EMAIL_CHANGE_CODE_SCOPE_ENUM = CodeScopeEnum.EMAIL_CHANGE;
+
 
     private User user;
     private Code code;
@@ -102,11 +107,5 @@ public class CodeCreationServiceTest {
 
         verify(codeRepository).findByScopeAndUserId(EMAIL_CHANGE_CODE_SCOPE_ENUM, USER_ID);
         verifyNoMoreInteractions(codeRepository);
-    }
-
-    static class Resources {
-        public static final long USER_ID = 1L;
-        public static final String CODE = "testCode";
-        public static final CodeScopeEnum EMAIL_CHANGE_CODE_SCOPE_ENUM = CodeScopeEnum.EMAIL_CHANGE;
     }
 }

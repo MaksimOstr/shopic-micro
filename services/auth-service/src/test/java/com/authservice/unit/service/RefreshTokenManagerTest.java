@@ -19,7 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.Instant;
 import java.util.Optional;
 
-import static com.authservice.unit.service.RefreshTokenManagerTest.Resources.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -35,6 +35,12 @@ public class RefreshTokenManagerTest {
 
     @InjectMocks
     private RefreshTokenManager refreshTokenManager;
+
+    private static final long USER_ID = 1L;
+    private static final String DEVICE_ID = "testDeviceId";
+    private static final String REFRESH_TOKEN = "testRefreshToken";
+    private static final String REFRESH_TOKEN_SECRET = "testRefreshTokenSecret";
+
 
     private RefreshToken refreshToken;
     private User user;
@@ -128,11 +134,4 @@ public class RefreshTokenManagerTest {
         assertNotEquals(REFRESH_TOKEN, usedToken);
     }
 
-
-    static class Resources {
-        public static final long USER_ID = 1L;
-        public static final String DEVICE_ID = "testDeviceId";
-        public static final String REFRESH_TOKEN = "testRefreshToken";
-        public static final String REFRESH_TOKEN_SECRET = "testRefreshTokenSecret";
-    }
 }

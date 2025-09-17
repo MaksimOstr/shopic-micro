@@ -23,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 
-import static com.authservice.unit.service.user.EmailChangeRequestServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -53,6 +52,17 @@ public class EmailChangeRequestServiceTest {
 
     @InjectMocks
     private EmailChangeService emailChangeService;
+
+
+    private static final String EMAIL = "test@gmail.com";
+    private static final String NEW_EMAIL = "newTest@gmail.com";
+    private static final String PASSWORD = "testPassword";
+    private static final String HASHED_PASSWORD = "hashedPassword";
+    private static final long USER_ID = 1L;
+    private static final String CODE = "testCode";
+    private static final ChangeEmailRequest CHANGE_EMAIL_REQUEST = new ChangeEmailRequest(NEW_EMAIL, PASSWORD);
+    private static final String PROVIDED_CODE = "providedCode";
+
 
     private User user;
     private Code code;
@@ -162,18 +172,5 @@ public class EmailChangeRequestServiceTest {
         verifyNoMoreInteractions(emailChangeRequestService);
 
         assertEquals(EMAIL, user.getEmail());
-    }
-
-
-
-    static class Resources {
-        public static final String EMAIL = "test@gmail.com";
-        public static final String NEW_EMAIL = "newTest@gmail.com";
-        public static final String PASSWORD = "testPassword";
-        public static final String HASHED_PASSWORD = "hashedPassword";
-        public static final long USER_ID = 1L;
-        public static final String CODE = "testCode";
-        public static final ChangeEmailRequest CHANGE_EMAIL_REQUEST = new ChangeEmailRequest(NEW_EMAIL, PASSWORD);
-        public static final String PROVIDED_CODE = "providedCode";
     }
 }

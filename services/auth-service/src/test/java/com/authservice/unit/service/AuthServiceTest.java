@@ -35,7 +35,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-import static com.authservice.unit.service.AuthServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -65,6 +64,30 @@ public class AuthServiceTest {
 
     @InjectMocks
     private AuthService authService;
+
+
+    private static final String PASSWORD = "masterkey";
+    private static final String FIRST_NAME = "firstName";
+    private static final String LAST_NAME = "lastName";
+    private static final String CODE_VALUE = "testCode";
+    private static final String DEVICE_ID = "deviceId";
+    private static final String EMAIL = "test@gmail.com";
+    private static final long USER_ID = 1;
+    private static final Set<GrantedAuthority> AUTHORITIES = Set.of(
+            new SimpleGrantedAuthority("ROLE_USER")
+    );
+    private static final List<String> ROLE_NAMES = List.of("ROLE_USER");
+    private static final String ACCESS_TOKEN = "access_token";
+    private static final String REFRESH_TOKEN = "refresh_token";
+
+    private static final TokenPairDto TOKEN_PAIR_DTO = new TokenPairDto(ACCESS_TOKEN, REFRESH_TOKEN);
+    private static final LocalRegisterRequest LOCAL_REGISTER_REQUEST = new LocalRegisterRequest(
+            PASSWORD,
+            EMAIL,
+            LAST_NAME,
+            LAST_NAME
+    );
+    private static final SignInRequestDto SIGN_IN_REQUEST_DTO = new SignInRequestDto(EMAIL, PASSWORD, DEVICE_ID);
 
 
     private User user;
@@ -135,7 +158,7 @@ public class AuthServiceTest {
 
         verify(authenticationManager).authenticate(authenticationArgumentCaptor.capture());
         verify(roleMapper).toRoleNames(authRequest.getAuthorities());
-        verify(tokenService).getTokenPair(USER_ID, Resources.ROLE_NAMES, DEVICE_ID);
+        verify(tokenService).getTokenPair(USER_ID, ROLE_NAMES, DEVICE_ID);
 
         Authentication authentication = authenticationArgumentCaptor.getValue();
 
@@ -173,32 +196,5 @@ public class AuthServiceTest {
         authService.logout(REFRESH_TOKEN, DEVICE_ID);
 
         verify(tokenService).logout(REFRESH_TOKEN, DEVICE_ID);
-    }
-
-
-
-    static class Resources {
-        public static final String PASSWORD = "masterkey";
-        public static final String FIRST_NAME = "firstName";
-        public static final String LAST_NAME = "lastName";
-        public static final String CODE_VALUE = "testCode";
-        public static final String DEVICE_ID = "deviceId";
-        public static final String EMAIL = "test@gmail.com";
-        public static final long USER_ID = 1;
-        public static final Set<GrantedAuthority> AUTHORITIES = Set.of(
-                new SimpleGrantedAuthority("ROLE_USER")
-        );
-        public static final List<String> ROLE_NAMES = List.of("ROLE_USER");
-        public static final String ACCESS_TOKEN = "access_token";
-        public static final String REFRESH_TOKEN = "refresh_token";
-
-        public static final TokenPairDto TOKEN_PAIR_DTO = new TokenPairDto(ACCESS_TOKEN, REFRESH_TOKEN);
-        public static final LocalRegisterRequest LOCAL_REGISTER_REQUEST = new LocalRegisterRequest(
-                PASSWORD,
-                EMAIL,
-                LAST_NAME,
-                LAST_NAME
-        );
-        public static final SignInRequestDto SIGN_IN_REQUEST_DTO = new SignInRequestDto(EMAIL, PASSWORD, DEVICE_ID);
     }
 }

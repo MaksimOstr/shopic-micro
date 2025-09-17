@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static com.authservice.unit.service.user.ForgotPasswordServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,6 +45,16 @@ public class ForgotPasswordServiceTest {
 
     @InjectMocks
     private ForgotPasswordService forgotPasswordService;
+
+
+    private static final AuthProviderEnum LOCAL_AUTH_PROVIDER_ENUM = AuthProviderEnum.LOCAL;
+    private static final AuthProviderEnum OAUTH_AUTH_PROVIDER_ENUM = AuthProviderEnum.GOOGLE;
+    private static final String EMAIL = "test@gmail.com";
+    private static final ForgotPasswordRequest FORGOT_PASSWORD_REQUEST = new ForgotPasswordRequest(EMAIL);
+    private static final String CODE = "testCode";
+    private static final String PASSWORD = "testPassword";
+    private static final String NEW_PASSWORD = "newTestPassword";
+
 
     private User user;
     private Code code;
@@ -131,15 +140,5 @@ public class ForgotPasswordServiceTest {
         verifyNoMoreInteractions(passwordService);
 
         assertEquals(PASSWORD, user.getPassword());
-    }
-
-    static class Resources {
-        public static final AuthProviderEnum LOCAL_AUTH_PROVIDER_ENUM = AuthProviderEnum.LOCAL;
-        public static final AuthProviderEnum OAUTH_AUTH_PROVIDER_ENUM = AuthProviderEnum.GOOGLE;
-        public static final String EMAIL = "test@gmail.com";
-        public static final ForgotPasswordRequest FORGOT_PASSWORD_REQUEST = new ForgotPasswordRequest(EMAIL);
-        public static final String CODE = "testCode";
-        public static final String PASSWORD = "testPassword";
-        public static final String NEW_PASSWORD = "newTestPassword";
     }
 }
