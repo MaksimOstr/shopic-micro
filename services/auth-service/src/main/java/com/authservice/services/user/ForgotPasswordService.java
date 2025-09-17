@@ -30,7 +30,7 @@ public class ForgotPasswordService {
         }
 
         Code code = codeCreationService.getCode(user, CodeScopeEnum.RESET_PASSWORD);
-        mailService.sendEmailChange(user.getEmail(), code.getCode());
+        mailService.sendForgotPasswordChange(user.getEmail(), code.getCode());
     }
 
     @Transactional

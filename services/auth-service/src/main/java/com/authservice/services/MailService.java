@@ -35,6 +35,13 @@ public class MailService {
         send(email, subject, text);
     }
 
+    public void sendForgotPasswordChange(String email, String code) {
+        String subject = "Forgot password change verification";
+        String text = "Code for password changing:" + code;
+
+        send(email, subject, text);
+    }
+
     private void send(String to, String subject, String text) {
         try {
             SimpleMailMessage msg = new SimpleMailMessage();

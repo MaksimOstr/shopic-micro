@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static com.authservice.unit.service.user.VerificationServiceTest.Resources.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -38,10 +39,6 @@ public class VerificationServiceTest {
 
     @InjectMocks
     private VerificationService verificationService;
-
-    private static final String EMAIL = "test@gmail.com";
-    private static final String CODE = "testCode";
-    private static final long USER_ID = 1L;
 
     private User user;
     private Code code;
@@ -108,4 +105,10 @@ public class VerificationServiceTest {
         verify(userService).updateVerificationStatus(USER_ID, true);
     }
 
+
+    static class Resources {
+        public static final String EMAIL = "test@gmail.com";
+        public static final String CODE = "testCode";
+        public static final long USER_ID = 1L;
+    }
 }
