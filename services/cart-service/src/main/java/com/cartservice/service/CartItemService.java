@@ -36,11 +36,7 @@ public class CartItemService {
     }
 
     public void deleteCartItemById(long id) {
-        int deleted = cartItemRepository.deleteById(id);
-
-        if(deleted == 0) {
-            throw new NotFoundException(CART_ITEM_NOT_FOUND);
-        }
+        cartItemRepository.deleteById(id);
     }
 
     public Optional<CartItem> getOptionalByCartIdAndProductId(long cartId, long productId) {
