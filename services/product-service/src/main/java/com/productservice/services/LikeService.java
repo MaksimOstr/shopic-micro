@@ -28,7 +28,7 @@ public class LikeService {
         }
     }
 
-    public void createLike(long productId, long userId) {
+    private void createLike(long productId, long userId) {
         Like like = Like.builder()
                 .userId(userId)
                 .product(entityManager.getReference(Product.class, productId))
