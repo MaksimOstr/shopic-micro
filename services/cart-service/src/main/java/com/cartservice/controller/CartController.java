@@ -4,8 +4,7 @@ import com.cartservice.config.security.model.CustomPrincipal;
 import com.cartservice.dto.CartDto;
 import com.cartservice.dto.CartItemDto;
 import com.cartservice.dto.request.AddItemToCartRequest;
-import com.cartservice.dto.request.ChangeCartItemQuantity;
-import com.cartservice.entity.CartItem;
+import com.cartservice.dto.request.ChangeCartItemQuantityRequest;
 import com.cartservice.service.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,7 @@ public class CartController {
     public ResponseEntity<Void> deleteCartItem(
             @PathVariable long id
     ) {
-        cartService.removeItemFromCart(id);
+        cartService.deleteItemFromCart(id);
 
         return ResponseEntity.ok().build();
     }
@@ -61,7 +60,7 @@ public class CartController {
 
     @PatchMapping("/items/quantity")
     public ResponseEntity<Void> changeCartItemQuantity(
-            @RequestBody @Valid ChangeCartItemQuantity body
+            @RequestBody @Valid ChangeCartItemQuantityRequest body
     ) {
         cartService.changeCartItemQuantity(body);
 

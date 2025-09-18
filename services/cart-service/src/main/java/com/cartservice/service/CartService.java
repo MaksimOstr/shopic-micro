@@ -4,7 +4,7 @@ import com.cartservice.dto.CartDto;
 import com.cartservice.dto.CartItemDto;
 import com.cartservice.dto.CartItemDtoForOrder;
 import com.cartservice.dto.request.AddItemToCartRequest;
-import com.cartservice.dto.request.ChangeCartItemQuantity;
+import com.cartservice.dto.request.ChangeCartItemQuantityRequest;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
 import com.cartservice.exception.InsufficientProductStockException;
@@ -65,7 +65,7 @@ public class CartService {
         return cartItemMapper.toCartItemDtoListForOrder(cart.getCartItems());
     }
 
-    public void removeItemFromCart(long cartItemId) {
+    public void deleteItemFromCart(long cartItemId) {
         long cartId = cartItemService.getCartIdFromCartItem(cartItemId);
 
         cartItemService.deleteCartItemById(cartItemId);
@@ -73,7 +73,7 @@ public class CartService {
     }
 
     @Transactional
-    public void changeCartItemQuantity(ChangeCartItemQuantity dto) {
+    public void changeCartItemQuantity(ChangeCartItemQuantityRequest dto) {
         CartItem cartItem = cartItemService.getCartItemById(dto.cartItemId());
 
         if (dto.amount() <= 0) {
@@ -85,11 +85,7 @@ public class CartService {
     }
 
     public void deleteCartByUserId(long userId) {
-        int deleted = cartRepository.deleteCartByUserId(userId);
-
-        if (deleted == 0) {
-            throw new NotFoundException(CART_NOT_FOUND);
-        }
+        cartRepository.deleteCartByUserId(userId);
     }
 
     private void deleteCartIfEmpty(long cartId) {
@@ -114,19 +110,6 @@ public class CartService {
         );
     }
 
-    private ProductInfo getProductInfoAndCheckQuantity(long productId, int quantity) {
-        ProductInfo productInfo = grpcProductService.getProductInfo(productId);
-
-        if(productInfo.getAvailableQuantity() < quantity) {
-            throw new InsufficientProductStockException(
-                    "Insufficient stock for product. Requested: %d, Available: %d"
-                            .formatted(quantity, productInfo.getAvailableQuantity())
-            );
-        }
-
-        return productInfo;
-    }
-
     private CartItemDto createNewItem(AddItemToCartRequest dto, Cart cart) {
         ProductInfo response = getProductInfoAndCheckQuantity(dto.productId(), dto.quantity());
         CartItem cartItem = cartItemMapper.toEntity(dto, response, cart);
@@ -138,5 +121,18 @@ public class CartService {
         getProductInfoAndCheckQuantity(dto.productId(), dto.quantity() + cartItem.getQuantity());
         cartItem.setQuantity(cartItem.getQuantity() + dto.quantity());
         return cartItemMapper.toCartItemDto(cartItem);
+    }
+
+    private ProductInfo getProductInfoAndCheckQuantity(long productId, int quantity) {
+        ProductInfo productInfo = grpcProductService.getProductInfo(productId);
+
+        if(productInfo.getAvailableQuantity() < quantity) {
+            throw new InsufficientProductStockException(
+                    "Insufficient stock for product. Requested: %d, Available: %d"
+                            .formatted(quantity, productInfo.getAvailableQuantity())
+            );
+        }
+
+        return productInfo;
     }
 }

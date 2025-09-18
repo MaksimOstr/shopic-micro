@@ -46,5 +46,4 @@ public class CartItemService {
     public Optional<CartItem> getOptionalByCartIdAndProductId(long cartId, long productId) {
         return cartItemRepository.findByCart_IdAndProductId(cartId, productId);
     }
-
 }

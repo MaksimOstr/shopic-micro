@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	alias(libs.plugins.spring.framework.boot)
 	alias(libs.plugins.spring.dependency.management)
+	id 'jacoco'
 }
 
 group = 'com'
@@ -34,6 +35,15 @@ dependencyManagement {
 	}
 }
 
+jacocoTestReport {
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
+	}
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
 }
