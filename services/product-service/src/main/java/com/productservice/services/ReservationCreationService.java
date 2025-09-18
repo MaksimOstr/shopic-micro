@@ -45,11 +45,13 @@ public class ReservationCreationService {
         Map<Long, Product> productMap = getProductQuantityMap(productIds);
 
         for (ItemForReservationDto reservationItem : reservationItems) {
-            Integer stockQuantity = productMap.get(reservationItem.productId()).getStockQuantity();
+            Product product = productMap.get(reservationItem.productId());
 
-            if (stockQuantity == null) {
+            if (product == null) {
                 throw new NotFoundException("There is no product with id " + reservationItem.productId());
             }
+
+            int stockQuantity = product.getStockQuantity();
 
             if (reservationItem.quantity() > stockQuantity) {
                 throw new InsufficientStockException("Insufficient stock for product " + reservationItem.productId());
