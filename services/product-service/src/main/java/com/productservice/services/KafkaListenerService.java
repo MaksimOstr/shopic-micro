@@ -38,7 +38,7 @@ public class KafkaListenerService {
         try {
             BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
 
-            reservationService.deleteReservation(event.orderId());
+            reservationService.deleteReservationByOrderId(event.orderId());
             ack.acknowledge();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());

@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.productservice.utils.ProductUtils.toProductMap;
 import static com.productservice.utils.Utils.extractIds;
 
 @Service
@@ -42,7 +43,8 @@ public class ReservationCreationService {
 
     private void checkAndDecreaseStockQuantity(List<ItemForReservationDto> reservationItems) {
         List<Long> productIds = extractIds(reservationItems);
-        Map<Long, Product> productMap = getProductQuantityMap(productIds);
+        List<Product> products = productQueryService.getProductsForUpdate(productIds);
+        Map<Long, Product> productMap = toProductMap(products);
 
         for (ItemForReservationDto reservationItem : reservationItems) {
             Product product = productMap.get(reservationItem.productId());
@@ -86,12 +88,5 @@ public class ReservationCreationService {
                 .build();
 
         return reservationRepository.save(reservation);
-    }
-
-    private Map<Long, Product> getProductQuantityMap(List<Long> productIds) {
-        List<Product> products = productQueryService.getProductsForUpdate(productIds);
-
-        return products.stream()
-                .collect(Collectors.toMap(Product::getId, Function.identity()));
     }
 }

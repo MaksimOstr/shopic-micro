@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.productservice.utils.ProductUtils.toProductMap;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,33 +30,28 @@ public class ReservationService {
 
     @Transactional
     public void cancelReservation(long orderId) {
-        List<ReservationItem> reservationItemList = reservationRepository.findByOrderIdWithItems(orderId)
-                .orElseThrow(() -> new NotFoundException("Reservation with id " + orderId + " not found"))
-                .getItems();
+        Reservation reservation = reservationRepository.findByOrderIdWithItems(orderId)
+                .orElseThrow(() -> new NotFoundException("Reservation with id " + orderId + " not found"));
+        List<ReservationItem> reservationItemList = reservation.getItems();
         List<Long> productIds = reservationItemList.stream().map(item -> item.getProduct().getId()).toList();
         List<Product> productList = productQueryService.getProductsForUpdate(productIds);
 
         updateProductQuantity(productList, reservationItemList);
-        deleteReservation(orderId);
+        reservationRepository.delete(reservation);
     }
 
-    public void deleteReservation(long orderId) {
-        int delete = reservationRepository.deleteByOrderId(orderId);
-
-        if(delete == 0) {
-            throw new NotFoundException("Reservation with orderId: " + orderId + " not found");
-        }
+    public void deleteReservationByOrderId(long orderId) {
+        reservationRepository.deleteByOrderId(orderId);
     }
 
-    public void updateProductQuantity(List<Product> productList, List<ReservationItem> reservationItemList) {
-        Map<Long, Product> productMap = productList.stream()
-                .collect(Collectors.toMap(Product::getId, Function.identity()));
+    private void updateProductQuantity(List<Product> productList, List<ReservationItem> reservationItemList) {
+        Map<Long, Product> productMap = toProductMap(productList);
 
         for (ReservationItem item : reservationItemList) {
             Product product = productMap.get(item.getProduct().getId());
             if(product == null) {
                 log.error("Product with id {} not found", item.getProduct().getId());
-                throw new NotFoundException("Product with id " + item.getProduct().getId() + " not found");
+                continue;
             }
 
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
