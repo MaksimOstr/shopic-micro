@@ -3,8 +3,9 @@ package com.productservice.services.products;
 import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
-import com.productservice.dto.request.ProductParams;
+import com.productservice.dto.request.UserProductParams;
 import com.productservice.entity.Product;
+import com.productservice.entity.ProductStatusEnum;
 import com.productservice.services.LikeService;
 import com.productservice.services.grpc.GrpcReviewService;
 import com.shopic.grpc.reviewservice.ProductRatingResponse;
@@ -30,13 +31,13 @@ public class UserProductFacade {
     private final GrpcReviewService grpcReviewService;
     private final LikeService likeService;
 
-    public Page<ProductUserPreviewDto> getProductsByFilters(ProductParams params, Pageable pageable, long userId) {
-        Specification<Product> spec = iLike("name", params.getName())
-                .and(hasActiveStatus("enabled", true))
-                .and(lte("price", params.getToPrice()))
-                .and(gte("price", params.getFromPrice()))
-                .and(hasChild("category", params.getCategoryId()))
-                .and(hasChild("brand", params.getBrandId()));
+    public Page<ProductUserPreviewDto> getProductsByFilters(UserProductParams params, Pageable pageable, long userId) {
+        Specification<Product> spec = iLike("name", params.productName())
+                .and(equalsEnum("status", ProductStatusEnum.ACTIVE))
+                .and(lte("price", params.toPrice()))
+                .and(gte("price", params.fromPrice()))
+                .and(hasChild("category", params.categoryId()))
+                .and(hasChild("brand", params.brandId()));
 
         return productSearchService.getPageOfUserProductsByFilters(spec, pageable, userId);
     }
@@ -46,7 +47,7 @@ public class UserProductFacade {
     }
 
     public UserProductDto getProduct(long productId, long userId) {
-        UserProductDto product = productQueryService.getUserProductById(productId);
+        UserProductDto product = productQueryService.getActiveUserProduct(productId);
         ProductRatingResponse rating = grpcReviewService.getProductRating(productId);
         boolean isLiked = likeService.isProductLiked(productId, userId);
 

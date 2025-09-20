@@ -42,16 +42,6 @@ public class AdminProductController {
                 .thenApply(product -> ResponseEntity.status(HttpStatus.CREATED).body(product));
     }
 
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(
-            @PathVariable long id
-    ) {
-        adminProductFacade.deleteProduct(id);
-
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<AdminProductDto> getProduct(
             @PathVariable long id,

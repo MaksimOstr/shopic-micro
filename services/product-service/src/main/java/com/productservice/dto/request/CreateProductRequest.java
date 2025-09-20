@@ -1,5 +1,6 @@
 package com.productservice.dto.request;
 
+import com.productservice.entity.ProductStatusEnum;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ public record CreateProductRequest(
         String description,
 
         @NotNull
-        Boolean enabled,
+        ProductStatusEnum status,
 
         @NotNull
         @DecimalMin("0")

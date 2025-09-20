@@ -29,13 +29,13 @@ public class ProductQueryService {
         return productRepository.findProductsForUpdate(productIds);
     }
 
-    public ProductBasicInfoDto getProductInfo(long productId) {
-        return productRepository.findProductInfo(productId)
+    public ProductBasicInfoDto getActiveProductBasicInfo(long productId) {
+        return productRepository.findActiveProductBasicInfoById(productId)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public List<ProductBasicInfoDto> getProductInfo(List<Long> productIds) {
-        return productRepository.findProductInfoList(productIds);
+    public List<ProductBasicInfoDto> getActiveProductBasicInfoList(List<Long> productIds) {
+        return productRepository.findActiveProductsBasicInfoByIds(productIds);
     }
 
     public Product getProductBySku(UUID sku) {
@@ -47,8 +47,8 @@ public class ProductQueryService {
         return productRepository.existsById(id);
     }
 
-    public UserProductDto getUserProductById(long id) {
-        return productRepository.getUserProduct(id)
+    public UserProductDto getActiveUserProduct(long id) {
+        return productRepository.getActiveUserProductById(id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
@@ -57,7 +57,7 @@ public class ProductQueryService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public AdminProductDto getAdminProductById(long id) {
+    public AdminProductDto getAdminProduct(long id) {
         return productRepository.getAdminProduct(id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
@@ -65,7 +65,6 @@ public class ProductQueryService {
     public List<LikedProductDto> getProductsByIds(Set<Long> productIds) {
         return productRepository.findProductsByIds(productIds);
     }
-
 
     public Page<Product> getProductPageBySpec(Specification<Product> spec, Pageable pageable) {
         return productRepository.findAll(spec, pageable);

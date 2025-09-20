@@ -24,6 +24,7 @@ import static com.productservice.utils.SpecificationUtils.*;
 import static com.productservice.utils.SpecificationUtils.gte;
 import static com.productservice.utils.SpecificationUtils.hasChild;
 
+
 @Service
 @RequiredArgsConstructor
 public class AdminProductFacade {
@@ -38,12 +39,8 @@ public class AdminProductFacade {
         return productCommandService.create(dto, productImage);
     }
 
-    public void deleteProduct(long productId) {
-        productCommandService.deleteProductById(productId);
-    }
-
     public AdminProductDto getAdminProduct(long productId, long userId) {
-        AdminProductDto product = productQueryService.getAdminProductById(productId);
+        AdminProductDto product = productQueryService.getAdminProduct(productId);
         ProductRatingResponse rating = grpcReviewService.getProductRating(productId);
         boolean isLiked = likeService.isProductLiked(productId, userId);
 
@@ -59,12 +56,12 @@ public class AdminProductFacade {
     }
 
     public Page<ProductAdminPreviewDto> getProductsByFilters(AdminProductParams params, Pageable pageable, long userId) {
-        Specification<Product> spec = iLike("name", params.getName())
-                .and(hasActiveStatus("enabled", params.getEnabled()))
-                .and(lte("price", params.getToPrice()))
-                .and(gte("price", params.getFromPrice()))
-                .and(hasChild("category", params.getCategoryId()))
-                .and(hasChild("brand", params.getBrandId()));
+        Specification<Product> spec = iLike("name", params.productName())
+                .and(equalsEnum("status", params.status()))
+                .and(lte("price", params.toPrice()))
+                .and(gte("price", params.fromPrice()))
+                .and(hasChild("category", params.categoryId()))
+                .and(hasChild("brand", params.brandId()));
 
         return productSearchService.getPageOfAdminProductsByFilters(spec, pageable, userId);
     }

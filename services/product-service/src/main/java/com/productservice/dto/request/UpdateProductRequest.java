@@ -1,5 +1,6 @@
 package com.productservice.dto.request;
 
+import com.productservice.entity.ProductStatusEnum;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -11,7 +12,7 @@ public record UpdateProductRequest(
         @Size(min = 3, max = 10)
         String name,
 
-        Boolean enabled,
+        ProductStatusEnum status,
 
         @Size(max = 1000)
         String description,

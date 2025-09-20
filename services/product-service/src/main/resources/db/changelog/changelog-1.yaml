@@ -51,8 +51,8 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: enabled
-                  type: boolean
+                  name: status
+                  type: varchar(20)
                   defaultValueBoolean: true
                   constraints:
                     nullable: false

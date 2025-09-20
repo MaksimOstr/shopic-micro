@@ -64,13 +64,6 @@ public class ProductCommandService {
                 });
     }
 
-    public void deleteProductById(long productId) {
-        String imageUrl = productQueryService.getProductImageUrl(productId);
-
-        productImageService.deleteImage(imageUrl);
-        productRepository.deleteProductById(productId);
-    }
-
     private Product createProductEntity(CreateProductRequest dto, String url, Category category, Brand brand) {
         return Product.builder()
                 .name(dto.name())
@@ -78,7 +71,7 @@ public class ProductCommandService {
                 .sku(getUUID())
                 .price(dto.price())
                 .imageUrl(url)
-                .enabled(dto.enabled())
+                .status(dto.status())
                 .category(category)
                 .stockQuantity(dto.stockQuantity())
                 .brand(brand)
@@ -90,7 +83,7 @@ public class ProductCommandService {
         Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
         Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
         Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
-        Optional.ofNullable(dto.enabled()).ifPresent(product::setEnabled);
+        Optional.ofNullable(dto.status()).ifPresent(product::setStatus);
         Optional.ofNullable(dto.categoryId()).ifPresent(categoryId -> {
             Category category = categoryService.findById(categoryId);
             product.setCategory(category);

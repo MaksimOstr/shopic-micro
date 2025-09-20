@@ -25,12 +25,11 @@ public class SpecificationUtils {
         return (root, query, cb) -> cb.equal(root.get(field).get("id"), value);
     }
 
-    public static Specification<Product> hasActiveStatus(String field, Boolean value) {
+    public static <T, E extends Enum<E>> Specification<Product> equalsEnum(String fieldName, E value) {
         if (value == null) {
             return Specification.where(null);
         }
-
-        return (root, query, cb) -> cb.equal(root.get(field), value);
+        return (root, query, cb) -> cb.equal(root.get(fieldName), value);
     }
 
     public static <T extends Comparable<? super T>> Specification<Product> gte(String field, T value) {

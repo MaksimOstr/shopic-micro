@@ -39,8 +39,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "c.name) " +
             "FROM Product p " +
             "JOIN p.brand b " +
-            "JOIN p.category c WHERE p.id = :id AND p.enabled = true")
-    Optional<UserProductDto> getUserProduct(long id);
+            "JOIN p.category c WHERE p.id = :id AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
+    Optional<UserProductDto> getActiveUserProductById(long id);
 
     @Query("SELECT new com.productservice.dto.AdminProductDto(" +
             "p.id, " +
@@ -51,11 +51,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.price, " +
             "b.name, " +
             "c.name," +
-            "p.enabled," +
+            "p.status," +
             "p.createdAt) " +
             "FROM Product p " +
             "JOIN p.brand b " +
-            "JOIN p.category c WHERE p.id = :id AND p.enabled = true")
+            "JOIN p.category c WHERE p.id = :id")
     Optional<AdminProductDto> getAdminProduct(long id);
 
     @Query("SELECT p FROM Product p JOIN FETCH p.category c JOIN FETCH p.brand b WHERE p.id = :id")
@@ -75,8 +75,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.name," +
             "p.stockQuantity" +
             ")" +
-            "FROM Product p WHERE p.id IN :ids")
-    List<ProductBasicInfoDto> findProductInfoList(List<Long> ids);
+            "FROM Product p WHERE p.id IN :ids AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
+    List<ProductBasicInfoDto> findActiveProductsBasicInfoByIds(List<Long> ids);
 
     @Query("SELECT new com.productservice.dto.ProductBasicInfoDto(" +
             "p.id," +
@@ -85,8 +85,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.name," +
             "p.stockQuantity" +
             ")" +
-            "FROM Product p WHERE p.id = :ids")
-    Optional<ProductBasicInfoDto> findProductInfo(Long ids);
+            "FROM Product p WHERE p.id = :id AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
+    Optional<ProductBasicInfoDto> findActiveProductBasicInfoById(Long id);
 
 
     @Query("SELECT new com.productservice.dto.LikedProductDto(" +

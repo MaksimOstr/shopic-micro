@@ -24,7 +24,7 @@ public class GrpcReviewService {
         return gRpcReviewService.getProductRatings(request);
     }
 
-    @CircuitBreaker(name = "review-service", fallbackMethod = "getProductRatingsFallback")
+    @CircuitBreaker(name = "review-service", fallbackMethod = "getProductRatingFallback")
     public ProductRatingResponse getProductRating(long productId) {
         ProductRatingRequest request = ProductRatingRequest.newBuilder()
                 .setProductId(productId)
@@ -34,6 +34,11 @@ public class GrpcReviewService {
     }
 
     public ProductRatingsResponse getProductRatingsFallback(List<Long> productIds, Throwable throwable) {
+        log.error("getProductRatingsFallback", throwable);
+        throw new ExternalServiceUnavailableException("Something went wrong. Please try again later");
+    }
+
+    public ProductRatingResponse getProductRatingFallback(long productId, Throwable throwable) {
         log.error("getProductRatingsFallback", throwable);
         throw new ExternalServiceUnavailableException("Something went wrong. Please try again later");
     }

@@ -4,8 +4,7 @@ import com.productservice.config.security.model.CustomPrincipal;
 import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
-import com.productservice.dto.request.ProductParams;
-import com.productservice.entity.Product;
+import com.productservice.dto.request.UserProductParams;
 import com.productservice.services.products.UserProductFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,7 +30,7 @@ public class PublicProductController {
     public ResponseEntity<Page<ProductUserPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestBody ProductParams body,
+            @RequestBody UserProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -49,7 +48,7 @@ public class PublicProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/active/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<UserProductDto> getUserProduct(
             @PathVariable long id,
             @AuthenticationPrincipal CustomPrincipal principal

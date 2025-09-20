@@ -10,7 +10,6 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.grpc.server.service.GrpcService;
-import org.springframework.stereotype.Service;
 
 @GrpcService
 @RequiredArgsConstructor

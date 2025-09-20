@@ -4,12 +4,12 @@ import com.productservice.entity.ProductStatusEnum;
 
 import java.math.BigDecimal;
 
-
-public record AdminProductParams(
+public record UserProductParams(
         String productName,
-        BigDecimal fromPrice,
+        ProductStatusEnum status,
         BigDecimal toPrice,
-        Integer brandId,
-        Integer categoryId,
-        ProductStatusEnum status
-) {}
+        BigDecimal fromPrice,
+        Long categoryId,
+        Long brandId
+) {
+}

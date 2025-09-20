@@ -26,7 +26,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getProductInfo(ProductInfoRequest request, StreamObserver<ProductInfo> responseObserver) {
-        ProductBasicInfoDto productDto = productQueryService.getProductInfo(request.getProductId());
+        ProductBasicInfoDto productDto = productQueryService.getActiveProductBasicInfo(request.getProductId());
 
         ProductInfo response = grpcMapper.toProductInfo(productDto);
 
@@ -47,7 +47,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getProductInfoList(ProductInfoListRequest request, StreamObserver<ProductInfoList> responseObserver) {
-        List<ProductBasicInfoDto> productPrices = productQueryService.getProductInfo(request.getProductIdList());
+        List<ProductBasicInfoDto> productPrices = productQueryService.getActiveProductBasicInfoList(request.getProductIdList());
         List<ProductInfo> productInfoList = grpcMapper.toProductInfoList(productPrices);
         ProductInfoList response = ProductInfoList.newBuilder()
                 .addAllProducts(productInfoList)

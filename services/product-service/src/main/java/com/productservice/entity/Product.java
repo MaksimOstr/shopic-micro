@@ -38,7 +38,8 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, optional = false)
     private Brand brand;
 
-    private Boolean enabled;
+    @Enumerated(EnumType.STRING)
+    private ProductStatusEnum status;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
