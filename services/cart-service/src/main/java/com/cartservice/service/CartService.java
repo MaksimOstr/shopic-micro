@@ -65,19 +65,20 @@ public class CartService {
         return cartItemMapper.toCartItemDtoListForOrder(cart.getCartItems());
     }
 
-    public void deleteItemFromCart(long cartItemId) {
-        long cartId = cartItemService.getCartIdFromCartItem(cartItemId);
+    public void deleteItemFromCart(long itemId, long userId) {
+        long cartId = cartRepository.findCartIdByUserId(userId)
+                        .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
 
-        cartItemService.deleteCartItemById(cartItemId);
+        cartItemService.deleteCartItem(itemId, cartId);
         deleteCartIfEmpty(cartId);
     }
 
     @Transactional
-    public void changeCartItemQuantity(ChangeCartItemQuantityRequest dto) {
-        CartItem cartItem = cartItemService.getCartItemById(dto.cartItemId());
+    public void changeCartItemQuantity(ChangeCartItemQuantityRequest dto, long itemId) {
+        CartItem cartItem = cartItemService.getCartItemById(itemId);
 
         if (dto.amount() <= 0) {
-            cartItemService.deleteCartItemById(cartItem.getId());
+            cartItemService.deleteCartItem(cartItem.getId());
             deleteCartIfEmpty(cartItem.getCart().getId());
         } else {
             cartItem.setQuantity(dto.amount());

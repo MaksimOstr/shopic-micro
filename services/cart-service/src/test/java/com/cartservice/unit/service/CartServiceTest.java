@@ -296,41 +296,54 @@ public class CartServiceTest {
     }
 
     @Test
-    public void testDeleteItemFromCart_whenCalledWithExistingCartItemAndEmptyCartAfterItemRemoving_thenDeleteItemAndCart() {
-        when(cartItemService.getCartIdFromCartItem(anyLong())).thenReturn(CART_ID);
+    public void testDeleteItemFromCart_whenCalledWithExistingCartAndEmptyCartAfterItemRemoving_thenDeleteItemAndCart() {
+        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.of(CART_ID));
         when(cartItemService.countCartItems(anyLong())).thenReturn(0);
 
-        cartService.deleteItemFromCart(CART_ITEM_ID);
+        cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
 
-        verify(cartItemService).getCartIdFromCartItem(CART_ITEM_ID);
-        verify(cartItemService).deleteCartItemById(CART_ITEM_ID);
+        verify(cartRepository).findCartIdByUserId(USER_ID);
+        verify(cartItemService).deleteCartItem(CART_ITEM_ID, CART_ID);
         verify(cartItemService).countCartItems(CART_ID);
         verify(cartRepository).deleteById(CART_ID);
     }
 
     @Test
-    public void testDeleteItemFromCart_whenCalledWithExistingCartItemAndNotEmptyCartAfterItemRemoving_thenDeleteItem() {
-        when(cartItemService.getCartIdFromCartItem(anyLong())).thenReturn(CART_ID);
+    public void testDeleteItemFromCart_whenCalledWithNotExistingCart_thenDeleteItemAndCart() {
+        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> {
+            cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
+        });
+
+        verify(cartRepository).findCartIdByUserId(USER_ID);
+        verifyNoInteractions(cartItemService);
+        verifyNoMoreInteractions(cartRepository);
+    }
+
+    @Test
+    public void testDeleteItemFromCart_whenCalledWithExistingCartAndNotEmptyCartAfterItemRemoving_thenDeleteItem() {
+        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.of(CART_ID));
         when(cartItemService.countCartItems(anyLong())).thenReturn(1);
 
-        cartService.deleteItemFromCart(CART_ITEM_ID);
+        cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
 
-        verify(cartItemService).getCartIdFromCartItem(CART_ITEM_ID);
-        verify(cartItemService).deleteCartItemById(CART_ITEM_ID);
+        verify(cartRepository).findCartIdByUserId(USER_ID);
+        verify(cartItemService).deleteCartItem(CART_ITEM_ID, CART_ID);
         verify(cartItemService).countCartItems(CART_ID);
-        verifyNoInteractions(cartRepository);
+        verifyNoMoreInteractions(cartRepository);
     }
 
     @Test
     public void testChangeCartItemQuantity_whenRequestedAboveZeroRequestedQuantity_thenSetQuantity() {
         int startItemQuantity = 10;
-        ChangeCartItemQuantityRequest changeCartItemQuantity = new ChangeCartItemQuantityRequest(REQUESTED_QUANTITY, CART_ITEM_ID);
+        ChangeCartItemQuantityRequest changeCartItemQuantity = new ChangeCartItemQuantityRequest(REQUESTED_QUANTITY);
 
         cartItem.setQuantity(startItemQuantity);
 
         when(cartItemService.getCartItemById(anyLong())).thenReturn(cartItem);
 
-        cartService.changeCartItemQuantity(changeCartItemQuantity);
+        cartService.changeCartItemQuantity(changeCartItemQuantity, CART_ITEM_ID);
 
         verify(cartItemService).getCartItemById(CART_ITEM_ID);
         verifyNoMoreInteractions(cartItemService);
@@ -343,17 +356,17 @@ public class CartServiceTest {
     @Test
     public void testChangeCartItemQuantity_whenRequestedBelowZeroRequestedQuantity_thenDeleteItem() {
         int startItemQuantity = 10;
-        ChangeCartItemQuantityRequest changeCartItemQuantity = new ChangeCartItemQuantityRequest(0, CART_ITEM_ID);
+        ChangeCartItemQuantityRequest changeCartItemQuantity = new ChangeCartItemQuantityRequest(0);
 
         cartItem.setQuantity(startItemQuantity);
 
         when(cartItemService.getCartItemById(anyLong())).thenReturn(cartItem);
         when(cartItemService.countCartItems(anyLong())).thenReturn(1);
 
-        cartService.changeCartItemQuantity(changeCartItemQuantity);
+        cartService.changeCartItemQuantity(changeCartItemQuantity, CART_ITEM_ID);
 
         verify(cartItemService).getCartItemById(CART_ITEM_ID);
-        verify(cartItemService).deleteCartItemById(CART_ITEM_ID);
+        verify(cartItemService).deleteCartItem(CART_ITEM_ID);
         verify(cartItemService).countCartItems(CART_ID);
     }
 

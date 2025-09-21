@@ -28,17 +28,6 @@ public class CartItemServiceTest {
     private static final long CART_ITEM_ID = 1L;
 
     @Test
-    public void testGetCartIdFromCartItem_whenCalledWithNonExistingItem_thenThrowException() {
-        when(cartItemRepository.getCartIdByCartItemId(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> {
-            cartItemService.getCartIdFromCartItem(CART_ITEM_ID);
-        });
-
-        verify(cartItemRepository).getCartIdByCartItemId(CART_ITEM_ID);
-    }
-
-    @Test
     public void testGetCartItemById_whenCalledWithNonExistingItem_thenThrowException() {
         when(cartItemRepository.findById(anyLong())).thenReturn(Optional.empty());
 

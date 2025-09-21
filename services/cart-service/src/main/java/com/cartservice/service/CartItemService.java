@@ -17,11 +17,6 @@ public class CartItemService {
 
     private static final String CART_ITEM_NOT_FOUND = "CartItem not found";
 
-    public long getCartIdFromCartItem(long cartItemId) {
-        return cartItemRepository.getCartIdByCartItemId(cartItemId)
-                .orElseThrow(() -> new NotFoundException(CART_ITEM_NOT_FOUND));
-    }
-
     public CartItem getCartItemById(long cartItemId) {
         return cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new NotFoundException(CART_ITEM_NOT_FOUND));
@@ -35,7 +30,11 @@ public class CartItemService {
         return cartItemRepository.countByCart_Id(cartId);
     }
 
-    public void deleteCartItemById(long id) {
+    public void deleteCartItem(long id, long cartId) {
+        cartItemRepository.deleteByCart_IdAndId(cartId, id);
+    }
+
+    public void deleteCartItem(long id) {
         cartItemRepository.deleteById(id);
     }
 

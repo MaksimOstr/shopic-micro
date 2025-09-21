@@ -62,13 +62,4 @@ public class OrderController {
 
         return ResponseEntity.ok().body(orders);
     }
-
-    @PutMapping("/{id}/cancel")
-    public ResponseEntity<?> cancelOrder(
-            @PathVariable long id
-    ) {
-        orderEventService.cancelOrder(id);
-
-        return ResponseEntity.ok().build();
-    }
 }

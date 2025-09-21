@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class CartController {
     private final CartService cartService;
 
-    @GetMapping("/items")
+    @GetMapping("/me")
     public ResponseEntity<CartDto> getCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
@@ -30,7 +30,7 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
-    @PostMapping("/items")
+    @PostMapping("/me/items")
     public ResponseEntity<CartItemDto> addCartItem(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid AddItemToCartRequest body
@@ -40,16 +40,17 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItem);
     }
 
-    @DeleteMapping("/items/{id}")
+    @DeleteMapping("/me/items/{id}")
     public ResponseEntity<Void> deleteCartItem(
-            @PathVariable long id
+            @PathVariable long id,
+            @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        cartService.deleteItemFromCart(id);
+        cartService.deleteItemFromCart(id, principal.getId());
 
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping
+    @DeleteMapping("/me")
     public ResponseEntity<Void> deleteCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
@@ -58,11 +59,12 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/items/quantity")
+    @PatchMapping("/me/items/{id}/quantity")
     public ResponseEntity<Void> changeCartItemQuantity(
-            @RequestBody @Valid ChangeCartItemQuantityRequest body
+            @RequestBody @Valid ChangeCartItemQuantityRequest body,
+            @PathVariable long id
     ) {
-        cartService.changeCartItemQuantity(body);
+        cartService.changeCartItemQuantity(body, id);
 
         return ResponseEntity.ok().build();
     }

@@ -36,6 +36,7 @@ public class AdminOrderService {
     @Transactional
     public Page<AdminOrderPreviewDto> getOrders(AdminOrderParams params, Pageable pageable) {
         Specification<Order> spec = iLikeNested("firstName", "customer" , params.firstName())
+                .and(hasId("userId", params.userId()))
                 .and(iLikeNested("lastName", "customer", params.lastName()))
                 .and(equalsEnum("status", params.status()));
         Page<Order> orderPage = queryService.getOrdersBySpec(spec, pageable);
