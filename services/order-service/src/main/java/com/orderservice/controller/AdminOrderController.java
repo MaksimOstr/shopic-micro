@@ -48,7 +48,7 @@ public class AdminOrderController {
         return ResponseEntity.ok().body(orders);
     }
 
-    @PatchMapping("/{id}/update-contact-info")
+    @PatchMapping("/{id}")
     public ResponseEntity<AdminOrderDto> updateContactInfo(
             @PathVariable long id,
             @RequestBody @Valid UpdateContactInfoRequest body

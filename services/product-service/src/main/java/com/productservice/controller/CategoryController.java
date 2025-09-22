@@ -15,7 +15,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<List<Category>> getAll(
             @RequestParam String name
     ) {

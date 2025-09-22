@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     private final OrderCreationService orderCreationService;
     private final OrderService orderService;
-    private final OrderEventService orderEventService;
 
 
     @PostMapping

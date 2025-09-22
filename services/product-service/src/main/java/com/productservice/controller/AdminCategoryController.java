@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminCategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<Page<Category>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

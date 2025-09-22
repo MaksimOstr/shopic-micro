@@ -26,10 +26,6 @@ public class ApiGatewayConfig {
                 .path("/auth", request -> request
                         .filter(jwtHandlerFilter)
                         .POST("/logout", http()))
-                .path("/admin/users", request -> request
-                        .filter(jwtHandlerFilter)
-                        .GET("/{id}", http())
-                        .GET("", http()))
                 .path("/verify", request -> request
                         .POST("/request", http())
                         .PATCH("", http()))
@@ -43,6 +39,11 @@ public class ApiGatewayConfig {
                         .filter(jwtHandlerFilter)
                         .POST("/change-request", http())
                         .PATCH("/change", http()))
+                .path("/admin", request -> request
+                        .filter(jwtHandlerFilter)
+                        .path("/users", req -> req
+                                .GET("/{id}", http())
+                                .GET("", http())))
                 .build();
     }
 
@@ -53,21 +54,38 @@ public class ApiGatewayConfig {
                 .filter(lb("product-service"))
                 .path("/likes", request -> request
                         .filter(jwtHandlerFilter)
-                        .POST("", http()))
+                        .POST("", http())
+                        .GET("/count", http()))
                 .path("/products", request -> request
                         .filter(jwtHandlerFilter)
-                        .GET("/active/{id}", http())
+                        .GET("/{id}", http())
                         .GET("", http())
                         .GET("/liked", http()))
-                .path("/admin/products", request -> request
+                .path("/brands", request -> request
+                        .GET("/search", http()))
+                .path("/categories", request -> request
+                        .GET("/search", http()))
+                .path("/admin", request -> request
                         .filter(jwtHandlerFilter)
-                        .POST("", http())
-                        .GET("/{id}", http())
-                        .GET("/sku", http())
-                        .GET("", http())
-                        .PATCH("/{id}/image", http())
-                        .PATCH("/{id}", http())
-                        .DELETE("/{id}", http()))
+                        .path("/products", req -> req
+                                .POST("", http())
+                                .GET("/{id}", http())
+                                .GET("/sku/{sku}", http())
+                                .GET("", http())
+                                .PATCH("/{id}/image", http())
+                                .PATCH("/{id}", http()))
+                        .path("/brands", req -> req
+                                .PATCH("/{id}", http())
+                                .GET("/search", http())
+                                .POST("", http())
+                                .PATCH("/{id}/deactivate", http())
+                                .PATCH("/{id}/activate", http()))
+                        .path("/categories", req -> req
+                                .GET("/search", http())
+                                .POST("", http())
+                                .PATCH("/{id}", http())
+                                .PATCH("/{id}/deactivate", http())
+                                .PATCH("/{id}/activate", http())))
                 .build();
     }
 
@@ -77,11 +95,11 @@ public class ApiGatewayConfig {
                 .filter(lb("cart-service"))
                 .path("/carts", request -> request
                         .filter(jwtHandlerFilter)
-                        .GET("/items", http())
-                        .POST("/items", http())
-                        .DELETE("/items/{id}", http())
-                        .DELETE("", http())
-                        .PATCH("/items/quantity", http()))
+                        .GET("/me", http())
+                        .POST("/me/items", http())
+                        .DELETE("/me/items/{id}", http())
+                        .DELETE("/me", http())
+                        .PATCH("/me/items/{id}/quantity", http()))
                 .build();
     }
 
@@ -92,16 +110,18 @@ public class ApiGatewayConfig {
                 .path("/orders", request -> request
                         .filter(jwtHandlerFilter)
                         .POST("", http())
-                        .GET("", http()))
+                        .GET("", http())
+                        .GET("/{id}", http()))
                 .path("/admin/orders", request -> request
                         .filter(jwtHandlerFilter)
-                        .GET("{id}", http())
+                        .GET("/{id}", http())
                         .GET("", http())
-                        .PATCH("/{id}/update-contact-info", http())
+                        .PATCH("/{id}", http())
                         .PATCH("/{id}/complete", http())
                         .PATCH("/{id}/cancel", http())
                         .PATCH("/{id}/process", http())
                         .PATCH("/{id}/ship", http())
+                        .PATCH("/{id}/return", http())
                         .PATCH("/{id}/pickup-ready", http()))
                 .build();
     }
@@ -141,24 +161,23 @@ public class ApiGatewayConfig {
                         .POST("", http())
                         .PATCH("/{id}", http())
                         .DELETE("/{id}", http()))
-                .path("/admin/reviews", request -> request
-                        .filter(jwtHandlerFilter)
-                        .GET("", http())
-                        .DELETE("/{id}", http()))
-                .path("/admin/review-comments", request -> request
-                        .filter(jwtHandlerFilter)
-                        .DELETE("/{id}", http())
-                        .GET("", http()))
                 .path("/reports", request -> request
                         .filter(jwtHandlerFilter)
                         .POST("/comment", http())
                         .POST("/review", http())
                         .GET("", http()))
-                .path("admin/reports", request -> request
-                    .filter(jwtHandlerFilter)
-                        .PATCH("/{id}/status", http())
-                        .GET("", http())
-                        .GET("/{id}", http()))
+                .path("/admin", request -> request
+                        .filter(jwtHandlerFilter)
+                        .path("/reports", req -> req
+                                .PATCH("/{id}/status", http())
+                                .GET("", http())
+                                .GET("/{id}", http()))
+                        .path("/review-comments", req -> req
+                                .DELETE("/{id}", http())
+                                .GET("", http()))
+                        .path("/reviews", req -> req
+                                .GET("", http())
+                                .DELETE("/{id}", http())))
                 .build();
     }
 }
