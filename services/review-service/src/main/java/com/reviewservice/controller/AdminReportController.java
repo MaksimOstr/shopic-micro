@@ -44,7 +44,7 @@ public class AdminReportController {
 
     @GetMapping
     public ResponseEntity<Page<ReportDto>> getReports(
-            @RequestBody AdminReportParams body,
+            @ModelAttribute AdminReportParams body,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {

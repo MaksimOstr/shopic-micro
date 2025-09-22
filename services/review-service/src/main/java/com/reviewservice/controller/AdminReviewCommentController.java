@@ -31,7 +31,7 @@ public class AdminReviewCommentController {
 
     @GetMapping
     public ResponseEntity<Page<ReviewCommentDto>> getReviewComments(
-            @RequestBody ReviewCommentParams body,
+            @ModelAttribute ReviewCommentParams body,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {

@@ -30,7 +30,7 @@ public class PublicProductController {
     public ResponseEntity<Page<ProductUserPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestBody UserProductParams body,
+            @ModelAttribute UserProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());

@@ -51,7 +51,7 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<Page<UserOrderPreviewDto>> getUserOrders(
             @AuthenticationPrincipal CustomPrincipal principal,
-            @RequestBody OrderParams body,
+            @ModelAttribute OrderParams body,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "desc") String sortDirection

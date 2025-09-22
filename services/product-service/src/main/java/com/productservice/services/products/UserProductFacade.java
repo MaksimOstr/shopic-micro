@@ -8,6 +8,7 @@ import com.productservice.entity.Product;
 import com.productservice.entity.ProductStatusEnum;
 import com.productservice.services.LikeService;
 import com.productservice.services.grpc.GrpcReviewService;
+import com.productservice.utils.SpecificationUtils;
 import com.shopic.grpc.reviewservice.ProductRatingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class UserProductFacade {
     private final LikeService likeService;
 
     public Page<ProductUserPreviewDto> getProductsByFilters(UserProductParams params, Pageable pageable, long userId) {
-        Specification<Product> spec = iLike("name", params.productName())
+        Specification<Product> spec = SpecificationUtils.<Product>iLike("name", params.productName())
                 .and(equalsEnum("status", ProductStatusEnum.ACTIVE))
                 .and(lte("price", params.toPrice()))
                 .and(gte("price", params.fromPrice()))

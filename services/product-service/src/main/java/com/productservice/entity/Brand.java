@@ -18,6 +18,9 @@ public class Brand {
     @Column(nullable = false, unique = true, length = 30)
     private String name;
 
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
+
     public Brand(String name) {
         this.name = name;
     }

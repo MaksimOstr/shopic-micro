@@ -29,7 +29,7 @@ public class AdminReviewController {
 
     @GetMapping
     public ResponseEntity<Page<ReviewDto>> getReviews(
-            @RequestBody ReviewParams body,
+            @ModelAttribute ReviewParams body,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {

@@ -53,7 +53,7 @@ public class ReportController {
 
     @GetMapping
     public ResponseEntity<Page<ReportStatusDto>> getReports(
-            @RequestBody UserReportParams body,
+            @ModelAttribute UserReportParams body,
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size

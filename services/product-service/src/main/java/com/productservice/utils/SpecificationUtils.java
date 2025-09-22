@@ -9,7 +9,7 @@ import java.util.Collection;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpecificationUtils {
-    public static Specification<Product> iLike(String field, String value) {
+    public static <T> Specification<T> iLike(String field, String value) {
         if (value == null || value.isBlank()) {
             return Specification.where(null);
         }
@@ -17,7 +17,7 @@ public class SpecificationUtils {
                 cb.like(cb.lower(root.get(field)), "%" + value.toLowerCase() + "%");
     }
 
-    public static Specification<Product> hasChild(String field, Number value) {
+    public static <T> Specification<T> hasChild(String field, Number value) {
         if (value == null) {
             return Specification.where(null);
         }
@@ -25,21 +25,28 @@ public class SpecificationUtils {
         return (root, query, cb) -> cb.equal(root.get(field).get("id"), value);
     }
 
-    public static <T, E extends Enum<E>> Specification<Product> equalsEnum(String fieldName, E value) {
+    public static <T, E extends Enum<E>> Specification<T> equalsEnum(String fieldName, E value) {
         if (value == null) {
             return Specification.where(null);
         }
         return (root, query, cb) -> cb.equal(root.get(fieldName), value);
     }
 
-    public static <T extends Comparable<? super T>> Specification<Product> gte(String field, T value) {
+    public static <S> Specification<S> equalsBoolean(String field, Boolean value) {
+        if (value == null) {
+            return Specification.where(null);
+        }
+        return (root, query, cb) -> cb.equal(root.get(field), value);
+    }
+
+    public static <T, E extends Comparable<? super E>> Specification<T> gte(String field, E value) {
         if (value == null) {
             return Specification.where(null);
         }
         return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get(field), value);
     }
 
-    public static <T extends Comparable<? super T>> Specification<Product> lte(String field, T value) {
+    public static <T, E extends Comparable<? super E>> Specification<T> lte(String field, E value) {
         if (value == null) {
             return Specification.where(null);
         }

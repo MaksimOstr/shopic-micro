@@ -35,7 +35,7 @@ public class PaymentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "desc") String sortDirection,
-            @RequestBody PaymentParams params
+            @ModelAttribute PaymentParams params
     ) {
         Sort.Direction direction = Sort.Direction.fromString(sortDirection);
         Pageable pageable = PageRequest.of(page, size, direction, "createdAt");

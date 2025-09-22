@@ -8,6 +8,7 @@ import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
 import com.productservice.services.LikeService;
 import com.productservice.services.grpc.GrpcReviewService;
+import com.productservice.utils.SpecificationUtils;
 import com.shopic.grpc.reviewservice.ProductRatingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -56,7 +57,7 @@ public class AdminProductFacade {
     }
 
     public Page<ProductAdminPreviewDto> getProductsByFilters(AdminProductParams params, Pageable pageable, long userId) {
-        Specification<Product> spec = iLike("name", params.productName())
+        Specification<Product> spec = SpecificationUtils.<Product>iLike("name", params.productName())
                 .and(equalsEnum("status", params.status()))
                 .and(lte("price", params.toPrice()))
                 .and(gte("price", params.fromPrice()))

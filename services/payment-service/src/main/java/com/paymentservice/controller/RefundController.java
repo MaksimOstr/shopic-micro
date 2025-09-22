@@ -42,7 +42,7 @@ public class RefundController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestBody RefundParams params
+            @ModelAttribute RefundParams params
     ) {
         Sort.Direction direction = Sort.Direction.fromString(sortDirection);
         Pageable pageable = PageRequest.of(page, size, direction, sortBy);

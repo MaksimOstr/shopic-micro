@@ -30,7 +30,7 @@ public class AdminUserController {
 
     @GetMapping
     public ResponseEntity<Page<UserSummaryDto>> getAllUsers(
-            @RequestBody UserParams params
+            @ModelAttribute UserParams params
     ) {
         Pageable pageable = PageRequest.of(0, 10);
         Page<UserSummaryDto> userPage = adminUserService.getUserPage(params, pageable);

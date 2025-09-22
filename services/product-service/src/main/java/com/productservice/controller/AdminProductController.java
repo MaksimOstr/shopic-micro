@@ -67,7 +67,7 @@ public class AdminProductController {
     public ResponseEntity<Page<ProductAdminPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestBody AdminProductParams body,
+            @ModelAttribute AdminProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -87,9 +87,9 @@ public class AdminProductController {
     }
 
 
-    @GetMapping("/sku")
+    @GetMapping("/sku/{sku}")
     public ResponseEntity<Product> getProductBySku(
-            @RequestParam UUID sku
+            @PathVariable UUID sku
     ) {
         Product product = adminProductFacade.getProductBySku(sku);
 
