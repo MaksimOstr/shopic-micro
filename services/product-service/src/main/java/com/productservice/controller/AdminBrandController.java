@@ -24,7 +24,7 @@ public class AdminBrandController {
     private final BrandService brandService;
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Brand>> getAllBrands(
+    public ResponseEntity<Page<Brand>> getAll(
             @ModelAttribute AdminBrandParams params,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -36,7 +36,7 @@ public class AdminBrandController {
     }
 
     @PostMapping
-    public ResponseEntity<Brand> createBrand(
+    public ResponseEntity<Brand> create(
             @RequestBody @Valid CreateBrandRequest body
     ) {
         Brand brand = brandService.create(body);
@@ -45,7 +45,7 @@ public class AdminBrandController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Brand> updateBrand(
+    public ResponseEntity<Brand> update(
             @PathVariable int id,
             @RequestBody @Valid UpdateBrandRequest body
     ) {
@@ -55,7 +55,7 @@ public class AdminBrandController {
     }
 
     @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateBrand(
+    public ResponseEntity<Void> deactivate(
             @PathVariable int id
     ) {
         brandService.changeIsActive(id, false);
@@ -64,7 +64,7 @@ public class AdminBrandController {
     }
 
     @PatchMapping("/{id}/active")
-    public ResponseEntity<Void> activateBrand(
+    public ResponseEntity<Void> activate(
             @PathVariable int id
     ) {
         brandService.changeIsActive(id, true);

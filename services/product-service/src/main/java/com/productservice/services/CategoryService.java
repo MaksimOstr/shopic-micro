@@ -1,17 +1,24 @@
 package com.productservice.services;
 
+import com.productservice.dto.request.AdminCategoryParams;
 import com.productservice.dto.request.CreateCategoryRequest;
 import com.productservice.dto.request.UpdateCategoryRequest;
 import com.productservice.entity.Category;
 import com.productservice.exceptions.AlreadyExistsException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.CategoryRepository;
+import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.productservice.utils.SpecificationUtils.equalsBoolean;
 
 
 @Service
@@ -48,14 +55,26 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException("Category not found"));
     }
 
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
+    public Page<Category> findAll(Pageable pageable, AdminCategoryParams params) {
+        Specification<Category> spec = SpecificationUtils.<Category>iLike("name", params.name())
+                .and(equalsBoolean("isActive", params.isActive()));
+
+        return categoryRepository.findAll(spec, pageable);
     }
 
-    public void deleteCategory(int categoryId) {
-        int deleted = categoryRepository.deleteById(categoryId);
+    public List<Category> findAllActive(String name) {
+        Specification<Category> spec = SpecificationUtils.<Category>iLike("name", name)
+                .and(equalsBoolean("isActive", true));
 
-        if(deleted == 0) {
+        return categoryRepository.findAll(spec);
+    }
+
+
+
+    public void changeIsActive(int id, boolean active) {
+        int updated = categoryRepository.changeIsActive(id, active);
+
+        if(updated == 0) {
             throw new NotFoundException("Category not found");
         }
     }

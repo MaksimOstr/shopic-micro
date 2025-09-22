@@ -8,6 +8,8 @@ import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
+import com.productservice.enums.ProductAdminSortEnum;
+import com.productservice.enums.SortDirectionEnum;
 import com.productservice.services.products.AdminProductFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -67,10 +69,16 @@ public class AdminProductController {
     public ResponseEntity<Page<ProductAdminPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") ProductAdminSortEnum sortBy,
+            @RequestParam(defaultValue = "desc") SortDirectionEnum sortDirection,
             @ModelAttribute AdminProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Sort sort = Sort.by(
+                sortDirection.toSpringDirection(),
+                sortBy.getField()
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductAdminPreviewDto> products = adminProductFacade.getProductsByFilters(body, pageable, principal.getId());
 
         return ResponseEntity.ok(products);

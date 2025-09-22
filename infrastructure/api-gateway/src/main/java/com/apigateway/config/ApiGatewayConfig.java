@@ -46,19 +46,6 @@ public class ApiGatewayConfig {
                 .build();
     }
 
-    @Bean
-    public RouterFunction<ServerResponse> profileRoute(JwtHandlerFilter jwtHandlerFilter) {
-        return route("profile-service-route")
-                .filter(lb("profile-service"))
-                .path("/profiles", request -> request
-                        .filter(jwtHandlerFilter)
-                        .GET("/me", http())
-                        .GET("/{id}", http())
-                        .GET("", http())
-                        .PATCH("", http()))
-                .build();
-    }
-
 
     @Bean
     public RouterFunction<ServerResponse> productRoute(JwtHandlerFilter jwtHandlerFilter) {

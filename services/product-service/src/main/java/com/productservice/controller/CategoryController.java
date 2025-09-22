@@ -1,14 +1,9 @@
 package com.productservice.controller;
 
-import com.productservice.dto.request.CreateCategoryRequest;
-import com.productservice.dto.request.UpdateCategoryRequest;
 import com.productservice.entity.Category;
 import com.productservice.services.CategoryService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,41 +14,14 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
+
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Category>> getCategories() {
-        List<Category> categories = categoryService.findAll();
+    public ResponseEntity<List<Category>> getAll(
+            @RequestParam String name
+    ) {
+        List<Category> categories = categoryService.findAllActive(name);
+
         return ResponseEntity.ok(categories);
     }
 
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Category> createCategory(
-            @RequestBody @Valid CreateCategoryRequest createCategoryRequest
-    ) {
-        Category category = categoryService.create(createCategoryRequest);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(category);
-    }
-
-    @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Category> updateCategory(
-            @PathVariable int id,
-            @RequestBody @Valid UpdateCategoryRequest body
-    ) {
-        Category category = categoryService.update(id, body);
-
-        return ResponseEntity.ok(category);
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteCategory(
-            @PathVariable int id
-    ) {
-        categoryService.deleteCategory(id);
-
-        return ResponseEntity.ok().build();
-    }
 }

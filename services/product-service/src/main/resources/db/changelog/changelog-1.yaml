@@ -159,6 +159,11 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: is_active
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
                   name: description
                   type: varchar(255)
                   constraints:
@@ -189,6 +194,9 @@ databaseChangeLog:
               - column:
                   name: description
                   value: Category for electronics
+              - column:
+                  name: is_active
+                  value: true
         - insert:
             tableName: categories
             columns:
@@ -201,6 +209,9 @@ databaseChangeLog:
               - column:
                   name: description
                   value: Category for food
+              - column:
+                  name: is_active
+                  value: true
 
         - insert:
             tableName: brands
@@ -211,6 +222,9 @@ databaseChangeLog:
               - column:
                   name: name
                   value: Samsung
+              - column:
+                  name: is_active
+                  value: true
         - insert:
             tableName: brands
             columns:
@@ -220,7 +234,9 @@ databaseChangeLog:
               - column:
                   name: name
                   value: Nokia
-
+              - column:
+                  name: is_active
+                  value: true
 
 
 
