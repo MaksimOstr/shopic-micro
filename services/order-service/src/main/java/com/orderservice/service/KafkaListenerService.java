@@ -2,17 +2,14 @@ package com.orderservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orderservice.dto.event.CheckoutSuccessEvent;
-import com.orderservice.dto.event.UnpaidPaymentEvent;
+import com.orderservice.dto.event.BaseReservationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 @Slf4j
 @Service
@@ -22,16 +19,14 @@ public class KafkaListenerService {
     private final OrderEventService orderEventService;
 
 
-    @KafkaListener(topics = "checkout-session-success", containerFactory = "batchFactory", batch = "true")
+    @KafkaListener(topics = "reservation.confirmed", groupId = "orderService")
     @Transactional
-    public void listenCheckoutSessionSuccess(@Payload List<String> messages, Acknowledgment ack) {
+    public void listenReservationConfirmed(String data, Acknowledgment ack) {
         try {
-            log.info("listenCheckoutSessionSuccess");
-            for (String message : messages) {
-                CheckoutSuccessEvent event = objectMapper.readValue(message, CheckoutSuccessEvent.class);
+            log.info("listenReservationConfirmed");
+            BaseReservationEvent event = objectMapper.readValue(data, BaseReservationEvent.class);
 
-                orderEventService.payOrder(event.orderId());
-            }
+            orderEventService.confirmOrder(event.orderId());
 
             ack.acknowledge();
         } catch (JsonProcessingException e) {
@@ -39,16 +34,14 @@ public class KafkaListenerService {
         }
     }
 
-
-    @KafkaListener(topics = "payment.unpaid", containerFactory = "batchFactory", batch = "true")
+    @KafkaListener(topics = "reservation.canceled", groupId = "orderService")
     @Transactional
-    public void listenUnpaidPayment(@Payload List<String> messages, Acknowledgment ack) {
-        log.info("listenUnpaidPayment");
+    public void listenReservationCanceled(String data, Acknowledgment ack) {
+        log.info("listenReservationCanceled");
         try {
-            for (String message : messages) {
-                UnpaidPaymentEvent event = objectMapper.readValue(message, UnpaidPaymentEvent.class);
-                orderEventService.cancelOrder(event.orderId());
-            }
+            BaseReservationEvent event = objectMapper.readValue(data, BaseReservationEvent.class);
+
+            orderEventService.cancelOrder(event.orderId());
 
             ack.acknowledge();
         } catch (JsonProcessingException e) {

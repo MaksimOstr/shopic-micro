@@ -22,8 +22,8 @@ public class OrderEventService {
     private final StateMachineFactory<OrderStatusEnum, OrderEvents> stateMachineFactory;
 
     @Transactional
-    public void payOrder(long orderId) {
-        processEvent(orderId, OrderEvents.PAY);
+    public void confirmOrder(long orderId) {
+        processEvent(orderId, OrderEvents.CONFIRM);
     }
 
     @Transactional

@@ -47,8 +47,8 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
         transitions
                 .withExternal()
                     .source(OrderStatusEnum.CREATED)
-                    .target(OrderStatusEnum.PAID)
-                    .event(OrderEvents.PAY)
+                    .target(OrderStatusEnum.CONFIRMED)
+                    .event(OrderEvents.CONFIRM)
                     .and()
                 .withExternal()
                     .source(OrderStatusEnum.CREATED)
@@ -59,7 +59,7 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderS
 
 
                 .withExternal()
-                    .source(OrderStatusEnum.PAID)
+                    .source(OrderStatusEnum.CONFIRMED)
                     .target(OrderStatusEnum.PROCESSING)
                     .event(OrderEvents.PROCESS)
                     .and()

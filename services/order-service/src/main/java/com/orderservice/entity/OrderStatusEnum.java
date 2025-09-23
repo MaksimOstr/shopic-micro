@@ -5,7 +5,7 @@ import com.orderservice.exception.NotFoundException;
 
 public enum OrderStatusEnum {
     CREATED,
-    PAID,
+    CONFIRMED,
     PROCESSING,
     SHIPPED,
     READY_FOR_PICKUP,

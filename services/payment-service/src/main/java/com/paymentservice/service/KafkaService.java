@@ -31,7 +31,7 @@ public class KafkaService {
         try {
             CheckoutSuccessEvent event = new CheckoutSuccessEvent(orderId);
 
-            atLeastOnceBatchTemplate.send("checkout-session-success", objectMapper.writeValueAsString(event));
+            atLeastOnceBatchTemplate.send("payment.paid", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
             log.error(e.getMessage(), e);
             throw new InternalException(SOMETHING_WENT_WRONG);

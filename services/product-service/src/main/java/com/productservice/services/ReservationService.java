@@ -3,23 +3,20 @@ package com.productservice.services;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
+import com.productservice.entity.ReservationStatusEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
 import com.productservice.services.products.ProductQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.productservice.utils.ProductUtils.toProductMap;
+
 
 @Slf4j
 @Service
@@ -37,11 +34,16 @@ public class ReservationService {
         List<Product> productList = productQueryService.getProductsForUpdate(productIds);
 
         updateProductQuantity(productList, reservationItemList);
-        reservationRepository.delete(reservation);
+        reservation.setStatus(ReservationStatusEnum.CANCELLED);
     }
 
-    public void deleteReservationByOrderId(long orderId) {
-        reservationRepository.deleteByOrderId(orderId);
+    public void updateReservationStatus(long orderId, ReservationStatusEnum status) {
+        int updated = reservationRepository.updateStatus(orderId, status);
+
+        if(updated == 0) {
+            log.error("Failed to update reservation status for order with order id {}", orderId);
+            throw new NotFoundException("Reservation with order id " + orderId + " not found");
+        }
     }
 
     private void updateProductQuantity(List<Product> productList, List<ReservationItem> reservationItemList) {

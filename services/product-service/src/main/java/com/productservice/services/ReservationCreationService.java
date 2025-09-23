@@ -5,6 +5,7 @@ import com.productservice.dto.request.CreateReservationItem;
 import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
+import com.productservice.entity.ReservationStatusEnum;
 import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
@@ -84,6 +85,7 @@ public class ReservationCreationService {
 
     private Reservation createAndSaveReservation(long orderId) {
         Reservation reservation = Reservation.builder()
+                .status(ReservationStatusEnum.PENDING)
                 .orderId(orderId)
                 .build();
 

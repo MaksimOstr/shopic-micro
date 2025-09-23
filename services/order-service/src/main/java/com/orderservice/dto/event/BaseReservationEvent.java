@@ -1,6 +1,6 @@
 package com.orderservice.dto.event;
 
-public record CheckoutSuccessEvent(
+public record BaseReservationEvent(
         long orderId
 ) {
 }

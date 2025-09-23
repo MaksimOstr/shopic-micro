@@ -27,6 +27,19 @@ spring:
           batch_size: 20
         generate_statistics: true
 
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      auto-offset-reset: latest
+      enable-auto-commit: false
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: manual_immediate
+  pulsar:
+    consumer:
+      retry-enable: true
+
 resilience4j:
   circuitbreaker:
     instances:

@@ -3,6 +3,7 @@ package com.productservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
@@ -26,6 +27,14 @@ public class Reservation {
 
     @Column(name = "order_id", nullable = false, unique = true)
     private long orderId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ReservationStatusEnum status;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
