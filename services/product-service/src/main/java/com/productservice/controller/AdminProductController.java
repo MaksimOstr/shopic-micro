@@ -68,7 +68,7 @@ public class AdminProductController {
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<Page<ProductAdminPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

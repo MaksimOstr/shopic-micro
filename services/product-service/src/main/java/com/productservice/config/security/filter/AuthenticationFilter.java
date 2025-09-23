@@ -4,6 +4,7 @@ import com.productservice.config.security.model.CustomPrincipal;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.util.AntPathMatcher;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
+
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Value("${SIGNATURE_SECRET}")
     private String signatureSecret;
@@ -57,7 +60,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
 
         setSecurityContext(userId, roles);
-
         filterChain.doFilter(request, response);
     }
 
@@ -87,11 +89,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     private boolean shouldExclude(HttpServletRequest request) {
         List<String> whiteList = List.of(
-                "/brands/search",
-                "/products"
+                "/public/**"
         );
+        String requestPath = request.getRequestURI();
 
-        return whiteList.contains(request.getRequestURI());
+        return whiteList.stream().anyMatch(pattern -> pathMatcher.match(pattern, requestPath));
     }
 
     private List<SimpleGrantedAuthority> toSimpleGrantedAuthorities(String roles) {

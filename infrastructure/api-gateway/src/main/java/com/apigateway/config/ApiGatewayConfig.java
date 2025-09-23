@@ -52,27 +52,28 @@ public class ApiGatewayConfig {
     public RouterFunction<ServerResponse> productRoute(JwtHandlerFilter jwtHandlerFilter) {
         return route("product-service-route")
                 .filter(lb("product-service"))
-                .path("/likes", request -> request
-                        .filter(jwtHandlerFilter)
-                        .POST("", http())
-                        .GET("/count", http()))
-                .path("/products", request -> request
-                        .GET("/{id}", http())
-                        .GET("", http())
-                        .GET("/liked", http())
-                        .POST("/{id}/like", http())
-                        .GET("/{id}/likes/count", http()))
-                .path("/brands", request -> request
-                        .GET("/search", http()))
-                .path("/categories", request -> request
-                        .GET("/search", http()))
+                .path("/user", request -> request
+                        .path("/products", req -> req
+                                .GET("/{id}", http())
+                                .GET("/search", http())
+                                .GET("/liked", http())
+                                .POST("/{id}/like", http())
+                                .GET("/{id}/likes/count", http())))
+                .path("/public", request -> request
+                        .path("/products", req -> req
+                                .GET("/{id}", http())
+                                .GET("/search", http()))
+                        .path("/categories", req -> req
+                                .GET("/search", http()))
+                        .path("/brands", req -> req
+                                .GET("/search", http())))
                 .path("/admin", request -> request
                         .filter(jwtHandlerFilter)
                         .path("/products", req -> req
                                 .POST("", http())
                                 .GET("/{id}", http())
                                 .GET("/sku/{sku}", http())
-                                .GET("", http())
+                                .GET("/search", http())
                                 .PATCH("/{id}/image", http())
                                 .PATCH("/{id}", http()))
                         .path("/brands", req -> req

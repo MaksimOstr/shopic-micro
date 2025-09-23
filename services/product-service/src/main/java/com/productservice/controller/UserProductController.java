@@ -31,7 +31,7 @@ public class UserProductController {
     private final LikeService likeService;
 
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<Page<ProductUserPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
