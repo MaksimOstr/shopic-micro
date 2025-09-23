@@ -25,7 +25,7 @@ public class AdminBrandController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<Brand>> getAll(
-            @ModelAttribute AdminBrandParams params,
+            AdminBrandParams params,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {

@@ -6,6 +6,7 @@ import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.UserProductParams;
 import com.productservice.enums.SortDirectionEnum;
+import com.productservice.services.LikeService;
 import com.productservice.services.products.UserProductFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,18 +14,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/products")
+@RequestMapping("/user/products")
 @PreAuthorize("hasRole('USER')")
-public class PublicProductController {
-    private final UserProductFacade productFacade;
+public class UserProductController {
+    private final UserProductFacade userProductFacade;
+    private final LikeService likeService;
 
 
     @GetMapping
@@ -32,7 +36,7 @@ public class PublicProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "desc") SortDirectionEnum sortDirection,
-            @ModelAttribute UserProductParams body,
+            UserProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Sort sort = Sort.by(
@@ -40,7 +44,7 @@ public class PublicProductController {
                 "price"
         );
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductUserPreviewDto> products = productFacade.getProductsByFilters(body, pageable, principal.getId());
+        Page<ProductUserPreviewDto> products = userProductFacade.getProductsByFilters(body, pageable, principal.getId());
 
         return ResponseEntity.ok(products);
     }
@@ -49,7 +53,7 @@ public class PublicProductController {
     public ResponseEntity<List<LikedProductDto>> getLikedProducts(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        List<LikedProductDto> products = productFacade.getLikedProducts(principal.getId());
+        List<LikedProductDto> products = userProductFacade.getLikedProducts(principal.getId());
 
         return ResponseEntity.ok(products);
     }
@@ -59,8 +63,27 @@ public class PublicProductController {
             @PathVariable long id,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        UserProductDto product = productFacade.getProduct(id, principal.getId());
+        UserProductDto product = userProductFacade.getProduct(id, principal.getId());
 
         return ResponseEntity.ok(product);
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Object> toggleLike(
+            @PathVariable long id,
+            @AuthenticationPrincipal CustomPrincipal principal
+    ) {
+        likeService.toggleLike(id, principal.getId());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/likes/count")
+    public ResponseEntity<Integer> getLikeCount(
+            @PathVariable long id
+    ) {
+        int likeCount = likeService.getLikeCount(id);
+
+        return ResponseEntity.ok(likeCount);
     }
 }

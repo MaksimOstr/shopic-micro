@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/brands")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('USER')")
 public class BrandController {
     private final BrandService brandService;
 
 
     @GetMapping("/search")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<Brand>> getAllBrands(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

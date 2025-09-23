@@ -8,9 +8,11 @@ import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
-import com.productservice.enums.ProductAdminSortEnum;
+import com.productservice.enums.ProductAdminSortByEnum;
 import com.productservice.enums.SortDirectionEnum;
 import com.productservice.services.products.AdminProductFacade;
+import com.productservice.services.products.ProductCommandService;
+import com.productservice.services.products.ProductQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,8 @@ import java.util.concurrent.CompletableFuture;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminProductController {
     private final AdminProductFacade adminProductFacade;
+    private final ProductCommandService productCommandService;
+    private final ProductQueryService productQueryService;
 
 
     @PostMapping
@@ -40,7 +44,7 @@ public class AdminProductController {
             @RequestPart("product") @Valid CreateProductRequest body,
             @RequestPart("image") MultipartFile imageFile
     ) {
-        return adminProductFacade.createProduct(body, imageFile)
+        return productCommandService.create(body, imageFile)
                 .thenApply(product -> ResponseEntity.status(HttpStatus.CREATED).body(product));
     }
 
@@ -54,13 +58,12 @@ public class AdminProductController {
         return ResponseEntity.ok(product);
     }
 
-
     @PatchMapping("/{id}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable long id,
             @RequestBody @Valid UpdateProductRequest body
     ) {
-        Product product = adminProductFacade.updateProduct(body, id);
+        Product product = productCommandService.updateProduct(body, id);
 
         return ResponseEntity.ok(product);
     }
@@ -69,9 +72,9 @@ public class AdminProductController {
     public ResponseEntity<Page<ProductAdminPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") ProductAdminSortEnum sortBy,
+            @RequestParam(defaultValue = "price") ProductAdminSortByEnum sortBy,
             @RequestParam(defaultValue = "desc") SortDirectionEnum sortDirection,
-            @ModelAttribute AdminProductParams body,
+            AdminProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Sort sort = Sort.by(
@@ -90,7 +93,7 @@ public class AdminProductController {
         @PathVariable long id,
         @RequestPart("image") MultipartFile imageFile
     ) {
-        return adminProductFacade.updateProductImage(id, imageFile)
+        return productCommandService.updateProductImage(id, imageFile)
                 .thenApply(_ -> ResponseEntity.ok().build());
     }
 
@@ -99,7 +102,7 @@ public class AdminProductController {
     public ResponseEntity<Product> getProductBySku(
             @PathVariable UUID sku
     ) {
-        Product product = adminProductFacade.getProductBySku(sku);
+        Product product = productQueryService.getProductBySku(sku);
 
         return ResponseEntity.ok(product);
     }

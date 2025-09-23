@@ -57,10 +57,11 @@ public class ApiGatewayConfig {
                         .POST("", http())
                         .GET("/count", http()))
                 .path("/products", request -> request
-                        .filter(jwtHandlerFilter)
                         .GET("/{id}", http())
                         .GET("", http())
-                        .GET("/liked", http()))
+                        .GET("/liked", http())
+                        .POST("/{id}/like", http())
+                        .GET("/{id}/likes/count", http()))
                 .path("/brands", request -> request
                         .GET("/search", http()))
                 .path("/categories", request -> request

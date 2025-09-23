@@ -27,7 +27,7 @@ public class AdminCategoryController {
     public ResponseEntity<Page<Category>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @ModelAttribute AdminCategoryParams params
+            AdminCategoryParams params
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Category> categories = categoryService.findAll(pageable, params);
