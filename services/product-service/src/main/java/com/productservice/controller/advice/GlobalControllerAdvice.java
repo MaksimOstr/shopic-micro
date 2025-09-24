@@ -3,6 +3,7 @@ package com.productservice.controller.advice;
 import com.productservice.dto.response.ErrorResponseDto;
 import com.productservice.exceptions.AlreadyExistsException;
 import com.productservice.exceptions.ExternalServiceUnavailableException;
+import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,15 @@ public class GlobalControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 HttpStatus.NOT_FOUND.value(),
+                e.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    private ResponseEntity<ErrorResponseDto> handleAlreadyExists(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
                 e.getMessage()
         ));
     }

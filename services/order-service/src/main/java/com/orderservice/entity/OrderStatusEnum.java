@@ -3,6 +3,7 @@ package com.orderservice.entity;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.orderservice.exception.NotFoundException;
 
+
 public enum OrderStatusEnum {
     CREATED,
     CONFIRMED,
@@ -13,13 +14,14 @@ public enum OrderStatusEnum {
     CANCELLED,
     RETURNED;
 
+
     @JsonCreator
     public static OrderStatusEnum fromString(String name) {
         try {
             String uppercaseName = name.toUpperCase();
             return OrderStatusEnum.valueOf(uppercaseName);
         } catch (IllegalArgumentException e) {
-            throw new NotFoundException(e.getMessage());
+            throw new NotFoundException("tetetetet");
         }
     }
 }

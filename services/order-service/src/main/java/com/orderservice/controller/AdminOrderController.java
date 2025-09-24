@@ -36,7 +36,7 @@ public class AdminOrderController {
 
     @GetMapping
     public ResponseEntity<Page<AdminOrderPreviewDto>> getAllOrders(
-            @ModelAttribute AdminOrderParams body,
+            AdminOrderParams body,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "desc") String sortDirection

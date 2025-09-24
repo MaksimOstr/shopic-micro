@@ -56,11 +56,11 @@ public class AdminProductController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<ProductAdminPreviewDto>> getPageOfProductsByFilter(
+            AdminProductParams body,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "price") ProductAdminSortByEnum sortBy,
-            @RequestParam(defaultValue = "desc") SortDirectionEnum sortDirection,
-            AdminProductParams body
+            @RequestParam(defaultValue = "PRICE") ProductAdminSortByEnum sortBy,
+            @RequestParam(defaultValue = "DESC") SortDirectionEnum sortDirection
     ) {
         Sort sort = Sort.by(
                 sortDirection.toSpringDirection(),

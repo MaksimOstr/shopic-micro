@@ -15,7 +15,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalControllerAdvice {
     @ExceptionHandler({InternalException.class, ExternalServiceUnavailableException.class})
-    public ResponseEntity<ErrorResponseDto> handleJsonProcessingException(ExternalServiceUnavailableException e) {
+    public ResponseEntity<ErrorResponseDto> handleInternalServerException(ExternalServiceUnavailableException e) {
         return ResponseEntity.badRequest().body(new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -41,8 +41,8 @@ public class GlobalControllerAdvice {
         ));
     }
 
-    @ExceptionHandler({InsufficientStockException.class, StateTransitionException.class})
-    private ResponseEntity<ErrorResponseDto> handleAlreadyExists(RuntimeException e) {
+    @ExceptionHandler({InsufficientStockException.class, StateTransitionException.class, IllegalArgumentException.class})
+    private ResponseEntity<ErrorResponseDto> handleBadRequestException(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),

@@ -95,7 +95,7 @@ public class PaymentService {
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void checkUnpaidPayments() {
-        Instant thirtyMinutesAgo = Instant.now().minus(Duration.ofMinutes(1));
+        Instant thirtyMinutesAgo = Instant.now().minus(Duration.ofMinutes(30));
         paymentRepository.findByStatusAndCreatedAtBefore(PaymentStatus.PENDING, thirtyMinutesAgo)
                 .forEach(payment -> {
                     payment.setStatus(PaymentStatus.FAILED);
