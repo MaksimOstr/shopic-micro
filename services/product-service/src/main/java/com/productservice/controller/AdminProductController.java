@@ -12,7 +12,6 @@ import com.productservice.enums.ProductAdminSortByEnum;
 import com.productservice.enums.SortDirectionEnum;
 import com.productservice.services.products.AdminProductFacade;
 import com.productservice.services.products.ProductCommandService;
-import com.productservice.services.products.ProductQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,25 +34,22 @@ import java.util.concurrent.CompletableFuture;
 public class AdminProductController {
     private final AdminProductFacade adminProductFacade;
     private final ProductCommandService productCommandService;
-    private final ProductQueryService productQueryService;
 
 
     @GetMapping("/{id}")
     public ResponseEntity<AdminProductDto> getProduct(
-            @PathVariable long id,
-            @AuthenticationPrincipal CustomPrincipal principal
+            @PathVariable long id
     ) {
-        AdminProductDto product = adminProductFacade.getAdminProduct(id, principal.getId());
+        AdminProductDto product = adminProductFacade.getAdminProduct(id);
 
         return ResponseEntity.ok(product);
     }
 
     @GetMapping("/sku/{sku}")
     public ResponseEntity<AdminProductDto> getProductBySku(
-            @PathVariable UUID sku,
-            @AuthenticationPrincipal CustomPrincipal principal
+            @PathVariable UUID sku
     ) {
-        AdminProductDto product = adminProductFacade.getAdminProduct(sku, principal.getId());
+        AdminProductDto product = adminProductFacade.getAdminProduct(sku);
 
         return ResponseEntity.ok(product);
     }
@@ -65,15 +60,14 @@ public class AdminProductController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "price") ProductAdminSortByEnum sortBy,
             @RequestParam(defaultValue = "desc") SortDirectionEnum sortDirection,
-            AdminProductParams body,
-            @AuthenticationPrincipal CustomPrincipal principal
+            AdminProductParams body
     ) {
         Sort sort = Sort.by(
                 sortDirection.toSpringDirection(),
                 sortBy.getField()
         );
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ProductAdminPreviewDto> products = adminProductFacade.getProductsByFilters(body, pageable, principal.getId());
+        Page<ProductAdminPreviewDto> products = adminProductFacade.getProductsByFilters(body, pageable);
 
         return ResponseEntity.ok(products);
     }

@@ -20,9 +20,6 @@ public abstract class BaseProductDto {
     private final String categoryName;
 
     @Setter
-    private boolean isLiked;
-
-    @Setter
     private BigDecimal rating;
 
     @Setter

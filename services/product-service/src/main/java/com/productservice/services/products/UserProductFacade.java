@@ -6,8 +6,9 @@ import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.UserProductParams;
 import com.productservice.entity.Product;
 import com.productservice.mapper.ProductMapper;
-import com.productservice.services.EnrichmentService;
+import com.productservice.services.LikeEnrichmentService;
 import com.productservice.services.LikeService;
+import com.productservice.services.RatingEnrichmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,15 +25,16 @@ import static com.productservice.utils.ProductUtils.buildUserProductSpec;
 @RequiredArgsConstructor
 public class UserProductFacade {
     private final ProductQueryService productQueryService;
-    private final EnrichmentService enrichmentService;
+    private final LikeEnrichmentService likeEnrichmentService;
+    private final RatingEnrichmentService ratingEnrichmentService;
     private final ProductMapper productMapper;
     private final LikeService likeService;
 
     public UserProductDto getProduct(long productId, long userId) {
         UserProductDto product = productQueryService.getActiveUserProduct(productId);
 
-        enrichmentService.enrichProductWithLike(product, userId);
-        enrichmentService.enrichProductWithRating(product);
+        likeEnrichmentService.enrichProduct(product, userId);
+        ratingEnrichmentService.enrichProduct(product);
 
         return product;
     }
@@ -49,8 +51,8 @@ public class UserProductFacade {
         List<Product> productList = productPage.getContent();
         List<ProductUserPreviewDto> previewDtoList = productMapper.productToProductUserPreviewDtoList(productList);
 
-        enrichmentService.enrichProductListWithLikes(previewDtoList, userId);
-        enrichmentService.enrichProductListWithRatings(previewDtoList);
+        likeEnrichmentService.enrichProductList(previewDtoList, userId);
+        ratingEnrichmentService.enrichProductList(previewDtoList);
 
         return  new PageImpl<>(previewDtoList, pageable, productPage.getTotalElements());
     }

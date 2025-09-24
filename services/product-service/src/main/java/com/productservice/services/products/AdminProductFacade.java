@@ -5,7 +5,7 @@ import com.productservice.dto.ProductAdminPreviewDto;
 import com.productservice.dto.request.AdminProductParams;
 import com.productservice.entity.Product;
 import com.productservice.mapper.ProductMapper;
-import com.productservice.services.EnrichmentService;
+import com.productservice.services.RatingEnrichmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,36 +24,33 @@ import static com.productservice.utils.ProductUtils.buildAdminProductSpec;
 @RequiredArgsConstructor
 public class AdminProductFacade {
     private final ProductQueryService productQueryService;
-    private final EnrichmentService enrichmentService;
+    private final RatingEnrichmentService ratingEnrichmentService;
     private final ProductMapper productMapper;
 
 
-    public AdminProductDto getAdminProduct(long productId, long userId) {
+    public AdminProductDto getAdminProduct(long productId) {
         AdminProductDto product = productQueryService.getAdminProduct(productId);
 
-        enrichmentService.enrichProductWithLike(product, userId);
-        enrichmentService.enrichProductWithRating(product);
+        ratingEnrichmentService.enrichProduct(product);
 
         return product;
     }
 
-    public AdminProductDto getAdminProduct(UUID sku, long userId) {
+    public AdminProductDto getAdminProduct(UUID sku) {
         AdminProductDto product = productQueryService.getAdminProduct(sku);
 
-        enrichmentService.enrichProductWithLike(product, userId);
-        enrichmentService.enrichProductWithRating(product);
+        ratingEnrichmentService.enrichProduct(product);
 
         return product;
     }
 
-    public Page<ProductAdminPreviewDto> getProductsByFilters(AdminProductParams params, Pageable pageable, long userId) {
+    public Page<ProductAdminPreviewDto> getProductsByFilters(AdminProductParams params, Pageable pageable) {
         Specification<Product> spec = buildAdminProductSpec(params);
         Page<Product> productPage = productQueryService.getProductPageBySpec(spec, pageable);
         List<Product> productList = productPage.getContent();
         List<ProductAdminPreviewDto> previewDtoList = productMapper.productToProductAdminPreviewDtoList(productList);
 
-        enrichmentService.enrichProductListWithLikes(previewDtoList, userId);
-        enrichmentService.enrichProductListWithRatings(previewDtoList);
+        ratingEnrichmentService.enrichProductList(previewDtoList);
 
         return new PageImpl<>(previewDtoList, pageable, productPage.getTotalElements());
     }

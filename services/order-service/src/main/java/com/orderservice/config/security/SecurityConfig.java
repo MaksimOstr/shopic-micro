@@ -31,13 +31,4 @@ public class SecurityConfig {
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-
-    @Bean
-    static RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.withDefaultRolePrefix()
-                .role("ADMIN").implies("USER")
-                .build();
-    }
-
 }

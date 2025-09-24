@@ -1,12 +1,11 @@
 package com.productservice.services.products;
 
-import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.UserProductParams;
 import com.productservice.entity.Product;
 import com.productservice.mapper.ProductMapper;
-import com.productservice.services.EnrichmentService;
+import com.productservice.services.RatingEnrichmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,14 +22,14 @@ import static com.productservice.utils.ProductUtils.buildUserProductSpec;
 @RequiredArgsConstructor
 public class PublicProductFacade {
     private final ProductQueryService productQueryService;
-    private final EnrichmentService enrichmentService;
+    private final RatingEnrichmentService ratingEnrichmentService;
     private final ProductMapper productMapper;
 
 
     public UserProductDto getProduct(long productId) {
         UserProductDto product = productQueryService.getActiveUserProduct(productId);
 
-        enrichmentService.enrichProductWithRating(product);
+        ratingEnrichmentService.enrichProduct(product);
 
         return product;
     }
@@ -41,7 +40,7 @@ public class PublicProductFacade {
         List<Product> productList = productPage.getContent();
         List<ProductUserPreviewDto> previewDtoList = productMapper.productToProductUserPreviewDtoList(productList);
 
-        enrichmentService.enrichProductListWithRatings(previewDtoList);
+        ratingEnrichmentService.enrichProductList(previewDtoList);
 
         return  new PageImpl<>(previewDtoList, pageable, productPage.getTotalElements());
     }

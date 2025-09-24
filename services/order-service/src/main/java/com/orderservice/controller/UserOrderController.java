@@ -6,7 +6,6 @@ import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.dto.request.OrderParams;
 import com.orderservice.service.OrderCreationService;
-import com.orderservice.service.OrderEventService;
 import com.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('USER')")
 @RequestMapping("/orders")
-public class OrderController {
+public class UserOrderController {
     private final OrderCreationService orderCreationService;
     private final OrderService orderService;
 
@@ -48,7 +47,7 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserOrderPreviewDto>> getUserOrders(
+    public ResponseEntity<Page<UserOrderPreviewDto>> getOrderPage(
             @AuthenticationPrincipal CustomPrincipal principal,
             @ModelAttribute OrderParams body,
             @RequestParam(defaultValue = "0") int page,
