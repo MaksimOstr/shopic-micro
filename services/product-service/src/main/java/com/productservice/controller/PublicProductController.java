@@ -4,7 +4,6 @@ package com.productservice.controller;
 import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.UserProductParams;
-import com.productservice.enums.SortDirectionEnum;
 import com.productservice.services.products.PublicProductFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,11 +34,11 @@ public class PublicProductController {
     public ResponseEntity<Page<ProductUserPreviewDto>> getProductsByFilters(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "desc") SortDirectionEnum sortDirection,
+            @RequestParam(defaultValue = "desc") String sortDirection,
             UserProductParams body
     ) {
         Sort sort = Sort.by(
-                sortDirection.toSpringDirection(),
+                Sort.Direction.fromString(sortDirection),
                 "price"
         );
         Pageable pageable = PageRequest.of(page, size, sort);

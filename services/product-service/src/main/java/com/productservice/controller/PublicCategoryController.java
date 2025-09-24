@@ -17,7 +17,7 @@ public class PublicCategoryController {
 
     @GetMapping("/search")
     public ResponseEntity<List<UserCategoryDto>> getAll(
-            @RequestParam String name
+            @RequestParam(required = false) String name
     ) {
         List<UserCategoryDto> categories = categoryService.getUserCategoryDtoList(name);
 

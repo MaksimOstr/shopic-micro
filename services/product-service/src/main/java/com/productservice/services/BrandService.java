@@ -70,9 +70,12 @@ public class BrandService {
 
     public Brand create(CreateBrandRequest dto) {
         if(existsByName(dto.brandName())) {
-            throw new AlreadyExistsException("Brand already exists");
+            throw new AlreadyExistsException("Brand name already exists");
         }
-        Brand brand = new Brand(dto.brandName());
+        Brand brand = Brand.builder()
+                .name(dto.brandName())
+                .isActive(dto.isActive())
+                .build();
 
         return brandRepository.save(brand);
     }

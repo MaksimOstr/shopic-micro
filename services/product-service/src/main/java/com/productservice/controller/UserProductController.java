@@ -5,7 +5,6 @@ import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.UserProductParams;
-import com.productservice.enums.SortDirectionEnum;
 import com.productservice.services.LikeService;
 import com.productservice.services.products.UserProductFacade;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +34,12 @@ public class UserProductController {
     public ResponseEntity<Page<ProductUserPreviewDto>> getPageOfProductsByFilter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "desc") SortDirectionEnum sortDirection,
+            @RequestParam(defaultValue = "desc") String sortDirection,
             UserProductParams body,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         Sort sort = Sort.by(
-                sortDirection.toSpringDirection(),
+                Sort.Direction.fromString(sortDirection),
                 "price"
         );
         Pageable pageable = PageRequest.of(page, size, sort);

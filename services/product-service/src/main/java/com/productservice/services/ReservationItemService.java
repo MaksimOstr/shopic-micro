@@ -16,7 +16,7 @@ public class ReservationItemService {
     private final ReservationItemMapper reservationItemMapper;
 
     public void saveReservationItems(List<CreateReservationItem> reservationItems) {
-        List<ReservationItem> reservationItemList = reservationItems.stream().map(reservationItemMapper::toReservationItem).toList();
+        List<ReservationItem> reservationItemList = reservationItemMapper.toReservationItemList(reservationItems);
 
         reservationItemRepository.saveAll(reservationItemList);
     }

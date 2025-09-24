@@ -20,7 +20,7 @@ public class PublicBrandController {
     public ResponseEntity<Page<UserBrandDto>> getAllBrands(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam String name
+            @RequestParam(required = false) String name
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserBrandDto> brands = brandService.getUserBrandDtoPage(name, pageable);

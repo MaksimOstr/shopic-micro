@@ -87,7 +87,11 @@ public class ApiGatewayConfig {
                                 .POST("", http())
                                 .PATCH("/{id}", http())
                                 .PATCH("/{id}/deactivate", http())
-                                .PATCH("/{id}/activate", http())))
+                                .PATCH("/{id}/activate", http()))
+                        .path("/reservations", req -> req
+                                .GET("/{id}", http())
+                                .GET("/by-order/{orderId}", http())
+                                .GET("/search", http())))
                 .build();
     }
 

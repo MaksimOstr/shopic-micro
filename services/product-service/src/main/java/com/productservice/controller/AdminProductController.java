@@ -1,7 +1,6 @@
 package com.productservice.controller;
 
 
-import com.productservice.config.security.model.CustomPrincipal;
 import com.productservice.dto.AdminProductDto;
 import com.productservice.dto.ProductAdminPreviewDto;
 import com.productservice.dto.request.AdminProductParams;
@@ -9,7 +8,6 @@ import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
 import com.productservice.enums.ProductAdminSortByEnum;
-import com.productservice.enums.SortDirectionEnum;
 import com.productservice.services.products.AdminProductFacade;
 import com.productservice.services.products.ProductCommandService;
 import jakarta.validation.Valid;
@@ -60,10 +58,10 @@ public class AdminProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "PRICE") ProductAdminSortByEnum sortBy,
-            @RequestParam(defaultValue = "DESC") SortDirectionEnum sortDirection
+            @RequestParam(defaultValue = "desc") String sortDirection
     ) {
         Sort sort = Sort.by(
-                sortDirection.toSpringDirection(),
+                Sort.Direction.fromString(sortDirection),
                 sortBy.getField()
         );
         Pageable pageable = PageRequest.of(page, size, sort);

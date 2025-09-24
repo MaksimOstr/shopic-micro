@@ -3,6 +3,7 @@ package com.productservice.repository;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,9 +15,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
 
-    int deleteByOrderId(Long orderId);
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.id = :id")
+    Optional<Reservation> findByIdWithItems(long id);
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.orderId = :orderId")
     Optional<Reservation> findByOrderIdWithItems(long orderId);

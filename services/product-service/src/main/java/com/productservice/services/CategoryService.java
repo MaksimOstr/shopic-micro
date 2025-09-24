@@ -35,10 +35,11 @@ public class CategoryService {
             throw new AlreadyExistsException("Category name already exists");
         }
 
-        Category category = new Category(
-                dto.name(),
-                dto.description()
-        );
+        Category category = Category.builder()
+                .name(dto.name())
+                .description(dto.description())
+                .isActive(dto.isActive())
+                .build();
 
         return categoryRepository.save(category);
     }
