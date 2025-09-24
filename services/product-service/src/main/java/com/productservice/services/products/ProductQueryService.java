@@ -38,8 +38,8 @@ public class ProductQueryService {
         return productRepository.findActiveProductsBasicInfoByIds(productIds);
     }
 
-    public Product getProductBySku(UUID sku) {
-        return productRepository.findBySku(sku)
+    public AdminProductDto getAdminProduct(UUID sku) {
+        return productRepository.getAdminProduct(sku)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 

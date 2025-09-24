@@ -39,15 +39,6 @@ public class AdminProductController {
     private final ProductQueryService productQueryService;
 
 
-    @PostMapping
-    public CompletableFuture<ResponseEntity<Product>> createProduct(
-            @RequestPart("product") @Valid CreateProductRequest body,
-            @RequestPart("image") MultipartFile imageFile
-    ) {
-        return productCommandService.create(body, imageFile)
-                .thenApply(product -> ResponseEntity.status(HttpStatus.CREATED).body(product));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<AdminProductDto> getProduct(
             @PathVariable long id,
@@ -58,12 +49,12 @@ public class AdminProductController {
         return ResponseEntity.ok(product);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(
-            @PathVariable long id,
-            @RequestBody @Valid UpdateProductRequest body
+    @GetMapping("/sku/{sku}")
+    public ResponseEntity<AdminProductDto> getProductBySku(
+            @PathVariable UUID sku,
+            @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        Product product = productCommandService.updateProduct(body, id);
+        AdminProductDto product = adminProductFacade.getAdminProduct(sku, principal.getId());
 
         return ResponseEntity.ok(product);
     }
@@ -87,6 +78,25 @@ public class AdminProductController {
         return ResponseEntity.ok(products);
     }
 
+    @PostMapping
+    public CompletableFuture<ResponseEntity<Product>> createProduct(
+            @RequestPart("product") @Valid CreateProductRequest body,
+            @RequestPart("image") MultipartFile imageFile
+    ) {
+        return productCommandService.create(body, imageFile)
+                .thenApply(product -> ResponseEntity.status(HttpStatus.CREATED).body(product));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable long id,
+            @RequestBody @Valid UpdateProductRequest body
+    ) {
+        Product product = productCommandService.updateProduct(body, id);
+
+        return ResponseEntity.ok(product);
+    }
+
 
     @PatchMapping("/{id}/image")
     public CompletableFuture<ResponseEntity<Void>> updateProductImage(
@@ -95,15 +105,5 @@ public class AdminProductController {
     ) {
         return productCommandService.updateProductImage(id, imageFile)
                 .thenApply(_ -> ResponseEntity.ok().build());
-    }
-
-
-    @GetMapping("/sku/{sku}")
-    public ResponseEntity<Product> getProductBySku(
-            @PathVariable UUID sku
-    ) {
-        Product product = productQueryService.getProductBySku(sku);
-
-        return ResponseEntity.ok(product);
     }
 }

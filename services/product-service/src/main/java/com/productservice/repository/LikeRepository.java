@@ -21,6 +21,4 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     @Query("SELECT l.product.id FROM Like l WHERE l.userId = :userId")
     Set<Long> findLikedProductIds(long userId);
-
-    int countByProduct_Id(long productId);
 }

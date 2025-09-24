@@ -58,6 +58,22 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "JOIN p.category c WHERE p.id = :id")
     Optional<AdminProductDto> getAdminProduct(long id);
 
+    @Query("SELECT new com.productservice.dto.AdminProductDto(" +
+            "p.id, " +
+            "p.name, " +
+            "p.description, " +
+            "p.imageUrl," +
+            "p.sku," +
+            "p.price, " +
+            "b.name, " +
+            "c.name," +
+            "p.status," +
+            "p.createdAt) " +
+            "FROM Product p " +
+            "JOIN p.brand b " +
+            "JOIN p.category c WHERE p.sku = :sku")
+    Optional<AdminProductDto> getAdminProduct(UUID sku);
+
     @Query("SELECT p FROM Product p JOIN FETCH p.category c JOIN FETCH p.brand b WHERE p.id = :id")
     Optional<Product> getProductWithCategoryAndBrand(long id);
 

@@ -53,12 +53,12 @@ public class ApiGatewayConfig {
         return route("product-service-route")
                 .filter(lb("product-service"))
                 .path("/user", request -> request
+                        .filter(jwtHandlerFilter)
                         .path("/products", req -> req
                                 .GET("/{id}", http())
                                 .GET("/search", http())
                                 .GET("/liked", http())
-                                .POST("/{id}/like", http())
-                                .GET("/{id}/likes/count", http())))
+                                .POST("/{id}/like", http())))
                 .path("/public", request -> request
                         .path("/products", req -> req
                                 .GET("/{id}", http())

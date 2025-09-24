@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.productservice.utils.ProductUtils.buildAdminProductSpec;
 
@@ -29,6 +30,15 @@ public class AdminProductFacade {
 
     public AdminProductDto getAdminProduct(long productId, long userId) {
         AdminProductDto product = productQueryService.getAdminProduct(productId);
+
+        enrichmentService.enrichProductWithLike(product, userId);
+        enrichmentService.enrichProductWithRating(product);
+
+        return product;
+    }
+
+    public AdminProductDto getAdminProduct(UUID sku, long userId) {
+        AdminProductDto product = productQueryService.getAdminProduct(sku);
 
         enrichmentService.enrichProductWithLike(product, userId);
         enrichmentService.enrichProductWithRating(product);

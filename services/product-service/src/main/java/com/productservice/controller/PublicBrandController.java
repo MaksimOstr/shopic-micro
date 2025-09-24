@@ -1,6 +1,6 @@
 package com.productservice.controller;
 
-import com.productservice.entity.Brand;
+import com.productservice.dto.UserBrandDto;
 import com.productservice.services.BrandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,13 +17,13 @@ public class PublicBrandController {
 
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Brand>> getAllBrands(
+    public ResponseEntity<Page<UserBrandDto>> getAllBrands(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam String name
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Brand> brands = brandService.getAllActiveBrands(name, pageable);
+        Page<UserBrandDto> brands = brandService.getUserBrandDtoPage(name, pageable);
 
         return ResponseEntity.ok(brands);
     }

@@ -1,11 +1,13 @@
 package com.productservice.services;
 
+import com.productservice.dto.UserCategoryDto;
 import com.productservice.dto.request.AdminCategoryParams;
 import com.productservice.dto.request.CreateCategoryRequest;
 import com.productservice.dto.request.UpdateCategoryRequest;
 import com.productservice.entity.Category;
 import com.productservice.exceptions.AlreadyExistsException;
 import com.productservice.exceptions.NotFoundException;
+import com.productservice.mapper.CategoryMapper;
 import com.productservice.repository.CategoryRepository;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import static com.productservice.utils.SpecificationUtils.equalsBoolean;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @Transactional
     public Category create(CreateCategoryRequest dto) {
@@ -62,13 +65,13 @@ public class CategoryService {
         return categoryRepository.findAll(spec, pageable);
     }
 
-    public List<Category> findAllActive(String name) {
+    public List<UserCategoryDto> getUserCategoryDtoList(String name) {
         Specification<Category> spec = SpecificationUtils.<Category>iLike("name", name)
                 .and(equalsBoolean("isActive", true));
+        List<Category> categoryList = categoryRepository.findAll(spec);
 
-        return categoryRepository.findAll(spec);
+        return categoryMapper.toUserCategoryDtoList(categoryList);
     }
-
 
 
     public void changeIsActive(int id, boolean active) {

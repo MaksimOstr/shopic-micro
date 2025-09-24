@@ -1,6 +1,6 @@
 package com.productservice.controller;
 
-import com.productservice.entity.Category;
+import com.productservice.dto.UserCategoryDto;
 import com.productservice.services.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +16,10 @@ public class PublicCategoryController {
 
 
     @GetMapping("/search")
-    public ResponseEntity<List<Category>> getAll(
+    public ResponseEntity<List<UserCategoryDto>> getAll(
             @RequestParam String name
     ) {
-        List<Category> categories = categoryService.findAllActive(name);
+        List<UserCategoryDto> categories = categoryService.getUserCategoryDtoList(name);
 
         return ResponseEntity.ok(categories);
     }

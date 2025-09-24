@@ -77,13 +77,4 @@ public class UserProductController {
 
         return ResponseEntity.ok().build();
     }
-
-    @GetMapping("/{id}/likes/count")
-    public ResponseEntity<Integer> getLikeCount(
-            @PathVariable long id
-    ) {
-        int likeCount = likeService.getLikeCount(id);
-
-        return ResponseEntity.ok(likeCount);
-    }
 }

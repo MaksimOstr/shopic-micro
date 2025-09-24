@@ -48,8 +48,4 @@ public class LikeService {
     public boolean isProductLiked(long productId, long userId) {
         return likeRepository.existsByProduct_IdAndUserId(productId, userId);
     }
-
-    public int getLikeCount(long productId) {
-        return likeRepository.countByProduct_Id(productId);
-    }
 }
