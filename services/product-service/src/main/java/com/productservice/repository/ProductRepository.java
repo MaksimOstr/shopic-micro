@@ -95,8 +95,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("UPDATE Product p SET p.imageUrl = :imageUrl WHERE p.id = :id")
     int updateProductImageUrl(long id, String imageUrl);
 
-    Optional<Product> findBySku(UUID sku);
-
     @Query("SELECT new com.productservice.dto.ProductBasicInfoDto(" +
             "p.id," +
             "p.price," +
@@ -135,8 +133,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);
 
-    @Transactional
     @Modifying
-    @Query("DELETE FROM Product p WHERE p.id = :id")
-    int deleteProductById(long id);
+    @Query("UPDATE Product p SET p.status = :status WHERE p.id = :id")
+    int changeProductStatus(long id, ProductStatusEnum status);
 }

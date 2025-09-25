@@ -5,6 +5,7 @@ import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Brand;
 import com.productservice.entity.Category;
 import com.productservice.entity.Product;
+import com.productservice.entity.ProductStatusEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ProductRepository;
 import com.productservice.services.BrandService;
@@ -32,6 +33,7 @@ public class ProductCommandService {
     private final ProductImageService productImageService;
 
 
+    @Transactional
     public CompletableFuture<Product> create(CreateProductRequest dto, MultipartFile productImage) {
         Category category = categoryService.findById(dto.categoryId());
         Brand brand = brandService.getBrandById(dto.brandId());
@@ -41,6 +43,38 @@ public class ProductCommandService {
 
             return productRepository.save(product);
         });
+    }
+
+    @Transactional
+    public void archiveProductById(long productId) {
+        Product product = productQueryService.getProductById(productId);
+
+        if(product.getStatus().equals(ProductStatusEnum.ARCHIVED)) {
+            throw new IllegalStateException("Product is already archived");
+        }
+
+        product.setStatus(ProductStatusEnum.ARCHIVED);
+    }
+
+    @Transactional
+    public void activateProductById(long productId) {
+        Product product = productQueryService.getProductWithCategoryAndBrand(productId);
+        Brand brand = product.getBrand();
+        Category category = product.getCategory();
+
+        if(product.getStatus().equals(ProductStatusEnum.ACTIVE)) {
+            throw new IllegalStateException("Product is already activated");
+        }
+
+        if (!brand.isActive()) {
+            throw new IllegalStateException("Cannot activate product: brand " + brand.getName() + " is inactive");
+        }
+
+        if (!category.isActive()) {
+            throw new IllegalStateException("Cannot activate product: category " + category.getName() + " is inactive");
+        }
+
+        product.setStatus(ProductStatusEnum.ACTIVE);
     }
 
     @Transactional
@@ -93,7 +127,6 @@ public class ProductCommandService {
         Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
         Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
         Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
-        Optional.ofNullable(dto.status()).ifPresent(product::setStatus);
         Optional.ofNullable(dto.categoryId()).ifPresent(categoryId -> {
             Category category = categoryService.findById(categoryId);
             product.setCategory(category);

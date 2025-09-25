@@ -79,6 +79,11 @@ public class ProductQueryService {
         return productRepository.findAll(spec, pageable);
     }
 
+    public Product getProductById(long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+    }
+
     public String getProductImageUrl(long productId) {
         return productRepository.getProductImageUrl(productId)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));

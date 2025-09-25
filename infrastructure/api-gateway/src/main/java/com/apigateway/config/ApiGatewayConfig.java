@@ -74,6 +74,8 @@ public class ApiGatewayConfig {
                                 .GET("/{id}", http())
                                 .GET("/sku/{sku}", http())
                                 .GET("/search", http())
+                                .PATCH("/{id}/archive", http())
+                                .PATCH("/{id}/activate", http())
                                 .PATCH("/{id}/image", http())
                                 .PATCH("/{id}", http()))
                         .path("/brands", req -> req
@@ -87,7 +89,6 @@ public class ApiGatewayConfig {
                                 .GET("/search", http())
                                 .POST("", http())
                                 .PATCH("/{id}", http())
-                                .PATCH("/{id}/deactivation-check", http())
                                 .PATCH("/{id}/deactivate", http())
                                 .PATCH("/{id}/activate", http()))
                         .path("/reservations", req -> req

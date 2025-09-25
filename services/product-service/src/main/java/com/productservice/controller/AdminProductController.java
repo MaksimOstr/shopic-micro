@@ -98,4 +98,22 @@ public class AdminProductController {
         return productCommandService.updateProductImage(id, imageFile)
                 .thenApply(_ -> ResponseEntity.ok().build());
     }
+
+    @PatchMapping("/{id}/archive")
+    public ResponseEntity<Void> archiveProduct(
+            @PathVariable long id
+    ) {
+        productCommandService.archiveProductById(id);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Void> activateProduct(
+            @PathVariable long id
+    ) {
+        productCommandService.activateProductById(id);
+
+        return ResponseEntity.ok().build();
+    }
 }

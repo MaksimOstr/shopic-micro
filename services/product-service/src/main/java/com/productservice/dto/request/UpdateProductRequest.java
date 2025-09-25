@@ -12,8 +12,6 @@ public record UpdateProductRequest(
         @Size(min = 3, max = 10)
         String name,
 
-        ProductStatusEnum status,
-
         @Size(max = 1000)
         String description,
 
