@@ -9,7 +9,7 @@ import com.productservice.entity.ReservationStatusEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ReservationMapper;
 import com.productservice.repository.ReservationRepository;
-import com.productservice.services.products.ProductQueryService;
+import com.productservice.services.products.ProductService;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ import static com.productservice.utils.ProductUtils.toProductMap;
 @RequiredArgsConstructor
 public class ReservationService {
     private final ReservationRepository reservationRepository;
-    private final ProductQueryService productQueryService;
+    private final ProductService productService;
     private final ReservationMapper reservationMapper;
 
     @Transactional
@@ -40,7 +40,7 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundException("Reservation with id " + orderId + " not found"));
         List<ReservationItem> reservationItemList = reservation.getItems();
         List<Long> productIds = reservationItemList.stream().map(item -> item.getProduct().getId()).toList();
-        List<Product> productList = productQueryService.getProductsForUpdate(productIds);
+        List<Product> productList = productService.getProductsForUpdate(productIds);
 
         updateProductQuantity(productList, reservationItemList);
         reservation.setStatus(ReservationStatusEnum.CANCELLED);

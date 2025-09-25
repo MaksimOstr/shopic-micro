@@ -27,7 +27,6 @@ import java.util.List;
 @PreAuthorize("hasRole('USER')")
 public class UserProductController {
     private final UserProductFacade userProductFacade;
-    private final LikeService likeService;
 
 
     @GetMapping("/search")
@@ -72,7 +71,7 @@ public class UserProductController {
             @PathVariable long id,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        likeService.toggleLike(id, principal.getId());
+        userProductFacade.toggleLike(id, principal.getId());
 
         return ResponseEntity.ok().build();
     }

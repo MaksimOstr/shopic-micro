@@ -9,7 +9,6 @@ import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Product;
 import com.productservice.enums.ProductAdminSortByEnum;
 import com.productservice.services.products.AdminProductFacade;
-import com.productservice.services.products.ProductCommandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/admin/products")
@@ -31,7 +29,6 @@ import java.util.concurrent.CompletableFuture;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminProductController {
     private final AdminProductFacade adminProductFacade;
-    private final ProductCommandService productCommandService;
 
 
     @GetMapping("/{id}")
@@ -71,12 +68,13 @@ public class AdminProductController {
     }
 
     @PostMapping
-    public CompletableFuture<ResponseEntity<Product>> createProduct(
+    public ResponseEntity<Product> createProduct(
             @RequestPart("product") @Valid CreateProductRequest body,
             @RequestPart("image") MultipartFile imageFile
     ) {
-        return productCommandService.create(body, imageFile)
-                .thenApply(product -> ResponseEntity.status(HttpStatus.CREATED).body(product));
+        Product product = adminProductFacade.createProduct(body, imageFile);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     @PatchMapping("/{id}")
@@ -84,26 +82,27 @@ public class AdminProductController {
             @PathVariable long id,
             @RequestBody @Valid UpdateProductRequest body
     ) {
-        Product product = productCommandService.updateProduct(body, id);
+        Product product = adminProductFacade.updateProduct(id, body);
 
         return ResponseEntity.ok(product);
     }
 
 
     @PatchMapping("/{id}/image")
-    public CompletableFuture<ResponseEntity<Void>> updateProductImage(
+    public ResponseEntity<Void> updateProductImage(
         @PathVariable long id,
         @RequestPart("image") MultipartFile imageFile
     ) {
-        return productCommandService.updateProductImage(id, imageFile)
-                .thenApply(_ -> ResponseEntity.ok().build());
+        adminProductFacade.changeProductImage(id, imageFile);
+
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}/archive")
     public ResponseEntity<Void> archiveProduct(
             @PathVariable long id
     ) {
-        productCommandService.archiveProductById(id);
+        adminProductFacade.archiveProduct(id);
 
         return ResponseEntity.ok().build();
     }
@@ -112,7 +111,7 @@ public class AdminProductController {
     public ResponseEntity<Void> activateProduct(
             @PathVariable long id
     ) {
-        productCommandService.activateProductById(id);
+        adminProductFacade.activateProduct(id);
 
         return ResponseEntity.ok().build();
     }

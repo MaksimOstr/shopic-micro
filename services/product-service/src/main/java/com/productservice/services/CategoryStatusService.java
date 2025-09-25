@@ -6,8 +6,7 @@ import com.productservice.entity.Category;
 import com.productservice.entity.ProductStatusEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.CategoryRepository;
-import com.productservice.services.products.ProductCommandService;
-import com.productservice.services.products.ProductQueryService;
+import com.productservice.services.products.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,15 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CategoryStatusService {
-    private final ProductCommandService productCommandService;
     private final CategoryRepository categoryRepository;
+    private final ProductService productService;
     private final CategoryService categoryService;
-    private final ProductQueryService productQueryService;
 
     @Transactional
     public CategoryDeactivationCheckResponse deactivationCheck(int id) {
-        Category category = categoryService.findById(id);
-        int activeCount = productQueryService.countProductsByCategoryIdAndStatus(category.getId(), ProductStatusEnum.ACTIVE);
+        Category category = categoryService.getCategoryById(id);
+        int activeCount = productService.countProductsByCategoryIdAndStatus(category.getId(), ProductStatusEnum.ACTIVE);
         String message = "During the deactivation, " + activeCount + " products will be affected";
 
         return new CategoryDeactivationCheckResponse(
@@ -36,7 +34,7 @@ public class CategoryStatusService {
 
     @Transactional
     public CategoryDeactivationResponse deactivate(int id) {
-        Category category = categoryService.findById(id);
+        Category category = categoryService.getCategoryById(id);
 
         if(!category.isActive()) {
             throw new IllegalStateException("Category is already deactivated");
@@ -44,7 +42,7 @@ public class CategoryStatusService {
 
         category.setActive(false);
 
-        int deactivatedCount = productCommandService.deactivateByCategoryId(id);
+        int deactivatedCount = productService.deactivateByCategoryId(id);
         String message = deactivatedCount + " products were deactivated";
 
         return new CategoryDeactivationResponse(

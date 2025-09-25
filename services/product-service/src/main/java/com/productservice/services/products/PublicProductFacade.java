@@ -21,13 +21,13 @@ import static com.productservice.utils.ProductUtils.buildUserProductSpec;
 @Service
 @RequiredArgsConstructor
 public class PublicProductFacade {
-    private final ProductQueryService productQueryService;
+    private final ProductService productService;
     private final RatingEnrichmentService ratingEnrichmentService;
     private final ProductMapper productMapper;
 
 
     public UserProductDto getProduct(long productId) {
-        UserProductDto product = productQueryService.getActiveUserProduct(productId);
+        UserProductDto product = productService.getActiveUserProduct(productId);
 
         ratingEnrichmentService.enrichProduct(product);
 
@@ -36,7 +36,7 @@ public class PublicProductFacade {
 
     public Page<ProductUserPreviewDto> getProductsByFilters(UserProductParams params, Pageable pageable) {
         Specification<Product> spec = buildUserProductSpec(params);
-        Page<Product> productPage = productQueryService.getProductPageBySpec(spec, pageable);
+        Page<Product> productPage = productService.getProductPageBySpec(spec, pageable);
         List<Product> productList = productPage.getContent();
         List<ProductUserPreviewDto> previewDtoList = productMapper.productToProductUserPreviewDtoList(productList);
 
