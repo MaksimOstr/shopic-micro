@@ -44,6 +44,16 @@ public class ProductCommandService {
     }
 
     @Transactional
+    public int deactivateByBrandId(int brandId) {
+        return productRepository.deactivateAllActiveProductsByBrandId(brandId);
+    }
+
+    @Transactional
+    public int deactivateByCategoryId(int brandId) {
+        return productRepository.deactivateAllActiveProductsByBrandId(brandId);
+    }
+
+    @Transactional
     public Product updateProduct(UpdateProductRequest dto, long productId) {
         Product product = productQueryService.getProductWithCategoryAndBrand(productId);
 

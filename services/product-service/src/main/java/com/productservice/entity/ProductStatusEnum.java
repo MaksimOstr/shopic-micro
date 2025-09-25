@@ -5,7 +5,7 @@ import com.productservice.exceptions.NotFoundException;
 
 public enum ProductStatusEnum {
     ACTIVE,
-    ARCHIVED,;
+    ARCHIVED;
 
     @JsonCreator
     public static ProductStatusEnum fromString(String name) {

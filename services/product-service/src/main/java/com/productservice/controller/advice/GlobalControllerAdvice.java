@@ -34,8 +34,8 @@ public class GlobalControllerAdvice {
         ));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    private ResponseEntity<ErrorResponseDto> handleAlreadyExists(IllegalArgumentException e) {
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    private ResponseEntity<ErrorResponseDto> handleBadRequest(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),

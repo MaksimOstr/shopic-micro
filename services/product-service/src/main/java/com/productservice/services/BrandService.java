@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static com.productservice.utils.SpecificationUtils.equalsBoolean;
 
+
 @Service
 @RequiredArgsConstructor
 public class BrandService {
@@ -60,13 +61,6 @@ public class BrandService {
         return new PageImpl<>(dtoList, pageable, brandPage.getTotalElements());
     }
 
-    public void changeIsActive(int id, boolean value) {
-        int updated = brandRepository.changeIsActive(id, value);
-
-        if(updated == 0) {
-            throw new NotFoundException("Brand not found");
-        }
-    }
 
     public Brand create(CreateBrandRequest dto) {
         if(existsByName(dto.brandName())) {

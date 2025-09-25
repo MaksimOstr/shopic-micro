@@ -74,15 +74,6 @@ public class CategoryService {
         return categoryMapper.toUserCategoryDtoList(categoryList);
     }
 
-
-    public void changeIsActive(int id, boolean active) {
-        int updated = categoryRepository.changeIsActive(id, active);
-
-        if(updated == 0) {
-            throw new NotFoundException("Category not found");
-        }
-    }
-
     private boolean existsByName(String name) {
         return categoryRepository.existsByName(name);
     }

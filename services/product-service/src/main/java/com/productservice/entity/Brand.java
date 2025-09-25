@@ -20,8 +20,4 @@ public class Brand {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
-
-    public Brand(String name) {
-        this.name = name;
-    }
 }

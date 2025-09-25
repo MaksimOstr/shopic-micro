@@ -80,12 +80,14 @@ public class ApiGatewayConfig {
                                 .PATCH("/{id}", http())
                                 .GET("/search", http())
                                 .POST("", http())
+                                .PATCH("/{id}/deactivation-check", http())
                                 .PATCH("/{id}/deactivate", http())
                                 .PATCH("/{id}/activate", http()))
                         .path("/categories", req -> req
                                 .GET("/search", http())
                                 .POST("", http())
                                 .PATCH("/{id}", http())
+                                .PATCH("/{id}/deactivation-check", http())
                                 .PATCH("/{id}/deactivate", http())
                                 .PATCH("/{id}/activate", http()))
                         .path("/reservations", req -> req

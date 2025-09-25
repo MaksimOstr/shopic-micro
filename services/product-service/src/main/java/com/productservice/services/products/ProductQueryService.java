@@ -4,6 +4,7 @@ import com.productservice.dto.AdminProductDto;
 import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
+import com.productservice.entity.ProductStatusEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.dto.ProductBasicInfoDto;
 import com.productservice.repository.ProductRepository;
@@ -45,6 +46,14 @@ public class ProductQueryService {
 
     public boolean isProductExist(long id) {
         return productRepository.existsById(id);
+    }
+
+    public int countProductsByBrandIdAndStatus(int brandId, ProductStatusEnum status) {
+        return productRepository.countByBrand_IdAndStatus(brandId, status);
+    }
+
+    public int countProductsByCategoryIdAndStatus(int brandId, ProductStatusEnum status) {
+        return productRepository.countByCategory_IdAndStatus(brandId, status);
     }
 
     public UserProductDto getActiveUserProduct(long id) {

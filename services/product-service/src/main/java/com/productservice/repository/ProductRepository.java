@@ -5,6 +5,7 @@ import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
 import com.productservice.dto.ProductBasicInfoDto;
+import com.productservice.entity.ProductStatusEnum;
 import com.shopic.grpc.productservice.ProductInfo;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,18 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "JOIN p.brand b " +
             "JOIN p.category c WHERE p.id = :id AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
     Optional<UserProductDto> getActiveUserProductById(long id);
+
+    int countByBrand_IdAndStatus(int brandId, ProductStatusEnum status);
+
+    int countByCategory_IdAndStatus(int categoryId, ProductStatusEnum status);
+
+    @Modifying
+    @Query("UPDATE Product p SET p.status = com.productservice.entity.ProductStatusEnum.ARCHIVED WHERE p.brand.id = :brandId AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
+    int deactivateAllActiveProductsByBrandId(int brandId);
+
+    @Modifying
+    @Query("UPDATE Product p SET p.status = com.productservice.entity.ProductStatusEnum.ARCHIVED WHERE p.category.id = :categoryId AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
+    int deactivateAllActiveProductsByCategoryId(int categoryId);
 
     @Query("SELECT new com.productservice.dto.AdminProductDto(" +
             "p.id, " +
