@@ -21,8 +21,9 @@ public class UserProductDto extends BaseProductDto {
             UUID sku,
             BigDecimal price,
             String brandName,
-            String categoryName
+            String categoryName,
+            int stockQuantity
     ) {
-        super(id, productName, description, imageUrl, sku, price, brandName, categoryName);
+        super(id, productName, description, imageUrl, sku, stockQuantity, price, brandName, categoryName);
     }
 }

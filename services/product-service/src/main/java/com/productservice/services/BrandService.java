@@ -11,6 +11,7 @@ import com.productservice.mapper.BrandMapper;
 import com.productservice.repository.BrandRepository;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,10 @@ public class BrandService {
 
     @Transactional
     public Brand updateBrand(int id, UpdateBrandRequest dto) {
+        if(existsByName(dto.brandName())) {
+            throw new  AlreadyExistsException("Brand with name " + dto.brandName() + " already exists");
+        }
+
         Brand brand = getBrandById(id);
 
         Optional.ofNullable(dto.brandName()).ifPresent(brand::setName);

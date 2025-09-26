@@ -35,7 +35,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.sku," +
             "p.price, " +
             "b.name, " +
-            "c.name) " +
+            "c.name," +
+            "p.stockQuantity) " +
             "FROM Product p " +
             "JOIN p.brand b " +
             "JOIN p.category c WHERE p.id = :id AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
@@ -63,6 +64,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "b.name, " +
             "c.name," +
             "p.status," +
+            "p.stockQuantity," +
             "p.createdAt) " +
             "FROM Product p " +
             "JOIN p.brand b " +
@@ -79,6 +81,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "b.name, " +
             "c.name," +
             "p.status," +
+            "p.stockQuantity," +
             "p.createdAt) " +
             "FROM Product p " +
             "JOIN p.brand b " +

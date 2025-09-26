@@ -134,5 +134,4 @@ public class AdminProductFacade {
             product.setBrand(brand);
         });
     }
-
 }

@@ -15,6 +15,7 @@ public abstract class BaseProductDto {
     private final String description;
     private final String imageUrl;
     private final UUID sku;
+    private final int stockQuantity;
     private final BigDecimal price;
     private final String brandName;
     private final String categoryName;

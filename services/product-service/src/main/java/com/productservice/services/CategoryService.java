@@ -11,6 +11,7 @@ import com.productservice.mapper.CategoryMapper;
 import com.productservice.repository.CategoryRepository;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,6 +47,10 @@ public class CategoryService {
 
     @Transactional
     public Category update(int categoryId, UpdateCategoryRequest dto) {
+        if(existsByName(dto.name())) {
+            throw new  AlreadyExistsException("Category already exists");
+        }
+
         Category category = getCategoryById(categoryId);
 
         Optional.ofNullable(dto.name()).ifPresent(category::setName);
