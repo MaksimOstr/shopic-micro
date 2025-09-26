@@ -115,7 +115,7 @@ public class BrandServiceTest {
         ArgumentCaptor<Brand> brandCaptor = ArgumentCaptor.forClass(Brand.class);
 
         when(brandRepository.existsBrandByName(anyString())).thenReturn(false);
-        when(brandRepository.save(brandCaptor.capture())).thenReturn(brand);
+        when(brandRepository.save(any(Brand.class))).thenReturn(brand);
 
         Brand result = brandService.create(CREATE_BRAND_REQUEST);
 
