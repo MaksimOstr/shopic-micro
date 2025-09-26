@@ -3,15 +3,14 @@ package com.productservice.unit;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
+import com.productservice.entity.ReservationStatusEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
+import com.productservice.services.ProductService;
 import com.productservice.services.ReservationService;
-import com.productservice.services.products.ProductQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,7 +31,7 @@ public class ReservationServiceTest {
     private ReservationRepository reservationRepository;
 
     @Mock
-    private ProductQueryService productQueryService;
+    private ProductService productService;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -44,7 +43,7 @@ public class ReservationServiceTest {
     private static final int PRODUCT_QUANTITY_2 = 10;
     private static final int RESERVATION_QUANTITY_1 = 15;
     private static final int RESERVATION_QUANTITY_2 = 20;
-
+    private static final ReservationStatusEnum RESERVATION_STATUS_ENUM = ReservationStatusEnum.PENDING;
     private Reservation reservation;
     private ReservationItem reservationItem1;
     private ReservationItem reservationItem2;
@@ -74,6 +73,7 @@ public class ReservationServiceTest {
                 .build();
 
         reservation = Reservation.builder()
+                .status(RESERVATION_STATUS_ENUM)
                 .orderId(ORDER_ID)
                 .items(List.of(reservationItem1, reservationItem2))
                 .build();
@@ -88,40 +88,41 @@ public class ReservationServiceTest {
         });
 
         verify(reservationRepository).findByOrderIdWithItems(ORDER_ID);
-        verifyNoInteractions(productQueryService);
+        verifyNoInteractions(productService);
         verifyNoMoreInteractions(reservationRepository);
 
         assertEquals(PRODUCT_QUANTITY_1, product1.getStockQuantity());
         assertEquals(PRODUCT_QUANTITY_2, product2.getStockQuantity());
+        assertEquals(RESERVATION_STATUS_ENUM, reservation.getStatus());
     }
 
     @Test
     public void testCancelReservation_whenCalledWithExistingReservation_thenCancelReservationAndUpdateProductQuantity() {
         when(reservationRepository.findByOrderIdWithItems(anyLong())).thenReturn(Optional.of(reservation));
-        when(productQueryService.getProductsForUpdate(anyList())).thenReturn(List.of(product1, product2));
+        when(productService.getProductsForUpdate(anyList())).thenReturn(List.of(product1, product2));
 
         reservationService.cancelReservation(ORDER_ID);
 
         verify(reservationRepository).findByOrderIdWithItems(ORDER_ID);
-        verify(productQueryService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
-        verify(reservationRepository).delete(reservation);
+        verify(productService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
 
         assertEquals(PRODUCT_QUANTITY_1 + RESERVATION_QUANTITY_1, product1.getStockQuantity());
         assertEquals(PRODUCT_QUANTITY_2 + RESERVATION_QUANTITY_2, product2.getStockQuantity());
+        assertEquals(ReservationStatusEnum.CANCELLED, reservation.getStatus());
     }
 
     @Test
     public void testCancelReservation_whenCalledWithExistingReservationAndNotExistingProduct_thenThrowException() {
         when(reservationRepository.findByOrderIdWithItems(anyLong())).thenReturn(Optional.of(reservation));
-        when(productQueryService.getProductsForUpdate(anyList())).thenReturn(List.of(product1));
+        when(productService.getProductsForUpdate(anyList())).thenReturn(List.of(product1));
 
-        reservationService.cancelReservation(ORDER_ID);
+        assertThrows(NotFoundException.class, () -> {
+            reservationService.cancelReservation(ORDER_ID);
+        });
 
         verify(reservationRepository).findByOrderIdWithItems(ORDER_ID);
-        verify(productQueryService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
-        verify(reservationRepository).delete(reservation);
+        verify(productService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
 
-        assertEquals(PRODUCT_QUANTITY_2, product2.getStockQuantity());
-        assertEquals(PRODUCT_QUANTITY_1 + RESERVATION_QUANTITY_1, product1.getStockQuantity());
+        assertEquals(RESERVATION_STATUS_ENUM, reservation.getStatus());
     }
 }

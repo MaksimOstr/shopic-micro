@@ -11,6 +11,7 @@ import com.productservice.mapper.CategoryMapper;
 import com.productservice.repository.CategoryRepository;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,7 +30,6 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    @Transactional
     public Category create(CreateCategoryRequest dto) {
         if(existsByName(dto.name())) {
             throw new AlreadyExistsException("Category name already exists");
@@ -46,7 +46,11 @@ public class CategoryService {
 
     @Transactional
     public Category update(int categoryId, UpdateCategoryRequest dto) {
-        Category category = findById(categoryId);
+        if(existsByName(dto.name())) {
+            throw new AlreadyExistsException("Category already exists");
+        }
+
+        Category category = getCategoryById(categoryId);
 
         Optional.ofNullable(dto.name()).ifPresent(category::setName);
         Optional.ofNullable(dto.description()).ifPresent(category::setDescription);
@@ -54,7 +58,15 @@ public class CategoryService {
         return category;
     }
 
-    public Category findById(int id) {
+    public void changeIsActive(int id, boolean isActive) {
+        int updated = categoryRepository.changeIsActive(id, isActive);
+
+        if(updated == 0) {
+            throw new NotFoundException("Category not found");
+        }
+    }
+
+    public Category getCategoryById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
     }

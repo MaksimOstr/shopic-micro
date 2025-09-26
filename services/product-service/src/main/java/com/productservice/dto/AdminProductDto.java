@@ -23,9 +23,10 @@ public class AdminProductDto extends BaseProductDto {
             String brandName,
             String categoryName,
             ProductStatusEnum status,
+            int stockQuantity,
             Instant createdAt
     ) {
-        super(id, productName, description, imageUrl, sku, price, brandName, categoryName);
+        super(id, productName, description, imageUrl, sku, stockQuantity, price, brandName, categoryName);
         this.status = status;
         this.createdAt = createdAt;
     }

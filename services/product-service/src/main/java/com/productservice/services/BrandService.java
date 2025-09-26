@@ -37,6 +37,10 @@ public class BrandService {
 
     @Transactional
     public Brand updateBrand(int id, UpdateBrandRequest dto) {
+        if(existsByName(dto.brandName())) {
+            throw new AlreadyExistsException("Brand with name " + dto.brandName() + " already exists");
+        }
+
         Brand brand = getBrandById(id);
 
         Optional.ofNullable(dto.brandName()).ifPresent(brand::setName);
@@ -61,11 +65,19 @@ public class BrandService {
         return new PageImpl<>(dtoList, pageable, brandPage.getTotalElements());
     }
 
+    public void activate(int id) {
+        int updated = brandRepository.changeIsActive(id, true);
+
+        if(updated == 0) {
+            throw new NotFoundException("Brand not found");
+        }
+    }
 
     public Brand create(CreateBrandRequest dto) {
         if(existsByName(dto.brandName())) {
             throw new AlreadyExistsException("Brand name already exists");
         }
+
         Brand brand = Brand.builder()
                 .name(dto.brandName())
                 .isActive(dto.isActive())

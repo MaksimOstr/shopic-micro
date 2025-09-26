@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ProductAdminSortByEnum {
+    ID("id"),
     PRICE("price"),
     CREATED_AT("createdAt");
 

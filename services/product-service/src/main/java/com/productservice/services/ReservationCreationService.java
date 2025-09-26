@@ -9,15 +9,12 @@ import com.productservice.entity.ReservationStatusEnum;
 import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
-import com.productservice.services.products.ProductQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.productservice.utils.ProductUtils.toProductMap;
 import static com.productservice.utils.Utils.extractIds;
@@ -27,7 +24,7 @@ import static com.productservice.utils.Utils.extractIds;
 public class ReservationCreationService {
     private final ReservationRepository reservationRepository;
     private final ReservationItemService reservationItemService;
-    private final ProductQueryService productQueryService;
+    private final ProductService productService;
 
 
     @Transactional
@@ -44,7 +41,7 @@ public class ReservationCreationService {
 
     private void checkAndDecreaseStockQuantity(List<ItemForReservationDto> reservationItems) {
         List<Long> productIds = extractIds(reservationItems);
-        List<Product> products = productQueryService.getProductsForUpdate(productIds);
+        List<Product> products = productService.getProductsForUpdate(productIds);
         Map<Long, Product> productMap = toProductMap(products);
 
         for (ItemForReservationDto reservationItem : reservationItems) {

@@ -6,7 +6,7 @@ import com.productservice.dto.request.CreateReservationDto;
 import com.productservice.mapper.GrpcMapper;
 import com.productservice.dto.ProductBasicInfoDto;
 import com.productservice.services.ReservationCreationService;
-import com.productservice.services.products.ProductQueryService;
+import com.productservice.services.ProductService;
 import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +20,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBase {
 
-    private final ProductQueryService productQueryService;
+    private final ProductService productService;
     private final ReservationCreationService reservationCreationService;
     private final GrpcMapper grpcMapper;
 
     @Override
     public void getProductInfo(ProductInfoRequest request, StreamObserver<ProductInfo> responseObserver) {
-        ProductBasicInfoDto productDto = productQueryService.getActiveProductBasicInfo(request.getProductId());
+        ProductBasicInfoDto productDto = productService.getActiveProductBasicInfo(request.getProductId());
 
         ProductInfo response = grpcMapper.toProductInfo(productDto);
 
@@ -47,7 +47,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void getProductInfoList(ProductInfoListRequest request, StreamObserver<ProductInfoList> responseObserver) {
-        List<ProductBasicInfoDto> productPrices = productQueryService.getActiveProductBasicInfoList(request.getProductIdList());
+        List<ProductBasicInfoDto> productPrices = productService.getActiveProductBasicInfoList(request.getProductIdList());
         List<ProductInfo> productInfoList = grpcMapper.toProductInfoList(productPrices);
         ProductInfoList response = ProductInfoList.newBuilder()
                 .addAllProducts(productInfoList)
@@ -59,7 +59,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void isProductExists(IsProductExistsRequest request, StreamObserver<IsProductExistsResponse> responseObserver) {
-        boolean isExists = productQueryService.isProductExist(request.getProductId());
+        boolean isExists = productService.existsById(request.getProductId());
 
         IsProductExistsResponse response = IsProductExistsResponse.newBuilder()
                 .setIsExists(isExists)
