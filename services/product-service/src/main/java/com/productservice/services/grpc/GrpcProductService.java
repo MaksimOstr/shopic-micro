@@ -6,7 +6,7 @@ import com.productservice.dto.request.CreateReservationDto;
 import com.productservice.mapper.GrpcMapper;
 import com.productservice.dto.ProductBasicInfoDto;
 import com.productservice.services.ReservationCreationService;
-import com.productservice.services.products.ProductService;
+import com.productservice.services.ProductService;
 import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;

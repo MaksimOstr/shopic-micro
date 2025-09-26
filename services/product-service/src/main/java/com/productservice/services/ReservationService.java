@@ -9,7 +9,6 @@ import com.productservice.entity.ReservationStatusEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ReservationMapper;
 import com.productservice.repository.ReservationRepository;
-import com.productservice.services.products.ProductService;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

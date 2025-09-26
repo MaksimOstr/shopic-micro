@@ -61,6 +61,14 @@ public class BrandService {
         return new PageImpl<>(dtoList, pageable, brandPage.getTotalElements());
     }
 
+    public void activate(int id) {
+        int updated = brandRepository.changeIsActive(id, true);
+
+        if(updated == 0) {
+            throw new NotFoundException("Brand not found");
+        }
+    }
+
 
     public Brand create(CreateBrandRequest dto) {
         if(existsByName(dto.brandName())) {

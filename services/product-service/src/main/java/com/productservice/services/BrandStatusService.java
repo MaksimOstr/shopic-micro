@@ -4,9 +4,6 @@ import com.productservice.dto.response.BrandDeactivationCheckResponse;
 import com.productservice.dto.response.BrandDeactivationResponse;
 import com.productservice.entity.Brand;
 import com.productservice.entity.ProductStatusEnum;
-import com.productservice.exceptions.NotFoundException;
-import com.productservice.repository.BrandRepository;
-import com.productservice.services.products.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BrandStatusService {
     private final ProductService productService;
-    private final BrandRepository brandRepository;
     private final BrandService brandService;
 
 
@@ -55,10 +51,6 @@ public class BrandStatusService {
     }
 
     public void activate(int id) {
-        int updated = brandRepository.changeIsActive(id, true);
-
-        if(updated == 0) {
-            throw new NotFoundException("Brand not found");
-        }
+        brandService.activate(id);
     }
 }

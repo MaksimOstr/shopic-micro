@@ -4,9 +4,6 @@ import com.productservice.dto.response.CategoryDeactivationCheckResponse;
 import com.productservice.dto.response.CategoryDeactivationResponse;
 import com.productservice.entity.Category;
 import com.productservice.entity.ProductStatusEnum;
-import com.productservice.exceptions.NotFoundException;
-import com.productservice.repository.CategoryRepository;
-import com.productservice.services.products.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CategoryStatusService {
-    private final CategoryRepository categoryRepository;
     private final ProductService productService;
     private final CategoryService categoryService;
 
@@ -54,10 +50,6 @@ public class CategoryStatusService {
     }
 
     public void activate(int id) {
-        int updated = categoryRepository.changeIsActive(id, true);
-
-        if(updated == 0) {
-            throw new NotFoundException("Category not found");
-        }
+        categoryService.changeIsActive(id, true);
     }
 }

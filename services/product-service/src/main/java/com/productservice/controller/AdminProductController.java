@@ -6,9 +6,8 @@ import com.productservice.dto.ProductAdminPreviewDto;
 import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.CreateProductRequest;
 import com.productservice.dto.request.UpdateProductRequest;
-import com.productservice.entity.Product;
 import com.productservice.enums.ProductAdminSortByEnum;
-import com.productservice.services.products.AdminProductFacade;
+import com.productservice.services.facades.AdminProductFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -68,21 +67,21 @@ public class AdminProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(
+    public ResponseEntity<AdminProductDto> createProduct(
             @RequestPart("product") @Valid CreateProductRequest body,
             @RequestPart("image") MultipartFile imageFile
     ) {
-        Product product = adminProductFacade.createProduct(body, imageFile);
+        AdminProductDto product = adminProductFacade.createProduct(body, imageFile);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(
+    public ResponseEntity<AdminProductDto> updateProduct(
             @PathVariable long id,
             @RequestBody @Valid UpdateProductRequest body
     ) {
-        Product product = adminProductFacade.updateProduct(id, body);
+        AdminProductDto product = adminProductFacade.updateProduct(id, body);
 
         return ResponseEntity.ok(product);
     }

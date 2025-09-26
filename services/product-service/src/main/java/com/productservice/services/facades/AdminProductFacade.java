@@ -1,4 +1,4 @@
-package com.productservice.services.products;
+package com.productservice.services.facades;
 
 import com.productservice.dto.AdminProductDto;
 import com.productservice.dto.ProductAdminPreviewDto;
@@ -14,6 +14,7 @@ import com.productservice.services.BrandService;
 import com.productservice.services.CategoryService;
 import com.productservice.services.RatingEnrichmentService;
 import com.productservice.services.S3Service;
+import com.productservice.services.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,21 +45,22 @@ public class AdminProductFacade {
     private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
 
     @Transactional
-    public Product createProduct(CreateProductRequest dto, MultipartFile productImage) {
+    public AdminProductDto createProduct(CreateProductRequest dto, MultipartFile productImage) {
         Brand brand = brandService.getBrandById(dto.brandId());
         Category category = categoryService.getCategoryById(dto.categoryId());
         String imageUrl = s3Service.uploadFile(createPutObjectDto(productImage));
+        Product product = productService.create(dto, imageUrl, category, brand);
 
-        return productService.create(dto, imageUrl, category, brand);
+        return productMapper.productToAdminProductDto(product);
     }
 
     @Transactional
-    public Product updateProduct(long id, UpdateProductRequest dto) {
+    public AdminProductDto updateProduct(long id, UpdateProductRequest dto) {
         Product product = productService.getProductById(id);
 
         updateProductFields(product, dto);
 
-        return product;
+        return productMapper.productToAdminProductDto(product);
     }
 
     @Transactional

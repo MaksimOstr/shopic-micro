@@ -9,7 +9,6 @@ import com.productservice.entity.ReservationStatusEnum;
 import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
-import com.productservice.services.products.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

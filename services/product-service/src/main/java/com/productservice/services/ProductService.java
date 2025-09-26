@@ -1,4 +1,4 @@
-package com.productservice.services.products;
+package com.productservice.services;
 
 import com.productservice.dto.AdminProductDto;
 import com.productservice.dto.LikedProductDto;

@@ -54,6 +54,14 @@ public class CategoryService {
         return category;
     }
 
+    public void changeIsActive(int id, boolean isActive) {
+        int updated = categoryRepository.changeIsActive(id, isActive);
+
+        if(updated == 0) {
+            throw new NotFoundException("Category not found");
+        }
+    }
+
     public Category getCategoryById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));

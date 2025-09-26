@@ -4,7 +4,7 @@ package com.productservice.controller;
 import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.UserProductParams;
-import com.productservice.services.products.PublicProductFacade;
+import com.productservice.services.facades.PublicProductFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
