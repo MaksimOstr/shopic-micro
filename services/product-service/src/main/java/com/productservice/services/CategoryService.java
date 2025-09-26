@@ -30,7 +30,6 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    @Transactional
     public Category create(CreateCategoryRequest dto) {
         if(existsByName(dto.name())) {
             throw new AlreadyExistsException("Category name already exists");
@@ -48,7 +47,7 @@ public class CategoryService {
     @Transactional
     public Category update(int categoryId, UpdateCategoryRequest dto) {
         if(existsByName(dto.name())) {
-            throw new  AlreadyExistsException("Category already exists");
+            throw new AlreadyExistsException("Category already exists");
         }
 
         Category category = getCategoryById(categoryId);

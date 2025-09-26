@@ -8,9 +8,9 @@ import com.productservice.entity.Reservation;
 import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ReservationRepository;
+import com.productservice.services.ProductService;
 import com.productservice.services.ReservationCreationService;
 import com.productservice.services.ReservationItemService;
-import com.productservice.services.products.ProductQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +45,7 @@ public class ReservationCreationServiceTest {
     private ArgumentCaptor<List<CreateReservationItem>> createReservationItemListArgumentCaptor;
 
     @Mock
-    private ProductQueryService productQueryService;
+    private ProductService productService;
 
     @InjectMocks
     private ReservationCreationService reservationCreationService;
@@ -94,12 +94,12 @@ public class ReservationCreationServiceTest {
 
     @Test
     public void testCreateReservation_whenCalledWithCorrectArguments_thenCreateReservation() {
-        when(productQueryService.getProductsForUpdate(anyList())).thenReturn(List.of(product1, product2));
+        when(productService.getProductsForUpdate(anyList())).thenReturn(List.of(product1, product2));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
         reservationCreationService.createReservation(CREATE_RESERVATION_DTO);
 
-        verify(productQueryService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
+        verify(productService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
         verify(reservationRepository).save(reservationArgumentCaptor.capture());
         verify(reservationItemService).saveReservationItems(createReservationItemListArgumentCaptor.capture());
 
@@ -123,13 +123,13 @@ public class ReservationCreationServiceTest {
 
     @Test
     public void testCreateReservation_whenCalledNonExistingProduct_thenThrowException() {
-        when(productQueryService.getProductsForUpdate(anyList())).thenReturn(List.of(product1));
+        when(productService.getProductsForUpdate(anyList())).thenReturn(List.of(product1));
 
         assertThrows(NotFoundException.class, () -> {
             reservationCreationService.createReservation(CREATE_RESERVATION_DTO);
         });
 
-        verify(productQueryService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
+        verify(productService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
         verifyNoInteractions(reservationRepository, reservationItemService);
 
         assertEquals(PRODUCT_QUANTITY_1, product1.getStockQuantity());
@@ -138,13 +138,13 @@ public class ReservationCreationServiceTest {
 
     @Test
     public void testCreateReservation_whenCalledUnsufficientStock_thenThrowException() {
-        when(productQueryService.getProductsForUpdate(anyList())).thenReturn(List.of(product1, product2));
+        when(productService.getProductsForUpdate(anyList())).thenReturn(List.of(product1, product2));
 
         assertThrows(InsufficientStockException.class, () -> {
             reservationCreationService.createReservation(CREATE_RESERVATION_DTO_2);
         });
 
-        verify(productQueryService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
+        verify(productService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
         verifyNoInteractions(reservationRepository, reservationItemService);
 
         assertEquals(PRODUCT_QUANTITY_1, product1.getStockQuantity());

@@ -85,7 +85,7 @@ public class ReservationService {
             Product product = productMap.get(item.getProduct().getId());
             if(product == null) {
                 log.error("Product with id {} not found", item.getProduct().getId());
-                continue;
+                throw new  NotFoundException("Product with id " + item.getProduct().getId() + " not found");
             }
 
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
