@@ -28,7 +28,7 @@ public class KafkaListenerService {
     @Transactional
     public void listenReturnedOrder(String data, Acknowledgment ack) {
         try {
-            log.info("listenReturnedOrder");
+            log.info("listenReturnedOrCanceledOrder");
             BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
 
             reservationService.cancelReservation(event.orderId());
@@ -63,7 +63,6 @@ public class KafkaListenerService {
 
             reservationService.cancelReservation(event.orderId());
 
-            kafkaService.sendReservationCancelled(event.orderId());
             ack.acknowledge();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());

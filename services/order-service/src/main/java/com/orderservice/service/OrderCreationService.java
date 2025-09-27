@@ -42,7 +42,6 @@ public class OrderCreationService {
         Order order = createAndSaveOrderWithOrderItems(userId, dto, productInfoList, productQuantityMap);
 
         productGrpcService.reserveProduct(cartItems, order.getId());
-
         return paymentGrpcService.createPayment(order.getId(), userId, productInfoList, productQuantityMap).getCheckoutUrl();
     }
 
@@ -69,7 +68,6 @@ public class OrderCreationService {
         List<OrderItem> orderItems = orderItemMapper.toOrderItemList(order, productInfoList, productQuantityMap);
 
         order.setOrderItems(orderItems);
-        order.setTotalPrice(order.calculateTotalPrice());
 
         return orderRepository.save(order);
     }

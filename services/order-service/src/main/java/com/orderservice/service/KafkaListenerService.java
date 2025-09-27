@@ -2,6 +2,7 @@ package com.orderservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.orderservice.dto.event.BasePaymentEvent;
 import com.orderservice.dto.event.BaseReservationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,21 @@ public class KafkaListenerService {
         log.info("listenReservationCanceled");
         try {
             BaseReservationEvent event = objectMapper.readValue(data, BaseReservationEvent.class);
+
+            orderEventService.cancelOrder(event.orderId());
+
+            ack.acknowledge();
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    @KafkaListener(topics = "payment.unpaid", groupId = "orderService")
+    @Transactional
+    public void listenPaymentUnpaid(String data, Acknowledgment ack) {
+        log.info("listenReservationCanceled");
+        try {
+            BasePaymentEvent event = objectMapper.readValue(data, BasePaymentEvent.class);
 
             orderEventService.cancelOrder(event.orderId());
 

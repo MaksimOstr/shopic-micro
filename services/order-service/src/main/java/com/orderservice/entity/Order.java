@@ -10,7 +10,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
@@ -55,19 +57,27 @@ public class Order {
     private OrderCustomer customer;
 
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<OrderItem> orderItems;
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
     @CreatedDate
     private Instant createdAt;
 
+
     @Column(name = "updated_at", nullable = false)
     @LastModifiedDate
     private Instant updatedAt;
 
-    public BigDecimal calculateTotalPrice() {
+    @PrePersist
+    @PreUpdate
+    public void prePersistAndPreUpdate() {
+        totalPrice = calculateTotalPrice();
+    }
+
+    private BigDecimal calculateTotalPrice() {
         return orderItems.stream()
                 .map(OrderItem::calculateTotalPrice)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

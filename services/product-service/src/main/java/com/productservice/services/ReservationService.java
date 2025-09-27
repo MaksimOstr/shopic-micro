@@ -37,6 +37,12 @@ public class ReservationService {
     public void cancelReservation(long orderId) {
         Reservation reservation = reservationRepository.findByOrderIdWithItems(orderId)
                 .orElseThrow(() -> new NotFoundException("Reservation with id " + orderId + " not found"));
+
+        if(reservation.getStatus().equals(ReservationStatusEnum.CANCELLED)) {
+            log.info("Reservation already cancelled for order: {}", orderId);
+            return;
+        }
+
         List<ReservationItem> reservationItemList = reservation.getItems();
         List<Long> productIds = reservationItemList.stream().map(item -> item.getProduct().getId()).toList();
         List<Product> productList = productService.getProductsForUpdate(productIds);
@@ -80,14 +86,16 @@ public class ReservationService {
 
     private void updateProductQuantity(List<Product> productList, List<ReservationItem> reservationItemList) {
         Map<Long, Product> productMap = toProductMap(productList);
-
+        System.out.println(productMap);
         for (ReservationItem item : reservationItemList) {
+            System.out.println(item);
             Product product = productMap.get(item.getProduct().getId());
+            System.out.println(product);
             if(product == null) {
                 log.error("Product with id {} not found", item.getProduct().getId());
                 throw new  NotFoundException("Product with id " + item.getProduct().getId() + " not found");
             }
-
+            System.out.println(product.getStockQuantity() + item.getQuantity());
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
         }
     }

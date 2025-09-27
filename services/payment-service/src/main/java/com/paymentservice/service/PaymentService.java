@@ -95,10 +95,11 @@ public class PaymentService {
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void checkUnpaidPayments() {
-        Instant thirtyMinutesAgo = Instant.now().minus(Duration.ofMinutes(30));
+        Instant thirtyMinutesAgo = Instant.now().minus(Duration.ofMinutes(1));
         paymentRepository.findByStatusAndCreatedAtBefore(PaymentStatus.PENDING, thirtyMinutesAgo)
                 .forEach(payment -> {
                     payment.setStatus(PaymentStatus.FAILED);
+                    System.out.println("Payment Status: " + payment.getStatus());
                     kafkaService.sendUnpaidPaymentEvent(payment.getOrderId());
                 });
     }

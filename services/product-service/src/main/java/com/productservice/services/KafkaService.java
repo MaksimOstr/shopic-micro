@@ -28,15 +28,4 @@ public class KafkaService {
             throw new InternalException(SOMETHING_WENT_WRONG);
         }
     }
-
-    public void sendReservationCancelled(long orderId) {
-        try {
-            BaseReservationEvent event = new BaseReservationEvent(orderId);
-
-            atLeastOnceBatchTemplate.send("reservation.canceled", objectMapper.writeValueAsString(event));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            throw new InternalException(SOMETHING_WENT_WRONG);
-        }
-    }
 }

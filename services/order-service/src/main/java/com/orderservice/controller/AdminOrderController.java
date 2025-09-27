@@ -4,6 +4,7 @@ import com.orderservice.dto.AdminOrderDto;
 import com.orderservice.dto.AdminOrderPreviewDto;
 import com.orderservice.dto.request.AdminOrderParams;
 import com.orderservice.dto.request.UpdateContactInfoRequest;
+import com.orderservice.enums.OrderAdminSortByEnum;
 import com.orderservice.service.AdminOrderService;
 import com.orderservice.service.OrderEventService;
 import jakarta.validation.Valid;
@@ -39,10 +40,14 @@ public class AdminOrderController {
             AdminOrderParams body,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(defaultValue = "ID") OrderAdminSortByEnum sortBy
     ) {
-        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-        Pageable pageable = PageRequest.of(page, size, direction, "createdAt");
+        Sort sort = Sort.by(
+                Sort.Direction.fromString(sortDirection),
+                sortBy.getField()
+        );
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<AdminOrderPreviewDto> orders = adminOrderService.getOrders(body, pageable);
 
         return ResponseEntity.ok().body(orders);
