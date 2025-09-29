@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class OrderEventService {
-    private final OrderQueryService orderQueryService;
+    private final OrderService orderService;
     private final StateMachineFactory<OrderStatusEnum, OrderEvents> stateMachineFactory;
 
     @Transactional
@@ -58,7 +58,7 @@ public class OrderEventService {
 
     protected void processEvent(Long orderId, OrderEvents event) {
         log.info("Processing order event: {}", event);
-        Order order = orderQueryService.getOrderById(orderId);
+        Order order =  orderService.getOrderById(orderId);
 
 
         StateMachine<OrderStatusEnum, OrderEvents> sm = build(order);

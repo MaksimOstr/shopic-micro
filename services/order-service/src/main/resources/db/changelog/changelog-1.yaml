@@ -45,6 +45,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: refunded
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
                   name: address_street
                   type: text
                   constraints:

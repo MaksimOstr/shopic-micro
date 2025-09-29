@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
@@ -30,5 +31,13 @@ public interface GrpcMapper {
     ReservationItem toReservationItem(CartItem cartItem);
 
     List<ReservationItem> toReservationItemList(List<CartItem> cartItemList);
+
+    default Map<Long, Integer> getProductQuantityMap(List<CartItem> cartItems) {
+        return cartItems.stream()
+                .collect(Collectors.toMap(
+                        CartItem::getProductId,
+                        CartItem::getQuantity
+                ));
+    }
 
 }

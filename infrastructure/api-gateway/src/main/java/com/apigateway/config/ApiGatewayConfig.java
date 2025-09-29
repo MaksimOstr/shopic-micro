@@ -119,7 +119,7 @@ public class ApiGatewayConfig {
                 .path("/orders", request -> request
                         .filter(jwtHandlerFilter)
                         .POST("", http())
-                        .GET("", http())
+                        .GET("/me", http())
                         .GET("/{id}", http()))
                 .path("/admin/orders", request -> request
                         .filter(jwtHandlerFilter)

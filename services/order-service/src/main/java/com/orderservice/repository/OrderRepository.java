@@ -23,5 +23,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     @Query("SELECT o FROM Order o JOIN FETCH o.orderItems oi WHERE o.id = :id")
     Optional<Order> findByIdWithItems(long id);
 
+    @Modifying
+    @Query("UPDATE Order o SET o.refunded = :value WHERE o.id = :id")
+    int updateIsRefunded(long id, boolean value);
+
     List<Order> findByStatusAndCreatedAtBefore(OrderStatusEnum status, Instant date);
 }

@@ -72,6 +72,8 @@ public class WebhookService {
         } else {
             payment.setStatus(PaymentStatus.PARTIALLY_REFUNDED);
         }
+
+        kafkaService.sendRefundSuccessEvent(payment.getOrderId(), refundEntity.getAmount());
     }
 
     public void handleCheckoutSuccess(Event event) {

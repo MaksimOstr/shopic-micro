@@ -30,6 +30,8 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum status;
 
+    private Boolean refunded;
+
     @Column(name = "user_id", nullable = false)
     private long userId;
 
