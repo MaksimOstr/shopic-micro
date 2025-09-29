@@ -10,8 +10,8 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
 
-    @Mapping(target = "name", source = "productName")
-    @Mapping(target = "imageUrl", source = "productImage")
+    @Mapping(target = "name", source = "itemName")
+    @Mapping(target = "imageUrl", source = "itemImage")
     @Mapping(target = "price", source = "priceForOne")
     CheckoutItem toCheckoutItem(OrderLineItem item);
 

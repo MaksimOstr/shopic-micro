@@ -5,9 +5,11 @@ import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.dto.request.OrderParams;
 import com.orderservice.entity.*;
+import com.orderservice.exception.NotFoundException;
 import com.orderservice.mapper.GrpcMapper;
 import com.orderservice.mapper.OrderItemMapper;
 import com.orderservice.mapper.OrderMapper;
+import com.orderservice.service.calculator.DeliveryPriceCalculator;
 import com.orderservice.service.grpc.CartGrpcService;
 import com.orderservice.service.grpc.PaymentGrpcService;
 import com.orderservice.service.grpc.ProductGrpcService;
@@ -40,6 +42,7 @@ public class UserOrderService {
     private final GrpcMapper grpcMapper;
     private final OrderItemMapper orderItemMapper;
     private final OrderMapper orderMapper;
+    private final List<DeliveryPriceCalculator> deliveryPriceCalculatorList;
 
 
     @Transactional
@@ -54,7 +57,7 @@ public class UserOrderService {
         Order order = createAndSaveOrderWithOrderItems(userId, dto, productInfoList, productQuantityMap);
 
         productGrpcService.reserveProduct(cartItems, order.getId());
-        return paymentGrpcService.createPayment(order.getId(), userId, productInfoList, productQuantityMap).getCheckoutUrl();
+        return paymentGrpcService.createPayment(order.getId(), userId, productInfoList, productQuantityMap, order.getDeliveryPrice()).getCheckoutUrl();
     }
 
     public Page<UserOrderPreviewDto> getOrdersByUserId(long userId, Pageable pageable, OrderParams params) {
@@ -90,6 +93,8 @@ public class UserOrderService {
                 dto.houseNumber()
         );
         Order order = Order.builder()
+                .refunded(false)
+                .deliveryType(dto.deliveryType())
                 .customer(customer)
                 .comment(dto.comment())
                 .status(OrderStatusEnum.CREATED)
@@ -100,6 +105,14 @@ public class UserOrderService {
 
         order.setOrderItems(orderItems);
 
+        DeliveryPriceCalculator deliveryPriceCalculator = getDeliveryPriceCalculator(dto.deliveryType());
+        order.setDeliveryPrice(deliveryPriceCalculator.calculateDeliveryPrice(dto, order.calculateTotalPrice()));
+
         return orderService.save(order);
+    }
+
+    private DeliveryPriceCalculator getDeliveryPriceCalculator(OrderDeliveryTypeEnum type) {
+        return deliveryPriceCalculatorList.stream().filter(calculator -> calculator.getDeliveryType() == type).findFirst()
+                .orElseThrow(() -> new NotFoundException("Provided delivery type is not supported"));
     }
 }

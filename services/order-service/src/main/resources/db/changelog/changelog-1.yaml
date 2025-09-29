@@ -45,6 +45,17 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: delivery_type
+                  type: varchar(25)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: delivery_price
+                  type: decimal(10,2)
+                  constraints:
+                    nullable: false
+                    checkConstraint: "delivery_price >= 0"
+              - column:
                   name: refunded
                   type: boolean
                   defaultValueBoolean: false

@@ -70,25 +70,30 @@ public class StripeCheckoutService {
 
     private List<SessionCreateParams.LineItem> getLineItems(List<CheckoutItem> checkoutItems) {
         List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
+
         for (CheckoutItem item : checkoutItems) {
-            lineItems.add(
-                    SessionCreateParams.LineItem.builder()
-                            .setPriceData(
-                                    SessionCreateParams.LineItem.PriceData.builder()
-                                            .setUnitAmountDecimal(toSmallestUnit(item.price()))
-                                            .setCurrency("USD")
-                                            .setProductData(
-                                                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                            .addImage(item.imageUrl())
-                                                            .setName(item.name())
-                                                            .build()
-                                            )
-                                            .build()
-                            )
-                            .setQuantity(item.quantity())
-                            .build()
-            );
+            SessionCreateParams.LineItem.PriceData.ProductData.Builder productBuilder =
+                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                            .setName(item.name());
+
+            if (item.imageUrl() != null && !item.imageUrl().isBlank()) {
+                productBuilder.addImage(item.imageUrl());
+            }
+
+            SessionCreateParams.LineItem lineItem = SessionCreateParams.LineItem.builder()
+                    .setPriceData(
+                            SessionCreateParams.LineItem.PriceData.builder()
+                                    .setUnitAmountDecimal(toSmallestUnit(item.price()))
+                                    .setCurrency("USD")
+                                    .setProductData(productBuilder.build())
+                                    .build()
+                    )
+                    .setQuantity(item.quantity())
+                    .build();
+
+            lineItems.add(lineItem);
         }
+
         return lineItems;
     }
 

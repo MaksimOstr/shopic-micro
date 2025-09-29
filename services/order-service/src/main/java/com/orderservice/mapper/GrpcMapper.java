@@ -17,7 +17,8 @@ public interface GrpcMapper {
 
     @Mapping(target = "allFields", ignore = true)
     @Mapping(target = "priceForOne", source = "price")
-    @Mapping(target = "productImage", source = "productImageUrl")
+    @Mapping(target = "itemImage", source = "productImageUrl")
+    @Mapping(target = "itemName", source = "productName")
     @Mapping(target = "quantity", expression = "java(productQuantityMap.get(productInfo.getProductId()))")
     OrderLineItem toOrderLineItem(
             ProductInfo productInfo,
