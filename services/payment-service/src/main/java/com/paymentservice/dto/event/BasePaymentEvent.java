@@ -1,5 +1,5 @@
 package com.paymentservice.dto.event;
 
-public record UnpaidPaymentEvent(
+public record BasePaymentEvent(
         long orderId
 ) {}

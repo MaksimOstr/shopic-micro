@@ -30,8 +30,17 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum status;
 
+    private Boolean refunded;
+
     @Column(name = "user_id", nullable = false)
     private long userId;
+
+    @Column(name = "delivery_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderDeliveryTypeEnum deliveryType;
+
+    @Column(name = "delivery_price", nullable = false)
+    private BigDecimal deliveryPrice = BigDecimal.ZERO;;
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
@@ -74,7 +83,7 @@ public class Order {
         totalPrice = calculateTotalPrice();
     }
 
-    private BigDecimal calculateTotalPrice() {
+    public BigDecimal calculateTotalPrice() {
         return orderItems.stream()
                 .map(OrderItem::calculateTotalPrice)
                 .filter(Objects::nonNull)

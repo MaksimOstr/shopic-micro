@@ -3,12 +3,15 @@ package com.paymentservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paymentservice.dto.event.CheckoutSuccessEvent;
-import com.paymentservice.dto.event.UnpaidPaymentEvent;
+import com.paymentservice.dto.event.BasePaymentEvent;
+import com.paymentservice.dto.event.RefundEvent;
 import com.paymentservice.exception.InternalException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Slf4j
 @Service
@@ -40,7 +43,7 @@ public class KafkaService {
 
     public void sendUnpaidPaymentEvent(long orderId) {
         try {
-            UnpaidPaymentEvent event = new UnpaidPaymentEvent(orderId);
+            BasePaymentEvent event = new BasePaymentEvent(orderId);
 
             atLeastOnceBatchTemplate.send("payment.unpaid", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
@@ -48,4 +51,17 @@ public class KafkaService {
             throw new InternalException(SOMETHING_WENT_WRONG);
         }
     }
+
+    public void sendRefundSuccessEvent(long orderId, BigDecimal refundAmount) {
+        try {
+            RefundEvent event = new RefundEvent(orderId, refundAmount);
+
+            atLeastOnceBatchTemplate.send("refund.success", objectMapper.writeValueAsString(event));
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            throw new InternalException(SOMETHING_WENT_WRONG);
+        }
+    }
+
+
 }

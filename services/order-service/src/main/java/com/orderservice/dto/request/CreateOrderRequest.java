@@ -1,6 +1,8 @@
 package com.orderservice.dto.request;
 
+import com.orderservice.entity.OrderDeliveryTypeEnum;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record CreateOrderRequest(
@@ -13,6 +15,9 @@ public record CreateOrderRequest(
         @NotBlank
         @Pattern(regexp="(^$|[0-9]{10})")
         String phoneNumber,
+
+        @NotNull
+        OrderDeliveryTypeEnum deliveryType,
 
         @NotBlank
         String country,

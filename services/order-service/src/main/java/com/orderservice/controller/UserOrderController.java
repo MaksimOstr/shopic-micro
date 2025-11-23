@@ -5,8 +5,7 @@ import com.orderservice.dto.UserOrderDto;
 import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.request.CreateOrderRequest;
 import com.orderservice.dto.request.OrderParams;
-import com.orderservice.service.OrderCreationService;
-import com.orderservice.service.OrderService;
+import com.orderservice.service.UserOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,8 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('USER')")
 @RequestMapping("/orders")
 public class UserOrderController {
-    private final OrderCreationService orderCreationService;
-    private final OrderService orderService;
+    private final UserOrderService userOrderService;
 
 
     @PostMapping
@@ -33,7 +31,7 @@ public class UserOrderController {
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid CreateOrderRequest body
     ) {
-        String redirectUrl = orderCreationService.createOrder(principal.getId(), body);
+        String redirectUrl = userOrderService.createOrder(principal.getId(), body);
 
         return ResponseEntity.ok(redirectUrl);
     }
@@ -42,12 +40,12 @@ public class UserOrderController {
     public ResponseEntity<UserOrderDto> getOrder(
             @PathVariable Long id
     ) {
-        UserOrderDto order = orderService.getOrderById(id);
+        UserOrderDto order = userOrderService.getUserOrderDtoById(id);
 
         return ResponseEntity.ok().body(order);
     }
 
-    @GetMapping
+    @GetMapping("/me")
     public ResponseEntity<Page<UserOrderPreviewDto>> getOrderPage(
             @AuthenticationPrincipal CustomPrincipal principal,
             OrderParams body,
@@ -57,7 +55,7 @@ public class UserOrderController {
     ) {
         Sort.Direction direction = Sort.Direction.fromString(sortDirection);
         Pageable pageable = PageRequest.of(page, size, direction, "createdAt");
-        Page<UserOrderPreviewDto> orders = orderService.getOrdersByUserId(principal.getId(), pageable, body);
+        Page<UserOrderPreviewDto> orders = userOrderService.getOrdersByUserId(principal.getId(), pageable, body);
 
         return ResponseEntity.ok().body(orders);
     }
