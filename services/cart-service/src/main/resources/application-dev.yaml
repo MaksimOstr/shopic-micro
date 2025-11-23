@@ -1,14 +1,4 @@
 spring:
-  cloud:
-    config:
-      label: services
-      discovery:
-        enabled: true
-        service-id: config-server
-      fail-fast: true
-  config:
-    import: "optional:configserver:"
-
   datasource:
     url: jdbc:postgresql://localhost:${CART_DB_PORT}/${CART_DB_NAME}
     username: ${DB_USER}
