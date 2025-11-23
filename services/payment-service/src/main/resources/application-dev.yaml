@@ -6,16 +6,29 @@ spring:
         enabled: true
         service-id: config-server
       fail-fast: true
-  config:
-    import: "optional:configserver:"
+
+  datasource:
+    url: jdbc:postgresql://localhost:${PAYMENT_DB_PORT}/${PAYMENT_DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   grpc:
     server:
       port: 1015
 
   jpa:
+    open-in-view: false
     properties:
       hibernate:
+        ddl-auto: validate
         order_inserts: true
         jdbc:
           batch_size: 20
         generate_statistics: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug

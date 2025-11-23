@@ -13,8 +13,15 @@ spring:
       region:
         static: ${AWS_REGION}
 
-  config:
-    import: "optional:configserver:"
+  datasource:
+    url: jdbc:postgresql://localhost:${PRODUCT_DB_PORT}/${PRODUCT_DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
 
   grpc:
     client:
@@ -40,6 +47,12 @@ spring:
   pulsar:
     consumer:
       retry-enable: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
 
 resilience4j:
   circuitbreaker:

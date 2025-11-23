@@ -6,8 +6,12 @@ spring:
         enabled: true
         service-id: config-server
       fail-fast: true
-  config:
-    import: "optional:configserver:"
+
+  datasource:
+    url: jdbc:postgresql://localhost:${ORDER_DB_PORT}/${ORDER_DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
   grpc:
     client:
@@ -20,8 +24,10 @@ spring:
           address: 0.0.0.0:1015
 
   jpa:
+    open-in-view: false
     properties:
       hibernate:
+        ddl-auto: validate
         order_inserts: true
         jdbc:
           batch_size: 20
@@ -39,6 +45,12 @@ spring:
   pulsar:
     consumer:
       retry-enable: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
 
 resilience4j:
   circuitbreaker:

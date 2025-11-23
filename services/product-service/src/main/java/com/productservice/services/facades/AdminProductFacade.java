@@ -12,7 +12,6 @@ import com.productservice.entity.Product;
 import com.productservice.mapper.ProductMapper;
 import com.productservice.services.BrandService;
 import com.productservice.services.CategoryService;
-import com.productservice.services.RatingEnrichmentService;
 import com.productservice.services.S3Service;
 import com.productservice.services.ProductService;
 import jakarta.transaction.Transactional;
@@ -35,7 +34,6 @@ import static com.productservice.utils.Utils.getUUID;
 @Service
 @RequiredArgsConstructor
 public class AdminProductFacade {
-    private final RatingEnrichmentService ratingEnrichmentService;
     private final ProductMapper productMapper;
     private final ProductService productService;
     private final BrandService brandService;
@@ -79,16 +77,12 @@ public class AdminProductFacade {
     public AdminProductDto getAdminProduct(long productId) {
         AdminProductDto product = productService.getAdminProductById(productId);
 
-        ratingEnrichmentService.enrichProduct(product);
-
         return product;
     }
 
     @Transactional
     public AdminProductDto getAdminProduct(UUID sku) {
         AdminProductDto product = productService.getAdminProductBySku(sku);
-
-        ratingEnrichmentService.enrichProduct(product);
 
         return product;
     }
@@ -98,8 +92,6 @@ public class AdminProductFacade {
         Page<Product> productPage = productService.getProductPageBySpec(spec, pageable);
         List<Product> productList = productPage.getContent();
         List<ProductAdminPreviewDto> previewDtoList = productMapper.productToProductAdminPreviewDtoList(productList);
-
-        ratingEnrichmentService.enrichProductList(previewDtoList);
 
         return new PageImpl<>(previewDtoList, pageable, productPage.getTotalElements());
     }

@@ -6,8 +6,17 @@ spring:
         enabled: true
         service-id: config-server
       fail-fast: true
-  config:
-    import: "optional:configserver:"
+
+  datasource:
+    url: jdbc:postgresql://localhost:${AUTH_DB_PORT}/${AUTH_DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
   security:
     oauth2:
       client:
@@ -48,6 +57,8 @@ logging:
         security:
           authentication: debug
           oauth2: debug
+      hibernate:
+        SQL: debug
 
 management:
   endpoint:
@@ -69,5 +80,7 @@ resilience4j:
             wait-duration: 100ms
             retry-exceptions:
               - org.springframework.dao.DataIntegrityViolationException
+
+
 
 

@@ -8,7 +8,6 @@ import com.productservice.entity.Product;
 import com.productservice.mapper.ProductMapper;
 import com.productservice.services.LikeEnrichmentService;
 import com.productservice.services.LikeService;
-import com.productservice.services.RatingEnrichmentService;
 import com.productservice.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +26,6 @@ import static com.productservice.utils.ProductUtils.buildUserProductSpec;
 public class UserProductFacade {
     private final ProductService productService;
     private final LikeEnrichmentService likeEnrichmentService;
-    private final RatingEnrichmentService ratingEnrichmentService;
     private final ProductMapper productMapper;
     private final LikeService likeService;
 
@@ -35,7 +33,6 @@ public class UserProductFacade {
         UserProductDto product = productService.getActiveUserProduct(productId);
 
         likeEnrichmentService.enrichProduct(product, userId);
-        ratingEnrichmentService.enrichProduct(product);
 
         return product;
     }
@@ -57,7 +54,6 @@ public class UserProductFacade {
         List<ProductUserPreviewDto> previewDtoList = productMapper.productToProductUserPreviewDtoList(productList);
 
         likeEnrichmentService.enrichProductList(previewDtoList, userId);
-        ratingEnrichmentService.enrichProductList(previewDtoList);
 
         return  new PageImpl<>(previewDtoList, pageable, productPage.getTotalElements());
     }

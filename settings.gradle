@@ -4,9 +4,6 @@ rootProject.name = 'shopic'
 include ':api-gateway'
 project(':api-gateway').projectDir = new File('infrastructure/api-gateway')
 
-include ':config-server'
-project(':config-server').projectDir = new File('infrastructure/config-server')
-
 include ':discovery-server'
 project(':discovery-server').projectDir = new File('infrastructure/discovery-server')
 
@@ -26,8 +23,5 @@ project(':cart-service').projectDir = new File('services/cart-service')
 
 include ':payment-service'
 project(':payment-service').projectDir = new File('services/payment-service')
-
-include ':review-service'
-project(':review-service').projectDir = new File('services/review-service')
 
 include(":proto")

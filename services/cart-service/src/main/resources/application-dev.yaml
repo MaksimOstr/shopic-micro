@@ -9,6 +9,16 @@ spring:
   config:
     import: "optional:configserver:"
 
+  datasource:
+    url: jdbc:postgresql://localhost:${CART_DB_PORT}/${CART_DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
   grpc:
     server:
       port: 1014
@@ -16,6 +26,14 @@ spring:
       channels:
         product-service:
           address: 0.0.0.0:1013
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+
+
 
 resilience4j:
   circuitbreaker:
