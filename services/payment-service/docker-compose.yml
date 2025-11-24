@@ -1,0 +1,12 @@
+services:
+  payment-service-db:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "${PAYMENT_DB_PORT}:5432"
+    volumes:
+      - /postgres/payment-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${PAYMENT_DB_NAME}

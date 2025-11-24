@@ -1,64 +1,11 @@
+include:
+  - ./services/cart-service/docker-compose.yml
+  - ./services/auth-service/docker-compose.yml
+  - ./services/order-service/docker-compose.yml
+  - ./services/payment-service/docker-compose.yml
+  - ./services/product-service/docker-compose.yml
+
 services:
-  auth-service-db:
-    image: postgres:latest
-    restart: always
-    ports:
-      - "${AUTH_DB_PORT}:5432"
-    volumes:
-      - /postgres/auth-service/
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${AUTH_DB_NAME}
-
-  order-service-db:
-    image: postgres:latest
-    restart: always
-    ports:
-      - "${ORDER_DB_PORT}:5432"
-    volumes:
-      - /postgres/order-service/
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${ORDER_DB_NAME}
-
-  product-service-db:
-    image: postgres:latest
-    restart: always
-    ports:
-      - "${PRODUCT_DB_PORT}:5432"
-    volumes:
-      - /postgres/product-service/
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${PRODUCT_DB_NAME}
-
-  cart-service-db:
-    image: postgres:latest
-    restart: always
-    ports:
-      - "${CART_DB_PORT}:5432"
-    volumes:
-      - /postgres/cart-service/
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${CART_DB_NAME}
-
-  payment-service-db:
-    image: postgres:latest
-    restart: always
-    ports:
-      - "${PAYMENT_DB_PORT}:5432"
-    volumes:
-      - /postgres/payment-service/
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${PAYMENT_DB_NAME}
-
   kafka:
     image: apache/kafka:latest
     restart: always
