@@ -1,0 +1,12 @@
+services:
+  auth-service-db:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "${AUTH_DB_PORT}:5432"
+    volumes:
+      - /postgres/auth-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}

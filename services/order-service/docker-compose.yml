@@ -1,0 +1,12 @@
+services:
+  order-service-db:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "${ORDER_DB_PORT}:5432"
+    volumes:
+      - /postgres/order-service/
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${ORDER_DB_NAME}
