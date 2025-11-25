@@ -28,13 +28,6 @@ public class MailService {
     }
 
     @Async
-    public void sendEmailChange(String email, String code) {
-        String subject = "Email change verification";
-        String text = "Code for email changing:" + code;
-
-        send(email, subject, text);
-    }
-
     public void sendForgotPasswordChange(String email, String code) {
         String subject = "Forgot password change verification";
         String text = "Code for password changing:" + code;

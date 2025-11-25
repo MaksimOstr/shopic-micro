@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ForgotPasswordService {
     private final MailService mailService;
-    private final PasswordService  passwordService;
+    private final PasswordService passwordService;
     private final UserService userService;
     private final CodeService codeService;
 
