@@ -1,4 +1,10 @@
 spring:
+  cloud:
+    config:
+      import-check:
+        enabled: false
+
+
   datasource:
     url: jdbc:postgresql://localhost:${AUTH_DB_PORT}/${AUTH_DB_NAME}
     username: ${DB_USER}
@@ -73,6 +79,9 @@ resilience4j:
             retry-exceptions:
               - org.springframework.dao.DataIntegrityViolationException
 
+eureka:
+  client:
+    enabled: false
 
 
 

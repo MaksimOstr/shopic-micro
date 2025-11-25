@@ -1,25 +1,29 @@
-package com.authservice.services.code;
+package com.authservice.services.impl;
 
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.User;
+import com.authservice.exceptions.CodeValidationException;
 import com.authservice.exceptions.InternalServiceException;
+import com.authservice.exceptions.NotFoundException;
 import com.authservice.repositories.CodeRepository;
+import com.authservice.services.CodeService;
 import io.github.resilience4j.retry.MaxRetriesExceededException;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Instant;
 
-@Slf4j
 @Service
+@Slf4j
 @RequiredArgsConstructor
-public class CodeCreationService {
+public class CodeServiceImpl implements CodeService {
     private final CodeRepository codeRepository;
 
     @Value("${CODE_EXPIRATION:900}")
@@ -33,37 +37,51 @@ public class CodeCreationService {
 
     @Retry(name = "codeGenerationRetry")
     @Transactional
-    public Code getCode(User user, CodeScopeEnum scope) {
+    public Code create(User user, CodeScopeEnum scope) {
         try {
-            return codeRepository.findByScopeAndUserId(scope, user.getId())
-                    .map(this::prepareCode)
-                    .orElseGet(() -> createCode(user, scope));
+            codeRepository.deleteByUser_IdAndScope(user.getId(), scope);
+
+            Code newCode = createCode(user, scope);
+
+            return codeRepository.save(newCode);
         } catch (MaxRetriesExceededException e) {
             log.error("Max retries exceeded", e);
             throw new InternalServiceException("Code generation failed.");
         }
     }
 
+    @Transactional
+    public Code validate(String code, CodeScopeEnum scope) {
+        return codeRepository.findByCodeAndScope(code, scope)
+                .map(foundCode -> {
+                    if(isCodeExpired(foundCode)) {
+                        log.error("Code validation failed: code is expired");
+                        throw new CodeValidationException("Code validation failed");
+                    }
 
-    private Code prepareCode(Code code) {
-        String generatedCode = generateAlphanumericCode();
-        code.setUsed(false);
-        code.setCode(generatedCode);
-        code.setExpiresAt(getExpirationTime());
-        return codeRepository.save(code);
+                    codeRepository.delete(foundCode);
+
+                    return foundCode;
+                })
+                .orElseThrow(() -> new NotFoundException("Code validation failed"));
+    }
+
+
+
+    private boolean isCodeExpired(Code code) {
+        return code.getExpiresAt().isBefore(Instant.now());
     }
 
     private Code createCode(User user, CodeScopeEnum scope) {
+        String generatedCode = generateAlphanumericCode();
         Code code = Code.builder()
+                .code(generatedCode)
                 .scope(scope)
                 .user(user)
+                .expiresAt(Instant.now().plusSeconds(expiresIn))
                 .build();
 
-        return prepareCode(code);
-    }
-
-    private Instant getExpirationTime() {
-        return Instant.now().plusSeconds(expiresIn);
+        return code;
     }
 
     private String generateAlphanumericCode() {
@@ -75,5 +93,11 @@ public class CodeCreationService {
         }
 
         return code.toString();
+    }
+
+    @Scheduled(fixedDelay = 900 * 1000)
+    public void clearExpiredCodes() {
+        log.info("Clearing expired codes");
+        codeRepository.deleteExpiredCodes();
     }
 }
