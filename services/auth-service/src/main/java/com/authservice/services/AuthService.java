@@ -9,7 +9,7 @@ import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
-import com.authservice.services.user.LocalUserService;
+import com.authservice.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,7 +27,7 @@ import java.util.List;
 public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final LocalUserService localUserService;
+    private final UserService userService;
     private final RoleMapper roleMapper;
     private final CodeService codeService;
     private final MailService mailService;
@@ -35,7 +35,7 @@ public class AuthService {
 
     @Transactional
     public LocalRegisterResult localRegister(LocalRegisterRequest dto){
-        User user = localUserService.createLocalUser(dto);
+        User user = userService.createUser(dto);
         Code code = codeService.create(user, CodeScopeEnum.EMAIL_VERIFICATION);
 
         mailService.sendEmailVerificationCode(user.getEmail(), code.getCode());

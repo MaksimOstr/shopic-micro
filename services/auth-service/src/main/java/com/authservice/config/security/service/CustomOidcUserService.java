@@ -2,9 +2,10 @@ package com.authservice.config.security.service;
 
 import com.authservice.config.security.model.CustomOidcUser;
 import com.authservice.dto.request.CreateOAuthUserRequest;
-import com.authservice.dto.response.CreateOAuthUserResponse;
 import com.authservice.entity.AuthProviderEnum;
-import com.authservice.services.user.OAuthUserService;
+import com.authservice.entity.User;
+import com.authservice.mapper.RoleMapper;
+import com.authservice.services.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
+    private final UserService userService;
+    private final RoleMapper roleMapper;
 
-    private final OAuthUserService oAuthUserService;
+
     private static final OAuth2Error error = new OAuth2Error(
             "account_linked_to_another_provider",
             "This account was registered via another provider",
@@ -42,18 +45,18 @@ public class CustomOidcUserService extends OidcUserService {
         String lastName = idToken.getFamilyName();
 
         CreateOAuthUserRequest request = new CreateOAuthUserRequest(authProvider, email, firstName, lastName);
-        CreateOAuthUserResponse response = oAuthUserService.createOrGetOAuthUser(request);
+        User user = userService.createOrGetOAuthUser(request);
 
-        if(response.provider().equals(AuthProviderEnum.LOCAL)) {
-            log.error("User has been registered via another provider: {}", response.provider());
+        if(user.getAuthProvider().equals(AuthProviderEnum.LOCAL)) {
+            log.error("User has been registered via another provider: {}", user.getAuthProvider());
             throw new OAuth2AuthenticationException(error);
         }
 
         return new CustomOidcUser(
                 userRequest.getIdToken(),
                 List.of(),
-                response.userId(),
-                response.roleNames()
+                user.getId(),
+                roleMapper.mapRolesToNames(user.getRoles())
         );
     }
 }
