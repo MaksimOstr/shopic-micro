@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ForgotPasswordService {
     private final MailService mailService;
-    private final PasswordService passwordService;
     private final UserService userService;
     private final CodeService codeService;
 
@@ -34,13 +33,6 @@ public class ForgotPasswordService {
     @Transactional
     public void resetPassword(String newPassword, String providedCode) {
         Code code = codeService.validate(providedCode, CodeScopeEnum.RESET_PASSWORD);
-        User user = code.getUser();
-
-        if(passwordService.comparePassword(user.getPassword(), newPassword)) {
-            throw new ResetPasswordException("Password is the same");
-        }
-
-        String encodedPassword = passwordService.encode(newPassword);
-        user.setPassword(encodedPassword);
+        userService.changeUserPassword(code.getUser(), newPassword);
     }
 }

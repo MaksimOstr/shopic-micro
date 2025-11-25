@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/forgot-password")
 @RequiredArgsConstructor
 public class ForgotPasswordController {
-
     private final ForgotPasswordService forgotPasswordService;
 
     @PostMapping("/request")
