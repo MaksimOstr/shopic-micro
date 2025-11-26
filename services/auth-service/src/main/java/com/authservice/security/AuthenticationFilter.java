@@ -27,7 +27,7 @@ import static com.authservice.utils.CryptoUtils.createHmac;
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
 
-    @Value("${SIGNATURE_SECRET}")
+    @Value("${signature-secret}")
     private String signatureSecret;
 
     @Override
@@ -36,7 +36,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
@@ -56,7 +55,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
 
         setSecurityContext(userId, roles);
-
         filterChain.doFilter(request, response);
     }
 

@@ -14,11 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static com.authservice.services.CookieService.REFRESH_TOKEN_COOKIE_NAME;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
@@ -51,7 +50,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshTokens(
-            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
+            @CookieValue("${refresh-token.cookie-name:refresh-token}") String refreshToken,
             HttpServletResponse response
     ) {
         TokenPairDto tokenPair = authService.refreshTokens(refreshToken);
@@ -66,7 +65,7 @@ public class AuthController {
     @PostMapping("/logout")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> logout(
-            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
+            @CookieValue("${refresh-token.cookie-name:refresh-token}") String refreshToken,
             HttpServletResponse response
     ) {
         authService.logout(refreshToken);

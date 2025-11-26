@@ -1,5 +1,6 @@
 package com.authservice.services;
 
+import com.authservice.config.properties.JwtProperties;
 import com.authservice.entity.PublicKey;
 import com.authservice.repositories.PublicKeyRepository;
 import com.nimbusds.jose.Algorithm;
@@ -16,17 +17,17 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PublicKeyService {
     private final PublicKeyRepository publicKeyRepository;
 
-    @Value("${PUBLIC_KEY_EXPIRATION}")
-    private int expiration;
+    private final JwtProperties jwtProperties;
 
-    @Value("${KEY_ALGORITHM}")
-    private String keyAlgorithm;
+    @Value("${public-key.expires-at}")
+    private int expiresAt;
 
     public void savePublicKey(RSAKey publicKey) {
         PublicKey key = new PublicKey();
@@ -49,7 +50,7 @@ public class PublicKeyService {
                             if (entity.getKeyId() != null) {
                                 builder.keyID(entity.getKeyId());
                             }
-                            builder.algorithm(Algorithm.parse(keyAlgorithm));
+                            builder.algorithm(Algorithm.parse(jwtProperties.getHeaderAlg()));
                             return builder.build();
                         }
 
@@ -63,7 +64,7 @@ public class PublicKeyService {
     }
 
     private Instant getExpireDate() {
-        return Instant.now().plusSeconds(expiration);
+        return Instant.now().plusSeconds(expiresAt);
     }
 
     @Scheduled(fixedDelay = 1000 * 60 * 60)

@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/forgot-password")
+@RequestMapping("/api/v1/forgot-password")
 @RequiredArgsConstructor
 public class ForgotPasswordController {
     private final ForgotPasswordService forgotPasswordService;

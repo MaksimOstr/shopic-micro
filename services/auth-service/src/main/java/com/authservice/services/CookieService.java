@@ -1,23 +1,21 @@
 package com.authservice.services;
 
+import com.authservice.config.properties.RefreshTokenProperties;
 import jakarta.servlet.http.Cookie;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CookieService {
-
-    @Value("${REFRESH_TOKEN_TTL:3600}")
-    private int refreshTokenTtl;
-
-    public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+    private final RefreshTokenProperties refreshTokenProperties;
 
 
     public Cookie createRefreshTokenCookie(String refreshToken) {
-        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
+        Cookie cookie = new Cookie(refreshTokenProperties.getCookieName(), refreshToken);
 
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(refreshTokenTtl);
+        cookie.setMaxAge(refreshTokenProperties.getExpiresAt());
         cookie.setPath("/");
         cookie.setAttribute("SameSite", "Lax");
 
@@ -25,7 +23,7 @@ public class CookieService {
     }
 
     public Cookie deleteRefreshTokenCookie(String refreshToken) {
-        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
+        Cookie cookie = new Cookie(refreshTokenProperties.getCookieName(), refreshToken);
 
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);

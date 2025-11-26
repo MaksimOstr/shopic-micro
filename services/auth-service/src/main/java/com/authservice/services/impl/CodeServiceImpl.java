@@ -26,24 +26,19 @@ import java.time.Instant;
 public class CodeServiceImpl implements CodeService {
     private final CodeRepository codeRepository;
 
-    @Value("${CODE_EXPIRATION:900}")
-    private int expiresIn;
-
+    @Value("${verification-code.expires-at}")
+    private int expiresAt;
     private final static byte CODE_LENGTH = 8;
-    private final static String chars = "0123456789" +
-            "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    private final static String chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
     private final SecureRandom random = new SecureRandom();
 
 
-    @Retry(name = "codeGenerationRetry")
     @Transactional
     public Code create(User user, CodeScopeEnum scope) {
         try {
             codeRepository.deleteByUser_IdAndScope(user.getId(), scope);
 
-            Code newCode = createCode(user, scope);
-
-            return codeRepository.save(newCode);
+            return createAndSave(user, scope);
         } catch (MaxRetriesExceededException e) {
             log.error("Max retries exceeded", e);
             throw new InternalServiceException("Code generation failed.");
@@ -72,16 +67,17 @@ public class CodeServiceImpl implements CodeService {
         return code.getExpiresAt().isBefore(Instant.now());
     }
 
-    private Code createCode(User user, CodeScopeEnum scope) {
+    @Retry(name = "codeGenerationRetry")
+    private Code createAndSave(User user, CodeScopeEnum scope) {
         String generatedCode = generateAlphanumericCode();
         Code code = Code.builder()
                 .code(generatedCode)
                 .scope(scope)
                 .user(user)
-                .expiresAt(Instant.now().plusSeconds(expiresIn))
+                .expiresAt(Instant.now().plusSeconds(expiresAt))
                 .build();
 
-        return code;
+        return codeRepository.save(code);
     }
 
     private String generateAlphanumericCode() {

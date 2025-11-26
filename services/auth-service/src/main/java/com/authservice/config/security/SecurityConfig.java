@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
     private static final String[] permittedURLs = {
-            "/actuator/health",
+            "/actuator/**",
             "/auth/sign-up",
             "/auth/sign-in",
             "/auth/refresh",
@@ -33,11 +33,8 @@ public class SecurityConfig {
             "/auth/oauth2/authorization/google",
             "/auth/login/oauth2/code/google",
             "/favicon.ico",
-            "/forgot-password/request",
-            "/forgot-password/reset",
-            "/verify",
-            "/verify/request",
-            "/users/request-email-verify"
+            "/forgot-password",
+            "/verify"
     };
 
     @Bean

@@ -1,5 +1,6 @@
 package com.authservice.services;
 
+import com.authservice.config.properties.MailProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,9 +16,7 @@ import org.springframework.stereotype.Service;
 public class MailService {
 
     private final JavaMailSender javaMailSender;
-
-    @Value("${spring.mail.from}")
-    private String from;
+    private final MailProperties mailProperties;
 
     @Async
     public void sendEmailVerificationCode(String email, String code) {
@@ -38,7 +37,7 @@ public class MailService {
     private void send(String to, String subject, String text) {
         try {
             SimpleMailMessage msg = new SimpleMailMessage();
-            msg.setFrom(from);
+            msg.setFrom(mailProperties.getFrom());
             msg.setTo(to);
             msg.setText(text);
             msg.setSubject(subject);

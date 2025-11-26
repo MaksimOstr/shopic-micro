@@ -83,5 +83,25 @@ eureka:
   client:
     enabled: false
 
+jwt:
+  expires-at: ${JWT_EXPIRE_TIME:600}
+  issuer: ${JWT_ISSUER:shopic}
+  header-alg: ${JWT_HEADER_ALG:RSA256}
+
+public-key:
+  expires-at: ${PUBLIC_KEY_EXPIRATION:3600}
+
+refresh-token:
+  expires-at : ${REFRESH_TOKEN_TTL:3600}
+  secret: ${REFRESH_TOKEN_SECRET}
+  cookie-name: refreshToken
+
+verification-code:
+  expires-at : ${CODE_EXPIRATION:900}
+
+signature-secret: ${SIGNATURE_SECRET}
+
+
+
 
 

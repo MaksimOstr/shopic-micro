@@ -1,5 +1,6 @@
 package com.authservice.services.impl;
 
+import com.authservice.config.properties.RefreshTokenProperties;
 import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
 import com.authservice.exceptions.TokenValidationException;
@@ -24,12 +25,7 @@ import static com.authservice.utils.CryptoUtils.createHmac;
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
-
-    @Value("${REFRESH_TOKEN_SECRET}")
-    private String refreshSecret;
-
-    @Value("${REFRESH_TOKEN_TTL:3600}")
-    private int refreshTokenTtl;
+    private final RefreshTokenProperties properties;
 
 
     @Transactional
@@ -66,12 +62,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
 
     private RefreshToken findToken(String token) {
-        return refreshTokenRepository.findByToken(createHmac(token, refreshSecret))
+        return refreshTokenRepository.findByToken(hashedToken(token))
                 .orElseThrow(() -> new TokenValidationException("Refresh token not found"));
     }
 
     private String hashedToken(String token) {
-        return createHmac(token, refreshSecret);
+        return createHmac(token, properties.getSecret());
     }
 
     private String generateToken() {
@@ -79,7 +75,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     private Instant getExpireTime() {
-        return Instant.now().plusSeconds(refreshTokenTtl);
+        return Instant.now().plusSeconds(properties.getExpiresAt());
     }
 
     @Scheduled(fixedDelay = 1000 * 60 * 60)

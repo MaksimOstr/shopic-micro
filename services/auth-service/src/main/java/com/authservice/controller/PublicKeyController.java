@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/public-keys")
+@RequestMapping("/api/v1/public-keys")
 @RequiredArgsConstructor
 public class PublicKeyController {
     private final PublicKeyService publicKeyService;

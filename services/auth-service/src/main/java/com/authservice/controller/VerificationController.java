@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/verify")
+@RequestMapping("/api/v1/verify")
 @RequiredArgsConstructor
 public class VerificationController {
     private final VerificationService verificationService;
