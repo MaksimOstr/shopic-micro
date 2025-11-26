@@ -1,6 +1,6 @@
-package com.authservice.config.security.handler;
+package com.authservice.security;
 
-import com.authservice.dto.response.ErrorResponseDto;
+import com.authservice.dto.ErrorResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

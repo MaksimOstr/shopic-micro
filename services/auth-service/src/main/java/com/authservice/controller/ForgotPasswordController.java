@@ -1,7 +1,7 @@
 package com.authservice.controller;
 
-import com.authservice.dto.request.ForgotPasswordRequest;
-import com.authservice.dto.request.ResetPasswordRequest;
+import com.authservice.dto.ForgotPasswordRequest;
+import com.authservice.dto.ResetPasswordRequest;
 import com.authservice.services.user.ForgotPasswordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.authservice.controller;
 
-import com.authservice.dto.request.EmailVerifyRequestDto;
-import com.authservice.dto.request.VerifyUserRequestDto;
+import com.authservice.dto.EmailVerifyRequestDto;
+import com.authservice.dto.VerifyUserRequestDto;
 import com.authservice.services.user.VerificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

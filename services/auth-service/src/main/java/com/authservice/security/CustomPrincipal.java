@@ -1,4 +1,4 @@
-package com.authservice.config.security.model;
+package com.authservice.security;
 
 import lombok.Getter;
 

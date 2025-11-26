@@ -1,10 +1,10 @@
 package com.authservice.services.user;
 
 import com.authservice.dto.UserDto;
-import com.authservice.dto.request.ChangePasswordRequest;
-import com.authservice.dto.request.CreateOAuthUserRequest;
-import com.authservice.dto.request.LocalRegisterRequest;
-import com.authservice.dto.request.UpdateUserRequest;
+import com.authservice.dto.ChangePasswordRequest;
+import com.authservice.dto.CreateOAuthUserRequest;
+import com.authservice.dto.LocalRegisterRequest;
+import com.authservice.dto.UpdateUserRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Role;
 import com.authservice.entity.User;
@@ -16,9 +16,6 @@ import com.authservice.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +39,7 @@ public class UserService {
             throw new AlreadyExistsException("User with such an email already exists");
         }
 
-        Role defaultRole = roleService.getDefaultUserRole();
+        Role defaultRole = roleService.getRoleByName("ROLE_USER");
         String hashedPassword = passwordEncoder.encode(dto.password());
         User user = User.builder()
                 .firstName(dto.firstName())
@@ -60,7 +57,7 @@ public class UserService {
     public User createOrGetOAuthUser(@Valid CreateOAuthUserRequest dto) {
         return findOptionalByEmail(dto.email())
                 .orElseGet(() -> {
-                    Role defaultRole = roleService.getDefaultUserRole();
+                    Role defaultRole = roleService.getRoleByName("ROLE_USER");
                     User user = User.builder()
                             .firstName(dto.firstName())
                             .lastName(dto.lastName())
@@ -132,11 +129,6 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public User findUserWithProfileAndRolesById(long id) {
-        return userRepository.findWithProfileAndRolesById(id)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-    }
-
     public void updateVerificationStatus(long userId, boolean verified) {
         int updated = userRepository.markUserVerified(userId, verified);
 
@@ -151,9 +143,5 @@ public class UserService {
 
     public Optional<User> findOptionalByEmail(String email) {
         return userRepository.findByEmail(email);
-    }
-
-    public Page<User> getUserPageBySpec(Pageable pageable, Specification<User> spec) {
-        return userRepository.findAll(spec, pageable);
     }
 }

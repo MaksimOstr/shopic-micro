@@ -1,4 +1,4 @@
-package com.authservice.config.security.model;
+package com.authservice.security;
 
 import com.authservice.entity.User;
 import lombok.Getter;
@@ -8,7 +8,6 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 public class CustomOidcUser extends DefaultOidcUser {

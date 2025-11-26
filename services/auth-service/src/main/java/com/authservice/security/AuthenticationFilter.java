@@ -1,6 +1,5 @@
-package com.authservice.config.security.filter;
+package com.authservice.security;
 
-import com.authservice.config.security.model.CustomPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,21 +37,22 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if(shouldExclude(request)) {
-            log.debug("Excluding request");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
 
-        if(!verifyHmac(roles, userId, signature)) {
+        if(userId == null || roles == null || signature == null){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (!verifyHmac(roles, userId, signature)) {
             response.sendError(
                     HttpStatus.UNAUTHORIZED.value(),
                     HttpStatus.UNAUTHORIZED.getReasonPhrase()
             );
+
+            return;
         }
 
         setSecurityContext(userId, roles);
@@ -64,31 +64,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private boolean verifyHmac(
             @NonNull String roles,
             @NonNull String userId,
-            @NonNull String signature) {
+            @NonNull String signature
+    ) {
         String data = userId + roles;
         String generatedSignature = createHmac(data, signatureSecret);
 
         return generatedSignature.equals(signature);
-    }
-
-    private boolean shouldExclude(HttpServletRequest request) {
-        List<String> whiteList = List.of(
-                "/actuator/health",
-                "/auth/sign-up",
-                "/auth/sign-in",
-                "/auth/refresh",
-                "/public-keys",
-                "/auth/oauth2/authorization/google",
-                "/auth/login/oauth2/code/google",
-                "/favicon.ico",
-                "/forgot-password/request",
-                "/forgot-password/reset",
-                "/verify",
-                "/verify/request",
-                "/users/request-email-verify"
-        );
-
-        return whiteList.contains(request.getRequestURI());
     }
 
     private List<SimpleGrantedAuthority> toSimpleGrantedAuthorities(String roles) {
@@ -105,4 +86,5 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         Authentication authToken = new UsernamePasswordAuthenticationToken(principal, null, toSimpleGrantedAuthorities(roles));
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }
+
 }

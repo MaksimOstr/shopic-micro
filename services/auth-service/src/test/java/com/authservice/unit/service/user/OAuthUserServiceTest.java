@@ -1,6 +1,6 @@
 package com.authservice.unit.service.user;
 
-import com.authservice.dto.request.CreateOAuthUserRequest;
+import com.authservice.dto.CreateOAuthUserRequest;
 import com.authservice.dto.response.CreateOAuthUserResponse;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Role;

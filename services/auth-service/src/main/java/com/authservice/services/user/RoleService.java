@@ -13,8 +13,8 @@ import java.util.List;
 public class RoleService {
     private final RoleRepository roleRepository;
 
-    public Role getDefaultUserRole() {
-        return roleRepository.findById(1)
+    public Role getRoleByName(String roleName) {
+        return roleRepository.findByName(roleName)
                 .orElseThrow(() -> new NotFoundException("User role not found"));
     }
 }

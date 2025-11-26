@@ -1,6 +1,5 @@
-package com.authservice.config.security.service;
+package com.authservice.security;
 
-import com.authservice.config.security.model.CustomUserDetails;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.exceptions.NotFoundException;
 import com.authservice.entity.User;

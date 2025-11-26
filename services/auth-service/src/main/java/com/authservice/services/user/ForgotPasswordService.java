@@ -1,7 +1,7 @@
 package com.authservice.services.user;
 
-import com.authservice.dto.request.ForgotPasswordRequest;
-import com.authservice.dto.request.ResetPasswordRequest;
+import com.authservice.dto.ForgotPasswordRequest;
+import com.authservice.dto.ResetPasswordRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;

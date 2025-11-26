@@ -1,4 +1,4 @@
-package com.authservice.dto.response;
+package com.authservice.dto;
 
 public record ErrorResponseDto (
         String code,

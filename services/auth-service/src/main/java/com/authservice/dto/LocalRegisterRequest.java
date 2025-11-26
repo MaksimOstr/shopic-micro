@@ -1,15 +1,15 @@
-package com.authservice.dto.request;
+package com.authservice.dto;
 
-
-import com.authservice.entity.AuthProviderEnum;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
-public record CreateOAuthUserRequest (
-        @NotNull
-        AuthProviderEnum provider,
+public record LocalRegisterRequest (
+        @NotBlank
+        @Min(8)
+        String password,
 
+        @NotBlank
         @Email
         String email,
 
@@ -19,3 +19,4 @@ public record CreateOAuthUserRequest (
         @NotBlank
         String lastName
 ) {}
+

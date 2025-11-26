@@ -1,20 +1,14 @@
 package com.authservice.controller.advice;
 
 import com.authservice.controller.AuthController;
-import com.authservice.dto.response.ErrorResponseDto;
+import com.authservice.dto.ErrorResponseDto;
 import com.authservice.exceptions.AlreadyExistsException;
-import com.authservice.exceptions.NotFoundException;
 import com.authservice.exceptions.TokenValidationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice(assignableTypes = {AuthController.class})
 public class AuthControllerAdvice {

@@ -1,10 +1,10 @@
 package com.authservice.services;
 
-import com.authservice.config.security.model.CustomUserDetails;
+import com.authservice.security.CustomUserDetails;
 import com.authservice.dto.LocalRegisterResult;
 import com.authservice.dto.TokenPairDto;
-import com.authservice.dto.request.LocalRegisterRequest;
-import com.authservice.dto.request.SignInRequestDto;
+import com.authservice.dto.LocalRegisterRequest;
+import com.authservice.dto.SignInRequestDto;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.RefreshToken;
@@ -18,9 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Set;
 
 
 @Slf4j

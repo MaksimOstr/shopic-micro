@@ -2,15 +2,14 @@ package com.authservice.controller;
 
 import com.authservice.dto.LocalRegisterResult;
 import com.authservice.dto.TokenPairDto;
-import com.authservice.dto.request.LocalRegisterRequest;
-import com.authservice.dto.request.SignInRequestDto;
+import com.authservice.dto.LocalRegisterRequest;
+import com.authservice.dto.SignInRequestDto;
 import com.authservice.services.AuthService;
 import com.authservice.services.CookieService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

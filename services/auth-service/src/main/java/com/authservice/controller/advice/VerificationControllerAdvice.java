@@ -1,6 +1,6 @@
 package com.authservice.controller.advice;
 
-import com.authservice.dto.response.ErrorResponseDto;
+import com.authservice.dto.ErrorResponseDto;
 import com.authservice.exceptions.EmailVerifyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.authservice.dto.request;
+package com.authservice.dto;
 
 public record UpdateUserRequest(
         String lastName,

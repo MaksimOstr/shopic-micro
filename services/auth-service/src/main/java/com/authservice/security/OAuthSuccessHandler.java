@@ -1,7 +1,5 @@
-package com.authservice.config.security.handler;
+package com.authservice.security;
 
-import com.authservice.config.security.model.CustomOidcUser;
-import com.authservice.dto.TokenPairDto;
 import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
 import com.authservice.services.CookieService;

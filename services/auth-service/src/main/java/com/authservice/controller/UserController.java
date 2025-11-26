@@ -1,9 +1,9 @@
 package com.authservice.controller;
 
-import com.authservice.config.security.model.CustomPrincipal;
+import com.authservice.security.CustomPrincipal;
 import com.authservice.dto.UserDto;
-import com.authservice.dto.request.ChangePasswordRequest;
-import com.authservice.dto.request.UpdateUserRequest;
+import com.authservice.dto.ChangePasswordRequest;
+import com.authservice.dto.UpdateUserRequest;
 import com.authservice.services.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
