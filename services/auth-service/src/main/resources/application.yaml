@@ -5,7 +5,7 @@ spring:
     active: dev
 
 server:
-  port: 0
+  port: ${AUTH_SERVICE_PORT}
   forward-headers-strategy: framework
 
 

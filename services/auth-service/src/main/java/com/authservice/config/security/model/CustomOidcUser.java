@@ -1,5 +1,6 @@
 package com.authservice.config.security.model;
 
+import com.authservice.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
@@ -11,13 +12,13 @@ import java.util.Set;
 
 @Getter
 public class CustomOidcUser extends DefaultOidcUser {
-    private final long id;
+    private final User user;
     private final List<String> roleNames;
 
-    public CustomOidcUser(OidcIdToken idToken, Collection<? extends GrantedAuthority> authorities, long userId, List<String> roleNames) {
+    public CustomOidcUser(OidcIdToken idToken, Collection<? extends GrantedAuthority> authorities, User user, List<String> roleNames) {
         super(authorities, idToken, "email");
 
-        this.id = userId;
+        this.user = user;
         this.roleNames = roleNames;
     }
 }

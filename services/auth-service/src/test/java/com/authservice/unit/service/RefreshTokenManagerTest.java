@@ -4,7 +4,7 @@ import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
 import com.authservice.exceptions.AlreadyExistsException;
 import com.authservice.repositories.RefreshTokenRepository;
-import com.authservice.services.RefreshTokenManager;
+import com.authservice.services.impl.RefreshTokenServiceImpl;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class RefreshTokenManagerTest {
     private EntityManager entityManager;
 
     @InjectMocks
-    private RefreshTokenManager refreshTokenManager;
+    private RefreshTokenServiceImpl refreshTokenManager;
 
     private static final long USER_ID = 1L;
     private static final String DEVICE_ID = "testDeviceId";

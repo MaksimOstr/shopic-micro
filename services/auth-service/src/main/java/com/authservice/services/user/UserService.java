@@ -114,7 +114,7 @@ public class UserService {
 
     public User getUserForAuth(String email) {
         log.info("Auth service received request to get user for auth: {}", email);
-        return userRepository.getUserForAuth(email)
+        return userRepository.findUserWithRolesByEmail(email)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 

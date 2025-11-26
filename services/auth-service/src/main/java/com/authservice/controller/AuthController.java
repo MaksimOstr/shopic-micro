@@ -26,7 +26,7 @@ public class AuthController {
     private final CookieService cookieService;
 
 
-    @PostMapping("/sing-up")
+    @PostMapping("/sign-up")
     public ResponseEntity<LocalRegisterResult> registerLocalUser(
             @Valid @RequestBody LocalRegisterRequest body
     ) {

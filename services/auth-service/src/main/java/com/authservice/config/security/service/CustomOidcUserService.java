@@ -55,7 +55,7 @@ public class CustomOidcUserService extends OidcUserService {
         return new CustomOidcUser(
                 userRequest.getIdToken(),
                 List.of(),
-                user.getId(),
+                user,
                 roleMapper.mapRolesToNames(user.getRoles())
         );
     }

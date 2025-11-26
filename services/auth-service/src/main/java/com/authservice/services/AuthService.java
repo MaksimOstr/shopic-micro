@@ -7,6 +7,7 @@ import com.authservice.dto.request.LocalRegisterRequest;
 import com.authservice.dto.request.SignInRequestDto;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
+import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
 import com.authservice.services.user.UserService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 
 @Slf4j
@@ -26,8 +28,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthService {
     private final AuthenticationManager authenticationManager;
-    private final TokenService tokenService;
+    private final RefreshTokenService refreshTokenService;
     private final UserService userService;
+    private final JwtService jwtService;
     private final RoleMapper roleMapper;
     private final CodeService codeService;
     private final MailService mailService;
@@ -52,17 +55,24 @@ public class AuthService {
         Authentication authReq = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
         Authentication authenticatedUser = authenticationManager.authenticate(authReq);
         CustomUserDetails customUserDetails = (CustomUserDetails) authenticatedUser.getPrincipal();
-        long userId = customUserDetails.getUserId();
-        List<String> roles = roleMapper.toRoleNames(customUserDetails.getAuthorities());
 
-        return tokenService.getTokenPair(userId, roles);
+        return getTokenPair(customUserDetails.getUser());
     }
 
     public TokenPairDto refreshTokens(String refreshToken) {
-        return tokenService.refreshTokens(refreshToken);
+        RefreshToken validatedToken = refreshTokenService.validate(refreshToken);
+        User user = validatedToken.getUser();
+        return getTokenPair(user);
+    }
+
+    private TokenPairDto getTokenPair(User user) {
+        String newRefreshToken = refreshTokenService.create(user);
+        String newAccessToken = jwtService.generateToken(String.valueOf(user.getId()), roleMapper.mapRolesToNames(user.getRoles()));
+
+        return new TokenPairDto(newAccessToken, newRefreshToken);
     }
 
     public void logout(String refreshToken) {
-        tokenService.logout(refreshToken);
+        refreshTokenService.deleteRefreshToken(refreshToken);
     }
 }

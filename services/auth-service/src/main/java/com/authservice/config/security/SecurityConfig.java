@@ -58,11 +58,10 @@ public class SecurityConfig {
                 .authenticationProvider(daoAuthenticationProvider)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
-                .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/verify/**").permitAll()
-                        .requestMatchers("/auth/register", "/auth/refresh", "/auth/sign-in").permitAll()
+                        .requestMatchers("/auth/sign-up", "/auth/refresh", "/auth/sign-in").permitAll()
                         .requestMatchers("/public-keys/**").permitAll()
                         .requestMatchers("/password/forgot-password", "/password/change").permitAll()
                         .anyRequest().authenticated())

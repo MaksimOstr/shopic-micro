@@ -19,6 +19,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private final Collection<? extends GrantedAuthority> authorities;
     @Getter
     private final long userId;
+    @Getter
+    private final User user;
 
     public CustomUserDetails(User user) {
         this.email = user.getEmail();
@@ -27,6 +29,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.isVerified = user.getIsVerified();
         this.userId = user.getId();
         this.authorities = mapToAuthorities(user.getRoles());
+        this.user = user;
     }
 
     @Override
