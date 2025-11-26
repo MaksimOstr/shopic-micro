@@ -36,13 +36,13 @@ public class RefreshTokenManager {
 
 
     @Transactional
-    public String create(long userId, String deviceId) {
-        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserIdAndDeviceId(userId, deviceId);
+    public String create(long userId) {
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserId(userId);
 
         if (optionalRefreshToken.isPresent()) {
             return updateRefreshToken(optionalRefreshToken.get());
         } else {
-            return createNewRefreshToken(userId, deviceId);
+            return createNewRefreshToken(userId);
         }
     }
 
@@ -59,8 +59,8 @@ public class RefreshTokenManager {
         return newToken;
     }
 
-    public void deleteRefreshToken(String token, String deviceId) {
-      int deleted = refreshTokenRepository.deleteRefreshTokenByTokenAndDeviceId(hashedToken(token), deviceId);
+    public void deleteRefreshToken(String token) {
+      int deleted = refreshTokenRepository.deleteRefreshTokenByToken(hashedToken(token));
 
       if (deleted == 0) {
           log.info("Refresh token was not deleted");
@@ -68,12 +68,11 @@ public class RefreshTokenManager {
     }
 
 
-    private String createNewRefreshToken(long userId, String deviceId) {
+    private String createNewRefreshToken(long userId) {
         String newToken = generateToken();
         User user = entityManager.getReference(User.class, userId);
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(hashedToken(newToken))
-                .deviceId(deviceId)
                 .user(user)
                 .expiresAt(getExpireTime())
                 .build();

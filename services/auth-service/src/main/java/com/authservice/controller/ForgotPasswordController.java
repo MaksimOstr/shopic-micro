@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 public class ForgotPasswordController {
     private final ForgotPasswordService forgotPasswordService;
 
-    @PostMapping("/request")
+
+    @PostMapping
     public ResponseEntity<Void> forgotPasswordRequest(
             @RequestBody @Valid ForgotPasswordRequest body
     ) {
@@ -23,12 +24,11 @@ public class ForgotPasswordController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/reset")
+    @PatchMapping
     public ResponseEntity<Void> resetPassword(
-            @RequestParam("code") String code,
             @RequestBody @Valid ResetPasswordRequest body
     ) {
-        forgotPasswordService.resetPassword(body.newPassword(), code);
+        forgotPasswordService.resetPassword(body);
 
         return ResponseEntity.ok().build();
     }

@@ -26,14 +26,11 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         CustomOidcUser oidcUser = (CustomOidcUser) authentication.getPrincipal();
-        String deviceId = UUID.randomUUID().toString();
 
-        TokenPairDto tokenResponse = tokenService.getTokenPair(oidcUser.getId(), oidcUser.getRoleNames(), deviceId);
+        TokenPairDto tokenResponse = tokenService.getTokenPair(oidcUser.getId(), oidcUser.getRoleNames());
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(tokenResponse.refreshToken());
-        Cookie deviceCookie = cookieService.createDeviceCookie(deviceId);
 
         response.addCookie(refreshTokenCookie);
-        response.addCookie(deviceCookie);
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json");
         response.getWriter().write(tokenResponse.accessToken());

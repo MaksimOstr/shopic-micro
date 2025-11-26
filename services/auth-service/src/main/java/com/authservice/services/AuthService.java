@@ -55,14 +55,14 @@ public class AuthService {
         long userId = customUserDetails.getUserId();
         List<String> roles = roleMapper.toRoleNames(customUserDetails.getAuthorities());
 
-        return tokenService.getTokenPair(userId, roles, dto.deviceId());
+        return tokenService.getTokenPair(userId, roles);
     }
 
-    public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
-        return tokenService.refreshTokens(refreshToken, deviceId);
+    public TokenPairDto refreshTokens(String refreshToken) {
+        return tokenService.refreshTokens(refreshToken);
     }
 
-    public void logout(String refreshToken, String deviceId) {
-        tokenService.logout(refreshToken, deviceId);
+    public void logout(String refreshToken) {
+        tokenService.logout(refreshToken);
     }
 }

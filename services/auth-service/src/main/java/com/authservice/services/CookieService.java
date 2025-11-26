@@ -11,7 +11,6 @@ public class CookieService {
     private int refreshTokenTtl;
 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
-    public static final String DEVICE_ID_COOKIE_NAME = "deviceId";
 
 
     public Cookie createRefreshTokenCookie(String refreshToken) {
@@ -25,31 +24,8 @@ public class CookieService {
         return cookie;
     }
 
-
-    public Cookie createDeviceCookie(String deviceId) {
-        Cookie cookie = new Cookie(DEVICE_ID_COOKIE_NAME, deviceId);
-
-        cookie.setMaxAge(31536000);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setAttribute("SameSite", "Lax");
-
-        return cookie;
-    }
-
     public Cookie deleteRefreshTokenCookie(String refreshToken) {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
-
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setAttribute("SameSite", "Lax");
-
-        return cookie;
-    }
-
-    public Cookie deleteDeviceCookie(String deviceId) {
-        Cookie cookie = new Cookie(DEVICE_ID_COOKIE_NAME, deviceId);
 
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);

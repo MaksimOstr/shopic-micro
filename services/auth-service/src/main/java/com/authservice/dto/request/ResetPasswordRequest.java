@@ -6,5 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 public record ResetPasswordRequest(
         @NotBlank
         @Min(8)
-        String newPassword
+        String newPassword,
+
+        @NotBlank
+        String code
 ) {}

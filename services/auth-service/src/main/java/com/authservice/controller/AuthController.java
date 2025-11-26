@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static com.authservice.services.CookieService.DEVICE_ID_COOKIE_NAME;
 import static com.authservice.services.CookieService.REFRESH_TOKEN_COOKIE_NAME;
 
 
@@ -23,12 +22,11 @@ import static com.authservice.services.CookieService.REFRESH_TOKEN_COOKIE_NAME;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
     private final AuthService authService;
     private final CookieService cookieService;
 
 
-    @PostMapping("/register")
+    @PostMapping("/sing-up")
     public ResponseEntity<LocalRegisterResult> registerLocalUser(
             @Valid @RequestBody LocalRegisterRequest body
     ) {
@@ -45,10 +43,8 @@ public class AuthController {
     ) {
         TokenPairDto tokenPair = authService.signIn(body);
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(tokenPair.refreshToken());
-        Cookie deviceIdCookie = cookieService.createDeviceCookie(body.deviceId());
 
         response.addCookie(refreshTokenCookie);
-        response.addCookie(deviceIdCookie);
 
         return ResponseEntity.ok(tokenPair.accessToken());
     }
@@ -56,15 +52,10 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshTokens(
-            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken,
-            @CookieValue(value = DEVICE_ID_COOKIE_NAME, required = false) String deviceId,
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
             HttpServletResponse response
     ) {
-        if(refreshToken == null || deviceId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        TokenPairDto tokenPair = authService.refreshTokens(refreshToken, deviceId);
+        TokenPairDto tokenPair = authService.refreshTokens(refreshToken);
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(tokenPair.refreshToken());
 
         response.addCookie(refreshTokenCookie);
@@ -77,16 +68,13 @@ public class AuthController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> logout(
             @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
-            @CookieValue(value = DEVICE_ID_COOKIE_NAME) String deviceId,
             HttpServletResponse response
     ) {
-        authService.logout(refreshToken, deviceId);
+        authService.logout(refreshToken);
 
         Cookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie(refreshToken);
-        Cookie deviceIdCookie = cookieService.deleteDeviceCookie(deviceId);
 
         response.addCookie(refreshTokenCookie);
-        response.addCookie(deviceIdCookie);
 
         String message = "You have been logged out successfully";
 

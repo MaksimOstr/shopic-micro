@@ -1,6 +1,7 @@
 package com.authservice.services.user;
 
 import com.authservice.dto.request.ForgotPasswordRequest;
+import com.authservice.dto.request.ResetPasswordRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
@@ -31,8 +32,8 @@ public class ForgotPasswordService {
     }
 
     @Transactional
-    public void resetPassword(String newPassword, String providedCode) {
-        Code code = codeService.validate(providedCode, CodeScopeEnum.RESET_PASSWORD);
-        userService.changeUserPassword(code.getUser(), newPassword);
+    public void resetPassword(ResetPasswordRequest dto) {
+        Code code = codeService.validate(dto.code(), CodeScopeEnum.RESET_PASSWORD);
+        userService.changeUserPassword(code.getUser(), dto.newPassword());
     }
 }

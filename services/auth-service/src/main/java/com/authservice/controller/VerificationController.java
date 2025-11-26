@@ -22,7 +22,7 @@ public class VerificationController {
         return ResponseEntity.ok("User verified successfully");
     }
 
-    @PostMapping("/request")
+    @PostMapping
     public ResponseEntity<String> requestVerificationCode(
             @RequestBody @Valid EmailVerifyRequestDto body
     ) {

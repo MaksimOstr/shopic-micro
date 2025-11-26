@@ -33,7 +33,4 @@ public class RefreshToken {
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
-
-    @Column(name = "device_id", nullable = false, unique = true)
-    private String deviceId;
 }

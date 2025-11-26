@@ -12,8 +12,5 @@ public record SignInRequestDto (
 
         @Size(min = 8)
         @NotBlank
-        String password,
-
-        @NotBlank
-        String deviceId
+        String password
 ) {}

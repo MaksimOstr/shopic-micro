@@ -1,15 +1,17 @@
 package com.authservice.services.user;
 
+import com.authservice.dto.UserDto;
 import com.authservice.dto.request.ChangePasswordRequest;
 import com.authservice.dto.request.CreateOAuthUserRequest;
 import com.authservice.dto.request.LocalRegisterRequest;
-import com.authservice.dto.response.CreateOAuthUserResponse;
+import com.authservice.dto.request.UpdateUserRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Role;
 import com.authservice.entity.User;
 import com.authservice.exceptions.AlreadyExistsException;
 import com.authservice.exceptions.NotFoundException;
 import com.authservice.exceptions.ResetPasswordException;
+import com.authservice.mapper.UserMapper;
 import com.authservice.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final UserMapper userMapper;
 
     private static final String USER_NOT_FOUND = "User was not found";
 
@@ -91,6 +94,22 @@ public class UserService {
 
         String encodedNewPassword = passwordEncoder.encode(dto.newPassword());
         user.setPassword(encodedNewPassword);
+    }
+
+    @Transactional
+    public UserDto updateUser(UpdateUserRequest dto, long userId) {
+        User user = findById(userId);
+
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+
+        return userMapper.toDto(user);
+    }
+
+    public UserDto getUserDto(long userId) {
+        User user = findById(userId);
+
+        return userMapper.toDto(user);
     }
 
     public User getUserForAuth(String email) {

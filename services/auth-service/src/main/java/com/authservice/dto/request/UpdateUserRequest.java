@@ -1,6 +1,6 @@
 package com.authservice.dto.request;
 
-public record UpdateProfileRequest(
+public record UpdateUserRequest(
         String lastName,
         String firstName
 ) {

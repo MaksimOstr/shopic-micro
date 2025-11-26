@@ -2,7 +2,7 @@ package com.authservice.dto;
 
 import java.time.Instant;
 
-public record UserProfileResponse(
+public record UserDto(
         Long id,
         String email,
         String firstName,

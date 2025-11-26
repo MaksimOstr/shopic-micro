@@ -23,8 +23,8 @@ public class TokenService {
 
 
     @Transactional
-    public TokenPairDto refreshTokens(String refreshToken, String deviceId) {
-        RefreshToken validatedRefreshToken = refreshTokenValidationService.validate(refreshToken, deviceId);
+    public TokenPairDto refreshTokens(String refreshToken) {
+        RefreshToken validatedRefreshToken = refreshTokenValidationService.validate(refreshToken);
         User user = validatedRefreshToken.getUser();
         long userId = user.getId();
         List<String> roleNames = roleMapper.mapRolesToNames(user.getRoles());
@@ -33,15 +33,15 @@ public class TokenService {
         return new TokenPairDto(getAccessToken(userId, roleNames), newRefreshToken);
     }
 
-    public TokenPairDto getTokenPair(long userId, List<String> userRoles, String deviceId) {
+    public TokenPairDto getTokenPair(long userId, List<String> userRoles) {
         String accessToken = getAccessToken(userId, userRoles);
-        String refreshToken = refreshTokenManager.create(userId, deviceId);
+        String refreshToken = refreshTokenManager.create(userId);
 
         return new TokenPairDto(accessToken, refreshToken);
     }
 
-    public void logout(String token, String deviceId) {
-        refreshTokenManager.deleteRefreshToken(token, deviceId);
+    public void logout(String token) {
+        refreshTokenManager.deleteRefreshToken(token);
     }
 
     private String getAccessToken(long userId, Collection<String> roleNames) {
