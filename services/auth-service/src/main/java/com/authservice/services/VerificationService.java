@@ -1,11 +1,9 @@
-package com.authservice.services.user;
+package com.authservice.services;
 
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.User;
 import com.authservice.exceptions.EmailVerifyException;
-import com.authservice.services.CodeService;
-import com.authservice.services.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

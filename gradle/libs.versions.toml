@@ -5,6 +5,7 @@ spring-cloud = "2024.0.1"
 mapstruct = "1.6.3"
 grpc-version = "0.8.0"
 protobuf = "0.9.5"
+openapi = "2.8.14"
 
 
 [libraries]
@@ -25,6 +26,7 @@ kafka = { module = "org.springframework.kafka:spring-kafka" }
 kafka-test = { module = "org.springframework.kafka:spring-kafka-test" }
 circuit-breaker = { module = "org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j" }
 actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+openapi-starter = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "openapi" }
 
 [plugins]
 spring-framework-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -33,7 +35,7 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 
 [bundles]
 core = ["spring-boot-starter-test", "spring-boot-starter", "junit", "actuator"]
-business-service = ["spring-boot-starter-web", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc", "spring-security", "circuit-breaker"]
+business-service = ["spring-boot-starter-web", "lombok", "mapstruct", "bean-validation", "kafka", "kafka-test", "grpc", "spring-security", "circuit-breaker", "openapi-starter"]
 business-service-additional = ["postgreSQL-driver", "liquidBase", "data-jpa"]
 
 

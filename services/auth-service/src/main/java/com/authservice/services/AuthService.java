@@ -10,7 +10,6 @@ import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
-import com.authservice.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;

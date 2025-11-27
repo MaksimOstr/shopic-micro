@@ -4,7 +4,7 @@ import com.authservice.dto.CreateOAuthUserRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
-import com.authservice.services.user.UserService;
+import com.authservice.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

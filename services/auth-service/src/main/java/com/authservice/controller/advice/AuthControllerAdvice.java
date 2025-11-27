@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class AuthControllerAdvice {
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleAlreadyExistsException(AlreadyExistsException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponseDto(
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDto(
                 HttpStatus.CONFLICT.getReasonPhrase(),
                 HttpStatus.CONFLICT.value(),
                 e.getMessage()

@@ -1,4 +1,4 @@
-package com.authservice.services.user;
+package com.authservice.services;
 
 import com.authservice.dto.UserDto;
 import com.authservice.dto.ChangePasswordRequest;

@@ -1,12 +1,10 @@
-package com.authservice.services.user;
+package com.authservice.services;
 
 import com.authservice.entity.Role;
 import com.authservice.exceptions.NotFoundException;
 import com.authservice.repositories.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

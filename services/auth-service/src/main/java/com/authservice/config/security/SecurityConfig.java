@@ -34,7 +34,11 @@ public class SecurityConfig {
             "/auth/login/oauth2/code/google",
             "/favicon.ico",
             "/forgot-password",
-            "/verify"
+            "/verify",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api-docs/**"
     };
 
     @Bean

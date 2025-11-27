@@ -1,4 +1,4 @@
-package com.authservice.services.user;
+package com.authservice.services;
 
 import com.authservice.dto.ForgotPasswordRequest;
 import com.authservice.dto.ResetPasswordRequest;
@@ -7,8 +7,6 @@ import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.User;
 import com.authservice.exceptions.ResetPasswordException;
-import com.authservice.services.CodeService;
-import com.authservice.services.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

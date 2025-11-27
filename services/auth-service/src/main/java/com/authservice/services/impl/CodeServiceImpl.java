@@ -58,7 +58,7 @@ public class CodeServiceImpl implements CodeService {
 
                     return foundCode;
                 })
-                .orElseThrow(() -> new NotFoundException("Code validation failed"));
+                .orElseThrow(() -> new CodeValidationException("Code validation failed"));
     }
 
 

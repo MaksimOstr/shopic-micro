@@ -13,7 +13,7 @@ import com.authservice.services.code.CodeCreationService;
 import com.authservice.services.code.CodeValidationService;
 import com.authservice.services.user.EmailChangeService;
 import com.authservice.services.user.PasswordService;
-import com.authservice.services.user.UserService;
+import com.authservice.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
