@@ -1,7 +1,7 @@
 package com.authservice.unit.service;
 
 import com.authservice.entity.RefreshToken;
-import com.authservice.exceptions.TokenValidationException;
+import com.authservice.exception.TokenValidationException;
 import com.authservice.repositories.RefreshTokenRepository;
 import com.authservice.services.RefreshTokenValidationService;
 import org.junit.jupiter.api.BeforeEach;

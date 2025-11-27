@@ -1,7 +1,7 @@
 package com.authservice.security;
 
 import com.authservice.entity.AuthProviderEnum;
-import com.authservice.exceptions.NotFoundException;
+import com.authservice.exception.NotFoundException;
 import com.authservice.entity.User;
 import com.authservice.services.UserService;
 import lombok.RequiredArgsConstructor;

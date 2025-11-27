@@ -6,8 +6,9 @@ import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.User;
-import com.authservice.exceptions.ResetPasswordException;
+import com.authservice.exception.ApiException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,7 @@ public class ForgotPasswordService {
         User user = userService.findByEmail(dto.email());
 
         if(user.getAuthProvider() != AuthProviderEnum.LOCAL) {
-            throw new ResetPasswordException("User is not a local user");
+            throw new ApiException("User is not a local user", HttpStatus.BAD_REQUEST);
         }
 
         Code code = codeService.create(user, CodeScopeEnum.RESET_PASSWORD);

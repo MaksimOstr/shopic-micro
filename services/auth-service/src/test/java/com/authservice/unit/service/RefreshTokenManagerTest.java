@@ -2,7 +2,7 @@ package com.authservice.unit.service;
 
 import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
-import com.authservice.exceptions.AlreadyExistsException;
+import com.authservice.exception.AlreadyExistsException;
 import com.authservice.repositories.RefreshTokenRepository;
 import com.authservice.services.impl.RefreshTokenServiceImpl;
 import jakarta.persistence.EntityManager;

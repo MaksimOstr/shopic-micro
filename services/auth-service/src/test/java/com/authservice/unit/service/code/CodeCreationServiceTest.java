@@ -3,7 +3,7 @@ package com.authservice.unit.service.code;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.User;
-import com.authservice.exceptions.InternalServiceException;
+import com.authservice.exception.InternalServiceException;
 import com.authservice.repositories.CodeRepository;
 import com.authservice.services.code.CodeCreationService;
 import io.github.resilience4j.retry.MaxRetriesExceededException;

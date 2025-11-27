@@ -4,7 +4,7 @@ import com.authservice.dto.LocalRegisterRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Role;
 import com.authservice.entity.User;
-import com.authservice.exceptions.AlreadyExistsException;
+import com.authservice.exception.AlreadyExistsException;
 import com.authservice.services.user.LocalUserService;
 import com.authservice.services.user.PasswordService;
 import com.authservice.services.RoleService;

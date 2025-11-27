@@ -3,12 +3,12 @@ package com.authservice.services.impl;
 import com.authservice.config.properties.RefreshTokenProperties;
 import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
-import com.authservice.exceptions.TokenValidationException;
+import com.authservice.exception.ApiException;
 import com.authservice.repositories.RefreshTokenRepository;
 import com.authservice.services.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +48,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken token = findToken(refreshToken);
 
         if(token.getExpiresAt().isBefore(Instant.now())) {
-            throw new TokenValidationException("Session is expired");
+            throw new ApiException("Session is expired", HttpStatus.UNAUTHORIZED);
         }
 
         refreshTokenRepository.delete(token);
@@ -63,7 +63,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private RefreshToken findToken(String token) {
         return refreshTokenRepository.findByToken(hashedToken(token))
-                .orElseThrow(() -> new TokenValidationException("Refresh token not found"));
+                .orElseThrow(() -> new ApiException("Refresh token not found",  HttpStatus.NOT_FOUND));
     }
 
     private String hashedToken(String token) {

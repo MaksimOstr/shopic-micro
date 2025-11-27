@@ -2,7 +2,7 @@ package com.authservice.unit.service;
 
 import com.authservice.entity.EmailChangeRequest;
 import com.authservice.entity.User;
-import com.authservice.exceptions.NotFoundException;
+import com.authservice.exception.NotFoundException;
 import com.authservice.repositories.EmailChangeRequestRepository;
 import com.authservice.services.EmailChangeRequestService;
 import org.junit.jupiter.api.BeforeEach;

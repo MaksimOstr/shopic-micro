@@ -9,7 +9,7 @@ import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.Role;
 import com.authservice.entity.User;
-import com.authservice.exceptions.AlreadyExistsException;
+import com.authservice.exception.AlreadyExistsException;
 import com.authservice.mapper.RoleMapper;
 import com.authservice.services.AuthService;
 import com.authservice.services.MailService;

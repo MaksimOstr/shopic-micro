@@ -3,9 +3,7 @@ package com.authservice.services.impl;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.User;
-import com.authservice.exceptions.CodeValidationException;
-import com.authservice.exceptions.InternalServiceException;
-import com.authservice.exceptions.NotFoundException;
+import com.authservice.exception.ApiException;
 import com.authservice.repositories.CodeRepository;
 import com.authservice.services.CodeService;
 import io.github.resilience4j.retry.MaxRetriesExceededException;
@@ -13,6 +11,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +40,7 @@ public class CodeServiceImpl implements CodeService {
             return createAndSave(user, scope);
         } catch (MaxRetriesExceededException e) {
             log.error("Max retries exceeded", e);
-            throw new InternalServiceException("Code generation failed.");
+            throw new ApiException("Code generation failed.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -51,14 +50,14 @@ public class CodeServiceImpl implements CodeService {
                 .map(foundCode -> {
                     if(isCodeExpired(foundCode)) {
                         log.error("Code validation failed: code is expired");
-                        throw new CodeValidationException("Code validation failed");
+                        throw new ApiException("Code validation failed", HttpStatus.BAD_REQUEST);
                     }
 
                     codeRepository.delete(foundCode);
 
                     return foundCode;
                 })
-                .orElseThrow(() -> new CodeValidationException("Code validation failed"));
+                .orElseThrow(() -> new ApiException("Code validation failed", HttpStatus.BAD_REQUEST));
     }
 
 

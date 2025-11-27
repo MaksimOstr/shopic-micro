@@ -8,14 +8,14 @@ import com.authservice.dto.UpdateUserRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Role;
 import com.authservice.entity.User;
-import com.authservice.exceptions.AlreadyExistsException;
-import com.authservice.exceptions.NotFoundException;
-import com.authservice.exceptions.ResetPasswordException;
+import com.authservice.exception.ApiException;
+import com.authservice.exception.NotFoundException;
 import com.authservice.mapper.UserMapper;
 import com.authservice.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +36,7 @@ public class UserService {
 
     public User createUser(LocalRegisterRequest dto) {
         if (isUserExist(dto.email())) {
-            throw new AlreadyExistsException("User with such an email already exists");
+            throw new ApiException("User with such an email already exists", HttpStatus.CONFLICT);
         }
 
         Role defaultRole = roleService.getRoleByName("ROLE_USER");
@@ -73,7 +73,7 @@ public class UserService {
     @Transactional
     public void changeUserPassword(User user, String newPassword) {
         if(passwordEncoder.matches(newPassword, user.getPassword())) {
-            throw new ResetPasswordException("Password is the same");
+            throw new ApiException("Password is the same", HttpStatus.BAD_REQUEST);
         }
 
         String encodedPassword = passwordEncoder.encode(newPassword);
