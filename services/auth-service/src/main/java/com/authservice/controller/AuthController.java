@@ -4,6 +4,7 @@ import com.authservice.dto.ErrorResponseDto;
 import com.authservice.dto.LocalRegisterRequest;
 import com.authservice.dto.LocalRegisterResult;
 import com.authservice.dto.SignInRequestDto;
+import com.authservice.dto.SignInResponse;
 import com.authservice.dto.TokenPairDto;
 import com.authservice.services.AuthService;
 import com.authservice.services.CookieService;
@@ -50,15 +51,33 @@ public class AuthController {
                             schema = @Schema(implementation = LocalRegisterResult.class)
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "Invalid input data",
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
                     content = @Content(
-                            examples = @ExampleObject(
-                                    value = """
-                                                {
-                                                 "email": "must be in email address format",
-                                                }
-                                            """)
-                    )),
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Invalid email",
+                                            value = """
+                                                    {
+                                                        "email": "must be in email address format"
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Passwords do not match",
+                                            value = """
+                                                    {
+                                                        "code": "Bad request",
+                                                        "status": 400,
+                                                        "message": "Passwords do not match"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
             @ApiResponse(
                     responseCode = "409",
                     description = "User with the same email already exists.",
@@ -98,8 +117,8 @@ public class AuthController {
                     responseCode = "200",
                     description = "Authentication successful.",
                     content = @Content(
-                            mediaType = "text/plain",
-                            schema = @Schema(type = "string", example = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...")
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SignInResponse.class)
                     )
             ),
             @ApiResponse(responseCode = "400", description = "Invalid input data",
@@ -121,7 +140,7 @@ public class AuthController {
             )
     })
     @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(
+    public ResponseEntity<SignInResponse> signIn(
             @RequestBody @Valid SignInRequestDto body,
             HttpServletResponse response
     ) {
@@ -130,7 +149,7 @@ public class AuthController {
 
         response.addCookie(refreshTokenCookie);
 
-        return ResponseEntity.ok(tokenPair.accessToken());
+        return ResponseEntity.ok(new SignInResponse(tokenPair.accessToken()));
     }
 
 

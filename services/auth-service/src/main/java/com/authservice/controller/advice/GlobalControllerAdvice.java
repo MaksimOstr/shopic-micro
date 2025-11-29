@@ -34,7 +34,7 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler(MissingRequestCookieException.class)
-    public ResponseEntity<ErrorResponseDto> handleMissingCookieException(Exception e) {
+    public ResponseEntity<ErrorResponseDto> handleMissingCookieException(MissingRequestCookieException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 HttpStatus.BAD_REQUEST.value(),

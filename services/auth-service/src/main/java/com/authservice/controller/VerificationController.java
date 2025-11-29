@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/v1/verify")
+@RequestMapping("/api/v1/verification")
 @RequiredArgsConstructor
 @Tag(name = "Email Verification", description = "Endpoints for issuing and confirming email verification codes")
 public class VerificationController {
@@ -33,11 +33,7 @@ public class VerificationController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "User verified.",
-                    content = @Content(
-                            mediaType = "text/plain",
-                            schema = @Schema(type = "string", example = "User verified successfully")
-                    )
+                    description = "User verified."
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -53,7 +49,7 @@ public class VerificationController {
             @RequestBody @Valid VerifyUserRequestDto body
     ) {
         verificationService.verifyUser(body.code());
-        return ResponseEntity.ok("User verified successfully");
+        return ResponseEntity.ok().build();
     }
 
     @Operation(

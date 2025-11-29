@@ -26,15 +26,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private static final String[] permittedURLs = {
             "/actuator/**",
-            "/auth/sign-up",
-            "/auth/sign-in",
-            "/auth/refresh",
+            "/api/v1/auth/**",
+            "/api/v1/verification",
             "/public-keys",
             "/auth/oauth2/authorization/google",
             "/auth/login/oauth2/code/google",
             "/favicon.ico",
-            "/forgot-password",
-            "/verify",
+            "/api/v1/forgot-password",
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs/**",

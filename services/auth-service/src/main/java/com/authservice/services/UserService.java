@@ -33,6 +33,10 @@ public class UserService {
     private static final String USER_NOT_FOUND = "User was not found";
 
     public User createUser(LocalRegisterRequest dto) {
+        if(!dto.password().equals(dto.confirmPassword())){
+            throw new ApiException("Passwords do not match", HttpStatus.BAD_REQUEST);
+        }
+
         if (isUserExist(dto.email())) {
             throw new ApiException("User with such an email already exists", HttpStatus.CONFLICT);
         }

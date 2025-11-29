@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "refresh-toke")
+@ConfigurationProperties(prefix = "refresh-token")
 public class RefreshTokenProperties {
     private String secret;
     private Integer expiresAt;

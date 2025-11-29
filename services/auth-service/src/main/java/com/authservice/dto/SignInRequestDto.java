@@ -2,14 +2,12 @@ package com.authservice.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 public record SignInRequestDto (
-        @Email
-        @NotBlank
+        @NotBlank(message = "Email should be valid and not blank")
+        @Email(message = "Email should be valid")
         String email,
 
-        @Size(min = 8)
-        @NotBlank
+        @NotBlank(message = "Password should be not blank")
         String password
 ) {}
