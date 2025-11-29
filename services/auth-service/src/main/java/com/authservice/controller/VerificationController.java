@@ -59,11 +59,7 @@ public class VerificationController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Verification code generated and sent.",
-                    content = @Content(
-                            mediaType = "text/plain",
-                            schema = @Schema(type = "string", example = "Verification code sent to: ada@example.com")
-                    )
+                    description = "Verification code generated and sent."
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -75,10 +71,10 @@ public class VerificationController {
             )
     })
     @PostMapping
-    public ResponseEntity<String> requestVerificationCode(
+    public ResponseEntity<Void> requestVerificationCode(
             @RequestBody @Valid EmailVerifyRequestDto body
     ) {
         verificationService.requestVerifyEmail(body.email());
-        return ResponseEntity.ok("Verification code sent to: " + body.email());
+        return ResponseEntity.ok().build();
     }
 }

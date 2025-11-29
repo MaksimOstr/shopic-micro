@@ -57,6 +57,7 @@ public class AuthService {
         return getTokenPair(customUserDetails.getUser());
     }
 
+    @Transactional
     public TokenPairDto refreshTokens(String refreshToken) {
         RefreshToken validatedToken = refreshTokenService.validate(refreshToken);
         User user = validatedToken.getUser();

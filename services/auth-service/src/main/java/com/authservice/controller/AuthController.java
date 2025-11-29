@@ -162,8 +162,8 @@ public class AuthController {
                     responseCode = "200",
                     description = "Refresh succeeded.",
                     content = @Content(
-                            mediaType = "text/plain",
-                            schema = @Schema(type = "string", example = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...")
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SignInResponse.class)
                     )
             ),
             @ApiResponse(
@@ -184,7 +184,7 @@ public class AuthController {
             )
     })
     @PostMapping("/refresh")
-    public ResponseEntity<String> refreshTokens(
+    public ResponseEntity<SignInResponse> refreshTokens(
             @CookieValue("${refresh-token.cookie-name:refresh-token}") String refreshToken,
             HttpServletResponse response
     ) {
@@ -193,7 +193,7 @@ public class AuthController {
 
         response.addCookie(refreshTokenCookie);
 
-        return ResponseEntity.ok(tokenPair.accessToken());
+        return ResponseEntity.ok(new SignInResponse(tokenPair.accessToken()));
     }
 
 
@@ -204,11 +204,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Logout completed, cookie cleared.",
-                    content = @Content(
-                            mediaType = "text/plain",
-                            schema = @Schema(type = "string", example = "You have been logged out successfully")
-                    )
+                    description = "Logout completed, cookie cleared."
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -229,7 +225,7 @@ public class AuthController {
     })
     @PostMapping("/logout")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> logout(
+    public ResponseEntity<Void> logout(
             @CookieValue("${refresh-token.cookie-name:refresh-token}") String refreshToken,
             HttpServletResponse response
     ) {
@@ -239,8 +235,6 @@ public class AuthController {
 
         response.addCookie(refreshTokenCookie);
 
-        String message = "You have been logged out successfully";
-
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok().build();
     }
 }

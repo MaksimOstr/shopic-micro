@@ -51,8 +51,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             throw new ApiException("Session is expired", HttpStatus.UNAUTHORIZED);
         }
 
-        refreshTokenRepository.delete(token);
-
         return token;
     }
 

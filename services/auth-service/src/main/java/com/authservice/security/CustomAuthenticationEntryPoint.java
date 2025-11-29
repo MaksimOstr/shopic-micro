@@ -36,14 +36,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        String message = authException != null && authException.getMessage() != null
-                ? authException.getMessage()
-                : "Authentication is required";
-
         ErrorResponseDto error = new ErrorResponseDto(
                 HttpStatus.UNAUTHORIZED.getReasonPhrase(),
                 HttpStatus.UNAUTHORIZED.value(),
-                message
+                "Authentication is required"
         );
 
         objectMapper.writeValue(response.getOutputStream(), error);
