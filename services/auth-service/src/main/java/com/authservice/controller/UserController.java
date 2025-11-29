@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -115,46 +114,4 @@ public class UserController {
 
         return ResponseEntity.ok(userDto);
     }
-
-
-    @Operation(
-            summary = "Update profile",
-            description = "Updates the authenticated user's first and/or last name."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Profile updated.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Authentication required.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "User not found.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-            )
-    })
-    @PatchMapping
-    public ResponseEntity<UserDto> updateProfile(
-            @RequestBody UpdateUserRequest body,
-            @AuthenticationPrincipal CustomPrincipal principal
-    ) {
-        UserDto userDto = userService.updateUser(body, principal.getId());
-
-        return ResponseEntity.ok(userDto);
-    }
-
 }

@@ -38,52 +38,11 @@ public class ForgotPasswordController {
                     description = "Reset code generated and sent."
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Validation failed or account is not a local account.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "ValidationError",
-                                            value = "{\"email\":\"must be a well-formed email address\"}"
-                                    ),
-                                    @ExampleObject(
-                                            name = "NonLocalAccount",
-                                            value = """
-                                                    {
-                                                      "code": "Bad Request",
-                                                      "status": 400,
-                                                      "message": "User is not a local user"
-                                                    }
-                                                    """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "User email not found.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-            ),
-            @ApiResponse(
                     responseCode = "500",
                     description = "Unable to generate reset code.",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponseDto.class),
-                            examples = @ExampleObject(
-                                    name = "CodeGenerationFailed",
-                                    value = """
-                                            {
-                                              "code": "Internal Server Error",
-                                              "status": 500,
-                                              "message": "Code generation failed."
-                                            }
-                                            """
-                            )
+                            schema = @Schema(implementation = ErrorResponseDto.class)
                     )
             )
     })

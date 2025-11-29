@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -47,14 +46,6 @@ public class VerificationController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponseDto.class)
                     )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Verification code or target user not found.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
             )
     })
     @PatchMapping
@@ -76,22 +67,6 @@ public class VerificationController {
                     content = @Content(
                             mediaType = "text/plain",
                             schema = @Schema(type = "string", example = "Verification code sent to: ada@example.com")
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Email is already verified.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "User email not found.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponseDto.class)
                     )
             ),
             @ApiResponse(

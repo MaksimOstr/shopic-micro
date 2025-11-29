@@ -22,7 +22,7 @@ public class RotatingJwkManager {
     private final List<RSAKey> keys = new CopyOnWriteArrayList<>();
     
     @Scheduled(fixedDelay = 1000 * 60 * 60 * 3)
-    public void init() {
+    public void rotate() {
         try {
             rotateKeys();
             authEventProducer.sendJwkSetInvalidationEvent();

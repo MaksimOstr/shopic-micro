@@ -2,11 +2,8 @@ package com.authservice.services;
 
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
-import com.authservice.entity.User;
-import com.authservice.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,16 +17,15 @@ public class VerificationService {
 
     @Transactional
     public void requestVerifyEmail(String email) {
-        User user = userService.findByEmail(email);
-
-        if (user.getIsVerified()) {
-            log.error("User already verified");
-            throw new ApiException("Email verification request failed", HttpStatus.BAD_REQUEST);
-        }
-
-        Code code = codeService.create(user, CodeScopeEnum.EMAIL_VERIFICATION);
-
-        mailService.sendEmailVerificationCode(user.getEmail(), code.getCode());
+        userService.findOptionalByEmail(email)
+                .ifPresent(user -> {
+                    if (!user.getIsVerified()) {
+                        Code code = codeService.create(user, CodeScopeEnum.EMAIL_VERIFICATION);
+                        mailService.sendEmailVerificationCode(user.getEmail(), code.getCode());
+                        return;
+                    }
+                    log.info("User already verified, skipping verification email");
+                });
     }
 
     public void verifyUser(String providedCode) {

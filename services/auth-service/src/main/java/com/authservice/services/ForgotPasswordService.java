@@ -5,13 +5,13 @@ import com.authservice.dto.ResetPasswordRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
-import com.authservice.entity.User;
-import com.authservice.exception.ApiException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ForgotPasswordService {
@@ -20,14 +20,15 @@ public class ForgotPasswordService {
     private final CodeService codeService;
 
     public void requestResetPassword(ForgotPasswordRequest dto) {
-        User user = userService.findByEmail(dto.email());
-
-        if(user.getAuthProvider() != AuthProviderEnum.LOCAL) {
-            throw new ApiException("User is not a local user", HttpStatus.BAD_REQUEST);
-        }
-
-        Code code = codeService.create(user, CodeScopeEnum.RESET_PASSWORD);
-        mailService.sendForgotPasswordChange(user.getEmail(), code.getCode());
+        userService.findOptionalByEmail(dto.email())
+                .ifPresent(user -> {
+                    if (user.getAuthProvider() == AuthProviderEnum.LOCAL) {
+                        Code code = codeService.create(user, CodeScopeEnum.RESET_PASSWORD);
+                        mailService.sendForgotPasswordChange(user.getEmail(), code.getCode());
+                        return;
+                    }
+                    log.info("User is not present, skipping...");
+                });
     }
 
     @Transactional

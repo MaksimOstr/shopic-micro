@@ -1,6 +1,5 @@
 package com.authservice.security;
 
-import com.authservice.dto.CreateOAuthUserRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.User;
 import com.authservice.mapper.RoleMapper;
@@ -40,11 +39,8 @@ public class CustomOidcUserService extends OidcUserService {
         String provider = userRequest.getClientRegistration().getRegistrationId();
         AuthProviderEnum authProvider = AuthProviderEnum.fromString(provider);
         String email = idToken.getEmail();
-        String firstName = idToken.getGivenName();
-        String lastName = idToken.getFamilyName();
 
-        CreateOAuthUserRequest request = new CreateOAuthUserRequest(authProvider, email, firstName, lastName);
-        User user = userService.createOrGetOAuthUser(request);
+        User user = userService.createOrGetOAuthUser(authProvider, email);
 
         if(user.getAuthProvider().equals(AuthProviderEnum.LOCAL)) {
             log.error("User has been registered via another provider: {}", user.getAuthProvider());

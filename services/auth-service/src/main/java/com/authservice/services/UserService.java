@@ -2,9 +2,7 @@ package com.authservice.services;
 
 import com.authservice.dto.UserDto;
 import com.authservice.dto.ChangePasswordRequest;
-import com.authservice.dto.CreateOAuthUserRequest;
 import com.authservice.dto.LocalRegisterRequest;
-import com.authservice.dto.UpdateUserRequest;
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.Role;
 import com.authservice.entity.User;
@@ -12,7 +10,6 @@ import com.authservice.exception.ApiException;
 import com.authservice.exception.NotFoundException;
 import com.authservice.mapper.UserMapper;
 import com.authservice.repositories.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
+
 
 @Slf4j
 @Service
@@ -42,8 +40,6 @@ public class UserService {
         Role defaultRole = roleService.getRoleByName("ROLE_USER");
         String hashedPassword = passwordEncoder.encode(dto.password());
         User user = User.builder()
-                .firstName(dto.firstName())
-                .lastName(dto.lastName())
                 .email(dto.email())
                 .password(hashedPassword)
                 .roles(Set.of(defaultRole))
@@ -54,16 +50,14 @@ public class UserService {
     }
 
     @Transactional
-    public User createOrGetOAuthUser(@Valid CreateOAuthUserRequest dto) {
-        return findOptionalByEmail(dto.email())
+    public User createOrGetOAuthUser(AuthProviderEnum provider,  String email) {
+        return findOptionalByEmail(email)
                 .orElseGet(() -> {
                     Role defaultRole = roleService.getRoleByName("ROLE_USER");
                     User user = User.builder()
-                            .firstName(dto.firstName())
-                            .lastName(dto.lastName())
-                            .email(dto.email())
+                            .email(email)
                             .roles(Set.of(defaultRole))
-                            .authProvider(dto.provider())
+                            .authProvider(provider)
                             .build();
 
                     return userRepository.save(user);
@@ -86,21 +80,11 @@ public class UserService {
         boolean isEqual = passwordEncoder.matches(user.getPassword(), dto.oldPassword());
 
         if(!isEqual) {
-            throw new IllegalArgumentException("Password does not match");
+            throw new ApiException("Password does not match", HttpStatus.BAD_REQUEST);
         }
 
         String encodedNewPassword = passwordEncoder.encode(dto.newPassword());
         user.setPassword(encodedNewPassword);
-    }
-
-    @Transactional
-    public UserDto updateUser(UpdateUserRequest dto, long userId) {
-        User user = findById(userId);
-
-        user.setFirstName(dto.firstName());
-        user.setLastName(dto.lastName());
-
-        return userMapper.toDto(user);
     }
 
     public UserDto getUserDto(long userId) {
