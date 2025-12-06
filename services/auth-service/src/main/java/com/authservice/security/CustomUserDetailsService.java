@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
             log.info("Loading user by email {}", email);
-            User user = userQueryService.getUserForAuth(email);
+            User user = userQueryService.findByEmail(email);
 
             if(user.getAuthProvider() != AuthProviderEnum.LOCAL) {
                 throw new UsernameNotFoundException("User was registered with another provider");

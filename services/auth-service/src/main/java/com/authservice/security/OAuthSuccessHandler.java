@@ -1,7 +1,6 @@
 package com.authservice.security;
 
 import com.authservice.entity.User;
-import com.authservice.mapper.RoleMapper;
 import com.authservice.services.CookieService;
 import com.authservice.services.JwtService;
 import com.authservice.services.RefreshTokenService;
@@ -15,6 +14,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -23,14 +23,16 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final CookieService cookieService;
-    private final RoleMapper roleMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         CustomOidcUser oidcUser = (CustomOidcUser) authentication.getPrincipal();
         String newRefreshToken = refreshTokenService.create(oidcUser.getUser());
         User user = oidcUser.getUser();
-        String newAccessToken = jwtService.generateToken(String.valueOf(user.getId()), roleMapper.mapRolesToNames(user.getRoles()));
+        String newAccessToken = jwtService.generateToken(
+                user.getId().toString(),
+                user.getRole()
+        );
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(newRefreshToken);
 
         response.addCookie(refreshTokenCookie);

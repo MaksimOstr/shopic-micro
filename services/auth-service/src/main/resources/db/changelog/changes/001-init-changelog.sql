@@ -1,0 +1,28 @@
+CREATE SEQUENCE users_seq
+    START WITH 1
+    INCREMENT BY 50
+    CACHE 50;
+
+CREATE SEQUENCE refresh_tokens_seq
+    START WITH 1
+    INCREMENT BY 50
+    CACHE 50;
+
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY DEFAULT nextval('users_seq'),
+    email VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255),
+    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    is_non_blocked BOOLEAN NOT NULL,
+    auth_provider VARCHAR(20) NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE refresh_tokens (
+    id BIGINT PRIMARY KEY DEFAULT nextval('refresh_tokens_seq'),
+    token TEXT NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

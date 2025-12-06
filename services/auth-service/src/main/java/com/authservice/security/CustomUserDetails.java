@@ -1,6 +1,5 @@
 package com.authservice.security;
 
-import com.authservice.entity.Role;
 import com.authservice.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.CredentialsContainer;
@@ -8,7 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
+import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
@@ -18,7 +18,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private final boolean isVerified;
     private final Collection<? extends GrantedAuthority> authorities;
     @Getter
-    private final long userId;
+    private final UUID userId;
     @Getter
     private final User user;
 
@@ -28,7 +28,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.isNonBlocked = user.getIsNonBlocked();
         this.isVerified = user.getIsVerified();
         this.userId = user.getId();
-        this.authorities = mapToAuthorities(user.getRoles());
+        this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
         this.user = user;
     }
 
@@ -62,7 +62,4 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.password = null;
     }
 
-    private Collection<? extends GrantedAuthority> mapToAuthorities(Set<Role> roles) {
-            return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList();
-    }
 }

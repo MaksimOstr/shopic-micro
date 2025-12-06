@@ -4,7 +4,7 @@ import com.authservice.dto.UserDto;
 import com.authservice.dto.ChangePasswordRequest;
 import com.authservice.dto.LocalRegisterRequest;
 import com.authservice.entity.AuthProviderEnum;
-import com.authservice.entity.Role;
+import com.authservice.entity.UserRolesEnum;
 import com.authservice.entity.User;
 import com.authservice.exception.ApiException;
 import com.authservice.exception.NotFoundException;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.Set;
+import java.util.UUID;
 
 
 @Slf4j
@@ -27,7 +27,6 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleService roleService;
     private final UserMapper userMapper;
 
     private static final String USER_NOT_FOUND = "User was not found";
@@ -41,12 +40,11 @@ public class UserService {
             throw new ApiException("User with such an email already exists", HttpStatus.CONFLICT);
         }
 
-        Role defaultRole = roleService.getRoleByName("ROLE_USER");
         String hashedPassword = passwordEncoder.encode(dto.password());
         User user = User.builder()
                 .email(dto.email())
                 .password(hashedPassword)
-                .roles(Set.of(defaultRole))
+                .role(UserRolesEnum.ROLE_USER)
                 .authProvider(AuthProviderEnum.LOCAL)
                 .build();
 
@@ -57,10 +55,9 @@ public class UserService {
     public User createOrGetOAuthUser(AuthProviderEnum provider,  String email) {
         return findOptionalByEmail(email)
                 .orElseGet(() -> {
-                    Role defaultRole = roleService.getRoleByName("ROLE_USER");
                     User user = User.builder()
                             .email(email)
-                            .roles(Set.of(defaultRole))
+                            .role(UserRolesEnum.ROLE_USER)
                             .authProvider(provider)
                             .build();
 
@@ -79,9 +76,9 @@ public class UserService {
     }
 
     @Transactional
-    public void changeUserPassword(long id, ChangePasswordRequest dto) {
+    public void changeUserPassword(UUID id, ChangePasswordRequest dto) {
         User user = findById(id);
-        boolean isEqual = passwordEncoder.matches(user.getPassword(), dto.oldPassword());
+        boolean isEqual = passwordEncoder.matches(dto.oldPassword(), user.getPassword());
 
         if(!isEqual) {
             throw new ApiException("Password does not match", HttpStatus.BAD_REQUEST);
@@ -91,23 +88,17 @@ public class UserService {
         user.setPassword(encodedNewPassword);
     }
 
-    public UserDto getUserDto(long userId) {
+    public UserDto getUserDto(UUID userId) {
         User user = findById(userId);
 
         return userMapper.toDto(user);
-    }
-
-    public User getUserForAuth(String email) {
-        log.info("Auth service received request to get user for auth: {}", email);
-        return userRepository.findUserWithRolesByEmail(email)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
     public boolean isUserExist(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    public User findById(long id) {
+    public User findById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
@@ -117,7 +108,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public void updateVerificationStatus(long userId, boolean verified) {
+    public void updateVerificationStatus(UUID userId, boolean verified) {
         int updated = userRepository.markUserVerified(userId, verified);
 
         if (updated == 0) {

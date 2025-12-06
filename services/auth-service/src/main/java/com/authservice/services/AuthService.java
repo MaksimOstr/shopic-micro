@@ -10,7 +10,6 @@ import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
 import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
-import com.authservice.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +18,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Slf4j
@@ -29,7 +30,6 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
     private final JwtService jwtService;
-    private final RoleMapper roleMapper;
     private final CodeService codeService;
     private final MailService mailService;
 
@@ -66,7 +66,10 @@ public class AuthService {
 
     private TokenPairDto getTokenPair(User user) {
         String newRefreshToken = refreshTokenService.create(user);
-        String newAccessToken = jwtService.generateToken(String.valueOf(user.getId()), roleMapper.mapRolesToNames(user.getRoles()));
+        String newAccessToken = jwtService.generateToken(
+                user.getId().toString(),
+                user.getRole()
+        );
 
         return new TokenPairDto(newAccessToken, newRefreshToken);
     }

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "codes")
@@ -18,8 +19,8 @@ import java.time.Instant;
 @EntityListeners(AuditingEntityListener.class)
 public class Code {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "codes_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "code", nullable = false, unique = true, length = 20)
     private String code;

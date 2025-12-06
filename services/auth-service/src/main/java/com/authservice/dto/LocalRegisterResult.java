@@ -1,9 +1,10 @@
 package com.authservice.dto;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record LocalRegisterResult (
-        long userId,
+        UUID userId,
         String email,
         Instant createdAt
 ) {}

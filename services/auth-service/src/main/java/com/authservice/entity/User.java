@@ -7,7 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -19,8 +19,8 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(unique = true, nullable = false, length = 50)
     private String email;
@@ -37,6 +37,10 @@ public class User {
     @Column(name = "auth_provider", nullable = false)
     private AuthProviderEnum authProvider;
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private UserRolesEnum role = UserRolesEnum.ROLE_USER;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -44,14 +48,6 @@ public class User {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
 
     @PrePersist
     protected void onCreate() {

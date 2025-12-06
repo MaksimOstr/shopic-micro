@@ -2,13 +2,13 @@ package com.authservice.security;
 
 import com.authservice.entity.AuthProviderEnum;
 import com.authservice.entity.User;
-import com.authservice.mapper.RoleMapper;
 import com.authservice.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
@@ -22,7 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
     private final UserService userService;
-    private final RoleMapper roleMapper;
 
 
     private static final OAuth2Error error = new OAuth2Error(
@@ -49,9 +48,8 @@ public class CustomOidcUserService extends OidcUserService {
 
         return new CustomOidcUser(
                 userRequest.getIdToken(),
-                List.of(),
-                user,
-                roleMapper.mapRolesToNames(user.getRoles())
+                List.of(new SimpleGrantedAuthority(user.getRole().name())),
+                user
         );
     }
 }

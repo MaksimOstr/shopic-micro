@@ -7,19 +7,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
     boolean existsByEmail(String email);
 
     @Transactional
     @Modifying
     @Query("UPDATE User u SET u.isVerified = :verified WHERE u.id = :userId")
-    int markUserVerified(@Param("userId") long userId, @Param("verified") boolean verified);
-
-
-    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.email = :email")
-    Optional<User> findUserWithRolesByEmail(@Param("email") String email);
+    int markUserVerified(@Param("userId") UUID userId, @Param("verified") boolean verified);
 
     Optional<User> findByEmail(String email);
 }
