@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.Instant;
 
+import static com.authservice.utils.CodeUtils.generateAlphanumericCode;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -27,10 +29,6 @@ public class CodeServiceImpl implements CodeService {
 
     @Value("${verification-code.expires-at}")
     private int expiresAt;
-    private final static byte CODE_LENGTH = 8;
-    private final static String chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-    private final SecureRandom random = new SecureRandom();
-
 
     @Transactional
     public Code create(User user, CodeScopeEnum scope) {
@@ -77,17 +75,6 @@ public class CodeServiceImpl implements CodeService {
                 .build();
 
         return codeRepository.save(code);
-    }
-
-    private String generateAlphanumericCode() {
-        StringBuilder code = new StringBuilder(CODE_LENGTH);
-
-        for (int i = 0; i < CODE_LENGTH; i++) {
-            int index = random.nextInt(chars.length());
-            code.append(chars.charAt(index));
-        }
-
-        return code.toString();
     }
 
     @Scheduled(fixedDelay = 900 * 1000)
