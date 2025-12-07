@@ -40,6 +40,7 @@ public class PublicKeyService {
         return publicKeyRepository.findAll()
                 .stream()
                 .map(entity -> {
+                    log.info("Fetching public keys...");
                     try {
                         return JWK.parse(entity.getPublicKey());
                     } catch (ParseException e) {

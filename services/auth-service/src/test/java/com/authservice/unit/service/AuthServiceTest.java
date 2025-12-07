@@ -1,63 +1,59 @@
 package com.authservice.unit.service;
 
-import com.authservice.security.CustomUserDetails;
-import com.authservice.dto.LocalRegisterResult;
-import com.authservice.dto.TokenPairDto;
 import com.authservice.dto.LocalRegisterRequest;
+import com.authservice.dto.LocalRegisterResult;
 import com.authservice.dto.SignInRequestDto;
+import com.authservice.dto.TokenPairDto;
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
-import com.authservice.entity.Role;
+import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
-import com.authservice.exception.AlreadyExistsException;
-import com.authservice.mapper.RoleMapper;
+import com.authservice.entity.UserRolesEnum;
+import com.authservice.exception.ApiException;
+import com.authservice.security.CustomUserDetails;
 import com.authservice.services.AuthService;
+import com.authservice.services.CodeService;
+import com.authservice.services.JwtService;
 import com.authservice.services.MailService;
-import com.authservice.services.TokenService;
-import com.authservice.services.code.CodeCreationService;
-import com.authservice.services.user.LocalUserService;
+import com.authservice.services.RefreshTokenService;
+import com.authservice.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
+class AuthServiceTest {
 
     @Mock
     private AuthenticationManager authenticationManager;
 
     @Mock
-    private TokenService tokenService;
+    private RefreshTokenService refreshTokenService;
 
     @Mock
-    private LocalUserService localUserService;
-
-    @Spy
-    private RoleMapper roleMapper;
+    private UserService userService;
 
     @Mock
-    private CodeCreationService codeCreationService;
+    private JwtService jwtService;
+
+    @Mock
+    private CodeService codeService;
 
     @Mock
     private MailService mailService;
@@ -65,136 +61,125 @@ public class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-
-    private static final String PASSWORD = "masterkey";
-    private static final String FIRST_NAME = "firstName";
-    private static final String LAST_NAME = "lastName";
-    private static final String CODE_VALUE = "testCode";
-    private static final String DEVICE_ID = "deviceId";
     private static final String EMAIL = "test@gmail.com";
-    private static final long USER_ID = 1;
-    private static final Set<GrantedAuthority> AUTHORITIES = Set.of(
-            new SimpleGrantedAuthority("ROLE_USER")
-    );
-    private static final List<String> ROLE_NAMES = List.of("ROLE_USER");
-    private static final String ACCESS_TOKEN = "access_token";
-    private static final String REFRESH_TOKEN = "refresh_token";
-
-    private static final TokenPairDto TOKEN_PAIR_DTO = new TokenPairDto(ACCESS_TOKEN, REFRESH_TOKEN);
-    private static final LocalRegisterRequest LOCAL_REGISTER_REQUEST = new LocalRegisterRequest(
-            PASSWORD,
-            EMAIL,
-            LAST_NAME,
-            LAST_NAME
-    );
-    private static final SignInRequestDto SIGN_IN_REQUEST_DTO = new SignInRequestDto(EMAIL, PASSWORD, DEVICE_ID);
-
+    private static final String PASSWORD = "password123";
+    private static final String ACCESS_TOKEN = "access";
+    private static final String REFRESH_TOKEN = "refresh";
 
     private User user;
 
     @BeforeEach
-    public void setUp() {
-        Role role = Role.builder()
-                .name("ROLE_USER")
-                .build();
-
-        Set<Role> roles = Set.of(role);
-
+    void setUp() {
         user = User.builder()
-                .id(USER_ID)
-                .password(PASSWORD)
+                .id(UUID.randomUUID())
                 .email(EMAIL)
-                .firstName(FIRST_NAME)
+                .password("hashed")
                 .isNonBlocked(true)
                 .isVerified(false)
-                .lastName(LAST_NAME)
+                .role(UserRolesEnum.ROLE_USER)
                 .createdAt(Instant.now())
-                .roles(roles)
                 .build();
     }
 
-
     @Test
-    public void testLocalRegister_whenCalled_thenReturnResult() {
+    void localRegister_shouldCreateUserGenerateCodeAndSendMail() {
+        LocalRegisterRequest request = new LocalRegisterRequest(PASSWORD, PASSWORD, EMAIL);
         Code code = Code.builder()
-                .code(CODE_VALUE)
+                .code("ABC12345")
                 .user(user)
+                .scope(CodeScopeEnum.EMAIL_VERIFICATION)
                 .build();
 
-        when(localUserService.createLocalUser(any(LocalRegisterRequest.class))).thenReturn(user);
-        when(codeCreationService.getCode(any(User.class), any(CodeScopeEnum.class))).thenReturn(code);
+        when(userService.createUser(request)).thenReturn(user);
+        when(codeService.create(user, CodeScopeEnum.EMAIL_VERIFICATION)).thenReturn(code);
 
-        LocalRegisterResult result = authService.localRegister(LOCAL_REGISTER_REQUEST);
+        LocalRegisterResult result = authService.localRegister(request);
 
-        verify(localUserService).createLocalUser(LOCAL_REGISTER_REQUEST);
-        verify(codeCreationService).getCode(user, CodeScopeEnum.EMAIL_VERIFICATION);
-        verify(mailService).sendEmailVerificationCode(user.getEmail(), code.getCode());
+        verify(userService).createUser(request);
+        verify(codeService).create(user, CodeScopeEnum.EMAIL_VERIFICATION);
+        verify(mailService).sendEmailVerificationCode(EMAIL, code.getCode());
 
-        assertEquals(result.userId(), user.getId());
-        assertEquals(result.email(), user.getEmail());
-        assertEquals(result.createdAt(), user.getCreatedAt());
+        assertEquals(user.getId(), result.userId());
+        assertEquals(user.getEmail(), result.email());
+        assertEquals(user.getCreatedAt(), result.createdAt());
     }
 
     @Test
-    public void testLocalRegister_whenUserAlreadyExists_thenThrowsException() {
-        when(localUserService.createLocalUser(any(LocalRegisterRequest.class))).thenThrow(new AlreadyExistsException(""));
+    void localRegister_shouldPropagateConflictWhenUserExists() {
+        LocalRegisterRequest request = new LocalRegisterRequest(PASSWORD, PASSWORD, EMAIL);
+        ApiException conflict = new ApiException("User with such an email already exists", HttpStatus.CONFLICT);
+        when(userService.createUser(request)).thenThrow(conflict);
 
-        assertThrows(AlreadyExistsException.class, () -> authService.localRegister(LOCAL_REGISTER_REQUEST));
+        ApiException thrown = assertThrows(ApiException.class, () -> authService.localRegister(request));
 
-        verify(localUserService).createLocalUser(LOCAL_REGISTER_REQUEST);
-        verifyNoInteractions(codeCreationService, mailService);
+        assertEquals(HttpStatus.CONFLICT, thrown.getStatus());
+        verify(userService).createUser(request);
+        verifyNoInteractions(codeService, mailService);
     }
 
     @Test
-    public void testSignIn_whenCorrectCredentials_thenReturnResult() {
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        Authentication authRequest = new UsernamePasswordAuthenticationToken(userDetails, null, AUTHORITIES);
-        ArgumentCaptor<Authentication> authenticationArgumentCaptor = ArgumentCaptor.forClass(Authentication.class);
+    void signIn_shouldPropagateAuthException() {
+        SignInRequestDto dto = new SignInRequestDto(EMAIL, PASSWORD);
+        ApiException unauthorized = new ApiException("Bad credentials", HttpStatus.UNAUTHORIZED);
+        when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(unauthorized);
 
-        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authRequest);
-        when(tokenService.getTokenPair(anyLong(), anyList(), anyString())).thenReturn(TOKEN_PAIR_DTO);
+        ApiException thrown = assertThrows(ApiException.class, () -> authService.signIn(dto));
 
-        TokenPairDto result = authService.signIn(SIGN_IN_REQUEST_DTO);
-
-        verify(authenticationManager).authenticate(authenticationArgumentCaptor.capture());
-        verify(roleMapper).toRoleNames(authRequest.getAuthorities());
-        verify(tokenService).getTokenPair(USER_ID, ROLE_NAMES, DEVICE_ID);
-
-        Authentication authentication = authenticationArgumentCaptor.getValue();
-
-        assertEquals(SIGN_IN_REQUEST_DTO.email(), authentication.getPrincipal());
-        assertEquals(SIGN_IN_REQUEST_DTO.password(), authentication.getCredentials());
-        assertEquals(ACCESS_TOKEN, result.accessToken());
-        assertEquals(REFRESH_TOKEN, result.refreshToken());
-    }
-
-    @Test
-    public void testSignIn_whenInvalidCredentials_thenThrowsException() {
-        when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(UsernameNotFoundException.class);
-
-        assertThrows(UsernameNotFoundException.class, () -> authService.signIn(SIGN_IN_REQUEST_DTO));
-
+        assertEquals(HttpStatus.UNAUTHORIZED, thrown.getStatus());
         verify(authenticationManager).authenticate(any(Authentication.class));
-        verifyNoInteractions(roleMapper, tokenService);
+        verifyNoInteractions(refreshTokenService, jwtService);
     }
 
-
     @Test
-    public void testRefreshToken_whenCalled_thenReturnResult() {
-        when(tokenService.refreshTokens(anyString(), anyString())).thenReturn(TOKEN_PAIR_DTO);
+    void signIn_shouldAuthenticateAndReturnTokenPair() {
+        SignInRequestDto dto = new SignInRequestDto(EMAIL, PASSWORD);
+        CustomUserDetails principal = new CustomUserDetails(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        ArgumentCaptor<Authentication> captor = ArgumentCaptor.forClass(Authentication.class);
 
-        TokenPairDto result = authService.refreshTokens(REFRESH_TOKEN, DEVICE_ID);
+        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authentication);
+        when(refreshTokenService.create(user)).thenReturn(REFRESH_TOKEN);
+        when(jwtService.generateToken(user.getId().toString(), user.getRole())).thenReturn(ACCESS_TOKEN);
 
-        verify(tokenService).refreshTokens(REFRESH_TOKEN, DEVICE_ID);
+        TokenPairDto result = authService.signIn(dto);
 
+        verify(authenticationManager).authenticate(captor.capture());
+        verify(refreshTokenService).create(user);
+        verify(jwtService).generateToken(user.getId().toString(), user.getRole());
+
+        Authentication authRequest = captor.getValue();
+        assertEquals(dto.email(), authRequest.getPrincipal());
+        assertEquals(dto.password(), authRequest.getCredentials());
         assertEquals(ACCESS_TOKEN, result.accessToken());
         assertEquals(REFRESH_TOKEN, result.refreshToken());
     }
 
     @Test
-    public void testLogout_whenCalled_thenReturnResult() {
-        authService.logout(REFRESH_TOKEN, DEVICE_ID);
+    void refreshTokens_shouldValidateRefreshTokenAndIssueNewPair() {
+        RefreshToken storedToken = RefreshToken.builder()
+                .token("hashed")
+                .user(user)
+                .expiresAt(Instant.now().plusSeconds(100))
+                .build();
 
-        verify(tokenService).logout(REFRESH_TOKEN, DEVICE_ID);
+        when(refreshTokenService.validate(REFRESH_TOKEN)).thenReturn(storedToken);
+        when(refreshTokenService.create(user)).thenReturn("new-refresh");
+        when(jwtService.generateToken(user.getId().toString(), user.getRole())).thenReturn("new-access");
+
+        TokenPairDto result = authService.refreshTokens(REFRESH_TOKEN);
+
+        verify(refreshTokenService).validate(REFRESH_TOKEN);
+        verify(refreshTokenService).create(user);
+        verify(jwtService).generateToken(user.getId().toString(), user.getRole());
+        assertEquals("new-access", result.accessToken());
+        assertEquals("new-refresh", result.refreshToken());
+    }
+
+    @Test
+    void logout_shouldDelegateDeletionToRefreshTokenService() {
+        authService.logout(REFRESH_TOKEN);
+
+        verify(refreshTokenService).deleteRefreshToken(REFRESH_TOKEN);
+        verifyNoMoreInteractions(refreshTokenService);
     }
 }
