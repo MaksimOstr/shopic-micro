@@ -1,9 +1,7 @@
 package com.authservice.services;
 
-import com.authservice.config.properties.JwtProperties;
 import com.authservice.entity.PublicKey;
 import com.authservice.repositories.PublicKeyRepository;
-import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import lombok.RequiredArgsConstructor;

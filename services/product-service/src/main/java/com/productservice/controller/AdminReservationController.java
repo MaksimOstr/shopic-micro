@@ -23,7 +23,7 @@ public class AdminReservationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AdminReservationDto> getReservation(
-        @PathVariable long id
+            @PathVariable long id
     ) {
         AdminReservationDto reservation = reservationService.getReservationAdminDto(id);
 

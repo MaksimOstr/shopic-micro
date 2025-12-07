@@ -2,7 +2,6 @@ package com.authservice.controller;
 
 import com.authservice.dto.ChangePasswordRequest;
 import com.authservice.dto.ErrorResponseDto;
-import com.authservice.dto.UpdateUserRequest;
 import com.authservice.dto.UserDto;
 import com.authservice.security.CustomPrincipal;
 import com.authservice.services.UserService;

@@ -2,10 +2,8 @@ package com.authservice.repositories;
 
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
-import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,8 +20,6 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
     void deleteExpiredCodes();
 
     void deleteByUser_IdAndScope(UUID userId, CodeScopeEnum scope);
-
-    Optional<Code> findByScopeAndUserId(CodeScopeEnum scope, UUID userId);
 
     Optional<Code> findByCodeAndScope(String code, CodeScopeEnum scope);
 }

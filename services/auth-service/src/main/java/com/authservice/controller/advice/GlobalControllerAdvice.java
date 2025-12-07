@@ -2,7 +2,7 @@ package com.authservice.controller.advice;
 
 
 import com.authservice.dto.ErrorResponseDto;
-import com.authservice.exception.*;
+import com.authservice.exception.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
