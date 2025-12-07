@@ -31,7 +31,7 @@ public class Cart {
     @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;
 
-    @OneToMany(mappedBy = "cart", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<CartItem> cartItems = new ArrayList<>();
 

@@ -63,6 +63,7 @@ public class CartController {
 
     @PatchMapping("/me/items/{id}/quantity")
     public ResponseEntity<Void> changeCartItemQuantity(
+            @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid ChangeCartItemQuantityRequest body,
             @PathVariable UUID id
     ) {

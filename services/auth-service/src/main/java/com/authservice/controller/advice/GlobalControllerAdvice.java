@@ -16,7 +16,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalControllerAdvice {
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ErrorResponseDto> handleNotFoundException(ApiException e) {
+    public ResponseEntity<ErrorResponseDto> handleApiException(ApiException e) {
         return ResponseEntity.status(e.getStatus()).body(new ErrorResponseDto(
                 e.getStatus().getReasonPhrase(),
                 e.getStatus().value(),
