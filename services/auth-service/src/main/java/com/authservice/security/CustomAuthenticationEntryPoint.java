@@ -39,7 +39,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         ErrorResponseDto error = new ErrorResponseDto(
                 HttpStatus.UNAUTHORIZED.getReasonPhrase(),
                 HttpStatus.UNAUTHORIZED.value(),
-                "Authentication is required"
+                authException.getMessage() == null ? "Authentication is required" : authException.getMessage()
         );
 
         objectMapper.writeValue(response.getOutputStream(), error);

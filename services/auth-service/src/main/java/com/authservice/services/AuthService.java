@@ -1,6 +1,5 @@
 package com.authservice.services;
 
-import com.authservice.exception.ApiException;
 import com.authservice.security.CustomUserDetails;
 import com.authservice.dto.LocalRegisterResult;
 import com.authservice.dto.TokenPairDto;
@@ -12,14 +11,11 @@ import com.authservice.entity.RefreshToken;
 import com.authservice.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 
 @Slf4j

@@ -24,8 +24,6 @@ import java.util.Objects;
 public class PublicKeyService {
     private final PublicKeyRepository publicKeyRepository;
 
-    private final JwtProperties jwtProperties;
-
     @Value("${public-key.expires-at}")
     private int expiresAt;
 
@@ -43,20 +41,9 @@ public class PublicKeyService {
                 .stream()
                 .map(entity -> {
                     try {
-                        JWK jwk = JWK.parse(entity.getPublicKey());
-
-                        if (jwk instanceof RSAKey) {
-                            RSAKey.Builder builder = new RSAKey.Builder((RSAKey) jwk);
-                            if (entity.getKeyId() != null) {
-                                builder.keyID(entity.getKeyId());
-                            }
-                            builder.algorithm(Algorithm.parse(jwtProperties.getHeaderAlg()));
-                            return builder.build();
-                        }
-
-                        return jwk;
+                        return JWK.parse(entity.getPublicKey());
                     } catch (ParseException e) {
-                        throw new RuntimeException(e.getMessage());
+                        throw new RuntimeException("Failed to parse JWK: " + e.getMessage(), e);
                     }
                 })
                 .filter(Objects::nonNull)
