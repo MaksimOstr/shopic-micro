@@ -10,9 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,11 +26,11 @@ public class CartItemServiceTest {
     @InjectMocks
     private CartItemService cartItemService;
 
-    private static final long CART_ITEM_ID = 1L;
+    private static final UUID CART_ITEM_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
     @Test
     public void testGetCartItemById_whenCalledWithNonExistingItem_thenThrowException() {
-        when(cartItemRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(cartItemRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> {
             cartItemService.getCartItemById(CART_ITEM_ID);

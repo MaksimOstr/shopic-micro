@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,11 +52,11 @@ public class CartServiceTest {
 
 
     private static final long PRODUCT_ID = 1L;
-    private static final long USER_ID = 2L;
-    private static final long CART_ITEM_ID = 3L;
+    private static final UUID USER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    private static final UUID CART_ITEM_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
     private static final String PRODUCT_NAME = "test_product_name";
     private static final String PRODUCT_IMAGE_URL = "test_product_image_url";
-    private static final long CART_ID = 4L;
+    private static final UUID CART_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
     private static final String PRICE_AT_ADD = "10.0";
     private static final int REQUESTED_QUANTITY = 9;
     private static final AddItemToCartRequest ADD_ITEM_TO_CART_REQUEST = new AddItemToCartRequest(
@@ -98,8 +99,8 @@ public class CartServiceTest {
 
         cartItem.setQuantity(REQUESTED_QUANTITY);
 
-        when(cartRepository.findCartByUserId(anyLong())).thenReturn(Optional.of(cart));
-        when(cartItemService.getOptionalByCartIdAndProductId(anyLong(), anyLong())).thenReturn(Optional.empty());
+        when(cartRepository.findCartByUserId(any(UUID.class))).thenReturn(Optional.of(cart));
+        when(cartItemService.getOptionalByCartIdAndProductId(any(UUID.class), anyLong())).thenReturn(Optional.empty());
         when(grpcProductService.getProductInfo(anyLong())).thenReturn(productInfo);
         when(cartItemService.save(any(CartItem.class))).thenReturn(cartItem);
 
@@ -141,8 +142,8 @@ public class CartServiceTest {
                 .build();
         cartItem.setQuantity(startItemQuantity);
 
-        when(cartRepository.findCartByUserId(anyLong())).thenReturn(Optional.of(cart));
-        when(cartItemService.getOptionalByCartIdAndProductId(anyLong(), anyLong())).thenReturn(Optional.of(cartItem));
+        when(cartRepository.findCartByUserId(any(UUID.class))).thenReturn(Optional.of(cart));
+        when(cartItemService.getOptionalByCartIdAndProductId(any(UUID.class), anyLong())).thenReturn(Optional.of(cartItem));
         when(grpcProductService.getProductInfo(anyLong())).thenReturn(productInfo);
 
         CartItemDto result = cartService.addItemToCart(ADD_ITEM_TO_CART_REQUEST, USER_ID);
@@ -175,8 +176,8 @@ public class CartServiceTest {
 
         cartItem.setQuantity(startItemQuantity);
 
-        when(cartRepository.findCartByUserId(anyLong())).thenReturn(Optional.of(cart));
-        when(cartItemService.getOptionalByCartIdAndProductId(anyLong(), anyLong())).thenReturn(Optional.of(cartItem));
+        when(cartRepository.findCartByUserId(any(UUID.class))).thenReturn(Optional.of(cart));
+        when(cartItemService.getOptionalByCartIdAndProductId(any(UUID.class), anyLong())).thenReturn(Optional.of(cartItem));
         when(grpcProductService.getProductInfo(anyLong())).thenReturn(productInfo);
 
         assertThrows(InsufficientProductStockException.class, () -> {
@@ -203,9 +204,9 @@ public class CartServiceTest {
                 .build();
         cartItem.setQuantity(startItemQuantity);
 
-        when(cartRepository.findCartByUserId(anyLong())).thenReturn(Optional.empty());
+        when(cartRepository.findCartByUserId(any(UUID.class))).thenReturn(Optional.empty());
         when(cartRepository.save(any(Cart.class))).thenReturn(cart);
-        when(cartItemService.getOptionalByCartIdAndProductId(anyLong(), anyLong())).thenReturn(Optional.of(cartItem));
+        when(cartItemService.getOptionalByCartIdAndProductId(any(UUID.class), anyLong())).thenReturn(Optional.of(cartItem));
         when(grpcProductService.getProductInfo(anyLong())).thenReturn(productInfo);
 
         CartItemDto result = cartService.addItemToCart(ADD_ITEM_TO_CART_REQUEST, USER_ID);
@@ -229,7 +230,7 @@ public class CartServiceTest {
 
     @Test
     public void testGetCart_whenCalledWithNonExistingCart_thenReturnEmptyCartDto() {
-        when(cartRepository.findCartWithItemsByUserId(anyLong())).thenReturn(Optional.empty());
+        when(cartRepository.findCartWithItemsByUserId(any(UUID.class))).thenReturn(Optional.empty());
 
         CartDto result = cartService.getCart(USER_ID);
 
@@ -248,7 +249,7 @@ public class CartServiceTest {
         cart.setCartItems(cartItemList);
         cartItem.setQuantity(itemQuantity);
 
-        when(cartRepository.findCartWithItemsByUserId(anyLong())).thenReturn(Optional.of(cart));
+        when(cartRepository.findCartWithItemsByUserId(any(UUID.class))).thenReturn(Optional.of(cart));
 
         CartDto result = cartService.getCart(USER_ID);
         CartItemDto cartItemDto = result.cartItemList().get(0);
@@ -270,7 +271,7 @@ public class CartServiceTest {
         List<CartItem> cartItemList = List.of(cartItem);
         cart.setCartItems(cartItemList);
 
-        when(cartRepository.findCartWithItemsByUserId(anyLong())).thenReturn(Optional.of(cart));
+        when(cartRepository.findCartWithItemsByUserId(any(UUID.class))).thenReturn(Optional.of(cart));
 
         List<CartItemDtoForOrder> result = cartService.getCartItemsForOrder(USER_ID);
         CartItemDtoForOrder cartItemDtoForOrder = result.get(0);
@@ -285,7 +286,7 @@ public class CartServiceTest {
 
     @Test
     public void testGetCartItemsForOrder_whenCalledWithNonExistingCart_thenThrowException() {
-        when(cartRepository.findCartWithItemsByUserId(anyLong())).thenReturn(Optional.empty());
+        when(cartRepository.findCartWithItemsByUserId(any(UUID.class))).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> {
             cartService.getCartItemsForOrder(USER_ID);
@@ -297,8 +298,8 @@ public class CartServiceTest {
 
     @Test
     public void testDeleteItemFromCart_whenCalledWithExistingCartAndEmptyCartAfterItemRemoving_thenDeleteItemAndCart() {
-        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.of(CART_ID));
-        when(cartItemService.countCartItems(anyLong())).thenReturn(0);
+        when(cartRepository.findCartIdByUserId(any(UUID.class))).thenReturn(Optional.of(CART_ID));
+        when(cartItemService.countCartItems(any(UUID.class))).thenReturn(0);
 
         cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
 
@@ -310,7 +311,7 @@ public class CartServiceTest {
 
     @Test
     public void testDeleteItemFromCart_whenCalledWithNotExistingCart_thenDeleteItemAndCart() {
-        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.empty());
+        when(cartRepository.findCartIdByUserId(any(UUID.class))).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> {
             cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
@@ -323,8 +324,8 @@ public class CartServiceTest {
 
     @Test
     public void testDeleteItemFromCart_whenCalledWithExistingCartAndNotEmptyCartAfterItemRemoving_thenDeleteItem() {
-        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.of(CART_ID));
-        when(cartItemService.countCartItems(anyLong())).thenReturn(1);
+        when(cartRepository.findCartIdByUserId(any(UUID.class))).thenReturn(Optional.of(CART_ID));
+        when(cartItemService.countCartItems(any(UUID.class))).thenReturn(1);
 
         cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
 
@@ -341,7 +342,7 @@ public class CartServiceTest {
 
         cartItem.setQuantity(startItemQuantity);
 
-        when(cartItemService.getCartItemById(anyLong())).thenReturn(cartItem);
+        when(cartItemService.getCartItemById(any(UUID.class))).thenReturn(cartItem);
 
         cartService.changeCartItemQuantity(changeCartItemQuantity, CART_ITEM_ID);
 
@@ -360,8 +361,8 @@ public class CartServiceTest {
 
         cartItem.setQuantity(startItemQuantity);
 
-        when(cartItemService.getCartItemById(anyLong())).thenReturn(cartItem);
-        when(cartItemService.countCartItems(anyLong())).thenReturn(1);
+        when(cartItemService.getCartItemById(any(UUID.class))).thenReturn(cartItem);
+        when(cartItemService.countCartItems(any(UUID.class))).thenReturn(1);
 
         cartService.changeCartItemQuantity(changeCartItemQuantity, CART_ITEM_ID);
 

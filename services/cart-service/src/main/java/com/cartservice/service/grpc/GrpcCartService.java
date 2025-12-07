@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.grpc.server.service.GrpcService;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @GrpcService
@@ -23,7 +24,8 @@ public class GrpcCartService extends CartServiceGrpc.CartServiceImplBase {
 
     @Override
     public void getCart(GetCartRequest request, StreamObserver<CartResponse> responseObserver) {
-        List<CartItemDtoForOrder> cartItems = cartService.getCartItemsForOrder(request.getUserId());
+        UUID userId = UUID.fromString(request.getUserId());
+        List<CartItemDtoForOrder> cartItems = cartService.getCartItemsForOrder(userId);
         List<CartItem> cartItemList = grpcMapper.toOrderCartItems(cartItems);
 
         CartResponse response = CartResponse.newBuilder()

@@ -2,12 +2,14 @@ package com.cartservice.config.security.model;
 
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class CustomPrincipal {
-    private final long id;
+    private final UUID id;
 
     public CustomPrincipal(String id) {
-        this.id = Long.parseLong(id);
+        this.id = UUID.fromString(id);
     }
 }
 

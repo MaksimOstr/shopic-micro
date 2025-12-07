@@ -47,11 +47,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
 
-        if (!verifyHmac(roles, userId, signature)) {
+        if (userId == null || roles == null || signature == null || !verifyHmac(roles, userId, signature)) {
             response.sendError(
                     HttpStatus.UNAUTHORIZED.value(),
                     HttpStatus.UNAUTHORIZED.getReasonPhrase()
             );
+            return;
         }
 
         setSecurityContext(userId, roles);

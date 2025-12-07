@@ -8,7 +8,7 @@ option java_package = "com.shopic.grpc.cartservice";
 
 
 message GetCartRequest {
-  int64 user_id = 1;
+  string user_id = 1;
 }
 
 message CartResponse {

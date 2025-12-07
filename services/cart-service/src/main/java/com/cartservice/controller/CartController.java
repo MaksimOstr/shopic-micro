@@ -14,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/carts")
@@ -42,7 +44,7 @@ public class CartController {
 
     @DeleteMapping("/me/items/{id}")
     public ResponseEntity<Void> deleteCartItem(
-            @PathVariable long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
         cartService.deleteItemFromCart(id, principal.getId());
@@ -62,7 +64,7 @@ public class CartController {
     @PatchMapping("/me/items/{id}/quantity")
     public ResponseEntity<Void> changeCartItemQuantity(
             @RequestBody @Valid ChangeCartItemQuantityRequest body,
-            @PathVariable long id
+            @PathVariable UUID id
     ) {
         cartService.changeCartItemQuantity(body, id);
 

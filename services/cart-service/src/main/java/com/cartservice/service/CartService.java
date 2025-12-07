@@ -10,6 +10,7 @@ import com.cartservice.entity.CartItem;
 import com.cartservice.exception.InsufficientProductStockException;
 import com.cartservice.exception.NotFoundException;
 import com.cartservice.mapper.CartItemMapper;
+import com.cartservice.service.CartItemService;
 import com.cartservice.repository.CartRepository;
 import com.cartservice.service.grpc.GrpcProductService;
 import com.shopic.grpc.productservice.ProductInfo;
@@ -18,7 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +35,13 @@ public class CartService {
     private static final String CART_NOT_FOUND = "Cart Not Found";
 
     @Transactional
-    public CartItemDto addItemToCart(AddItemToCartRequest dto, long userId) {
+    public CartItemDto addItemToCart(AddItemToCartRequest dto, UUID userId) {
         Cart cart = cartRepository.findCartByUserId(userId)
                 .orElseGet(() -> createCart(userId));
 
         Optional<CartItem> cartItemOptional = cartItemService.getOptionalByCartIdAndProductId(cart.getId(), dto.productId());
 
-        if(cartItemOptional.isPresent()) {
+        if (cartItemOptional.isPresent()) {
             return updateExistingItem(dto, cartItemOptional.get());
         } else {
             return createNewItem(dto, cart);
@@ -45,7 +49,7 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public CartDto getCart(long userId) {
+    public CartDto getCart(UUID userId) {
         return cartRepository.findCartWithItemsByUserId(userId)
                 .map(cart -> {
                     List<CartItemDto> cartItemList = cartItemMapper.toCartItemDtoList(cart.getCartItems());
@@ -58,23 +62,23 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public List<CartItemDtoForOrder> getCartItemsForOrder(long userId) {
+    public List<CartItemDtoForOrder> getCartItemsForOrder(UUID userId) {
         Cart cart = cartRepository.findCartWithItemsByUserId(userId)
                 .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
 
         return cartItemMapper.toCartItemDtoListForOrder(cart.getCartItems());
     }
 
-    public void deleteItemFromCart(long itemId, long userId) {
-        long cartId = cartRepository.findCartIdByUserId(userId)
-                        .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
+    public void deleteItemFromCart(UUID itemId, UUID userId) {
+        UUID cartId = cartRepository.findCartIdByUserId(userId)
+                .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
 
         cartItemService.deleteCartItem(itemId, cartId);
         deleteCartIfEmpty(cartId);
     }
 
     @Transactional
-    public void changeCartItemQuantity(ChangeCartItemQuantityRequest dto, long itemId) {
+    public void changeCartItemQuantity(ChangeCartItemQuantityRequest dto, UUID itemId) {
         CartItem cartItem = cartItemService.getCartItemById(itemId);
 
         if (dto.amount() <= 0) {
@@ -85,18 +89,18 @@ public class CartService {
         }
     }
 
-    public void deleteCartByUserId(long userId) {
+    public void deleteCartByUserId(UUID userId) {
         cartRepository.deleteCartByUserId(userId);
     }
 
-    private void deleteCartIfEmpty(long cartId) {
+    private void deleteCartIfEmpty(UUID cartId) {
         int cartItemsCount = cartItemService.countCartItems(cartId);
         if (cartItemsCount == 0) {
             cartRepository.deleteById(cartId);
         }
     }
 
-    private Cart createCart(long userId) {
+    private Cart createCart(UUID userId) {
         Cart cart = Cart.builder()
                 .userId(userId)
                 .build();
@@ -127,7 +131,7 @@ public class CartService {
     private ProductInfo getProductInfoAndCheckQuantity(long productId, int quantity) {
         ProductInfo productInfo = grpcProductService.getProductInfo(productId);
 
-        if(productInfo.getAvailableQuantity() < quantity) {
+        if (productInfo.getAvailableQuantity() < quantity) {
             throw new InsufficientProductStockException(
                     "Insufficient stock for product. Requested: %d, Available: %d"
                             .formatted(quantity, productInfo.getAvailableQuantity())
