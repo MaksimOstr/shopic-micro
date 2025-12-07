@@ -2,15 +2,14 @@ package com.authservice.repositories;
 
 import com.authservice.entity.Code;
 import com.authservice.entity.CodeScopeEnum;
-import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface CodeRepository extends JpaRepository<Code, Long> {
@@ -20,9 +19,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
     @Query("DELETE FROM Code c WHERE c.expiresAt < CURRENT_TIMESTAMP")
     void deleteExpiredCodes();
 
-    Optional<Code> findByScopeAndUserId(CodeScopeEnum scope, long userId);
+    void deleteByUser_IdAndScope(UUID userId, CodeScopeEnum scope);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT c FROM Code c WHERE c.code = :code AND c.used = false AND c.scope = :scope")
-    Optional<Code> findUnusedByCode(String code, CodeScopeEnum scope);
+    Optional<Code> findByCodeAndScope(String code, CodeScopeEnum scope);
 }

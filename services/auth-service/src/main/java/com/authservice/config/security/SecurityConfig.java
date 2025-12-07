@@ -1,11 +1,11 @@
 package com.authservice.config.security;
 
-import com.authservice.config.security.filter.AuthenticationFilter;
-import com.authservice.config.security.handler.CustomAuthenticationEntryPoint;
-import com.authservice.config.security.handler.OAuthSuccessHandler;
-import com.authservice.config.security.handler.OauthFailureHandler;
-import com.authservice.config.security.service.CustomOidcUserService;
-import com.authservice.config.security.service.CustomUserDetailsService;
+import com.authservice.security.AuthenticationFilter;
+import com.authservice.security.CustomAuthenticationEntryPoint;
+import com.authservice.security.OAuthSuccessHandler;
+import com.authservice.security.OauthFailureHandler;
+import com.authservice.security.CustomOidcUserService;
+import com.authservice.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +24,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+    private static final String[] permittedURLs = {
+            "/actuator/**",
+            "/api/v1/auth/**",
+            "/api/v1/verification",
+            "/public-keys",
+            "/auth/oauth2/authorization/google",
+            "/auth/login/oauth2/code/google",
+            "/favicon.ico",
+            "/api/v1/forgot-password",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api-docs/**"
+    };
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -58,13 +72,8 @@ public class SecurityConfig {
                 .authenticationProvider(daoAuthenticationProvider)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
-                .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/verify/**").permitAll()
-                        .requestMatchers("/auth/register", "/auth/refresh", "/auth/sign-in").permitAll()
-                        .requestMatchers("/public-keys/**").permitAll()
-                        .requestMatchers("/password/forgot-password", "/password/change").permitAll()
+                        .requestMatchers(permittedURLs).permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo

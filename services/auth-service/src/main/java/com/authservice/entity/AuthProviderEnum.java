@@ -1,6 +1,6 @@
 package com.authservice.entity;
 
-import com.authservice.exceptions.NotFoundException;
+import com.authservice.exception.NotFoundException;
 
 public enum AuthProviderEnum {
     LOCAL, GOOGLE;

@@ -1,11 +1,12 @@
 package com.authservice.controller.advice;
 
 
-import com.authservice.dto.response.ErrorResponseDto;
-import com.authservice.exceptions.*;
+import com.authservice.dto.ErrorResponseDto;
+import com.authservice.exception.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -14,20 +15,11 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
-    @ExceptionHandler({CodeValidationException.class, ResetPasswordException.class})
-    public ResponseEntity<ErrorResponseDto> handleException(RuntimeException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponseDto(
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                HttpStatus.BAD_REQUEST.value(),
-                e.getMessage()
-        ));
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                HttpStatus.NOT_FOUND.value(),
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorResponseDto> handleNotFoundException(ApiException e) {
+        return ResponseEntity.status(e.getStatus()).body(new ErrorResponseDto(
+                e.getStatus().getReasonPhrase(),
+                e.getStatus().value(),
                 e.getMessage()
         ));
     }
@@ -41,13 +33,12 @@ public class GlobalControllerAdvice {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler({InternalServiceException.class, ExternalServiceUnavailableException.class})
-    public ResponseEntity<ErrorResponseDto> handleInternalException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public ResponseEntity<ErrorResponseDto> handleMissingCookieException(MissingRequestCookieException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
                 e.getMessage()
         ));
     }
-
 }

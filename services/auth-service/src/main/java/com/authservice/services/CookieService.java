@@ -1,55 +1,29 @@
 package com.authservice.services;
 
+import com.authservice.config.properties.RefreshTokenProperties;
 import jakarta.servlet.http.Cookie;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CookieService {
-
-    @Value("${REFRESH_TOKEN_TTL:3600}")
-    private int refreshTokenTtl;
-
-    public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
-    public static final String DEVICE_ID_COOKIE_NAME = "deviceId";
+    private final RefreshTokenProperties refreshTokenProperties;
 
 
     public Cookie createRefreshTokenCookie(String refreshToken) {
-        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
+        Cookie cookie = new Cookie(refreshTokenProperties.getCookieName(), refreshToken);
 
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(refreshTokenTtl);
+        cookie.setMaxAge(refreshTokenProperties.getExpiresAt());
         cookie.setPath("/");
-        cookie.setAttribute("SameSite", "Lax");
-
-        return cookie;
-    }
-
-
-    public Cookie createDeviceCookie(String deviceId) {
-        Cookie cookie = new Cookie(DEVICE_ID_COOKIE_NAME, deviceId);
-
-        cookie.setMaxAge(31536000);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
         cookie.setAttribute("SameSite", "Lax");
 
         return cookie;
     }
 
     public Cookie deleteRefreshTokenCookie(String refreshToken) {
-        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
-
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setAttribute("SameSite", "Lax");
-
-        return cookie;
-    }
-
-    public Cookie deleteDeviceCookie(String deviceId) {
-        Cookie cookie = new Cookie(DEVICE_ID_COOKIE_NAME, deviceId);
+        Cookie cookie = new Cookie(refreshTokenProperties.getCookieName(), refreshToken);
 
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);

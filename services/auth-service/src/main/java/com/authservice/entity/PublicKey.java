@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "public_keys")
@@ -15,8 +16,8 @@ import java.time.Instant;
 @EntityListeners(AuditingEntityListener.class)
 public class PublicKey {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.SEQUENCE, generator = "public_keys_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "key_id", nullable = false, unique = true)
     private String keyId;

@@ -2,7 +2,6 @@ package com.authservice.services;
 
 import com.authservice.entity.PublicKey;
 import com.authservice.repositories.PublicKeyRepository;
-import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +15,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PublicKeyService {
     private final PublicKeyRepository publicKeyRepository;
 
-    @Value("${PUBLIC_KEY_EXPIRATION}")
-    private int expiration;
-
-    @Value("${KEY_ALGORITHM}")
-    private String keyAlgorithm;
+    @Value("${public-key.expires-at}")
+    private int expiresAt;
 
     public void savePublicKey(RSAKey publicKey) {
         PublicKey key = new PublicKey();
@@ -41,21 +38,11 @@ public class PublicKeyService {
         return publicKeyRepository.findAll()
                 .stream()
                 .map(entity -> {
+                    log.info("Fetching public keys...");
                     try {
-                        JWK jwk = JWK.parse(entity.getPublicKey());
-
-                        if (jwk instanceof RSAKey) {
-                            RSAKey.Builder builder = new RSAKey.Builder((RSAKey) jwk);
-                            if (entity.getKeyId() != null) {
-                                builder.keyID(entity.getKeyId());
-                            }
-                            builder.algorithm(Algorithm.parse(keyAlgorithm));
-                            return builder.build();
-                        }
-
-                        return jwk;
+                        return JWK.parse(entity.getPublicKey());
                     } catch (ParseException e) {
-                        throw new RuntimeException(e.getMessage());
+                        throw new RuntimeException("Failed to parse JWK: " + e.getMessage(), e);
                     }
                 })
                 .filter(Objects::nonNull)
@@ -63,7 +50,7 @@ public class PublicKeyService {
     }
 
     private Instant getExpireDate() {
-        return Instant.now().plusSeconds(expiration);
+        return Instant.now().plusSeconds(expiresAt);
     }
 
     @Scheduled(fixedDelay = 1000 * 60 * 60)

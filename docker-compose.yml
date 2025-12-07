@@ -42,16 +42,6 @@ services:
       - /redis/data
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]
 
-  kafka-ui:
-    container_name: kafka-ui
-    image: provectuslabs/kafka-ui:latest
-    ports:
-      - "8080:8080"
-    depends_on:
-      - kafka
-    environment:
-      DYNAMIC_CONFIG_ENABLED: true
-
   pg-admin:
     image: dpage/pgadmin4
     restart: always

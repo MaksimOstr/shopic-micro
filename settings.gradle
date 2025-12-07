@@ -1,14 +1,10 @@
 rootProject.name = 'shopic'
 
-//infrastructure
+
+
 include ':api-gateway'
-project(':api-gateway').projectDir = new File('infrastructure/api-gateway')
+project(':api-gateway').projectDir = new File('services/api-gateway')
 
-include ':discovery-server'
-project(':discovery-server').projectDir = new File('infrastructure/discovery-server')
-
-
-//services
 include ':auth-service'
 project(':auth-service').projectDir = new File('services/auth-service')
 

@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "refresh_tokens")
@@ -17,8 +18,8 @@ import java.time.Instant;
 @EntityListeners(AuditingEntityListener.class)
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.SEQUENCE, generator = "refresh_tokens_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "token", nullable = false, unique = true)
     private String token;
@@ -33,7 +34,4 @@ public class RefreshToken {
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
-
-    @Column(name = "device_id", nullable = false, unique = true)
-    private String deviceId;
 }
