@@ -11,7 +11,7 @@ public class CartServiceApplication {
 
 		System.out.println(
 				"▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞\n" +
-						"Swagger: http://localhost:" + System.getenv("AUTH_SERVICE_PORT") + "/swagger-ui.html \n" +
+						"Swagger: http://localhost:" + System.getenv("CART_SERVICE_PORT") + "/swagger-ui.html \n" +
 						"▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞"
 		);
 	}

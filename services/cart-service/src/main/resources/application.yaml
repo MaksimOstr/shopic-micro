@@ -7,4 +7,4 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
 server:
-  port: 0
+  port: ${CART_SERVICE_PORT}
