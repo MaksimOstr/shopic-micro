@@ -32,8 +32,6 @@ public class CartService {
     private final GrpcProductService grpcProductService;
     private final CartMapper cartMapper;
 
-    private static final String CART_NOT_FOUND = "Cart Not Found";
-
     @Transactional
     public CartItemDto addItemToCart(AddItemToCartRequest dto, UUID userId) {
         Cart cart = cartRepository.findCartWithItemsByUserId(userId)
@@ -50,7 +48,10 @@ public class CartService {
     public CartDto getCart(UUID userId) {
         return cartRepository.findCartWithItemsByUserId(userId)
                 .map(cartMapper::toDto)
-                .orElseGet(this::createEmptyCartDto);
+                .orElseGet(() -> new CartDto(
+                        Collections.emptyList(),
+                        BigDecimal.ZERO
+                ));
     }
 
     @Transactional(readOnly = true)
@@ -64,8 +65,12 @@ public class CartService {
     public void deleteItemFromCart(UUID itemId, UUID userId) {
         Cart cart = getCartWithItemsByUserId(userId);
 
-        cart.getCartItems().removeIf(item -> item.getId().equals(itemId));
+        CartItem item = cart.getCartItems().stream()
+                .filter(i -> i.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new ApiException("Cart item not found", HttpStatus.NOT_FOUND));
 
+        cart.getCartItems().remove(item);
         deleteCartIfEmpty(cart);
     }
 
@@ -93,7 +98,7 @@ public class CartService {
 
     private Cart getCartWithItemsByUserId(UUID userId) {
         return cartRepository.findCartWithItemsByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("Cart Not Found"));
     }
 
     private void deleteCartIfEmpty(Cart cart) {
@@ -108,13 +113,6 @@ public class CartService {
                 .build();
 
         return cartRepository.save(cart);
-    }
-
-    private CartDto createEmptyCartDto() {
-        return new CartDto(
-                Collections.emptyList(),
-                BigDecimal.ZERO
-        );
     }
 
     private CartItemDto createNewItem(AddItemToCartRequest dto, Cart cart) {
