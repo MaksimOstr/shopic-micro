@@ -70,7 +70,7 @@ public class CartService {
     }
 
     @Transactional
-    public void changeCartItemQuantity(ChangeCartItemQuantityRequest dto, UUID itemId, UUID userId) {
+    public void updateCartItem(ChangeCartItemQuantityRequest dto, UUID itemId, UUID userId) {
         Cart cart = getCartWithItemsByUserId(userId);
         List<CartItem> cartItems = cart.getCartItems();
         CartItem selectedItem = cartItems.stream()
@@ -86,8 +86,6 @@ public class CartService {
             selectedItem.setQuantity(dto.amount());
         }
     }
-
-
 
     public void deleteCartByUserId(UUID userId) {
         cartRepository.deleteCartByUserId(userId);
@@ -139,7 +137,7 @@ public class CartService {
         return cartItemMapper.toCartItemDto(cartItem);
     }
 
-    private ProductInfo getProductInfoAndCheckQuantity(long productId, int quantity) {
+    private ProductInfo getProductInfoAndCheckQuantity(UUID productId, int quantity) {
         ProductInfo productInfo = grpcProductService.getProductInfo(productId);
 
         if (productInfo.getAvailableQuantity() < quantity) {

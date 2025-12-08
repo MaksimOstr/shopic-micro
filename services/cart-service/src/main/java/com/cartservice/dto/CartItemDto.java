@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record CartItemDto(
         UUID id,
-        long productId,
+        UUID productId,
         int quantity,
         BigDecimal priceAtAdd,
         String productName,

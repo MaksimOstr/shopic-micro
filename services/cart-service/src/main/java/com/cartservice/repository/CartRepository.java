@@ -30,6 +30,4 @@ public interface CartRepository extends JpaRepository<Cart, UUID> {
     @Modifying
     @Query("DELETE FROM Cart c WHERE c.userId = :userId")
     void deleteCartByUserId(UUID userId);
-
-    <T> ScopedValue<T> findCartWByUserId(UUID userId, Sort sort, Limit limit);
 }

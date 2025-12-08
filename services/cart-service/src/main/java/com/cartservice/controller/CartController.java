@@ -18,12 +18,12 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/carts")
+@RequestMapping("/api/v1/carts")
 @PreAuthorize("hasRole('USER')")
 public class CartController {
     private final CartService cartService;
 
-    @GetMapping("/me")
+    @GetMapping
     public ResponseEntity<CartDto> getCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
@@ -32,7 +32,7 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
-    @PostMapping("/me/items")
+    @PostMapping("/items")
     public ResponseEntity<CartItemDto> addCartItem(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid AddItemToCartRequest body
@@ -42,7 +42,7 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItem);
     }
 
-    @DeleteMapping("/me/items/{id}")
+    @DeleteMapping("/items/{id}")
     public ResponseEntity<Void> deleteCartItem(
             @PathVariable UUID id,
             @AuthenticationPrincipal CustomPrincipal principal
@@ -52,7 +52,7 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/me")
+    @DeleteMapping()
     public ResponseEntity<Void> deleteCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
@@ -61,13 +61,13 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/me/items/{id}/quantity")
-    public ResponseEntity<Void> changeCartItemQuantity(
+    @PatchMapping("/items/{id}")
+    public ResponseEntity<Void> updateCartItem(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid ChangeCartItemQuantityRequest body,
             @PathVariable UUID id
     ) {
-        cartService.changeCartItemQuantity(body, id);
+        cartService.updateCartItem(body, id, principal.getId());
 
         return ResponseEntity.ok().build();
     }

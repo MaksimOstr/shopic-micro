@@ -1,6 +1,8 @@
 package com.cartservice.dto;
 
+import java.util.UUID;
+
 public record CartItemDtoForOrder (
-        long productId,
+        UUID productId,
         int quantity
 ) {}
