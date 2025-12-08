@@ -54,10 +54,10 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public List<CartItemDtoForOrder> getCartItemsForOrder(UUID userId) {
+    public List<CartItemDto> getCartItemsForOrder(UUID userId) {
         Cart cart = getCartWithItemsByUserId(userId);
 
-        return cartItemMapper.toCartItemDtoListForOrder(cart.getCartItems());
+        return cartItemMapper.toDtoList(cart.getCartItems());
     }
 
     @Transactional
@@ -128,13 +128,13 @@ public class CartService {
                 .productImageUrl(response.getProductImageUrl())
                 .build();
 
-        return cartItemMapper.toCartItemDto(newCartItem);
+        return cartItemMapper.toDto(newCartItem);
     }
 
     private CartItemDto updateExistingItem(AddItemToCartRequest dto, CartItem cartItem) {
         getProductInfoAndCheckQuantity(dto.productId(), dto.quantity() + cartItem.getQuantity());
         cartItem.setQuantity(cartItem.getQuantity() + dto.quantity());
-        return cartItemMapper.toCartItemDto(cartItem);
+        return cartItemMapper.toDto(cartItem);
     }
 
     private ProductInfo getProductInfoAndCheckQuantity(UUID productId, int quantity) {

@@ -1,6 +1,6 @@
 package com.cartservice.controller;
 
-import com.cartservice.config.security.model.CustomPrincipal;
+import com.cartservice.security.CustomPrincipal;
 import com.cartservice.dto.CartDto;
 import com.cartservice.dto.CartItemDto;
 import com.cartservice.dto.request.AddItemToCartRequest;

@@ -1,4 +1,4 @@
-package com.cartservice.config.security.model;
+package com.cartservice.security;
 
 import lombok.Getter;
 
