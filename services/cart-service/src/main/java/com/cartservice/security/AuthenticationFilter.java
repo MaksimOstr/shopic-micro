@@ -1,8 +1,5 @@
-package com.cartservice.config.security.filter;
+package com.cartservice.security;
 
-
-
-import com.cartservice.config.security.model.CustomPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,13 +25,12 @@ import java.util.Base64;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
 
-    @Value("${SIGNATURE_SECRET}")
+    @Value("${signature-secret}")
     private String signatureSecret;
-
 
     @Override
     protected void doFilterInternal(
@@ -42,16 +38,22 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
         String userId = request.getHeader("X-User-Id");
         String roles = request.getHeader("X-Roles");
         String signature = request.getHeader("X-Signature");
+
+        if(userId == null || roles == null || signature == null){
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (!verifyHmac(roles, userId, signature)) {
             response.sendError(
                     HttpStatus.UNAUTHORIZED.value(),
                     HttpStatus.UNAUTHORIZED.getReasonPhrase()
             );
+
+            return;
         }
 
         setSecurityContext(userId, roles);
@@ -62,11 +64,21 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private boolean verifyHmac(
             @NonNull String roles,
             @NonNull String userId,
-            @NonNull String signature) {
+            @NonNull String signature
+    ) {
         String data = userId + roles;
         String generatedSignature = createHmac(data);
 
         return generatedSignature.equals(signature);
+    }
+
+    private List<SimpleGrantedAuthority> toSimpleGrantedAuthorities(String roles) {
+        String cleaned = roles.replaceAll("^\\[|]$", "");
+        List<String> roleList = Arrays.asList(cleaned.split(","));
+
+        return roleList.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     private String createHmac(String data) {
@@ -82,19 +94,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private List<SimpleGrantedAuthority> toSimpleGrantedAuthorities(String roles) {
-        String cleaned = roles.replaceAll("^\\[|]$", "");
-        List<String> roleList = Arrays.asList(cleaned.split(","));
-
-        return roleList.stream()
-                .map(SimpleGrantedAuthority::new)
-                .toList();
-    }
-
     private void setSecurityContext(String userId, String roles) {
         CustomPrincipal principal = new CustomPrincipal(userId);
         Authentication authToken = new UsernamePasswordAuthenticationToken(principal, null, toSimpleGrantedAuthorities(roles));
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }
+
 }
+
 

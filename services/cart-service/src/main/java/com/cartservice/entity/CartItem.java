@@ -5,8 +5,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 
 @Entity
@@ -18,21 +20,21 @@ import java.math.BigDecimal;
 @Builder
 public class CartItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_items_seq")
-    private Long id;
+    @GeneratedValue(strategy =  GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cart_id")
+    @JoinColumn(name = "cart_id", nullable = false)
     @JsonBackReference
     private Cart cart;
 
     @Column(name = "product_id")
-    private Long productId;
+    private UUID productId;
 
     @Column(name = "product_image_url", nullable = false)
     private String productImageUrl;
 
-    @Column(name = "productName", nullable = false)
+    @Column(name = "product_name", nullable = false)
     private String productName;
 
     @Column(nullable = false)

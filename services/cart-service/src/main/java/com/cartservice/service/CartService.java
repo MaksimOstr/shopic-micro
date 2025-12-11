@@ -7,96 +7,107 @@ import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.dto.request.ChangeCartItemQuantityRequest;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
-import com.cartservice.exception.InsufficientProductStockException;
+import com.cartservice.exception.ApiException;
 import com.cartservice.exception.NotFoundException;
 import com.cartservice.mapper.CartItemMapper;
+import com.cartservice.mapper.CartMapper;
 import com.cartservice.repository.CartRepository;
 import com.cartservice.service.grpc.GrpcProductService;
 import com.shopic.grpc.productservice.ProductInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CartService {
     private final CartRepository cartRepository;
-    private final CartItemService cartItemService;
     private final CartItemMapper cartItemMapper;
     private final GrpcProductService grpcProductService;
-
-    private static final String CART_NOT_FOUND = "Cart Not Found";
+    private final CartMapper cartMapper;
 
     @Transactional
-    public CartItemDto addItemToCart(AddItemToCartRequest dto, long userId) {
-        Cart cart = cartRepository.findCartByUserId(userId)
+    public CartItemDto addItemToCart(AddItemToCartRequest dto, UUID userId) {
+        Cart cart = cartRepository.findCartWithItemsByUserId(userId)
                 .orElseGet(() -> createCart(userId));
 
-        Optional<CartItem> cartItemOptional = cartItemService.getOptionalByCartIdAndProductId(cart.getId(), dto.productId());
-
-        if(cartItemOptional.isPresent()) {
-            return updateExistingItem(dto, cartItemOptional.get());
-        } else {
-            return createNewItem(dto, cart);
-        }
+        return cart.getCartItems().stream()
+                .filter(item -> item.getProductId().equals(dto.productId()))
+                .findFirst()
+                .map(existing -> updateExistingItem(dto, existing))
+                .orElseGet(() -> createNewItem(dto, cart));
     }
 
     @Transactional(readOnly = true)
-    public CartDto getCart(long userId) {
+    public CartDto getCart(UUID userId) {
         return cartRepository.findCartWithItemsByUserId(userId)
-                .map(cart -> {
-                    List<CartItemDto> cartItemList = cartItemMapper.toCartItemDtoList(cart.getCartItems());
-                    return new CartDto(
-                            cartItemList,
-                            cart.calculateTotal()
-                    );
-                })
-                .orElseGet(this::createEmptyCartDto);
+                .map(cartMapper::toDto)
+                .orElseGet(() -> new CartDto(
+                        Collections.emptyList(),
+                        BigDecimal.ZERO
+                ));
     }
 
     @Transactional(readOnly = true)
-    public List<CartItemDtoForOrder> getCartItemsForOrder(long userId) {
-        Cart cart = cartRepository.findCartWithItemsByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
+    public List<CartItemDto> getCartItemsForOrder(UUID userId) {
+        Cart cart = getCartWithItemsByUserId(userId);
 
-        return cartItemMapper.toCartItemDtoListForOrder(cart.getCartItems());
-    }
-
-    public void deleteItemFromCart(long itemId, long userId) {
-        long cartId = cartRepository.findCartIdByUserId(userId)
-                        .orElseThrow(() -> new NotFoundException(CART_NOT_FOUND));
-
-        cartItemService.deleteCartItem(itemId, cartId);
-        deleteCartIfEmpty(cartId);
+        return cartItemMapper.toDtoList(cart.getCartItems());
     }
 
     @Transactional
-    public void changeCartItemQuantity(ChangeCartItemQuantityRequest dto, long itemId) {
-        CartItem cartItem = cartItemService.getCartItemById(itemId);
+    public void deleteItemFromCart(UUID itemId, UUID userId) {
+        Cart cart = getCartWithItemsByUserId(userId);
+
+        CartItem item = cart.getCartItems().stream()
+                .filter(i -> i.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new ApiException("Cart item not found", HttpStatus.NOT_FOUND));
+
+        cart.getCartItems().remove(item);
+        deleteCartIfEmpty(cart);
+    }
+
+    @Transactional
+    public void updateCartItem(ChangeCartItemQuantityRequest dto, UUID itemId, UUID userId) {
+        Cart cart = getCartWithItemsByUserId(userId);
+        List<CartItem> cartItems = cart.getCartItems();
+        CartItem selectedItem = cartItems.stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new ApiException("Cart item not found", HttpStatus.NOT_FOUND));
+
 
         if (dto.amount() <= 0) {
-            cartItemService.deleteCartItem(cartItem.getId());
-            deleteCartIfEmpty(cartItem.getCart().getId());
+            cartItems.remove(selectedItem);
+            deleteCartIfEmpty(cart);
         } else {
-            cartItem.setQuantity(dto.amount());
+            selectedItem.setQuantity(dto.amount());
         }
     }
 
-    public void deleteCartByUserId(long userId) {
+    public void deleteCartByUserId(UUID userId) {
         cartRepository.deleteCartByUserId(userId);
     }
 
-    private void deleteCartIfEmpty(long cartId) {
-        int cartItemsCount = cartItemService.countCartItems(cartId);
-        if (cartItemsCount == 0) {
-            cartRepository.deleteById(cartId);
+    private Cart getCartWithItemsByUserId(UUID userId) {
+        return cartRepository.findCartWithItemsByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Cart Not Found"));
+    }
+
+    private void deleteCartIfEmpty(Cart cart) {
+        if (cart.getCartItems().isEmpty()) {
+            cartRepository.delete(cart);
         }
     }
 
-    private Cart createCart(long userId) {
+    private Cart createCart(UUID userId) {
         Cart cart = Cart.builder()
                 .userId(userId)
                 .build();
@@ -104,33 +115,34 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    private CartDto createEmptyCartDto() {
-        return new CartDto(
-                Collections.emptyList(),
-                BigDecimal.ZERO
-        );
-    }
-
     private CartItemDto createNewItem(AddItemToCartRequest dto, Cart cart) {
         ProductInfo response = getProductInfoAndCheckQuantity(dto.productId(), dto.quantity());
-        CartItem cartItem = cartItemMapper.toEntity(dto, response, cart);
-        CartItem savedCartItem = cartItemService.save(cartItem);
-        return cartItemMapper.toCartItemDto(savedCartItem);
+        CartItem newCartItem = CartItem.builder()
+                .priceAtAdd(new BigDecimal(response.getPrice()))
+                .productName(response.getProductName())
+                .quantity(dto.quantity())
+                .productId(dto.productId())
+                .cart(cart)
+                .productImageUrl(response.getProductImageUrl())
+                .build();
+
+        return cartItemMapper.toDto(newCartItem);
     }
 
     private CartItemDto updateExistingItem(AddItemToCartRequest dto, CartItem cartItem) {
         getProductInfoAndCheckQuantity(dto.productId(), dto.quantity() + cartItem.getQuantity());
         cartItem.setQuantity(cartItem.getQuantity() + dto.quantity());
-        return cartItemMapper.toCartItemDto(cartItem);
+        return cartItemMapper.toDto(cartItem);
     }
 
-    private ProductInfo getProductInfoAndCheckQuantity(long productId, int quantity) {
+    private ProductInfo getProductInfoAndCheckQuantity(UUID productId, int quantity) {
         ProductInfo productInfo = grpcProductService.getProductInfo(productId);
 
-        if(productInfo.getAvailableQuantity() < quantity) {
-            throw new InsufficientProductStockException(
+        if (productInfo.getAvailableQuantity() < quantity) {
+            throw new ApiException(
                     "Insufficient stock for product. Requested: %d, Available: %d"
-                            .formatted(quantity, productInfo.getAvailableQuantity())
+                            .formatted(quantity, productInfo.getAvailableQuantity()),
+                    HttpStatus.BAD_REQUEST
             );
         }
 

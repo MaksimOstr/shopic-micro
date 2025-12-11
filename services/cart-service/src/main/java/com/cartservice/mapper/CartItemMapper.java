@@ -16,23 +16,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface CartItemMapper {
+    CartItemDto toDto(CartItem cartItem);
 
-
-    CartItemDtoForOrder toCartItemDtoForOrder(CartItem cartItem);
-
-    List<CartItemDtoForOrder> toCartItemDtoListForOrder(List<CartItem> cartItems);
-
-    CartItemDto toCartItemDto(CartItem cartItem);
-
-    List<CartItemDto> toCartItemDtoList(List<CartItem> cartItems);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "productId", source = "dto.productId")
-    @Mapping(target = "cart", source = "cart")
-    CartItem toEntity(AddItemToCartRequest dto, ProductInfo productInfo, Cart cart);
-
-    @AfterMapping
-    default void setPriceAtAdd(@MappingTarget CartItem cartItem, ProductInfo productInfo) {
-        cartItem.setPriceAtAdd(new BigDecimal(productInfo.getPrice()));
-    }
+    List<CartItemDto> toDtoList(List<CartItem> cartItems);
 }

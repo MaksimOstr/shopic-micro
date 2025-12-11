@@ -10,22 +10,22 @@ option java_package = "com.shopic.grpc.productservice";
 
 
 message ProductInfoRequest {
-  int64 product_id = 1;
+  string product_id = 1;
 }
 
 message ReserveProductsRequest {
-  int64 order_id = 2;
+  string order_id = 2;
   repeated ReservationItem reservation_items = 3;
 }
 
 message ReservationItem {
-  int64 product_id = 1;
+  string product_id = 1;
   int32 quantity = 2;
 }
 
 
 message ProductInfo {
-  int64 product_id = 1;
+  string product_id = 1;
   string product_name = 2;
   string product_image_url = 3;
   string price = 4;
@@ -43,7 +43,7 @@ message ProductInfoList {
 }
 
 message IsProductExistsRequest {
-  int64 product_id = 1;
+  string product_id = 1;
 }
 
 message IsProductExistsResponse {

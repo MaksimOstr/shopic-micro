@@ -2,376 +2,278 @@ package com.cartservice.unit.service;
 
 import com.cartservice.dto.CartDto;
 import com.cartservice.dto.CartItemDto;
-import com.cartservice.dto.CartItemDtoForOrder;
 import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.dto.request.ChangeCartItemQuantityRequest;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
-import com.cartservice.exception.InsufficientProductStockException;
+import com.cartservice.exception.ApiException;
 import com.cartservice.exception.NotFoundException;
 import com.cartservice.mapper.CartItemMapper;
+import com.cartservice.mapper.CartMapper;
 import com.cartservice.repository.CartRepository;
-import com.cartservice.service.CartItemService;
 import com.cartservice.service.CartService;
 import com.cartservice.service.grpc.GrpcProductService;
 import com.shopic.grpc.productservice.ProductInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CartServiceTest {
+class CartServiceTest {
+    private static final UUID USER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    private static final UUID CART_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    private static final UUID CART_ITEM_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
+    private static final UUID PRODUCT_ID = UUID.fromString("44444444-4444-4444-4444-444444444444");
+    private static final UUID OTHER_PRODUCT_ID = UUID.fromString("55555555-5555-5555-5555-555555555555");
+    private static final BigDecimal PRICE_AT_ADD = new BigDecimal("10.50");
+    private static final String PRODUCT_NAME = "Test product name";
+    private static final String PRODUCT_IMAGE_URL = "http://image.png";
+
     @Mock
     private CartRepository cartRepository;
 
     @Mock
-    private CartItemService cartItemService;
-
-    @Spy
-    private CartItemMapper cartItemMapper = Mappers.getMapper(CartItemMapper.class);
+    private CartItemMapper cartItemMapper;
 
     @Mock
     private GrpcProductService grpcProductService;
 
+    @Mock
+    private CartMapper cartMapper;
+
     @InjectMocks
     private CartService cartService;
-
-
-    private static final long PRODUCT_ID = 1L;
-    private static final long USER_ID = 2L;
-    private static final long CART_ITEM_ID = 3L;
-    private static final String PRODUCT_NAME = "test_product_name";
-    private static final String PRODUCT_IMAGE_URL = "test_product_image_url";
-    private static final long CART_ID = 4L;
-    private static final String PRICE_AT_ADD = "10.0";
-    private static final int REQUESTED_QUANTITY = 9;
-    private static final AddItemToCartRequest ADD_ITEM_TO_CART_REQUEST = new AddItemToCartRequest(
-            PRODUCT_ID,
-            REQUESTED_QUANTITY
-    );
-
 
     private Cart cart;
     private CartItem cartItem;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         cart = Cart.builder()
                 .id(CART_ID)
                 .userId(USER_ID)
+                .cartItems(new ArrayList<>())
                 .build();
 
         cartItem = CartItem.builder()
                 .id(CART_ITEM_ID)
-                .productName(PRODUCT_NAME)
-                .priceAtAdd(new BigDecimal(PRICE_AT_ADD))
-                .productImageUrl(PRODUCT_IMAGE_URL)
-                .productId(PRODUCT_ID)
                 .cart(cart)
+                .productId(PRODUCT_ID)
+                .priceAtAdd(PRICE_AT_ADD)
+                .quantity(1)
+                .productName(PRODUCT_NAME)
+                .productImageUrl(PRODUCT_IMAGE_URL)
                 .build();
     }
 
     @Test
-    public void testAddItemToCart_whenCalledWithExistingCartAndEnoughProductStockAndNonExistingCartItem_thenAddNewItemToCart() {
-        ArgumentCaptor<CartItem> cartItemArgumentCaptor = ArgumentCaptor.forClass(CartItem.class);
-        int availableQuantity = 10;
-        ProductInfo productInfo = ProductInfo.newBuilder()
-                .setProductId(PRODUCT_ID)
-                .setAvailableQuantity(availableQuantity)
-                .setProductName(PRODUCT_NAME)
-                .setProductImageUrl(PRODUCT_IMAGE_URL)
-                .setPrice(PRICE_AT_ADD)
-                .build();
-
-        cartItem.setQuantity(REQUESTED_QUANTITY);
-
-        when(cartRepository.findCartByUserId(anyLong())).thenReturn(Optional.of(cart));
-        when(cartItemService.getOptionalByCartIdAndProductId(anyLong(), anyLong())).thenReturn(Optional.empty());
-        when(grpcProductService.getProductInfo(anyLong())).thenReturn(productInfo);
-        when(cartItemService.save(any(CartItem.class))).thenReturn(cartItem);
-
-        CartItemDto result = cartService.addItemToCart(ADD_ITEM_TO_CART_REQUEST, USER_ID);
-
-        verify(cartRepository).findCartByUserId(USER_ID);
-        verify(cartItemService).getOptionalByCartIdAndProductId(CART_ID, PRODUCT_ID);
-        verify(grpcProductService).getProductInfo(PRODUCT_ID);
-        verify(cartItemMapper).toEntity(ADD_ITEM_TO_CART_REQUEST, productInfo, cart);
-        verify(cartItemService).save(cartItemArgumentCaptor.capture());
-        verify(cartItemMapper).toCartItemDto(cartItem);
-
-        CartItem savedCartItem = cartItemArgumentCaptor.getValue();
-
-        assertEquals(cart, savedCartItem.getCart());
-        assertEquals(PRODUCT_ID, savedCartItem.getProductId());
-        assertEquals(PRODUCT_NAME, savedCartItem.getProductName());
-        assertEquals(PRODUCT_IMAGE_URL, savedCartItem.getProductImageUrl());
-        assertEquals(REQUESTED_QUANTITY, savedCartItem.getQuantity());
-        assertEquals(new BigDecimal(PRICE_AT_ADD), savedCartItem.getPriceAtAdd());
-        assertEquals(PRODUCT_ID, result.productId());
-        assertEquals(PRODUCT_NAME, result.productName());
-        assertEquals(PRODUCT_IMAGE_URL, result.productImageUrl());
-        assertEquals(REQUESTED_QUANTITY, result.quantity());
-        assertEquals(new BigDecimal(PRICE_AT_ADD), result.priceAtAdd());
-    }
-
-
-    @Test
-    public void testAddItemToCart_whenCalledWithExistingCartAndEnoughProductStockAndExistingCartItem_thenUpdateExistingCartItem() {
-        int startItemQuantity = 7;
-        int availableQuantity = startItemQuantity + REQUESTED_QUANTITY;
-        ProductInfo productInfo = ProductInfo.newBuilder()
-                .setProductId(PRODUCT_ID)
-                .setAvailableQuantity(availableQuantity)
-                .setProductName(PRODUCT_NAME)
-                .setProductImageUrl(PRODUCT_IMAGE_URL)
-                .setPrice(PRICE_AT_ADD)
-                .build();
-        cartItem.setQuantity(startItemQuantity);
-
-        when(cartRepository.findCartByUserId(anyLong())).thenReturn(Optional.of(cart));
-        when(cartItemService.getOptionalByCartIdAndProductId(anyLong(), anyLong())).thenReturn(Optional.of(cartItem));
-        when(grpcProductService.getProductInfo(anyLong())).thenReturn(productInfo);
-
-        CartItemDto result = cartService.addItemToCart(ADD_ITEM_TO_CART_REQUEST, USER_ID);
-
-        verify(cartRepository).findCartByUserId(USER_ID);
-        verify(cartItemService).getOptionalByCartIdAndProductId(CART_ID, PRODUCT_ID);
-        verify(grpcProductService).getProductInfo(PRODUCT_ID);
-        verify(cartItemMapper).toCartItemDto(cartItem);
-
-        assertEquals(CART_ITEM_ID, result.id());
-        assertEquals(PRODUCT_ID, result.productId());
-        assertEquals(PRODUCT_NAME, result.productName());
-        assertEquals(PRODUCT_IMAGE_URL, result.productImageUrl());
-        assertEquals(new BigDecimal(PRICE_AT_ADD), result.priceAtAdd());
-        assertEquals(startItemQuantity + REQUESTED_QUANTITY, result.quantity());
-    }
-
-    @Test
-    public void testAddItemToCart_whenCalledWithExistingCartAndNotEnoughProductStockAndExistingCartItem_thenUpdateExistingCartItem() {
-        int startItemQuantity = 7;
-        int availableQuantity = startItemQuantity + REQUESTED_QUANTITY - 2;
+    void addItemToCart_updatesExistingItemQuantity() {
+        AddItemToCartRequest request = new AddItemToCartRequest(PRODUCT_ID, 2);
+        cart.getCartItems().add(cartItem);
+        CartItemDto expectedDto = new CartItemDto(CART_ITEM_ID, PRODUCT_ID, 3, PRICE_AT_ADD, PRODUCT_NAME, PRODUCT_IMAGE_URL);
 
         ProductInfo productInfo = ProductInfo.newBuilder()
-                .setProductId(PRODUCT_ID)
-                .setAvailableQuantity(availableQuantity)
+                .setProductId(PRODUCT_ID.toString())
+                .setAvailableQuantity(10)
+                .setPrice(PRICE_AT_ADD.toString())
                 .setProductName(PRODUCT_NAME)
                 .setProductImageUrl(PRODUCT_IMAGE_URL)
-                .setPrice(PRICE_AT_ADD)
                 .build();
 
-        cartItem.setQuantity(startItemQuantity);
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.of(cart));
+        when(grpcProductService.getProductInfo(PRODUCT_ID)).thenReturn(productInfo);
+        when(cartItemMapper.toDto(cartItem)).thenReturn(expectedDto);
 
-        when(cartRepository.findCartByUserId(anyLong())).thenReturn(Optional.of(cart));
-        when(cartItemService.getOptionalByCartIdAndProductId(anyLong(), anyLong())).thenReturn(Optional.of(cartItem));
-        when(grpcProductService.getProductInfo(anyLong())).thenReturn(productInfo);
+        CartItemDto result = cartService.addItemToCart(request, USER_ID);
 
-        assertThrows(InsufficientProductStockException.class, () -> {
-            cartService.addItemToCart(ADD_ITEM_TO_CART_REQUEST, USER_ID);
-        });
-
-        verify(cartRepository).findCartByUserId(USER_ID);
-        verify(cartItemService).getOptionalByCartIdAndProductId(CART_ID, PRODUCT_ID);
+        verify(cartRepository).findCartWithItemsByUserId(USER_ID);
         verify(grpcProductService).getProductInfo(PRODUCT_ID);
-        verifyNoInteractions(cartItemMapper);
+        verify(cartItemMapper).toDto(cartItem);
+
+        assertEquals(3, cartItem.getQuantity());
+        assertSame(expectedDto, result);
     }
 
     @Test
-    public void testAddItemToCart_whenCalledWithNonExistingCartAndEnoughProductStockAndExistingCartItem_thenCreateCartAndUpdateExistingCartItem() {
-        int startItemQuantity = 7;
-        int availableQuantity = startItemQuantity + REQUESTED_QUANTITY;
+    void addItemToCart_createsCartWhenMissing() {
+        AddItemToCartRequest request = new AddItemToCartRequest(OTHER_PRODUCT_ID, 1);
+        Cart savedCart = Cart.builder()
+                .id(CART_ID)
+                .userId(USER_ID)
+                .cartItems(new ArrayList<>())
+                .build();
+
+        ProductInfo productInfo = ProductInfo.newBuilder()
+                .setProductId(OTHER_PRODUCT_ID.toString())
+                .setAvailableQuantity(5)
+                .setPrice(PRICE_AT_ADD.toString())
+                .setProductName(PRODUCT_NAME)
+                .setProductImageUrl(PRODUCT_IMAGE_URL)
+                .build();
+
+        CartItemDto mappedDto = new CartItemDto(null, OTHER_PRODUCT_ID, 1, PRICE_AT_ADD, PRODUCT_NAME, PRODUCT_IMAGE_URL);
+
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.empty());
+        when(cartRepository.save(any(Cart.class))).thenReturn(savedCart);
+        when(grpcProductService.getProductInfo(OTHER_PRODUCT_ID)).thenReturn(productInfo);
+        when(cartItemMapper.toDto(any(CartItem.class))).thenReturn(mappedDto);
+
         ArgumentCaptor<Cart> cartCaptor = ArgumentCaptor.forClass(Cart.class);
+        ArgumentCaptor<CartItem> cartItemCaptor = ArgumentCaptor.forClass(CartItem.class);
+
+        CartItemDto result = cartService.addItemToCart(request, USER_ID);
+
+        verify(cartRepository).save(cartCaptor.capture());
+        verify(grpcProductService).getProductInfo(OTHER_PRODUCT_ID);
+        verify(cartItemMapper).toDto(cartItemCaptor.capture());
+
+        Cart saved = cartCaptor.getValue();
+        CartItem newItem = cartItemCaptor.getValue();
+
+        assertEquals(USER_ID, saved.getUserId());
+        assertEquals(OTHER_PRODUCT_ID, newItem.getProductId());
+        assertEquals(1, newItem.getQuantity());
+        assertEquals(PRICE_AT_ADD, newItem.getPriceAtAdd());
+        assertEquals(PRODUCT_NAME, newItem.getProductName());
+        assertEquals(PRODUCT_IMAGE_URL, newItem.getProductImageUrl());
+        assertSame(mappedDto, result);
+    }
+
+    @Test
+    void addItemToCart_throwsApiExceptionWhenStockIsInsufficient() {
+        AddItemToCartRequest request = new AddItemToCartRequest(PRODUCT_ID, 3);
         ProductInfo productInfo = ProductInfo.newBuilder()
-                .setProductId(PRODUCT_ID)
-                .setAvailableQuantity(availableQuantity)
+                .setProductId(PRODUCT_ID.toString())
+                .setAvailableQuantity(2)
+                .setPrice(PRICE_AT_ADD.toString())
                 .setProductName(PRODUCT_NAME)
                 .setProductImageUrl(PRODUCT_IMAGE_URL)
-                .setPrice(PRICE_AT_ADD)
                 .build();
-        cartItem.setQuantity(startItemQuantity);
 
-        when(cartRepository.findCartByUserId(anyLong())).thenReturn(Optional.empty());
-        when(cartRepository.save(any(Cart.class))).thenReturn(cart);
-        when(cartItemService.getOptionalByCartIdAndProductId(anyLong(), anyLong())).thenReturn(Optional.of(cartItem));
-        when(grpcProductService.getProductInfo(anyLong())).thenReturn(productInfo);
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.of(cart));
+        when(grpcProductService.getProductInfo(PRODUCT_ID)).thenReturn(productInfo);
 
-        CartItemDto result = cartService.addItemToCart(ADD_ITEM_TO_CART_REQUEST, USER_ID);
+        ApiException exception = assertThrows(ApiException.class, () -> cartService.addItemToCart(request, USER_ID));
 
-        verify(cartRepository).findCartByUserId(USER_ID);
-        verify(cartRepository).save(cartCaptor.capture());
-        verify(cartItemService).getOptionalByCartIdAndProductId(CART_ID, PRODUCT_ID);
         verify(grpcProductService).getProductInfo(PRODUCT_ID);
-        verify(cartItemMapper).toCartItemDto(cartItem);
-
-        Cart savedCart = cartCaptor.getValue();
-
-        assertEquals(CART_ITEM_ID, result.id());
-        assertEquals(PRODUCT_ID, result.productId());
-        assertEquals(PRODUCT_NAME, result.productName());
-        assertEquals(PRODUCT_IMAGE_URL, result.productImageUrl());
-        assertEquals(new BigDecimal(PRICE_AT_ADD), result.priceAtAdd());
-        assertEquals(startItemQuantity + REQUESTED_QUANTITY, result.quantity());
-        assertEquals(USER_ID, savedCart.getUserId());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 
     @Test
-    public void testGetCart_whenCalledWithNonExistingCart_thenReturnEmptyCartDto() {
-        when(cartRepository.findCartWithItemsByUserId(anyLong())).thenReturn(Optional.empty());
+    void getCart_returnsEmptyDtoWhenCartMissing() {
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.empty());
 
         CartDto result = cartService.getCart(USER_ID);
 
         verify(cartRepository).findCartWithItemsByUserId(USER_ID);
-        verifyNoInteractions(cartItemMapper);
-
-        assertEquals(Collections.emptyList(), result.cartItemList());
-        assertEquals(BigDecimal.ZERO, result.totalPrice());
+        assertEquals(new CartDto(Collections.emptyList(), BigDecimal.ZERO), result);
+        verifyNoInteractions(cartMapper);
     }
 
     @Test
-    public void testGetCart_whenCalledWithExistingCart_thenReturnCartDtoWithItems() {
-        List<CartItem> cartItemList = List.of(cartItem);
-        int itemQuantity = REQUESTED_QUANTITY;
-
-        cart.setCartItems(cartItemList);
-        cartItem.setQuantity(itemQuantity);
-
-        when(cartRepository.findCartWithItemsByUserId(anyLong())).thenReturn(Optional.of(cart));
+    void getCart_returnsMappedDtoWhenCartExists() {
+        CartDto mappedDto = new CartDto(Collections.emptyList(), BigDecimal.TEN);
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.of(cart));
+        when(cartMapper.toDto(cart)).thenReturn(mappedDto);
 
         CartDto result = cartService.getCart(USER_ID);
-        CartItemDto cartItemDto = result.cartItemList().get(0);
 
         verify(cartRepository).findCartWithItemsByUserId(USER_ID);
-        verify(cartItemMapper).toCartItemDtoList(cartItemList);
-
-        assertEquals(new BigDecimal(PRICE_AT_ADD).multiply(BigDecimal.valueOf(itemQuantity)), result.totalPrice());
-        assertEquals(cartItem.getQuantity(), cartItemDto.quantity());
-        assertEquals(cartItem.getProductId(), cartItemDto.productId());
-        assertEquals(cartItem.getProductName(), cartItemDto.productName());
-        assertEquals(cartItem.getProductImageUrl(), cartItemDto.productImageUrl());
-        assertEquals(cartItem.getPriceAtAdd(), cartItemDto.priceAtAdd());
-        assertEquals(cartItem.getId(), cartItemDto.id());
+        verify(cartMapper).toDto(cart);
+        assertSame(mappedDto, result);
     }
 
     @Test
-    public void testGetCartItemsForOrder_whenCalledWithExistingCart_thenReturnCartItems() {
-        List<CartItem> cartItemList = List.of(cartItem);
-        cart.setCartItems(cartItemList);
+    void getCartItemsForOrder_returnsMappedItems() {
+        cart.getCartItems().add(cartItem);
+        List<CartItemDto> expected = List.of(new CartItemDto(CART_ITEM_ID, PRODUCT_ID, 1, PRICE_AT_ADD, PRODUCT_NAME, PRODUCT_IMAGE_URL));
 
-        when(cartRepository.findCartWithItemsByUserId(anyLong())).thenReturn(Optional.of(cart));
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.of(cart));
+        when(cartItemMapper.toDtoList(cart.getCartItems())).thenReturn(expected);
 
-        List<CartItemDtoForOrder> result = cartService.getCartItemsForOrder(USER_ID);
-        CartItemDtoForOrder cartItemDtoForOrder = result.get(0);
+        List<CartItemDto> result = cartService.getCartItemsForOrder(USER_ID);
 
         verify(cartRepository).findCartWithItemsByUserId(USER_ID);
-        verify(cartItemMapper).toCartItemDtoListForOrder(cartItemList);
-
-        assertEquals(cartItemList.size(), result.size());
-        assertEquals(cartItem.getProductId(), cartItemDtoForOrder.productId());
-        assertEquals(cartItem.getQuantity(), cartItemDtoForOrder.quantity());
+        verify(cartItemMapper).toDtoList(cart.getCartItems());
+        assertEquals(expected, result);
     }
 
     @Test
-    public void testGetCartItemsForOrder_whenCalledWithNonExistingCart_thenThrowException() {
-        when(cartRepository.findCartWithItemsByUserId(anyLong())).thenReturn(Optional.empty());
+    void getCartItemsForOrder_throwsWhenCartMissing() {
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> {
-            cartService.getCartItemsForOrder(USER_ID);
-        });
-
+        assertThrows(NotFoundException.class, () -> cartService.getCartItemsForOrder(USER_ID));
         verify(cartRepository).findCartWithItemsByUserId(USER_ID);
-        verifyNoInteractions(cartItemMapper);
     }
 
     @Test
-    public void testDeleteItemFromCart_whenCalledWithExistingCartAndEmptyCartAfterItemRemoving_thenDeleteItemAndCart() {
-        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.of(CART_ID));
-        when(cartItemService.countCartItems(anyLong())).thenReturn(0);
+    void deleteItemFromCart_removesItemAndDeletesCartWhenEmpty() {
+        cart.getCartItems().add(cartItem);
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.of(cart));
 
         cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
 
-        verify(cartRepository).findCartIdByUserId(USER_ID);
-        verify(cartItemService).deleteCartItem(CART_ITEM_ID, CART_ID);
-        verify(cartItemService).countCartItems(CART_ID);
-        verify(cartRepository).deleteById(CART_ID);
+        verify(cartRepository).findCartWithItemsByUserId(USER_ID);
+        verify(cartRepository).delete(cart);
+        assertTrue(cart.getCartItems().isEmpty());
     }
 
     @Test
-    public void testDeleteItemFromCart_whenCalledWithNotExistingCart_thenDeleteItemAndCart() {
-        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.empty());
+    void deleteItemFromCart_throwsWhenItemNotFound() {
+        cart.getCartItems().add(cartItem);
+        UUID missingItemId = UUID.randomUUID();
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.of(cart));
 
-        assertThrows(NotFoundException.class, () -> {
-            cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
-        });
+        ApiException exception = assertThrows(ApiException.class, () -> cartService.deleteItemFromCart(missingItemId, USER_ID));
 
-        verify(cartRepository).findCartIdByUserId(USER_ID);
-        verifyNoInteractions(cartItemService);
-        verifyNoMoreInteractions(cartRepository);
+        verify(cartRepository).findCartWithItemsByUserId(USER_ID);
+        verify(cartRepository, never()).delete(any(Cart.class));
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals(1, cart.getCartItems().size());
     }
 
     @Test
-    public void testDeleteItemFromCart_whenCalledWithExistingCartAndNotEmptyCartAfterItemRemoving_thenDeleteItem() {
-        when(cartRepository.findCartIdByUserId(anyLong())).thenReturn(Optional.of(CART_ID));
-        when(cartItemService.countCartItems(anyLong())).thenReturn(1);
+    void updateCartItem_setsQuantityWhenPositive() {
+        cart.getCartItems().add(cartItem);
+        ChangeCartItemQuantityRequest request = new ChangeCartItemQuantityRequest(5);
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.of(cart));
 
-        cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID);
+        cartService.updateCartItem(request, CART_ITEM_ID, USER_ID);
 
-        verify(cartRepository).findCartIdByUserId(USER_ID);
-        verify(cartItemService).deleteCartItem(CART_ITEM_ID, CART_ID);
-        verify(cartItemService).countCartItems(CART_ID);
-        verifyNoMoreInteractions(cartRepository);
+        assertEquals(5, cartItem.getQuantity());
+        verify(cartRepository, never()).delete(any(Cart.class));
     }
 
     @Test
-    public void testChangeCartItemQuantity_whenRequestedAboveZeroRequestedQuantity_thenSetQuantity() {
-        int startItemQuantity = 10;
-        ChangeCartItemQuantityRequest changeCartItemQuantity = new ChangeCartItemQuantityRequest(REQUESTED_QUANTITY);
+    void updateCartItem_removesItemAndDeletesCartWhenAmountIsZero() {
+        cart.getCartItems().add(cartItem);
+        ChangeCartItemQuantityRequest request = new ChangeCartItemQuantityRequest(0);
+        when(cartRepository.findCartWithItemsByUserId(USER_ID)).thenReturn(Optional.of(cart));
 
-        cartItem.setQuantity(startItemQuantity);
+        cartService.updateCartItem(request, CART_ITEM_ID, USER_ID);
 
-        when(cartItemService.getCartItemById(anyLong())).thenReturn(cartItem);
-
-        cartService.changeCartItemQuantity(changeCartItemQuantity, CART_ITEM_ID);
-
-        verify(cartItemService).getCartItemById(CART_ITEM_ID);
-        verifyNoMoreInteractions(cartItemService);
-        verifyNoInteractions(cartRepository);
-
-        assertNotEquals(startItemQuantity, cartItem.getQuantity());
-        assertEquals(REQUESTED_QUANTITY, cartItem.getQuantity());
+        verify(cartRepository).delete(cart);
+        assertTrue(cart.getCartItems().isEmpty());
     }
 
     @Test
-    public void testChangeCartItemQuantity_whenRequestedBelowZeroRequestedQuantity_thenDeleteItem() {
-        int startItemQuantity = 10;
-        ChangeCartItemQuantityRequest changeCartItemQuantity = new ChangeCartItemQuantityRequest(0);
-
-        cartItem.setQuantity(startItemQuantity);
-
-        when(cartItemService.getCartItemById(anyLong())).thenReturn(cartItem);
-        when(cartItemService.countCartItems(anyLong())).thenReturn(1);
-
-        cartService.changeCartItemQuantity(changeCartItemQuantity, CART_ITEM_ID);
-
-        verify(cartItemService).getCartItemById(CART_ITEM_ID);
-        verify(cartItemService).deleteCartItem(CART_ITEM_ID);
-        verify(cartItemService).countCartItems(CART_ID);
-    }
-
-    @Test
-    public void testDeleteCartByUserId_whenCalledWithArguments_thenDeleteCart() {
+    void deleteCartByUserId_delegatesToRepository() {
         cartService.deleteCartByUserId(USER_ID);
 
         verify(cartRepository).deleteCartByUserId(USER_ID);
