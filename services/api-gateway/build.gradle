@@ -18,16 +18,12 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.kafka:spring-kafka'
-	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation libs.bundles.core
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway-mvc'
 	implementation 'org.projectlombok:lombok'
-	implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
 }
 
 dependencyManagement {
