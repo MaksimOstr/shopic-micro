@@ -18,17 +18,35 @@ import static org.springframework.cloud.gateway.server.mvc.predicate.GatewayRequ
 public class ApiGatewayConfig {
     private final ServicesProperties servicesProperties;
 
+    private static final String[] authServiceUrlPatterns = {
+            "/api/v1/auth/**",
+            "/api/v1/forgot-password/**",
+            "/api/v1/users/**",
+            "/api/v1/verification/**"
+    };
+
+    private static final String[] productServiceUrlPatterns = {
+            "/api/v1/products/**",
+            "/brands/**",
+            "/categories/**"
+    };
+
+    private static final String[] orderServiceUrlPatterns = {
+            "/api/v1/admin/orders/**",
+            "/api/v1/orders/**"
+    };
+
     @Bean
     public RouterFunction<ServerResponse> authRoute() {
         return route("auth-service-route")
-                .route(path("/api/v1/auth/**"), http(servicesProperties.getAuthUrl()))
+                .route(path(authServiceUrlPatterns), http(servicesProperties.getAuthUrl()))
                 .build();
     }
 
     @Bean
     public RouterFunction<ServerResponse> productRoute() {
         return route("product-service-route")
-                .route(path("/api/v1/products/**", "/brands/**", "/categories/**"), http(servicesProperties.getProductUrl()))
+                .route(path(productServiceUrlPatterns), http(servicesProperties.getProductUrl()))
                 .filter(circuitBreaker(""))
                 .build();
     }
@@ -36,7 +54,7 @@ public class ApiGatewayConfig {
     @Bean
     public RouterFunction<ServerResponse> orderRoute() {
         return route("order-service-route")
-                .route(path("/api/v1/orders/**"), http(servicesProperties.getOrderUrl()))
+                .route(path(orderServiceUrlPatterns), http(servicesProperties.getOrderUrl()))
                 .build();
     }
 
