@@ -1,4 +1,4 @@
-package com.apigateway.dto.response;
+package com.apigateway.dto;
 
 public record ErrorResponseDto (
         String code,

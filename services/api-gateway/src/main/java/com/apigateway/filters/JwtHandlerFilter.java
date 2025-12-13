@@ -1,34 +1,30 @@
 package com.apigateway.filters;
 
-import com.apigateway.dto.JwtVerificationResult;
-import com.apigateway.dto.response.ErrorResponseDto;
+import com.apigateway.dto.ErrorResponseDto;
 import com.apigateway.exceptions.JwtValidationException;
-import com.apigateway.service.JwtValidationService;
 import com.nimbusds.jose.JOSEException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.function.HandlerFilterFunction;
 import org.springframework.web.servlet.function.HandlerFunction;
 import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.Base64;
+
+import static com.apigateway.utils.CryptoUtils.createHmac;
 
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, ServerResponse> {
-    private final static String JWT_SET_URL = "http://auth-service/public-keys";
+
     private static final ErrorResponseDto invalidJwtResponse = new ErrorResponseDto(
             HttpStatus.UNAUTHORIZED.getReasonPhrase(),
             HttpStatus.UNAUTHORIZED.value(),
@@ -47,28 +43,30 @@ public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, S
 
     @Value("${SIGNATURE_SECRET}")
     private String signatureSecret;
-    private final JwtValidationService jwtValidator;
+    private final JwtDecoder jwtDecoder;
 
     @Override
     public ServerResponse filter(
             @NonNull ServerRequest request,
             @NonNull HandlerFunction<ServerResponse> next
-    ) {
+    ) throws Exception {
         log.info("JWT handler filter");
         String token = extractToken(request);
 
         if (token == null) {
-            return ServerResponse.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            return next.handle(request);
         }
 
         try {
-            JwtVerificationResult jwt = jwtValidator.validateToken(token, JWT_SET_URL);
+            Jwt jwt = jwtDecoder.decode(token);
+            String subject = jwt.getSubject();
+            String role = jwt.getClaimAsString("role");
 
             ServerRequest modified = ServerRequest
                     .from(request)
-                    .header("X-User-Id", jwt.userId())
-                    .header("X-Roles", jwt.roles())
-                    .header("X-Signature", createHmac(jwt.userId() + jwt.roles()))
+                    .header("X-User-Id", subject)
+                    .header("X-Role", role)
+                    .header("X-Signature", createHmac(subject + role, signatureSecret))
                     .build();
 
             return next.handle(modified);
@@ -90,17 +88,5 @@ public class JwtHandlerFilter implements HandlerFilterFunction<ServerResponse, S
             return authHeader.substring(7);
         }
         return null;
-    }
-
-    private String createHmac(String data) {
-        try {
-            Mac mac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secretKey = new SecretKeySpec(signatureSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-            mac.init(secretKey);
-            byte[] hmacBytes = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(hmacBytes);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate HMAC", e);
-        }
     }
 }
