@@ -1,6 +1,5 @@
 package com.authservice.config.security;
 
-import com.authservice.security.AuthenticationFilter;
 import com.authservice.security.CustomAuthenticationEntryPoint;
 import com.authservice.security.OAuthSuccessHandler;
 import com.authservice.security.OauthFailureHandler;
@@ -18,7 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
@@ -28,7 +26,7 @@ public class SecurityConfig {
             "/actuator/**",
             "/api/v1/auth/**",
             "/api/v1/verification",
-            "/public-keys",
+            "/api/v1/public-keys",
             "/auth/oauth2/authorization/google",
             "/auth/login/oauth2/code/google",
             "/favicon.ico",
@@ -62,7 +60,6 @@ public class SecurityConfig {
             HttpSecurity http,
             DaoAuthenticationProvider daoAuthenticationProvider,
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
-            AuthenticationFilter authenticationFilter,
             CustomOidcUserService customOidcUserService,
             OAuthSuccessHandler oAuthSuccessHandler,
             OauthFailureHandler oauthFailureHandler
@@ -75,6 +72,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(permittedURLs).permitAll()
                         .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {}))
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(customOidcUserService))
@@ -85,7 +83,6 @@ public class SecurityConfig {
                         .successHandler(oAuthSuccessHandler)
                         .failureHandler(oauthFailureHandler)
                 )
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .build();
     }

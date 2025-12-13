@@ -1,6 +1,6 @@
 package com.apigateway.config;
 
-import com.apigateway.filters.JwtHandlerFilter;
+import com.apigateway.config.properties.ServicesProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,38 +19,38 @@ public class ApiGatewayConfig {
     private final ServicesProperties servicesProperties;
 
     @Bean
-    public RouterFunction<ServerResponse> authRoute(JwtHandlerFilter jwtHandlerFilter) {
+    public RouterFunction<ServerResponse> authRoute() {
         return route("auth-service-route")
                 .route(path("/api/v1/auth/**"), http(servicesProperties.getAuthUrl()))
                 .build();
     }
 
     @Bean
-    public RouterFunction<ServerResponse> productRoute(JwtHandlerFilter jwtHandlerFilter) {
+    public RouterFunction<ServerResponse> productRoute() {
         return route("product-service-route")
-                .route(path("/products/**", "/brands/**", "/categories/**"), http(servicesProperties.getProductUrl()))
+                .route(path("/api/v1/products/**", "/brands/**", "/categories/**"), http(servicesProperties.getProductUrl()))
                 .filter(circuitBreaker(""))
                 .build();
     }
 
     @Bean
-    public RouterFunction<ServerResponse> orderRoute(JwtHandlerFilter jwtHandlerFilter) {
+    public RouterFunction<ServerResponse> orderRoute() {
         return route("order-service-route")
-                .route(path("/orders/**"), http(servicesProperties.getOrderUrl()))
+                .route(path("/api/v1/orders/**"), http(servicesProperties.getOrderUrl()))
                 .build();
     }
 
     @Bean
-    public RouterFunction<ServerResponse> paymentRoute(JwtHandlerFilter jwtHandlerFilter) {
+    public RouterFunction<ServerResponse> paymentRoute() {
         return route("payment-service-route")
-                .route(path("/payments/**"), http(servicesProperties.getPaymentUrl()))
+                .route(path("/api/v1/payments/**"), http(servicesProperties.getPaymentUrl()))
                 .build();
     }
 
     @Bean
-    public RouterFunction<ServerResponse> cartRoute(JwtHandlerFilter jwtHandlerFilter) {
+    public RouterFunction<ServerResponse> cartRoute() {
         return route("cart-service-route")
-                .route(path("/carts/**"), http(servicesProperties.getCartUrl()))
+                .route(path("/api/v1/carts/**"), http(servicesProperties.getCartUrl()))
                 .build();
     }
 }

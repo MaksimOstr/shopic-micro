@@ -1,4 +1,4 @@
-package com.apigateway.config;
+package com.apigateway.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -17,7 +17,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class RotatingJwkManager {
 
     private final PublicKeyService publicKeyService;
-    private final KafkaEventProducer authEventProducer;
 
     private final List<RSAKey> keys = new CopyOnWriteArrayList<>();
     
@@ -25,7 +24,6 @@ public class RotatingJwkManager {
     public void rotate() {
         try {
             rotateKeys();
-            authEventProducer.sendJwkSetInvalidationEvent();
         } catch (Exception e) {
             log.error("Error while rotating keys {}", e.getMessage());
         }

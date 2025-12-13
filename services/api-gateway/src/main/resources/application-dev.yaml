@@ -5,6 +5,7 @@ spring:
         jwt:
           jwk-set-uri: ${AUTH_SERVICE_URL}${JWK_PATH}
           jws-algorithms: RS256
+          authorities-claim-name: role
 
 logging:
   level:
