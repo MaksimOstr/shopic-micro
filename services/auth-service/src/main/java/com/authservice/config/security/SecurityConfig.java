@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 
@@ -58,6 +59,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
+            JwtDecoder jwtDecoder,
             DaoAuthenticationProvider daoAuthenticationProvider,
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
             CustomOidcUserService customOidcUserService,
@@ -65,14 +67,15 @@ public class SecurityConfig {
             OauthFailureHandler oauthFailureHandler
     ) throws Exception {
         return http
-
                 .authenticationProvider(daoAuthenticationProvider)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(permittedURLs).permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {}))
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {
+                    jwtConfigurer.decoder(jwtDecoder);
+                }))
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(customOidcUserService))

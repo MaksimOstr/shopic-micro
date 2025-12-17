@@ -16,11 +16,6 @@ public interface CartRepository extends JpaRepository<Cart, UUID> {
     @Query("SELECT c FROM Cart c JOIN FETCH c.cartItems WHERE c.userId = :userId")
     Optional<Cart> findCartWithItemsByUserId(UUID userId);
 
-    Optional<Cart> findCartByUserId(UUID userId);
-
-    @Query("SELECT c.id FROM Cart c WHERE c.userId = :userId")
-    Optional<UUID> findCartIdByUserId(UUID userId);
-
     @Transactional
     @Modifying
     @Query("DELETE FROM Cart c WHERE c.id = :id")

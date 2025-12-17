@@ -33,6 +33,7 @@ spring:
           jwk-set-uri: ${AUTH_SERVICE_URL}${JWK_PATH}
           jws-algorithms: RS256
           authorities-claim-name: role
+          authority-prefix: ""
 
 
   mail:
@@ -91,9 +92,11 @@ eureka:
     enabled: false
 
 jwt:
-  expires-at: ${JWT_EXPIRE_TIME:600}
+  expires-at: ${JWT_EXPIRE_TIME}
   issuer: ${JWT_ISSUER:shopic}
   header-alg: ${JWT_HEADER_ALG:RSA256}
+  public-key-url: ${AUTH_SERVICE_URL}${JWK_PATH}
+
 
 public-key:
   expires-at: ${PUBLIC_KEY_EXPIRATION:3600}

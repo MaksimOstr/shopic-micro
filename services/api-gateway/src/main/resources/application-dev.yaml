@@ -1,11 +1,8 @@
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${AUTH_SERVICE_URL}${JWK_PATH}
-          jws-algorithms: RS256
-          authorities-claim-name: role
+jwt:
+  issuer: ${JWT_ISSUER}
+  header-alg: ${JWT_HEADER_ALG:RSA256}
+  public-key-url: ${AUTH_SERVICE_URL}${JWK_PATH}
+
 
 logging:
   level:

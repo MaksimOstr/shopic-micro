@@ -1,11 +1,16 @@
 package com.apigateway.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,6 +29,13 @@ public class SecurityConfig {
             "/api-docs/**"
     };
 
+    @Value("${jwt.issuer}")
+    private String issuer;
+
+    @Value("${jwt.public-key.url}")
+    private String jwkSetUri;
+
+
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http
@@ -35,7 +47,24 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .requestMatchers(permittedURLs).permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {}))
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {
+                    jwtConfigurer.decoder(jwtDecoder());
+                }))
                 .build();
+    }
+
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
+                .withJwkSetUri(jwkSetUri)
+                .jwsAlgorithm(SignatureAlgorithm.RS256)
+                .build();
+
+        jwtDecoder.setJwtValidator(
+                JwtValidators.createDefaultWithIssuer(issuer)
+        );
+
+        return jwtDecoder;
     }
 }

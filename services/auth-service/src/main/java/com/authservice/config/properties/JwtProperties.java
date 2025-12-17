@@ -13,5 +13,5 @@ public class JwtProperties {
     private Integer expiresAt;
     private String issuer;
     private String headerAlg;
-
+    private String publicKeyUrl;
 }
