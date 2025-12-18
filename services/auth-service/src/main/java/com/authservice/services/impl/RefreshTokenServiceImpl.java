@@ -13,7 +13,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Ref;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.authservice.utils.CryptoUtils.createHmac;
@@ -30,17 +32,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Transactional
     public String create(User user) {
-        refreshTokenRepository.deleteAllByUser(user);
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUser(user);
 
-        String rawToken = generateToken();
-        RefreshToken newRefreshToken = RefreshToken.builder()
-                .token(hashedToken(rawToken))
-                .user(user)
-                .expiresAt(getExpireTime())
-                .build();
-
-        refreshTokenRepository.save(newRefreshToken);
-        return rawToken;
+        if(optionalRefreshToken.isPresent()) {
+            return updateRefreshToken(optionalRefreshToken.get());
+        } else {
+            return createRefreshToken(user);
+        }
     }
 
     @Transactional
@@ -62,6 +60,28 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private RefreshToken findToken(String token) {
         return refreshTokenRepository.findByToken(hashedToken(token))
                 .orElseThrow(() -> new ApiException("Refresh token not found",  HttpStatus.NOT_FOUND));
+    }
+
+    private String updateRefreshToken(RefreshToken refreshToken) {
+        String rawToken = generateToken();
+
+        refreshToken.setToken(hashedToken(rawToken));
+        refreshToken.setExpiresAt(getExpireTime());
+
+        return rawToken;
+    }
+
+    private String createRefreshToken(User user) {
+        String rawToken = generateToken();
+        RefreshToken newRefreshToken = RefreshToken.builder()
+                .token(hashedToken(rawToken))
+                .user(user)
+                .expiresAt(getExpireTime())
+                .build();
+
+        refreshTokenRepository.save(newRefreshToken);
+
+        return rawToken;
     }
 
     private String hashedToken(String token) {
