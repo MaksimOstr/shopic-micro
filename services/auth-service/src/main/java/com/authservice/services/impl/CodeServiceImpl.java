@@ -31,9 +31,9 @@ public class CodeServiceImpl implements CodeService {
     @Transactional
     public Code create(User user, CodeScopeEnum scope) {
         try {
-            codeRepository.deleteByUser_IdAndScope(user.getId(), scope);
-
-            return createAndSave(user, scope);
+            return codeRepository.findByUserAndScope(user, scope)
+                    .map(this::update)
+                    .orElseGet(() -> createAndSave(user, scope));
         } catch (MaxRetriesExceededException e) {
             log.error("Max retries exceeded", e);
             throw new ApiException("Code generation failed.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -60,6 +60,14 @@ public class CodeServiceImpl implements CodeService {
 
     private boolean isCodeExpired(Code code) {
         return code.getExpiresAt().isBefore(Instant.now());
+    }
+
+    private Code update(Code code) {
+        String generatedCode = generateAlphanumericCode();
+        code.setExpiresAt(Instant.now().plusSeconds(expiresAt));
+        code.setCode(generatedCode);
+
+        return code;
     }
 
     @Retry(name = "codeGenerationRetry")

@@ -21,7 +21,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 
 @Configuration
-@EnableMethodSecurity
 public class SecurityConfig {
     private static final String[] permittedURLs = {
             "/actuator/**",
@@ -31,7 +30,7 @@ public class SecurityConfig {
             "/auth/oauth2/authorization/google",
             "/auth/login/oauth2/code/google",
             "/favicon.ico",
-            "/api/v1/forgot-password",
+            "/api/v1/forgot-password/**",
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs/**",

@@ -1,5 +1,8 @@
 package com.apigateway.config;
 
+import com.apigateway.config.properties.JwtProperties;
+import com.apigateway.security.CustomAuthenticationEntryPoint;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] permittedURLs = {
             "/api/v1/auth/**",
@@ -26,19 +30,17 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/api-docs/**"
+            "/api-docs/**",
+
     };
 
-    @Value("${jwt.issuer}")
-    private String issuer;
-
-    @Value("${jwt.public-key.url}")
-    private String jwkSetUri;
+    private final JwtProperties jwtProperties;
 
 
     @Bean
     SecurityFilterChain securityFilterChain(
-            HttpSecurity http
+            HttpSecurity http,
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint
     ) throws Exception {
         return http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -50,6 +52,7 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {
                     jwtConfigurer.decoder(jwtDecoder());
                 }))
+                .exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .build();
     }
 
@@ -57,12 +60,12 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
-                .withJwkSetUri(jwkSetUri)
-                .jwsAlgorithm(SignatureAlgorithm.RS256)
+                .withJwkSetUri(jwtProperties.getPublicKeyUrl())
+                .jwsAlgorithm(SignatureAlgorithm.from(jwtProperties.getHeaderAlg()))
                 .build();
 
         jwtDecoder.setJwtValidator(
-                JwtValidators.createDefaultWithIssuer(issuer)
+                JwtValidators.createDefaultWithIssuer(jwtProperties.getIssuer())
         );
 
         return jwtDecoder;
