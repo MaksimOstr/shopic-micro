@@ -19,6 +19,8 @@ public class ApiGatewayConfig {
     private final ServicesProperties servicesProperties;
 
     private static final String[] authServiceUrlPatterns = {
+            "/auth/oauth2/authorization/**",
+            "/auth/login/oauth2/code/**",
             "/api/v1/auth/**",
             "/api/v1/forgot-password/**",
             "/api/v1/users/**",

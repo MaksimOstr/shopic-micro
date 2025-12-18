@@ -4,7 +4,6 @@ spring:
       import-check:
         enabled: false
 
-
   datasource:
     url: jdbc:postgresql://localhost:${AUTH_DB_PORT}/${AUTH_DB_NAME}
     username: ${DB_USER}
@@ -94,8 +93,6 @@ verification-code:
   expires-at : ${CODE_EXPIRATION:900}
 
 signature-secret: ${SIGNATURE_SECRET}
-
-
 
 
 

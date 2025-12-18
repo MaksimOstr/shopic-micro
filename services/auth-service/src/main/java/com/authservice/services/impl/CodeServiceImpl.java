@@ -34,7 +34,7 @@ public class CodeServiceImpl implements CodeService {
     @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 100))
     public Code create(User user, CodeScopeEnum scope) {
         try {
-            log.info("Creating code for user {}", user);
+            log.info("Creating code for user {} with scope {}", user, scope);
             return codeRepository.findByUserAndScope(user, scope)
                     .map((this::update))
                     .orElseGet(() -> createAndSave(user, scope));
@@ -67,7 +67,7 @@ public class CodeServiceImpl implements CodeService {
     }
 
     private Code update(Code code) {
-        String generatedCode = "111111";
+        String generatedCode = generateAlphanumericCode();
         code.setExpiresAt(Instant.now().plusSeconds(expiresAt));
         code.setCode(generatedCode);
 
@@ -75,7 +75,7 @@ public class CodeServiceImpl implements CodeService {
     }
 
     private Code createAndSave(User user, CodeScopeEnum scope) {
-        String generatedCode = "111111";
+        String generatedCode = generateAlphanumericCode();
         Code code = Code.builder()
                 .code(generatedCode)
                 .scope(scope)
@@ -86,7 +86,7 @@ public class CodeServiceImpl implements CodeService {
         return codeRepository.save(code);
     }
 
-    @Scheduled(fixedDelay = 900 * 1000)
+    @Scheduled(fixedDelay = 1000 * 60 * 5)
     public void clearExpiredCodes() {
         log.info("Clearing expired codes");
         codeRepository.deleteExpiredCodes();
