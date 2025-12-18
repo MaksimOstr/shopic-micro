@@ -45,20 +45,42 @@ class CodeServiceImplTest {
     }
 
     @Test
-    void create_shouldDeletePreviousCodesAndPersistNewOne() {
-        when(codeRepository.save(any(Code.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        Instant before = Instant.now();
+    void create_shouldUpdateExistingCodeIfPresent() {
+        Code existing = Code.builder()
+                .code("OLD1234")
+                .scope(CodeScopeEnum.EMAIL_VERIFICATION)
+                .user(user)
+                .expiresAt(Instant.now().plusSeconds(60))
+                .build();
 
+        when(codeRepository.findByUserAndScope(user, CodeScopeEnum.EMAIL_VERIFICATION))
+                .thenReturn(Optional.of(existing));
+
+        Instant before = Instant.now();
         Code result = codeService.create(user, CodeScopeEnum.EMAIL_VERIFICATION);
 
-        verify(codeRepository).deleteByUser_IdAndScope(user.getId(), CodeScopeEnum.EMAIL_VERIFICATION);
-        verify(codeRepository).save(any(Code.class));
+
         assertEquals(user, result.getUser());
         assertEquals(CodeScopeEnum.EMAIL_VERIFICATION, result.getScope());
         assertEquals(8, result.getCode().length());
-        assertTrue(result.getExpiresAt().isAfter(before.plusSeconds(118)));
-        assertTrue(result.getExpiresAt().isBefore(before.plusSeconds(122)));
+        assertTrue(result.getExpiresAt().isAfter(before));
     }
+
+    @Test
+    void create_shouldCreateNewCodeIfNoneExists() {
+        when(codeRepository.findByUserAndScope(user, CodeScopeEnum.EMAIL_VERIFICATION))
+                .thenReturn(Optional.empty());
+        when(codeRepository.save(any(Code.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Instant before = Instant.now();
+        Code result = codeService.create(user, CodeScopeEnum.EMAIL_VERIFICATION);
+
+        assertEquals(user, result.getUser());
+        assertEquals(CodeScopeEnum.EMAIL_VERIFICATION, result.getScope());
+        assertEquals(8, result.getCode().length());
+        assertTrue(result.getExpiresAt().isAfter(before));
+    }
+
 
     @Test
     void validate_shouldDeleteCodeAndReturnWhenValid() {

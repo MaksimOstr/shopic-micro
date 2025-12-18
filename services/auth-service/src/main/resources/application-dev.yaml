@@ -71,15 +71,6 @@ management:
     circuitbreakers:
       enabled: true
 
-resilience4j:
-  retry:
-    instances:
-          codeGenerationRetry:
-            max-attempts: 3
-            wait-duration: 100ms
-            retry-exceptions:
-              - org.springframework.dao.DataIntegrityViolationException
-
 eureka:
   client:
     enabled: false
