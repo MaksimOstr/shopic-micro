@@ -5,4 +5,4 @@ spring:
     active: dev
 
 server:
-  port: 0
+  port: ${PAYMENT_SERVICE_PORT}

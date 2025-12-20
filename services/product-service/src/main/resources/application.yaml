@@ -5,6 +5,6 @@ spring:
     active: dev
 
 server:
-  port: 0
+  port: ${PRODUCT_SERVICE_PORT}
 
 
