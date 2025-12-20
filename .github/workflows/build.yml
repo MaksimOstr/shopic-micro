@@ -1,0 +1,41 @@
+name: Build
+on:
+  workflow_call:
+    inputs:
+      context:
+        required: true
+        type: string
+        default: '.'
+      service:
+        required: true
+        type: string
+
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: ${{ inputs.service }}
+
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Set up Java and Gradle
+          uses: actions/setup-java@v5
+          with:
+            distribution: temurin
+            java-version: 24
+            cache: gradle
+
+        - name: Run tests
+          run: ./gradlew test
+
+
+
+

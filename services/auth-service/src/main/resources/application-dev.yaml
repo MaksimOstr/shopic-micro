@@ -1,9 +1,4 @@
 spring:
-  cloud:
-    config:
-      import-check:
-        enabled: false
-
   datasource:
     url: jdbc:postgresql://localhost:${AUTH_DB_PORT}/${AUTH_DB_NAME}
     username: ${DB_USER}
@@ -35,19 +30,6 @@ spring:
     username: ${EMAIL_SENDER_USERNAME}
     password: ${EMAIL_SENDER_PASSWORD}
 
-  kafka:
-    bootstrap-servers: localhost:9094
-    consumer:
-      auto-offset-reset: latest
-      enable-auto-commit: false
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    listener:
-      ack-mode: manual_immediate
-  pulsar:
-    consumer:
-      retry-enable: true
-
 logging:
   level:
     org:
@@ -70,10 +52,6 @@ management:
     circuitbreakers:
       enabled: true
 
-eureka:
-  client:
-    enabled: false
-
 jwt:
   expires-at: ${JWT_EXPIRE_TIME}
   issuer: ${JWT_ISSUER:shopic}
@@ -93,6 +71,8 @@ verification-code:
   expires-at : ${CODE_EXPIRATION:900}
 
 signature-secret: ${SIGNATURE_SECRET}
+
+
 
 
 

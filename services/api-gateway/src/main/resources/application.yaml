@@ -3,6 +3,7 @@ spring:
     name: api-gateway
   profiles:
     active: dev
+
   security:
     oauth2:
       resourceserver:
@@ -10,7 +11,7 @@ spring:
           authorities-claim-name: roles
 
 server:
-  port: 3030
+  port: ${API_GATEWAY_PORT}
 
 
 

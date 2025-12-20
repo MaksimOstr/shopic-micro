@@ -1,0 +1,25 @@
+name: Build Payment Service
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v.*.*.*'
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-payment-service.yml'
+      - 'services/payment-service/**'
+
+permissions:
+  contents: read
+  packages: write
+
+
+jobs:
+  build:
+    name: Build Service
+    uses: ./.github/workflows/build.yml
+    with:
+      context: 'payment-service'
+      service: 'payment-service'
