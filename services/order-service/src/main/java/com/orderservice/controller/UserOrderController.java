@@ -1,6 +1,6 @@
 package com.orderservice.controller;
 
-import com.orderservice.config.security.model.CustomPrincipal;
+import com.orderservice.security.CustomPrincipal;
 import com.orderservice.dto.UserOrderDto;
 import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.request.CreateOrderRequest;
