@@ -1,7 +1,7 @@
 CREATE TABLE orders
 (
     id                    UUID PRIMARY KEY        DEFAULT gen_random_uuid(),
-    customer_name         VARCHAR(30)    NOT NULL,
+    customer_name         VARCHAR(50)    NOT NULL,
     customer_phone_number VARCHAR(30)    NOT NULL,
     delivery_type         VARCHAR(25)    NOT NULL,
     delivery_price        DECIMAL(10, 2) NOT NULL CHECK (delivery_price >= 0),
@@ -11,7 +11,9 @@ CREATE TABLE orders
     comment               TEXT,
     total_price           DECIMAL(10, 2) NOT NULL CHECK (total_price >= 0),
     created_at            TIMESTAMPTZ    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at            TIMESTAMPTZ    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at            TIMESTAMPTZ    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CHECK (customer_phone_number ~ '^\+?[0-9]{7,15}$')
 );
 
 CREATE TABLE order_items

@@ -18,16 +18,16 @@ import java.util.UUID;
 public class CartGrpcService {
     private final CartServiceGrpc.CartServiceBlockingStub cartGrpcService;
 
-    @CircuitBreaker(name = "cart-service", fallbackMethod = "getCartInfoFallback")
-    public CartResponse getCartInfo(UUID userId) {
+    @CircuitBreaker(name = "cart-service", fallbackMethod = "getCartFallback")
+    public CartResponse getCart(UUID userId) {
         GetCartRequest request = GetCartRequest.newBuilder()
-                .setUserId(userId)
+                .setUserId(userId.toString())
                 .build();
 
         return cartGrpcService.getCart(request);
     }
 
-    public CartResponse getCartInfoFallback(long userId, Throwable exception) {
+    public CartResponse getCartFallback(long userId, Throwable exception) {
         if (exception instanceof StatusRuntimeException e) {
             if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {
                 throw new NotFoundException(e.getStatus().getDescription());

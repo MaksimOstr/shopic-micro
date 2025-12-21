@@ -3,7 +3,7 @@ package com.orderservice.mapper;
 import com.orderservice.dto.OrderItemDto;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderItem;
-import com.shopic.grpc.productservice.ProductInfo;
+import com.shopic.grpc.productservice.Product;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,7 +17,7 @@ public interface OrderItemMapper {
 
     default List<OrderItem> toOrderItemList(
             Order order,
-            List<ProductInfo> productInfoList,
+            List<Product> productInfoList,
             Map<Long, Integer> productQuantityMap
     ) {
         return productInfoList.stream()
@@ -30,7 +30,7 @@ public interface OrderItemMapper {
     @Mapping(target = "quantity", expression = "java(productQuantityMap.get(productInfo.getProductId()))")
     OrderItem toOrderItem(
             Order order,
-            ProductInfo productInfo,
+            Product productInfo,
             @Context Map<Long, Integer> productQuantityMap
     );
 }

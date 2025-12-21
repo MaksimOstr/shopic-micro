@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -24,16 +25,22 @@ import java.util.Objects;
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orders_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum status;
 
-    private Boolean refunded;
+    @Column(name = "customer_name", nullable = false, length = 50)
+    private String customerName;
+
+    @Column(name = "customer_phone_number", nullable = false)
+    private String customerPhoneNumber;
+
+    private String address;
 
     @Column(name = "user_id", nullable = false)
-    private long userId;
+    private UUID userId;
 
     @Column(name = "delivery_type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -46,24 +53,6 @@ public class Order {
     private BigDecimal totalPrice;
 
     private String comment;
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "country", column = @Column(name = "address_country", nullable = false)),
-            @AttributeOverride(name = "street", column = @Column(name = "address_street", nullable = false)),
-            @AttributeOverride(name = "city", column = @Column(name = "address_city", nullable = false)),
-            @AttributeOverride(name = "postalCode", column = @Column(name = "address_postalCode", nullable = false)),
-            @AttributeOverride(name = "houseNumber", column = @Column(name = "address_houseNumber", nullable = false)),
-    })
-    private Address address;
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "firstName", column = @Column(name = "customer_first_name", nullable = false)),
-            @AttributeOverride(name = "lastName", column = @Column(name = "customer_last_name", nullable = false)),
-            @AttributeOverride(name = "phoneNumber", column = @Column(name = "customer_phone_number", nullable = false)),
-    })
-    private OrderCustomer customer;
 
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();

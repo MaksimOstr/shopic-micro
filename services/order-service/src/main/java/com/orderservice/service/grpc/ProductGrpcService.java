@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @GrpcService
@@ -23,25 +25,27 @@ public class ProductGrpcService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productGrpcService;
 
     @CircuitBreaker(name = "product-service", fallbackMethod = "reserveProductFallback")
-    public Empty reserveProduct(List<CartItem> cartItems, long orderId) {
+    public Empty reserveProduct(List<CartItem> cartItems, UUID orderId) {
         List<ReservationItem> reservationItems = grpcMapper.toReservationItemList(cartItems);
         ReserveProductsRequest request = ReserveProductsRequest.newBuilder()
-                .setOrderId(orderId)
+                .setOrderId(orderId.toString())
                 .addAllReservationItems(reservationItems).build();
 
 
         return productGrpcService.reserveProducts(request);
     }
 
-    @CircuitBreaker(name = "product-service", fallbackMethod = "getActualProductInfoFallback")
-    public ProductInfoList getProductInfoList(List<Long> productIds) {
-        ProductInfoListRequest request = ProductInfoListRequest.newBuilder()
-                .addAllProductId(productIds).build();
+    @CircuitBreaker(name = "product-service", fallbackMethod = "getProductListFallback")
+    public ProductListResponse getProductList(List<UUID> productIds) {
+        List<String> mappedProductIds = productIds.stream().map(UUID::toString).toList();
 
-        return productGrpcService.getProductInfoList(request);
+        GetProductListRequest request = GetProductListRequest.newBuilder()
+                .addAllProductId(mappedProductIds).build();
+
+        return productGrpcService.getProductList(request);
     }
 
-    public Empty reserveProductFallback(List<CartItem> cartItems, long orderId, Throwable throwable) {
+    public Empty reserveProductFallback(List<CartItem> cartItems, UUID orderId, Throwable throwable) {
         log.error("reserveProductFallback", throwable);
 
         if (throwable instanceof StatusRuntimeException e) {
@@ -58,7 +62,7 @@ public class ProductGrpcService {
         }
     }
 
-    public ProductInfoList getActualProductInfoFallback(List<Long> productIds, Throwable throwable) {
+    public ProductListResponse getProductListFallback(List<Long> productIds, Throwable throwable) {
         log.error("getActualProductInfoFallback", throwable);
         throw new ExternalServiceUnavailableException("Something went wrong. Try again later");
     }

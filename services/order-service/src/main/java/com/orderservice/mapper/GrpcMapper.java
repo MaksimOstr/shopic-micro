@@ -1,8 +1,8 @@
 package com.orderservice.mapper;
 
 import com.shopic.grpc.cartservice.CartItem;
-import com.shopic.grpc.paymentservice.OrderLineItem;
-import com.shopic.grpc.productservice.ProductInfo;
+import com.shopic.grpc.paymentservice.OrderItem;
+import com.shopic.grpc.productservice.Product;
 import com.shopic.grpc.productservice.ReservationItem;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -20,12 +20,12 @@ public interface GrpcMapper {
     @Mapping(target = "itemImage", source = "productImageUrl")
     @Mapping(target = "itemName", source = "productName")
     @Mapping(target = "quantity", expression = "java(productQuantityMap.get(productInfo.getProductId()))")
-    OrderLineItem toOrderLineItem(
-            ProductInfo productInfo,
+    OrderItem toOrderLineItem(
+            Product product,
             @Context Map<Long, Integer> productQuantityMap
     );
 
-    List<OrderLineItem> toOrderLineItemList(List<ProductInfo> productInfoList, @Context Map<Long, Integer> productQuantityMap);
+    List<OrderItem> toOrderLineItemList(List<Product> productList, @Context Map<Long, Integer> productQuantityMap);
 
 
     @Mapping(target = "allFields", ignore = true)
@@ -33,7 +33,7 @@ public interface GrpcMapper {
 
     List<ReservationItem> toReservationItemList(List<CartItem> cartItemList);
 
-    default Map<Long, Integer> getProductQuantityMap(List<CartItem> cartItems) {
+    default Map<String, Integer> getProductQuantityMap(List<CartItem> cartItems) {
         return cartItems.stream()
                 .collect(Collectors.toMap(
                         CartItem::getProductId,

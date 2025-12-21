@@ -15,8 +15,10 @@ import com.orderservice.service.grpc.PaymentGrpcService;
 import com.orderservice.service.grpc.ProductGrpcService;
 import com.shopic.grpc.cartservice.CartItem;
 import com.shopic.grpc.cartservice.CartResponse;
+import com.shopic.grpc.productservice.Product;
 import com.shopic.grpc.productservice.ProductInfo;
 import com.shopic.grpc.productservice.ProductInfoList;
+import com.shopic.grpc.productservice.ProductListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -48,17 +50,17 @@ public class UserOrderService {
 
     @Transactional
     public String createOrder(UUID userId, CreateOrderRequest dto) {
-        CartResponse cartInfo = cartGrpcService.getCartInfo(userId);
+        CartResponse cartInfo = cartGrpcService.getCart(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
-        ProductInfoList response = productGrpcService.getProductInfoList(
+        ProductListResponse response = productGrpcService.getProductList(
                 cartItems.stream().map(CartItem::getProductId).toList()
         );
-        List<ProductInfo> productInfoList = response.getProductsList();
-        Map<Long, Integer> productQuantityMap = grpcMapper.getProductQuantityMap(cartItems);
-        Order order = createAndSaveOrderWithOrderItems(userId, dto, productInfoList, productQuantityMap);
+        List<Product> productList = response.getProductsList();
+        Map<String, Integer> productQuantityMap = grpcMapper.getProductQuantityMap(cartItems);
+        Order order = createAndSaveOrderWithOrderItems(userId, dto, productList, productQuantityMap);
 
         productGrpcService.reserveProduct(cartItems, order.getId());
-        return paymentGrpcService.createPayment(order.getId(), userId, productInfoList, productQuantityMap, order.getDeliveryPrice()).getCheckoutUrl();
+        return paymentGrpcService.createPayment(order.getId(), userId, productList, productQuantityMap, order.getDeliveryPrice()).getCheckoutUrl();
     }
 
     public Page<UserOrderPreviewDto> getOrdersByUserId(long userId, Pageable pageable, OrderParams params) {
@@ -80,27 +82,14 @@ public class UserOrderService {
         return orderMapper.toOrderDto(order);
     }
 
-    private Order createAndSaveOrderWithOrderItems(long userId, CreateOrderRequest dto, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap) {
-        OrderCustomer customer = new OrderCustomer(
-                dto.firstName(),
-                dto.lastName(),
-                dto.phoneNumber()
-        );
-        Address address = new Address(
-                dto.country(),
-                dto.street(),
-                dto.city(),
-                dto.postalCode(),
-                dto.houseNumber()
-        );
+    private Order createAndSaveOrderWithOrderItems(UUID userId, CreateOrderRequest dto, List<Product> productInfoList, Map<Long, Integer> productQuantityMap) {
+
         Order order = Order.builder()
-                .refunded(false)
                 .deliveryType(dto.deliveryType())
-                .customer(customer)
                 .comment(dto.comment())
-                .status(OrderStatusEnum.CREATED)
+                .status(OrderStatusEnum.PENDING)
                 .userId(userId)
-                .address(address)
+                .address(dto.address())
                 .build();
         List<OrderItem> orderItems = orderItemMapper.toOrderItemList(order, productInfoList, productQuantityMap);
 

@@ -7,32 +7,17 @@ import jakarta.validation.constraints.Pattern;
 
 public record CreateOrderRequest(
         @NotBlank
-        String firstName,
+        String name,
 
         @NotBlank
-        String lastName,
-
-        @NotBlank
-        @Pattern(regexp="(^$|[0-9]{10})")
+        @Pattern(regexp="^\\+?[0-9]{7,15}$")
         String phoneNumber,
 
         @NotNull
         OrderDeliveryTypeEnum deliveryType,
 
         @NotBlank
-        String country,
-
-        @NotBlank
-        String city,
-
-        @NotBlank
-        String postalCode,
-
-        @NotBlank
-        String street,
-
-        @NotBlank
-        String houseNumber,
+        String address,
 
         String comment
 ) {

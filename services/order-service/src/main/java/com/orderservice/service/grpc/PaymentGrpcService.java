@@ -6,9 +6,9 @@ import com.orderservice.exception.InternalException;
 import com.orderservice.mapper.GrpcMapper;
 import com.shopic.grpc.paymentservice.CreatePaymentRequest;
 import com.shopic.grpc.paymentservice.CreatePaymentResponse;
-import com.shopic.grpc.paymentservice.OrderLineItem;
+import com.shopic.grpc.paymentservice.OrderItem;
 import com.shopic.grpc.paymentservice.PaymentServiceGrpc;
-import com.shopic.grpc.productservice.ProductInfo;
+import com.shopic.grpc.productservice.Product;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Slf4j
@@ -28,12 +29,12 @@ public class PaymentGrpcService {
     private final GrpcMapper grpcMapper;
 
     @CircuitBreaker(name = "payment-service", fallbackMethod = "createPaymentFallback")
-    public CreatePaymentResponse createPayment(long orderId, long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap, BigDecimal deliveryPrice) {
+    public CreatePaymentResponse createPayment(UUID orderId, UUID userId, List<Product> productInfoList, Map<Long, Integer> productQuantityMap, BigDecimal deliveryPrice) {
         log.info("Create payment gRpc request");
 
-        List<OrderLineItem> orderLineItemList = grpcMapper.toOrderLineItemList(productInfoList, productQuantityMap);
+        List<OrderItem> orderItems = grpcMapper.toOrderLineItemList(productInfoList, productQuantityMap);
 
-        OrderLineItem deliveryLineItem = OrderLineItem.newBuilder()
+        OrderItem deliveryLineItem = OrderItem.newBuilder()
                 .setQuantity(1)
                 .setPriceForOne(deliveryPrice.toString())
                 .setItemName("Delivery")
@@ -41,18 +42,15 @@ public class PaymentGrpcService {
                 .build();
 
         CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
-                .setOrderId(orderId)
-                .setCustomerId(userId)
-                .addAllLineItems(orderLineItemList)
-                .addLineItems(deliveryLineItem)
+                .setOrderId(orderId.toString())
+                .setUserId(userId.toString())
+                .addAllOrderItems(orderItems)
                 .build();
 
-        System.out.println(request.getLineItemsList());
-
-        return paymentGrpcService.createPaymentForOrder(request);
+        return paymentGrpcService.createPayment(request);
     }
 
-    public CreatePaymentResponse createPaymentFallback(long orderId, long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap, Throwable exception) {
+    public CreatePaymentResponse createPaymentFallback(UUID orderId, UUID userId, List<Product> productInfoList, Map<Long, Integer> productQuantityMap, Throwable exception) {
         log.error(exception.getMessage(), exception);
         if (exception instanceof StatusRuntimeException e) {
             switch (e.getStatus().getCode()) {
