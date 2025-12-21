@@ -2,7 +2,6 @@ package com.cartservice.service;
 
 import com.cartservice.dto.CartDto;
 import com.cartservice.dto.CartItemDto;
-import com.cartservice.dto.CartItemDtoForOrder;
 import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.dto.request.ChangeCartItemQuantityRequest;
 import com.cartservice.entity.Cart;
@@ -13,7 +12,7 @@ import com.cartservice.mapper.CartItemMapper;
 import com.cartservice.mapper.CartMapper;
 import com.cartservice.repository.CartRepository;
 import com.cartservice.service.grpc.GrpcProductService;
-import com.shopic.grpc.productservice.ProductInfo;
+import com.shopic.grpc.productservice.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -116,36 +115,36 @@ public class CartService {
     }
 
     private CartItemDto createNewItem(AddItemToCartRequest dto, Cart cart) {
-        ProductInfo response = getProductInfoAndCheckQuantity(dto.productId(), dto.quantity());
+        Product product = getProductByIdAndCheckQuantity(dto.productId(), dto.quantity());
         CartItem newCartItem = CartItem.builder()
-                .priceAtAdd(new BigDecimal(response.getPrice()))
-                .productName(response.getProductName())
+                .priceAtAdd(new BigDecimal(product.getPrice()))
+                .productName(product.getProductName())
                 .quantity(dto.quantity())
                 .productId(dto.productId())
                 .cart(cart)
-                .productImageUrl(response.getProductImageUrl())
+                .productImageUrl(product.getProductImageUrl())
                 .build();
 
         return cartItemMapper.toDto(newCartItem);
     }
 
     private CartItemDto updateExistingItem(AddItemToCartRequest dto, CartItem cartItem) {
-        getProductInfoAndCheckQuantity(dto.productId(), dto.quantity() + cartItem.getQuantity());
+        getProductByIdAndCheckQuantity(dto.productId(), dto.quantity() + cartItem.getQuantity());
         cartItem.setQuantity(cartItem.getQuantity() + dto.quantity());
         return cartItemMapper.toDto(cartItem);
     }
 
-    private ProductInfo getProductInfoAndCheckQuantity(UUID productId, int quantity) {
-        ProductInfo productInfo = grpcProductService.getProductInfo(productId);
+    private Product getProductByIdAndCheckQuantity(UUID productId, int quantity) {
+        Product product = grpcProductService.getProductById(productId);
 
-        if (productInfo.getAvailableQuantity() < quantity) {
+        if (product.getAvailableQuantity() < quantity) {
             throw new ApiException(
                     "Insufficient stock for product. Requested: %d, Available: %d"
-                            .formatted(quantity, productInfo.getAvailableQuantity()),
+                            .formatted(quantity, product.getAvailableQuantity()),
                     HttpStatus.BAD_REQUEST
             );
         }
 
-        return productInfo;
+        return product;
     }
 }

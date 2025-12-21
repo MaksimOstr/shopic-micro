@@ -20,16 +20,16 @@ import java.util.UUID;
 public class GrpcProductService {
     private final ProductServiceGrpc.ProductServiceBlockingStub productServiceGrpc;
 
-    @CircuitBreaker(name = "product-service", fallbackMethod = "getProductInfoForCartFallback")
-    public ProductInfo getProductInfo(UUID productId) {
-        ProductInfoRequest request = ProductInfoRequest.newBuilder()
+    @CircuitBreaker(name = "product-service", fallbackMethod = "getProductByIdFallback")
+    public Product getProductById(UUID productId) {
+        GetProductRequest request = GetProductRequest.newBuilder()
                 .setProductId(productId.toString())
                 .build();
 
-        return productServiceGrpc.getProductInfo(request);
+        return productServiceGrpc.getProductById(request);
     }
 
-    public ProductInfo getProductInfoForCartFallback(long productId, Throwable e) {
+    public Product getProductByIdFallback(UUID productId, Throwable e) {
         if (e instanceof StatusRuntimeException exception) {
             Status.Code code = exception.getStatus().getCode();
 
