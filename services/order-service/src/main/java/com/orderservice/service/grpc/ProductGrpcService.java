@@ -31,16 +31,13 @@ public class ProductGrpcService {
                 .setOrderId(orderId.toString())
                 .addAllReservationItems(reservationItems).build();
 
-
         return productGrpcService.reserveProducts(request);
     }
 
     @CircuitBreaker(name = "product-service", fallbackMethod = "getProductListFallback")
-    public ProductListResponse getProductList(List<UUID> productIds) {
-        List<String> mappedProductIds = productIds.stream().map(UUID::toString).toList();
-
+    public ProductListResponse getProductList(List<String> productIds) {
         GetProductListRequest request = GetProductListRequest.newBuilder()
-                .addAllProductId(mappedProductIds).build();
+                .addAllProductId(productIds).build();
 
         return productGrpcService.getProductList(request);
     }
@@ -62,7 +59,7 @@ public class ProductGrpcService {
         }
     }
 
-    public ProductListResponse getProductListFallback(List<Long> productIds, Throwable throwable) {
+    public ProductListResponse getProductListFallback(List<String> productIds, Throwable throwable) {
         log.error("getActualProductInfoFallback", throwable);
         throw new ExternalServiceUnavailableException("Something went wrong. Try again later");
     }

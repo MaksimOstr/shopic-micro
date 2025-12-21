@@ -5,7 +5,7 @@ import com.orderservice.dto.AdminOrderPreviewDto;
 import com.orderservice.dto.AdminOrderParams;
 import com.orderservice.dto.UpdateContactInfoRequest;
 import com.orderservice.enums.OrderAdminSortByEnum;
-import com.orderservice.service.AdminOrderService;
+import com.orderservice.service.AdminOrderFacade;
 import com.orderservice.service.OrderEventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,18 +17,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/orders")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminOrderController {
-    private final AdminOrderService adminOrderService;
+    private final AdminOrderFacade adminOrderService;
     private final OrderEventService orderEventService;
 
 
     @GetMapping("/{id}")
     public ResponseEntity<AdminOrderDto> getOrderById(
-            @PathVariable("id") int id
+            @PathVariable("id") UUID id
     ) {
         AdminOrderDto order = adminOrderService.getOrder(id);
 
@@ -55,7 +57,7 @@ public class AdminOrderController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<AdminOrderDto> updateContactInfo(
-            @PathVariable long id,
+            @PathVariable UUID id,
             @RequestBody @Valid UpdateContactInfoRequest body
     ) {
         AdminOrderDto order = adminOrderService.updateOrderContactInfo(id, body);

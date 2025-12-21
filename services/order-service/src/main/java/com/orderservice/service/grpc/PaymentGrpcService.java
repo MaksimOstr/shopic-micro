@@ -1,9 +1,11 @@
 package com.orderservice.service.grpc;
 
 
+import com.orderservice.entity.Order;
 import com.orderservice.exception.ExternalServiceUnavailableException;
 import com.orderservice.exception.InternalException;
 import com.orderservice.mapper.GrpcMapper;
+import com.orderservice.mapper.OrderItemMapper;
 import com.shopic.grpc.paymentservice.CreatePaymentRequest;
 import com.shopic.grpc.paymentservice.CreatePaymentResponse;
 import com.shopic.grpc.paymentservice.OrderItem;
@@ -27,24 +29,26 @@ import java.util.UUID;
 public class PaymentGrpcService {
     private final PaymentServiceGrpc.PaymentServiceBlockingStub paymentGrpcService;
     private final GrpcMapper grpcMapper;
+    private final OrderItemMapper orderItemMapper;
 
     @CircuitBreaker(name = "payment-service", fallbackMethod = "createPaymentFallback")
-    public CreatePaymentResponse createPayment(UUID orderId, UUID userId, List<Product> productInfoList, Map<Long, Integer> productQuantityMap, BigDecimal deliveryPrice) {
+    public CreatePaymentResponse createPayment(UUID userId, Order order) {
         log.info("Create payment gRpc request");
 
-        List<OrderItem> orderItems = grpcMapper.toOrderLineItemList(productInfoList, productQuantityMap);
+        List<OrderItem> orderItems = orderItemMapper.toGrpcOrderItems(order.getOrderItems());
 
         OrderItem deliveryLineItem = OrderItem.newBuilder()
                 .setQuantity(1)
-                .setPriceForOne(deliveryPrice.toString())
+                .setPriceForOne(order.getDeliveryPrice().toString())
                 .setItemName("Delivery")
                 .setItemImage("")
                 .build();
 
         CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
-                .setOrderId(orderId.toString())
+                .setOrderId(order.getId().toString())
                 .setUserId(userId.toString())
                 .addAllOrderItems(orderItems)
+                .addOrderItems(deliveryLineItem)
                 .build();
 
         return paymentGrpcService.createPayment(request);

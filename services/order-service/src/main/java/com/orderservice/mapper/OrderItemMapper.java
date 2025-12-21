@@ -15,13 +15,14 @@ import java.util.Map;
 public interface OrderItemMapper {
     OrderItemDto toOrderItemDto(OrderItem orderItem);
 
+    List<com.shopic.grpc.paymentservice.OrderItem> toGrpcOrderItems(List<OrderItem> orderItemList);
+
     default List<OrderItem> toOrderItemList(
-            Order order,
             List<Product> productInfoList,
-            Map<Long, Integer> productQuantityMap
+            Map<String, Integer> productQuantityMap
     ) {
         return productInfoList.stream()
-                .map(productInfo -> toOrderItem(order, productInfo, productQuantityMap))
+                .map(productInfo -> toOrderItem(productInfo, productQuantityMap))
                 .toList();
     }
 
@@ -29,8 +30,7 @@ public interface OrderItemMapper {
     @Mapping(target = "order", source = "order")
     @Mapping(target = "quantity", expression = "java(productQuantityMap.get(productInfo.getProductId()))")
     OrderItem toOrderItem(
-            Order order,
             Product productInfo,
-            @Context Map<Long, Integer> productQuantityMap
+            @Context Map<String, Integer> productQuantityMap
     );
 }

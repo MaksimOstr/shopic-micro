@@ -78,4 +78,9 @@ public class Order {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public void addNewOrderItems(List<OrderItem> orderItems) {
+        orderItems.forEach(orderItem -> orderItem.setOrder(this));
+        this.orderItems.addAll(orderItems);
+    }
 }

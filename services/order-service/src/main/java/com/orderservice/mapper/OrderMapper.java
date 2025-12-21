@@ -2,6 +2,7 @@ package com.orderservice.mapper;
 
 import com.orderservice.dto.*;
 import com.orderservice.entity.Order;
+import com.shopic.grpc.paymentservice.OrderItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

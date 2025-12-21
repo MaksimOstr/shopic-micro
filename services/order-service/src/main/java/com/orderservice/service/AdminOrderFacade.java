@@ -15,18 +15,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.orderservice.utils.SpecificationUtils.*;
 
 
 @Service
 @RequiredArgsConstructor
-public class AdminOrderService {
+public class AdminOrderFacade {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
 
 
-    public AdminOrderDto getOrder(long orderId) {
+    public AdminOrderDto getOrder(UUID orderId) {
         Order order = orderService.getOrderWithItems(orderId);
 
         return orderMapper.toAdminOrderDto(order);
@@ -46,7 +47,7 @@ public class AdminOrderService {
     }
 
     @Transactional
-    public AdminOrderDto updateOrderContactInfo(long orderId, UpdateContactInfoRequest dto) {
+    public AdminOrderDto updateOrderContactInfo(UUID orderId, UpdateContactInfoRequest dto) {
         Order updatedOrder = orderService.updateOrderContactInfo(orderId, dto);
 
         return orderMapper.toAdminOrderDto(updatedOrder);

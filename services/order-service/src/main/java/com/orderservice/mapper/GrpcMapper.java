@@ -25,8 +25,6 @@ public interface GrpcMapper {
             @Context Map<Long, Integer> productQuantityMap
     );
 
-    List<OrderItem> toOrderLineItemList(List<Product> productList, @Context Map<Long, Integer> productQuantityMap);
-
 
     @Mapping(target = "allFields", ignore = true)
     ReservationItem toReservationItem(CartItem cartItem);

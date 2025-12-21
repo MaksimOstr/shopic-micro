@@ -5,6 +5,8 @@ import com.orderservice.entity.Order;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.UUID;
+
 @UtilityClass
 public class SpecificationUtils {
     public static Specification<Order> iLikeNested(String field, String nested, String value) {
@@ -15,7 +17,7 @@ public class SpecificationUtils {
                 cb.like(cb.lower(root.get(nested).get(field)), "%" + value.toLowerCase() + "%");
     }
 
-    public static Specification<Order> hasId(String field, Long value) {
+    public static Specification<Order> hasId(String field, UUID value) {
         if (value == null) {
             return Specification.where(null);
         }

@@ -5,6 +5,7 @@ import com.orderservice.dto.UserOrderDto;
 import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.CreateOrderRequest;
 import com.orderservice.dto.OrderParams;
+import com.orderservice.service.UserOrderFacade;
 import com.orderservice.service.UserOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('USER')")
 @RequestMapping("/orders")
 public class UserOrderController {
-    private final UserOrderService userOrderService;
+    private final UserOrderFacade userOrderFacade;
 
 
     @PostMapping
@@ -31,7 +32,7 @@ public class UserOrderController {
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid CreateOrderRequest body
     ) {
-        String redirectUrl = userOrderService.createOrder(principal.getId(), body);
+        String redirectUrl = userOrderFacade.placeOrder(body, principal.getId());
 
         return ResponseEntity.ok(redirectUrl);
     }
@@ -40,7 +41,7 @@ public class UserOrderController {
     public ResponseEntity<UserOrderDto> getOrder(
             @PathVariable Long id
     ) {
-        UserOrderDto order = userOrderService.getUserOrderDtoById(id);
+        UserOrderDto order = userOrderFacade.getUserOrderDtoById(id);
 
         return ResponseEntity.ok().body(order);
     }
@@ -55,7 +56,7 @@ public class UserOrderController {
     ) {
         Sort.Direction direction = Sort.Direction.fromString(sortDirection);
         Pageable pageable = PageRequest.of(page, size, direction, "createdAt");
-        Page<UserOrderPreviewDto> orders = userOrderService.getOrdersByUserId(principal.getId(), pageable, body);
+        Page<UserOrderPreviewDto> orders = userOrderFacade.getOrdersByUserId(principal.getId(), pageable, body);
 
         return ResponseEntity.ok().body(orders);
     }
