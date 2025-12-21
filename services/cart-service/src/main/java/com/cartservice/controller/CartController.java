@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -58,7 +57,7 @@ public class CartController {
     public ResponseEntity<CartDto> getCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        CartDto cart = cartService.getCart(principal.getId());
+        CartDto cart = cartService.getCart(principal.id());
 
         return ResponseEntity.ok(cart);
     }
@@ -116,7 +115,7 @@ public class CartController {
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid AddItemToCartRequest body
     ) {
-        CartItemDto cartItem = cartService.addItemToCart(body, principal.getId());
+        CartItemDto cartItem = cartService.addItemToCart(body, principal.id());
 
         return ResponseEntity.ok(cartItem);
     }
@@ -152,7 +151,7 @@ public class CartController {
             @PathVariable UUID id,
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        cartService.deleteItemFromCart(id, principal.getId());
+        cartService.deleteItemFromCart(id, principal.id());
 
         return ResponseEntity.ok().build();
     }
@@ -179,7 +178,7 @@ public class CartController {
     public ResponseEntity<Void> deleteCart(
             @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        cartService.deleteCartByUserId(principal.getId());
+        cartService.deleteCartByUserId(principal.id());
 
         return ResponseEntity.ok().build();
     }
@@ -225,7 +224,7 @@ public class CartController {
             @RequestBody @Valid ChangeCartItemQuantityRequest body,
             @PathVariable UUID id
     ) {
-        cartService.updateCartItem(body, id, principal.getId());
+        cartService.updateCartItem(body, id, principal.id());
 
         return ResponseEntity.ok().build();
     }

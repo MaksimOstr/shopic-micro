@@ -7,7 +7,6 @@ import com.authservice.exception.ApiException;
 import com.authservice.repositories.CodeRepository;
 import com.authservice.services.CodeService;
 import io.github.resilience4j.retry.MaxRetriesExceededException;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

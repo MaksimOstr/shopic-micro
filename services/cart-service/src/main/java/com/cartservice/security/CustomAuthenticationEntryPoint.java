@@ -1,6 +1,6 @@
-package com.apigateway.security;
+package com.cartservice.security;
 
-import com.apigateway.dto.ErrorResponseDto;
+import com.cartservice.dto.response.ErrorResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,4 +45,3 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         objectMapper.writeValue(response.getOutputStream(), error);
     }
 }
-

@@ -55,7 +55,7 @@ management:
 jwt:
   expires-at: ${JWT_EXPIRE_TIME}
   issuer: ${JWT_ISSUER:shopic}
-  header-alg: ${JWT_HEADER_ALG:RSA256}
+  header-alg: ${JWT_HEADER_ALG}
   public-key-url: ${AUTH_SERVICE_URL}${JWK_PATH}
 
 
@@ -70,7 +70,6 @@ refresh-token:
 verification-code:
   expires-at : ${CODE_EXPIRATION:900}
 
-signature-secret: ${SIGNATURE_SECRET}
 
 
 

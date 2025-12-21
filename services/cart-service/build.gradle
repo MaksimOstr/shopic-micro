@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation project(':proto')
 	testImplementation 'org.springframework.security:spring-security-test'

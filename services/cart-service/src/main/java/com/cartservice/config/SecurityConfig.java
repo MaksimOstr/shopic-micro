@@ -1,17 +1,24 @@
 package com.cartservice.config;
 
-import com.cartservice.security.AuthenticationFilter;
+import com.cartservice.config.properties.JwtProperties;
+import com.cartservice.security.CustomAuthenticationEntryPoint;
+import com.cartservice.security.CustomJwtAuthenticationConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] permittedURLs = {
             "/actuator/**",
@@ -21,10 +28,13 @@ public class SecurityConfig {
             "/api-docs/**"
     };
 
+    private final JwtProperties jwtProperties;
+
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            AuthenticationFilter authenticationFilter
+            CustomJwtAuthenticationConverter customJwtAuthenticationConverter,
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint
     ) throws Exception {
         return http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -33,7 +43,27 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(permittedURLs).permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwtConfigurer -> {
+                            jwtConfigurer
+                                    .jwtAuthenticationConverter(customJwtAuthenticationConverter)
+                                    .decoder(jwtDecoder());
+                        }))
+                .exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
+                .withJwkSetUri(jwtProperties.getPublicKeyUrl())
+                .jwsAlgorithm(SignatureAlgorithm.from(jwtProperties.getHeaderAlg()))
+                .build();
+
+        jwtDecoder.setJwtValidator(
+                JwtValidators.createDefaultWithIssuer(jwtProperties.getIssuer())
+        );
+
+        return jwtDecoder;
     }
 }

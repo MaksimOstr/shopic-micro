@@ -6,6 +6,7 @@ import com.authservice.dto.LocalRegisterResult;
 import com.authservice.dto.SignInRequestDto;
 import com.authservice.dto.SignInResponse;
 import com.authservice.dto.TokenPairDto;
+import com.authservice.exception.ApiException;
 import com.authservice.services.AuthService;
 import com.authservice.services.CookieService;
 import jakarta.servlet.http.Cookie;
@@ -226,9 +227,13 @@ public class AuthController {
     @PostMapping("/logout")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> logout(
-            @CookieValue("${refresh-token.cookie-name:refresh-token}") String refreshToken,
+            @CookieValue(value = "${refresh-token.cookie-name:refresh-token}", required = false) String refreshToken,
             HttpServletResponse response
     ) {
+        if(refreshToken == null) {
+            throw new ApiException("Refresh token cookie is required", HttpStatus.BAD_REQUEST);
+        }
+
         authService.logout(refreshToken);
 
         Cookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie(refreshToken);
