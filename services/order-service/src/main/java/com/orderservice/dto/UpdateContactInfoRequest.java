@@ -1,4 +1,4 @@
-package com.orderservice.dto.request;
+package com.orderservice.dto;
 
 import jakarta.validation.constraints.Pattern;
 

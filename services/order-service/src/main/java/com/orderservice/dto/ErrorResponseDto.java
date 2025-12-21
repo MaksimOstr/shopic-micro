@@ -1,4 +1,4 @@
-package com.orderservice.dto.response;
+package com.orderservice.dto;
 
 public record ErrorResponseDto (
         String code,

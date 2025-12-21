@@ -1,6 +1,6 @@
 package com.orderservice.service;
 
-import com.orderservice.dto.request.UpdateContactInfoRequest;
+import com.orderservice.dto.UpdateContactInfoRequest;
 import com.orderservice.entity.Order;
 import com.orderservice.exception.NotFoundException;
 import com.orderservice.repository.OrderRepository;

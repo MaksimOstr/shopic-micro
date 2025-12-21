@@ -2,8 +2,8 @@ package com.orderservice.service;
 
 import com.orderservice.dto.AdminOrderDto;
 import com.orderservice.dto.AdminOrderPreviewDto;
-import com.orderservice.dto.request.AdminOrderParams;
-import com.orderservice.dto.request.UpdateContactInfoRequest;
+import com.orderservice.dto.AdminOrderParams;
+import com.orderservice.dto.UpdateContactInfoRequest;
 import com.orderservice.entity.*;
 import com.orderservice.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;

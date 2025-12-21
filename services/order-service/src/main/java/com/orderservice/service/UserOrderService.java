@@ -2,8 +2,8 @@ package com.orderservice.service;
 
 import com.orderservice.dto.UserOrderDto;
 import com.orderservice.dto.UserOrderPreviewDto;
-import com.orderservice.dto.request.CreateOrderRequest;
-import com.orderservice.dto.request.OrderParams;
+import com.orderservice.dto.CreateOrderRequest;
+import com.orderservice.dto.OrderParams;
 import com.orderservice.entity.*;
 import com.orderservice.exception.NotFoundException;
 import com.orderservice.mapper.GrpcMapper;

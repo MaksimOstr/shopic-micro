@@ -1,7 +1,7 @@
 package com.orderservice.controller.advice;
 
 
-import com.orderservice.dto.response.ErrorResponseDto;
+import com.orderservice.dto.ErrorResponseDto;
 import com.orderservice.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

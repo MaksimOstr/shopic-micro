@@ -2,7 +2,7 @@ package com.orderservice.security;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orderservice.dto.response.ErrorResponseDto;
+import com.orderservice.dto.ErrorResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

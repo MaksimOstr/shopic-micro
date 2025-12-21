@@ -1,6 +1,6 @@
 package com.orderservice.service.calculator;
 
-import com.orderservice.dto.request.CreateOrderRequest;
+import com.orderservice.dto.CreateOrderRequest;
 import com.orderservice.entity.OrderDeliveryTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

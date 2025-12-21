@@ -1,4 +1,4 @@
-package com.orderservice.dto.request;
+package com.orderservice.dto;
 
 import com.orderservice.entity.OrderDeliveryTypeEnum;
 import jakarta.validation.constraints.NotBlank;

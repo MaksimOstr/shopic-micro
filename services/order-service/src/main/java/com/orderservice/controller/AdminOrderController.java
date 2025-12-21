@@ -2,8 +2,8 @@ package com.orderservice.controller;
 
 import com.orderservice.dto.AdminOrderDto;
 import com.orderservice.dto.AdminOrderPreviewDto;
-import com.orderservice.dto.request.AdminOrderParams;
-import com.orderservice.dto.request.UpdateContactInfoRequest;
+import com.orderservice.dto.AdminOrderParams;
+import com.orderservice.dto.UpdateContactInfoRequest;
 import com.orderservice.enums.OrderAdminSortByEnum;
 import com.orderservice.service.AdminOrderService;
 import com.orderservice.service.OrderEventService;
