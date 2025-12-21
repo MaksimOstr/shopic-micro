@@ -22,5 +22,5 @@ message CartItem {
 
 
 service CartService {
-  rpc getCart(GetCartRequest) returns (CartResponse);
+  rpc GetCart(GetCartRequest) returns (CartResponse);
 }

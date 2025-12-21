@@ -11,13 +11,15 @@ import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.grpc.server.service.GrpcService;
 
+import java.util.UUID;
+
 @GrpcService
 @RequiredArgsConstructor
 public class CartGrpcService {
     private final CartServiceGrpc.CartServiceBlockingStub cartGrpcService;
 
     @CircuitBreaker(name = "cart-service", fallbackMethod = "getCartInfoFallback")
-    public CartResponse getCartInfo(long userId) {
+    public CartResponse getCartInfo(UUID userId) {
         GetCartRequest request = GetCartRequest.newBuilder()
                 .setUserId(userId)
                 .build();

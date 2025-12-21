@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.orderservice.utils.SpecificationUtils.*;
 import static com.orderservice.utils.SpecificationUtils.equalsEnum;
@@ -46,7 +47,7 @@ public class UserOrderService {
 
 
     @Transactional
-    public String createOrder(long userId, CreateOrderRequest dto) {
+    public String createOrder(UUID userId, CreateOrderRequest dto) {
         CartResponse cartInfo = cartGrpcService.getCartInfo(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
         ProductInfoList response = productGrpcService.getProductInfoList(
