@@ -2,6 +2,7 @@ package com.orderservice.service;
 
 import com.orderservice.dto.CreateOrderRequest;
 import com.orderservice.dto.UpdateContactInfoRequest;
+import com.orderservice.dto.UpdateOrderStatusRequest;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderDeliveryTypeEnum;
 import com.orderservice.entity.OrderItem;
@@ -58,6 +59,14 @@ public class OrderService {
         Optional.ofNullable(dto.address()).ifPresent(order::setAddress);
 
         return order;
+    }
+
+    public Order updateOrderStatus(UUID orderId, UpdateOrderStatusRequest dto) {
+        Order order = getOrderById(orderId);
+
+        order.changeOrderStatus(dto.targetStatus());
+
+        return orderRepository.save(order);
     }
 
     public Order getOrderWithItems(UUID orderId) {

@@ -1,7 +1,5 @@
 package com.orderservice.dto;
 
-import com.orderservice.entity.Address;
-import com.orderservice.entity.OrderCustomer;
 import com.orderservice.entity.OrderStatusEnum;
 import lombok.*;
 
@@ -21,7 +19,5 @@ public class AdminOrderDto {
     private Instant createdAt;
     private Instant updatedAt;
     private List<OrderItemDto> orderItems;
-    private Address address;
-    private OrderCustomer customer;
     private String comment;
 }

@@ -1,6 +1,5 @@
 package com.orderservice.dto;
 
-import com.orderservice.entity.Address;
 import com.orderservice.entity.OrderStatusEnum;
 
 import java.math.BigDecimal;
@@ -13,7 +12,6 @@ public record UserOrderDto(
         BigDecimal totalPrice,
         Instant createdAt,
         Instant updatedAt,
-        List<OrderItemDto> orderItems,
-        Address address
+        List<OrderItemDto> orderItems
 ) {}
 

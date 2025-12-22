@@ -4,6 +4,7 @@ import com.orderservice.dto.AdminOrderDto;
 import com.orderservice.dto.AdminOrderPreviewDto;
 import com.orderservice.dto.AdminOrderParams;
 import com.orderservice.dto.UpdateContactInfoRequest;
+import com.orderservice.dto.UpdateOrderStatusRequest;
 import com.orderservice.entity.*;
 import com.orderservice.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,12 @@ public class AdminOrderFacade {
     @Transactional
     public AdminOrderDto updateOrderContactInfo(UUID orderId, UpdateContactInfoRequest dto) {
         Order updatedOrder = orderService.updateOrderContactInfo(orderId, dto);
+
+        return orderMapper.toAdminOrderDto(updatedOrder);
+    }
+
+    public AdminOrderDto updateOrderStatus(UUID orderId, UpdateOrderStatusRequest dto) {
+        Order updatedOrder = orderService.updateOrderStatus(orderId, dto);
 
         return orderMapper.toAdminOrderDto(updatedOrder);
     }

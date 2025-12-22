@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class KafkaListenerService {
     private final ObjectMapper objectMapper;
-    private final OrderEventService orderEventService;
     private final OrderService orderService;
 
 

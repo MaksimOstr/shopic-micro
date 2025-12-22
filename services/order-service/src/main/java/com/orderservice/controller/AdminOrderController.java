@@ -4,9 +4,9 @@ import com.orderservice.dto.AdminOrderDto;
 import com.orderservice.dto.AdminOrderPreviewDto;
 import com.orderservice.dto.AdminOrderParams;
 import com.orderservice.dto.UpdateContactInfoRequest;
+import com.orderservice.dto.UpdateOrderStatusRequest;
 import com.orderservice.enums.OrderAdminSortByEnum;
 import com.orderservice.service.AdminOrderFacade;
-import com.orderservice.service.OrderEventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,6 @@ import java.util.UUID;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminOrderController {
     private final AdminOrderFacade adminOrderService;
-    private final OrderEventService orderEventService;
 
 
     @GetMapping("/{id}")
@@ -55,7 +54,7 @@ public class AdminOrderController {
         return ResponseEntity.ok().body(orders);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/contact-info")
     public ResponseEntity<AdminOrderDto> updateContactInfo(
             @PathVariable UUID id,
             @RequestBody @Valid UpdateContactInfoRequest body
@@ -65,51 +64,15 @@ public class AdminOrderController {
         return ResponseEntity.ok().body(order);
     }
 
-    @PatchMapping("/{id}/complete")
-    public ResponseEntity<Void> completeOrder(
-            @PathVariable long id
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<AdminOrderDto> updateOrderStatus(
+            @PathVariable UUID id,
+            @RequestBody @Valid UpdateOrderStatusRequest body
     ) {
-        orderEventService.completeOrder(id);
-        return ResponseEntity.ok().build();
+        AdminOrderDto order = adminOrderService.updateOrderStatus(id, body);
+
+        return ResponseEntity.ok(order);
     }
 
-    @PatchMapping("/{id}/process")
-    public ResponseEntity<Void> processOrder(
-            @PathVariable long id
-    ) {
-        orderEventService.processOrder(id);
-        return ResponseEntity.ok().build();
-    }
 
-    @PatchMapping("/{id}/ship")
-    public ResponseEntity<Void> shipOrder(
-            @PathVariable long id
-    ) {
-        orderEventService.shipOrder(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{id}/pickup-ready")
-    public ResponseEntity<Void> pickupReadyOrder(
-            @PathVariable long id
-    ) {
-        orderEventService.pickupReadyOrder(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{id}/return")
-    public ResponseEntity<Void> returnOrder(
-            @PathVariable long id
-    ) {
-        orderEventService.returnOrder(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelOrder(
-            @PathVariable long id
-    ) {
-        orderEventService.cancelOrder(id);
-        return ResponseEntity.ok().build();
-    }
 }
