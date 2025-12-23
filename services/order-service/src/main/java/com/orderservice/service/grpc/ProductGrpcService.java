@@ -1,8 +1,7 @@
 package com.orderservice.service.grpc;
 
 import com.google.protobuf.Empty;
-import com.orderservice.exception.ExternalServiceUnavailableException;
-import com.orderservice.exception.InsufficientStockException;
+import com.orderservice.exception.ApiException;
 import com.orderservice.exception.NotFoundException;
 import com.orderservice.mapper.GrpcMapper;
 import com.shopic.grpc.cartservice.CartItem;
@@ -12,6 +11,7 @@ import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -50,17 +50,17 @@ public class ProductGrpcService {
                 case NOT_FOUND:
                     throw new NotFoundException(e.getStatus().getDescription());
                 case FAILED_PRECONDITION:
-                    throw new InsufficientStockException(e.getStatus().getDescription());
+                    throw new ApiException(e.getStatus().getDescription(), HttpStatus.CONFLICT);
                 default:
                     throw e;
             }
         } else {
-            throw new ExternalServiceUnavailableException("Something went wrong. Try again later");
+            throw new ApiException("Something went wrong. Try again later", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     public ProductListResponse getProductListFallback(List<String> productIds, Throwable throwable) {
         log.error("getActualProductInfoFallback", throwable);
-        throw new ExternalServiceUnavailableException("Something went wrong. Try again later");
+        throw new ApiException("Something went wrong. Try again later", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

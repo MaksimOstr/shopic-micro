@@ -2,8 +2,7 @@ package com.orderservice.service.grpc;
 
 
 import com.orderservice.entity.Order;
-import com.orderservice.exception.ExternalServiceUnavailableException;
-import com.orderservice.exception.InternalException;
+import com.orderservice.exception.ApiException;
 import com.orderservice.mapper.GrpcMapper;
 import com.orderservice.mapper.OrderItemMapper;
 import com.shopic.grpc.paymentservice.CreatePaymentRequest;
@@ -15,6 +14,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -59,12 +59,12 @@ public class PaymentGrpcService {
         if (exception instanceof StatusRuntimeException e) {
             switch (e.getStatus().getCode()) {
                 case INTERNAL, FAILED_PRECONDITION:
-                    throw new InternalException(e.getStatus().getDescription());
+                    throw new ApiException("Something went wrong. Try again later", HttpStatus.INTERNAL_SERVER_ERROR);
                 default:
                     throw e;
             }
         } else {
-            throw new ExternalServiceUnavailableException("Something went wrong. Please try again later");
+            throw new ApiException("Something went wrong. Try again later", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

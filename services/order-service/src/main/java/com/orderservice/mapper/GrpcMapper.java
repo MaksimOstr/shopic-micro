@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -19,10 +20,10 @@ public interface GrpcMapper {
     @Mapping(target = "priceForOne", source = "price")
     @Mapping(target = "itemImage", source = "productImageUrl")
     @Mapping(target = "itemName", source = "productName")
-    @Mapping(target = "quantity", expression = "java(productQuantityMap.get(productInfo.getProductId()))")
+    @Mapping(target = "quantity", expression = "java(productQuantityMap.get(product.getProductId()))")
     OrderItem toOrderLineItem(
             Product product,
-            @Context Map<Long, Integer> productQuantityMap
+            @Context Map<UUID, Integer> productQuantityMap
     );
 
 

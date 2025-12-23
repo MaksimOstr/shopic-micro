@@ -6,14 +6,15 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminOrderDto {
-    private long orderId;
-    private long userId;
+    private UUID orderId;
+    private UUID userId;
     private OrderStatusEnum status;
     private BigDecimal totalPrice;
     private Instant createdAt;

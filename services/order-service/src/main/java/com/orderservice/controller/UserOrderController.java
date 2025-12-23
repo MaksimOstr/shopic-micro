@@ -6,7 +6,6 @@ import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.CreateOrderRequest;
 import com.orderservice.dto.OrderParams;
 import com.orderservice.service.UserOrderFacade;
-import com.orderservice.service.UserOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 
 @RestController
@@ -39,7 +40,7 @@ public class UserOrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserOrderDto> getOrder(
-            @PathVariable Long id
+            @PathVariable UUID id
     ) {
         UserOrderDto order = userOrderFacade.getUserOrderDtoById(id);
 

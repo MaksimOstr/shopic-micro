@@ -23,8 +23,6 @@ public interface OrderMapper {
     UserOrderDto toOrderDto(Order order);
 
     @Mapping(source = "id", target = "orderId")
-    @Mapping(source = "customer.firstName", target = "firstName")
-    @Mapping(source = "customer.lastName", target = "lastName")
     AdminOrderPreviewDto toAdminOrderSummaryDto(Order order);
 
     List<AdminOrderPreviewDto> toAdminOrderSummaryDto(List<Order> order);

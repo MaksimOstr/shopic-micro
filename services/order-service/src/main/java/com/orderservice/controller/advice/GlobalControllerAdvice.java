@@ -14,11 +14,11 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
-    @ExceptionHandler({InternalException.class, ExternalServiceUnavailableException.class})
-    public ResponseEntity<ErrorResponseDto> handleInternalServerException(ExternalServiceUnavailableException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponseDto(
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorResponseDto> handleApiException(ApiException e) {
+        return ResponseEntity.status(e.getStatus()).body(new ErrorResponseDto(
+                e.getStatus().getReasonPhrase(),
+                e.getStatus().value(),
                 e.getMessage()
         ));
     }
@@ -30,23 +30,5 @@ public class GlobalControllerAdvice {
             errors.put(error.getField(), error.getDefaultMessage());
         });
         return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                HttpStatus.NOT_FOUND.value(),
-                e.getMessage()
-        ));
-    }
-
-    @ExceptionHandler({InsufficientStockException.class, StateTransitionException.class, IllegalArgumentException.class})
-    private ResponseEntity<ErrorResponseDto> handleBadRequestException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                HttpStatus.BAD_REQUEST.value(),
-                e.getMessage()
-        ));
     }
 }

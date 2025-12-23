@@ -1,6 +1,6 @@
 package com.orderservice.service.grpc;
 
-import com.orderservice.exception.ExternalServiceUnavailableException;
+import com.orderservice.exception.ApiException;
 import com.orderservice.exception.NotFoundException;
 import com.shopic.grpc.cartservice.CartServiceGrpc;
 import com.shopic.grpc.cartservice.GetCartRequest;
@@ -10,6 +10,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.grpc.server.service.GrpcService;
+import org.springframework.http.HttpStatus;
 
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public class CartGrpcService {
             }
             throw e;
         } else {
-            throw new ExternalServiceUnavailableException("Something went wrong. Please try again later");
+            throw new ApiException("Something went wrong. Please try again later", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
