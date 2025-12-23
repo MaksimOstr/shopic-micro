@@ -1,6 +1,6 @@
 package com.productservice.controller;
 
-import com.productservice.config.security.model.CustomPrincipal;
+import com.productservice.security.CustomPrincipal;
 import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;

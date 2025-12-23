@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/orders")
+@RequestMapping("/api/v1/admin/orders")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminOrderController {
     private final AdminOrderFacade adminOrderService;

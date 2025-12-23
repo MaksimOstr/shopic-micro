@@ -23,7 +23,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('USER')")
-@RequestMapping("/orders")
+@RequestMapping("/api/v1/orders")
 public class UserOrderController {
     private final UserOrderFacade userOrderFacade;
 

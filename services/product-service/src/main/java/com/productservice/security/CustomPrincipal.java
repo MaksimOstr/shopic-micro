@@ -1,4 +1,4 @@
-package com.productservice.config.security.model;
+package com.productservice.security;
 
 import lombok.Getter;
 
