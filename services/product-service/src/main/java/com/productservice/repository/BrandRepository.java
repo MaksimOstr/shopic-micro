@@ -8,13 +8,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Repository
-public interface BrandRepository extends JpaRepository<Brand, Integer>, JpaSpecificationExecutor<Brand> {
+public interface BrandRepository extends JpaRepository<Brand, UUID>, JpaSpecificationExecutor<Brand> {
 
     @Transactional
     @Modifying
     @Query("UPDATE Brand b SET b.isActive = :status WHERE b.id = :id")
-    int changeIsActive(int id, boolean status);
+    int changeIsActive(UUID id, boolean status);
 
     boolean existsBrandByName(String name);
 }

@@ -60,3 +60,8 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 10
         sliding-window-size: 50
         register-health-indicator: true
+
+jwt:
+  issuer: ${JWT_ISSUER:shopic}
+  header-alg: ${JWT_HEADER_ALG}
+  public-key-url: ${AUTH_SERVICE_URL}${JWK_PATH}

@@ -3,6 +3,8 @@ package com.productservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 
 @Entity
 @Table(name = "reservation_items")
@@ -13,8 +15,8 @@ import lombok.*;
 @AllArgsConstructor
 public class ReservationItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reservation_items_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)

@@ -10,11 +10,10 @@ import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
 public abstract class BaseProductDto {
-    private final long id;
+    private final UUID id;
     private final String productName;
     private final String description;
     private final String imageUrl;
-    private final UUID sku;
     private final int stockQuantity;
     private final BigDecimal price;
     private final String brandName;

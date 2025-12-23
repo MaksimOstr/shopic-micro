@@ -14,7 +14,7 @@ public class UserProductDto extends BaseProductDto {
     private boolean isLiked;
 
     public UserProductDto(
-            long id,
+            UUID id,
             String productName,
             String description,
             String imageUrl,
@@ -24,6 +24,6 @@ public class UserProductDto extends BaseProductDto {
             String categoryName,
             int stockQuantity
     ) {
-        super(id, productName, description, imageUrl, sku, stockQuantity, price, brandName, categoryName);
+        super(id, productName, description, imageUrl, stockQuantity, price, brandName, categoryName);
     }
 }

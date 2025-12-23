@@ -13,18 +13,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
+public interface ReservationRepository extends JpaRepository<Reservation, UUID>, JpaSpecificationExecutor<Reservation> {
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.id = :id")
-    Optional<Reservation> findByIdWithItems(long id);
+    Optional<Reservation> findByIdWithItems(UUID id);
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.orderId = :orderId")
-    Optional<Reservation> findByOrderIdWithItems(long orderId);
+    Optional<Reservation> findByOrderIdWithItems(UUID orderId);
 
     @Transactional
     @Modifying
     @Query("UPDATE Reservation r SET r.status = :status WHERE r.orderId = :orderId")
-    int updateStatus(@Param("orderId") Long orderId, @Param("status") ReservationStatusEnum status);
+    int updateStatus(@Param("orderId") UUID orderId, @Param("status") ReservationStatusEnum status);
 }

@@ -22,54 +22,51 @@ import java.util.UUID;
 
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
 
     @Query("SELECT p.imageUrl FROM Product p WHERE p.id = :id")
-    Optional<String> getProductImageUrl(long id);
+    Optional<String> getProductImageUrl(UUID id);
 
     @Query("SELECT new com.productservice.dto.UserProductDto(" +
             "p.id, " +
             "p.name, " +
             "p.description, " +
             "p.imageUrl," +
-            "p.sku," +
-            "p.price, " +
+            "p.price," +
             "b.name, " +
             "c.name," +
             "p.stockQuantity) " +
             "FROM Product p " +
             "JOIN p.brand b " +
             "JOIN p.category c WHERE p.id = :id AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
-    Optional<UserProductDto> getActiveUserProductById(long id);
+    Optional<UserProductDto> getActiveUserProductById(UUID id);
 
-    int countByBrand_IdAndStatus(int brandId, ProductStatusEnum status);
+    int countByBrand_IdAndStatus(UUID brandId, ProductStatusEnum status);
 
-    int countByCategory_IdAndStatus(int categoryId, ProductStatusEnum status);
+    int countByCategory_IdAndStatus(UUID categoryId, ProductStatusEnum status);
 
     @Modifying
     @Query("UPDATE Product p SET p.status = com.productservice.entity.ProductStatusEnum.ARCHIVED WHERE p.brand.id = :brandId AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
-    int deactivateAllActiveProductsByBrandId(int brandId);
+    int deactivateAllActiveProductsByBrandId(UUID brandId);
 
     @Modifying
     @Query("UPDATE Product p SET p.status = com.productservice.entity.ProductStatusEnum.ARCHIVED WHERE p.category.id = :categoryId AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
-    int deactivateAllActiveProductsByCategoryId(int categoryId);
+    int deactivateAllActiveProductsByCategoryId(UUID categoryId);
 
     @Query("SELECT new com.productservice.dto.AdminProductDto(" +
             "p.id, " +
             "p.name, " +
             "p.description, " +
             "p.imageUrl," +
-            "p.sku," +
             "p.price, " +
             "b.name, " +
-            "c.name," +
-            "p.status," +
+            "c.name,"
             "p.stockQuantity," +
             "p.createdAt) " +
             "FROM Product p " +
             "JOIN p.brand b " +
             "JOIN p.category c WHERE p.id = :id")
-    Optional<AdminProductDto> getAdminProduct(long id);
+    Optional<AdminProductDto> getAdminProduct(UUID id);
 
     @Query("SELECT new com.productservice.dto.AdminProductDto(" +
             "p.id, " +
@@ -89,7 +86,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     Optional<AdminProductDto> getAdminProduct(UUID sku);
 
     @Query("SELECT p FROM Product p JOIN FETCH p.category c JOIN FETCH p.brand b WHERE p.id = :id")
-    Optional<Product> getProductWithCategoryAndBrand(long id);
+    Optional<Product> getProductWithCategoryAndBrand(UUID id);
 
     @Query("SELECT new com.productservice.dto.ProductBasicInfoDto(" +
             "p.id," +
@@ -99,7 +96,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.stockQuantity" +
             ")" +
             "FROM Product p WHERE p.id IN :ids AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
-    List<ProductBasicInfoDto> findActiveProductsBasicInfoByIds(List<Long> ids);
+    List<ProductBasicInfoDto> findActiveProductsBasicInfoByIds(List<UUID> ids);
 
     @Query("SELECT new com.productservice.dto.ProductBasicInfoDto(" +
             "p.id," +
@@ -109,7 +106,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.stockQuantity" +
             ")" +
             "FROM Product p WHERE p.id = :id AND p.status = com.productservice.entity.ProductStatusEnum.ACTIVE")
-    Optional<ProductBasicInfoDto> findActiveProductBasicInfoById(Long id);
+    Optional<ProductBasicInfoDto> findActiveProductBasicInfoById(UUID id);
 
 
     @Query("SELECT new com.productservice.dto.LikedProductDto(" +
@@ -119,11 +116,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "p.price) " +
             "FROM Product p " +
             "WHERE p.id IN :productIds")
-    List<LikedProductDto> findProductsByIds(@Param("productIds") Set<Long> productIds);
+    List<LikedProductDto> findProductsByIds(@Param("productIds") Set<UUID> productIds);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Product p WHERE p.id IN :productIds")
-    List<Product> findProductsForUpdate(List<Long> productIds);
+    List<Product> findProductsForUpdate(List<UUID> productIds);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

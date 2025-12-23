@@ -22,28 +22,24 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "products_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, length = 100)
     private String name;
 
     private String description;
 
-    private UUID sku;
-
     @DecimalMin(value = "0.0", message = "Price cannot be negative")
     private BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(nullable = false, name = "brand_id")
     private Brand brand;
 
-    @Enumerated(EnumType.STRING)
-    private ProductStatusEnum status;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
@@ -55,4 +51,8 @@ public class Product {
     @Column(name = "stock_quantity", nullable = false)
     @Min(value = 0)
     private Integer stockQuantity;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 }

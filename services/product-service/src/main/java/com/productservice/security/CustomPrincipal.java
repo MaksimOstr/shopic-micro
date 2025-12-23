@@ -1,12 +1,8 @@
 package com.productservice.security;
 
-import lombok.Getter;
 
-@Getter
-public class CustomPrincipal {
-    private final long id;
+import java.util.UUID;
 
-    public CustomPrincipal(String id) {
-        this.id = Long.parseLong(id);
-    }
-}
+public record CustomPrincipal(
+        UUID id
+) {}

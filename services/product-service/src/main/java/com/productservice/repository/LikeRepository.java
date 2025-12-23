@@ -8,17 +8,18 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Repository
-public interface LikeRepository extends JpaRepository<Like, Long> {
+public interface LikeRepository extends JpaRepository<Like, UUID> {
 
-    boolean existsByProduct_IdAndUserId(long productId, long userId);
+    boolean existsByProduct_IdAndUserId(UUID productId, UUID userId);
 
     @Transactional
     @Modifying
     @Query("DELETE FROM Like l WHERE l.product.id = :productId AND l.userId = :userId")
-    int deleteByProduct_IdAndUserId(long productId, long userId);
+    int deleteByProduct_IdAndUserId(UUID productId, UUID userId);
 
     @Query("SELECT l.product.id FROM Like l WHERE l.userId = :userId")
-    Set<Long> findLikedProductIds(long userId);
+    Set<Long> findLikedProductIds(UUID userId);
 }

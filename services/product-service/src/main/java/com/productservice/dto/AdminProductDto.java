@@ -14,11 +14,10 @@ public class AdminProductDto extends BaseProductDto {
     private final Instant createdAt;
 
     public AdminProductDto(
-            long id,
+            UUID id,
             String productName,
             String description,
             String imageUrl,
-            UUID sku,
             BigDecimal price,
             String brandName,
             String categoryName,
@@ -26,7 +25,7 @@ public class AdminProductDto extends BaseProductDto {
             int stockQuantity,
             Instant createdAt
     ) {
-        super(id, productName, description, imageUrl, sku, stockQuantity, price, brandName, categoryName);
+        super(id, productName, description, imageUrl, stockQuantity, price, brandName, categoryName);
         this.status = status;
         this.createdAt = createdAt;
     }

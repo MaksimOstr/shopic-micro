@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "reservations")
@@ -19,14 +20,14 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Reservation {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reservations_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReservationItem> items;
 
     @Column(name = "order_id", nullable = false, unique = true)
-    private long orderId;
+    private UUID orderId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
