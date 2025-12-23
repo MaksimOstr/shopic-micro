@@ -19,7 +19,7 @@ public class PublicCategoryController {
     public ResponseEntity<List<UserCategoryDto>> getAll(
             @RequestParam(required = false) String name
     ) {
-        List<UserCategoryDto> categories = categoryService.getUserCategoryDtoList(name);
+        List<UserCategoryDto> categories = categoryService.searchUserCategories(name);
 
         return ResponseEntity.ok(categories);
     }

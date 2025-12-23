@@ -1,5 +1,6 @@
 package com.productservice.services;
 
+import com.productservice.dto.AdminCategoryDto;
 import com.productservice.dto.UserCategoryDto;
 import com.productservice.dto.request.AdminCategoryParams;
 import com.productservice.dto.request.CreateCategoryRequest;
@@ -12,15 +13,16 @@ import com.productservice.repository.CategoryRepository;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
-import static com.productservice.utils.SpecificationUtils.equalsBoolean;
+import static com.productservice.utils.SpecificationUtils.equalsField;
 
 
 @Service
@@ -44,42 +46,37 @@ public class CategoryService {
     }
 
     @Transactional
-    public Category update(int categoryId, UpdateCategoryRequest dto) {
+    public AdminCategoryDto update(UUID categoryId, UpdateCategoryRequest dto) {
         if(existsByName(dto.name())) {
             throw new AlreadyExistsException("Category already exists");
         }
 
         Category category = getCategoryById(categoryId);
 
-        Optional.ofNullable(dto.name()).ifPresent(category::setName);
-        Optional.ofNullable(dto.description()).ifPresent(category::setDescription);
+        category.setName(dto.name());
+        category.setDescription(dto.description());
+        category.setActive(dto.isActive());
 
-        return category;
+        return categoryMapper.toAdminCategoryDto(category);
     }
 
-    public void changeIsActive(int id, boolean isActive) {
-        int updated = categoryRepository.changeIsActive(id, isActive);
-
-        if(updated == 0) {
-            throw new NotFoundException("Category not found");
-        }
-    }
-
-    public Category getCategoryById(int id) {
+    public Category getCategoryById(UUID id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
     }
 
-    public Page<Category> findAll(Pageable pageable, AdminCategoryParams params) {
+    public Page<AdminCategoryDto> searchAdminCategories(Pageable pageable, AdminCategoryParams params) {
         Specification<Category> spec = SpecificationUtils.<Category>iLike("name", params.name())
-                .and(equalsBoolean("isActive", params.isActive()));
+                .and(equalsField("isActive", params.isActive()));
+        Page<Category> categoryPage = categoryRepository.findAll(spec, pageable);
+        List<AdminCategoryDto> categoryDtoList = categoryMapper.toAdminCategoryDtoList(categoryPage.getContent());
 
-        return categoryRepository.findAll(spec, pageable);
+        return new PageImpl<>(categoryDtoList, pageable, categoryPage.getTotalElements());
     }
 
-    public List<UserCategoryDto> getUserCategoryDtoList(String name) {
+    public List<UserCategoryDto> searchUserCategories(String name) {
         Specification<Category> spec = SpecificationUtils.<Category>iLike("name", name)
-                .and(equalsBoolean("isActive", true));
+                .and(equalsField("isActive", true));
         List<Category> categoryList = categoryRepository.findAll(spec);
 
         return categoryMapper.toUserCategoryDtoList(categoryList);
