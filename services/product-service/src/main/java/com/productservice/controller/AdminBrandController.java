@@ -1,5 +1,6 @@
 package com.productservice.controller;
 
+import com.productservice.dto.AdminBrandDto;
 import com.productservice.dto.request.AdminBrandParams;
 import com.productservice.dto.request.CreateBrandRequest;
 import com.productservice.dto.request.UpdateBrandRequest;
@@ -20,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/admin/brands")
@@ -27,10 +30,9 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminBrandController {
     private final BrandService brandService;
-    private final BrandStatusService brandStatusService;
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Brand>> getAll(
+    public ResponseEntity<Page<AdminBrandDto>> getAll(
             AdminBrandParams params,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -42,7 +44,7 @@ public class AdminBrandController {
                 sortBy.getField()
         );
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Brand> brands = brandService.getAllBrands(params, pageable);
+        Page<AdminBrandDto> brands = brandService.searchAdminBrands(params, pageable);
 
         return ResponseEntity.ok().body(brands);
     }
@@ -56,40 +58,14 @@ public class AdminBrandController {
         return ResponseEntity.status(HttpStatus.CREATED).body(brand);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Brand> update(
-            @PathVariable int id,
+    @PutMapping("/{id}")
+    public ResponseEntity<AdminBrandDto> update(
+            @PathVariable UUID id,
             @RequestBody @Valid UpdateBrandRequest body
     ) {
-        Brand brand = brandService.updateBrand(id, body);
+        AdminBrandDto brand = brandService.updateBrand(id, body);
 
         return ResponseEntity.ok(brand);
     }
 
-    @PatchMapping("/{id}/deactivation-check")
-    public ResponseEntity<BrandDeactivationCheckResponse> deactivatingCheck(
-            @PathVariable int id
-    ) {
-        BrandDeactivationCheckResponse response = brandStatusService.deactivationCheck(id);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<BrandDeactivationResponse> deactivate(
-            @PathVariable int id
-    ) {
-        BrandDeactivationResponse response = brandStatusService.deactivate(id);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void> activate(
-            @PathVariable int id
-    ) {
-        brandStatusService.activate(id);
-
-        return ResponseEntity.ok().build();
-    }
 }

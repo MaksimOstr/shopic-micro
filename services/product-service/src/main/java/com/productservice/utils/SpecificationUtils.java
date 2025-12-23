@@ -25,19 +25,10 @@ public class SpecificationUtils {
         return (root, query, cb) -> cb.equal(root.get(field).get("id"), value);
     }
 
-    public static <T, E extends Enum<E>> Specification<T> equalsEnum(String fieldName, E value) {
-        if (value == null) {
-            return Specification.where(null);
-        }
-        return (root, query, cb) -> cb.equal(root.get(fieldName), value);
+    public static <T> Specification<T> equalsField(String fieldName, Object value) {
+        return (root, query, cb) -> value != null ? cb.equal(root.get(fieldName), value) : null;
     }
 
-    public static <S> Specification<S> equalsBoolean(String field, Boolean value) {
-        if (value == null) {
-            return Specification.where(null);
-        }
-        return (root, query, cb) -> cb.equal(root.get(field), value);
-    }
 
     public static <T, E extends Comparable<? super E>> Specification<T> gte(String field, E value) {
         if (value == null) {

@@ -16,20 +16,6 @@ public class BrandStatusService {
 
 
     @Transactional
-    public BrandDeactivationCheckResponse deactivationCheck(int id) {
-        Brand brand = brandService.getBrandById(id);
-        int activeCount = productService.countProductsByBrandIdAndStatus(brand.getId(), ProductStatusEnum.ACTIVE);
-        String message = "During the deactivation, " + activeCount + " products will be affected";
-
-        return new BrandDeactivationCheckResponse(
-                brand.getId(),
-                brand.getName(),
-                activeCount,
-                message
-        );
-    }
-
-    @Transactional
     public BrandDeactivationResponse deactivate(int id) {
         Brand brand = brandService.getBrandById(id);
 

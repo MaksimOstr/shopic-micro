@@ -23,7 +23,7 @@ public class PublicBrandController {
             @RequestParam(required = false) String name
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserBrandDto> brands = brandService.getUserBrandDtoPage(name, pageable);
+        Page<UserBrandDto> brands = brandService.searchUserBrands(name, pageable);
 
         return ResponseEntity.ok(brands);
     }
