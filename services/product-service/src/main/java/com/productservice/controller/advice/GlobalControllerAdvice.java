@@ -1,9 +1,8 @@
 package com.productservice.controller.advice;
 
-import com.productservice.dto.response.ErrorResponseDto;
+import com.productservice.dto.ErrorResponseDto;
 import com.productservice.exceptions.AlreadyExistsException;
 import com.productservice.exceptions.ExternalServiceUnavailableException;
-import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

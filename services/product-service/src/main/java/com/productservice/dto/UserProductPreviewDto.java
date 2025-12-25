@@ -1,5 +1,6 @@
 package com.productservice.dto;
 
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -7,19 +8,13 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-
-
+@RequiredArgsConstructor
 @Getter
 @Setter
-@RequiredArgsConstructor
-public class UserProductDto {
+public class UserProductPreviewDto {
     private final UUID id;
-    private final String productName;
-    private final String description;
+    private final String name;
     private final String imageUrl;
-    private final int stockQuantity;
     private final BigDecimal price;
-    private final String brandName;
-    private final String categoryName;
     private Boolean isLiked;
 }

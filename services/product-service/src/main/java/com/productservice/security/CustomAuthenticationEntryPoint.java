@@ -1,7 +1,7 @@
 package com.productservice.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.productservice.dto.response.ErrorResponseDto;
+import com.productservice.dto.ErrorResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

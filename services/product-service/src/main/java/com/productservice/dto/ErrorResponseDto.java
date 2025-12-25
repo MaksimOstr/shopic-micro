@@ -1,4 +1,4 @@
-package com.productservice.dto.response;
+package com.productservice.dto;
 
 public record ErrorResponseDto (
         String code,

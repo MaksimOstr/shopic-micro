@@ -1,14 +1,10 @@
 package com.productservice.services;
 
-import com.productservice.dto.AdminProductDto;
-import com.productservice.dto.LikedProductDto;
-import com.productservice.dto.ProductBasicInfoDto;
-import com.productservice.dto.UserProductDto;
 import com.productservice.dto.request.CreateProductRequest;
+import com.productservice.dto.request.UpdateProductRequest;
 import com.productservice.entity.Brand;
 import com.productservice.entity.Category;
 import com.productservice.entity.Product;
-import com.productservice.entity.ProductStatusEnum;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +25,13 @@ import static com.productservice.utils.ProductUtils.PRODUCT_NOT_FOUND;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final CategoryService categoryService;
+    private final BrandService brandService;
 
     @Transactional
-    public Product create(CreateProductRequest dto, String imageUrl, Category category, Brand brand) {
+    public Product create(CreateProductRequest dto, String imageUrl) {
+        Brand brand = brandService.getBrandById(dto.brandId());
+        Category category = categoryService.getCategoryById(dto.categoryId());
         Product product = createProductEntity(dto, imageUrl, category, brand);
 
         return productRepository.save(product);
@@ -41,6 +41,34 @@ public class ProductService {
         return productRepository.findByIdIn(idList);
     }
 
+
+    public Product updateProduct(UUID id, UpdateProductRequest dto) {
+        Product product = getProductById(id);
+
+        Optional.ofNullable(dto.name()).ifPresent(product::setName);
+        Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
+        Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
+        Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
+        Optional.ofNullable(dto.categoryId()).ifPresent(categoryId -> {
+            Category category = categoryService.getCategoryById(categoryId);
+            product.setCategory(category);
+        });
+        Optional.ofNullable(dto.brandId()).ifPresent(brandId -> {
+            Brand brand = brandService.getBrandById(brandId);
+            product.setBrand(brand);
+        });
+
+        return productRepository.save(product);
+    }
+
+    public String updateProductImage(UUID id, String newImageUrl) {
+        Product product = getProductById(id);
+        String oldImageUrl = product.getImageUrl();
+        product.setImageUrl(newImageUrl);
+        productRepository.save(product);
+
+        return oldImageUrl;
+    }
 
     public boolean existsById(UUID id) {
         return productRepository.existsById(id);
@@ -60,9 +88,6 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    public Optional<String> getOptionalProductImageUrl(UUID productId) {
-        return productRepository.getProductImageUrl(productId);
-    }
 
     private Product createProductEntity(CreateProductRequest dto, String url, Category category, Brand brand) {
         return Product.builder()
