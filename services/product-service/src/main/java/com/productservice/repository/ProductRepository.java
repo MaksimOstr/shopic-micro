@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
@@ -29,8 +30,11 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     @Query("SELECT p FROM Product p JOIN FETCH p.category c JOIN FETCH p.brand b WHERE p.id = :id")
     Optional<Product> getProductWithCategoryAndBrand(UUID id);
 
+    @Query("SELECT p FROM Product p WHERE p.id IN :ids")
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Product> findByIdInWithLock(@Param("ids") Collection<UUID> ids);
 
-    List<Product> findByIdIn(Collection<UUID> ids);
+    List<Product> findByIdInAndDeleted(Collection<UUID> ids, boolean deleted);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

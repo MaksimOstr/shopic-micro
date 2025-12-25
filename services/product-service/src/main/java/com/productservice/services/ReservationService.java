@@ -2,16 +2,23 @@ package com.productservice.services;
 
 import com.productservice.dto.AdminReservationDto;
 import com.productservice.dto.AdminReservationPreviewDto;
+import com.productservice.dto.ProductReservedQuantity;
+import com.productservice.dto.request.CreateReservationDto;
+import com.productservice.dto.request.CreateReservationItem;
+import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
 import com.productservice.entity.ReservationStatusEnum;
+import com.productservice.exceptions.InsufficientStockException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ReservationMapper;
+import com.productservice.repository.ReservationItemRepository;
 import com.productservice.repository.ReservationRepository;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.errors.ApiException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +26,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.productservice.utils.ProductUtils.toProductMap;
+import static com.productservice.utils.Utils.extractIds;
 
 
 @Slf4j
@@ -32,6 +44,52 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ProductService productService;
     private final ReservationMapper reservationMapper;
+    private final ReservationItemRepository findReservedQuantitiesByProductIdsAndStatus;
+
+    @Transactional
+    public void createReservation(List<ItemForReservationDto> reservationItems, UUID orderId) {
+        Reservation reservation = Reservation.builder()
+                .status(ReservationStatusEnum.PENDING)
+                .orderId(orderId)
+                .build();
+        List<ReservationItem> reservationItemList = createReservationItems(reservationItems, reservation);
+
+        reservation.setItems(reservationItemList);
+
+        reservationRepository.save(reservation);
+    }
+
+    private List<ReservationItem> createReservationItems(List<ItemForReservationDto> reservationItems, Reservation reservation) {
+        List<UUID> productIds = extractIds(reservationItems);
+        List<ProductReservedQuantity> productReservedQuantityList = findReservedQuantitiesByProductIdsAndStatus.findReservedQuantitiesByProductIdsAndStatus(productIds, ReservationStatusEnum.PENDING);
+        List<Product> products = productService.getProductsByIdsWithLock(productIds);
+        Map<UUID, ProductReservedQuantity> reservedMap = productReservedQuantityList.stream()
+                .collect(Collectors.toMap(ProductReservedQuantity::productId, Function.identity()));
+        Map<UUID, Product> productMap = toProductMap(products);
+        List<ReservationItem> reservationItemList = new ArrayList<>();
+
+        for (ItemForReservationDto reservationItem : reservationItems) {
+            Product product = productMap.get(reservationItem.productId());
+            ProductReservedQuantity reservationInfo = reservedMap.get(reservationItem.productId());
+
+            int reservedQty = reservationInfo != null ? reservationInfo.reservedQuantity() : 0;
+            int available = product.getStockQuantity() - reservedQty;
+
+            if(available < reservationItem.quantity()){
+                throw new ApiException("Insufficient stock for product with id: " + product.getId());
+            }
+
+            ReservationItem reservationItemEntity = new ReservationItem();
+            reservationItemEntity.setProduct(product);
+            reservationItemEntity.setReservation(reservation);
+            reservationItemEntity.setQuantity(reservationItem.quantity());
+
+            reservationItemList.add(reservationItemEntity);
+        }
+
+        return reservationItemList;
+    }
+
 
     @Transactional
     public void cancelReservation(long orderId) {

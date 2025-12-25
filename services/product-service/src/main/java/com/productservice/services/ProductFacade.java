@@ -85,7 +85,7 @@ public class ProductFacade {
     public List<LikedProductDto> getLikedProducts(UUID userId) {
         Set<UUID> productIds = likeService.getLikedProductIds(userId);
 
-        List<Product> likedProducts = productService.getProductsByIds(productIds);
+        List<Product> likedProducts = productService.getActiveProductsByIds(productIds);
 
         return productMapper.toLikedProductDtoList(likedProducts);
     }

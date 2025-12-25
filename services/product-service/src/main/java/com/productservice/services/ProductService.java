@@ -37,8 +37,12 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public List<Product> getProductsByIds(Collection<UUID> idList) {
-        return productRepository.findByIdIn(idList);
+    public List<Product> getActiveProductsByIds(Collection<UUID> idList) {
+        return productRepository.findByIdInAndDeleted(idList, false);
+    }
+
+    public List<Product> getProductsByIdsWithLock(Collection<UUID> idList) {
+        return  productRepository.findByIdInWithLock(idList);
     }
 
 

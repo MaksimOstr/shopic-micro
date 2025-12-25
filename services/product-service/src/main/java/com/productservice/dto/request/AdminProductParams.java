@@ -12,5 +12,5 @@ public record AdminProductParams(
         BigDecimal toPrice,
         Integer brandId,
         Integer categoryId,
-        ProductStatusEnum status
+        Boolean isDeleted
 ) {}

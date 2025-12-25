@@ -2,33 +2,31 @@ package com.productservice.services.grpc;
 
 import com.google.protobuf.Empty;
 import com.productservice.dto.request.ItemForReservationDto;
-import com.productservice.dto.request.CreateReservationDto;
 import com.productservice.mapper.GrpcMapper;
-import com.productservice.dto.ProductBasicInfoDto;
-import com.productservice.services.ReservationCreationService;
+import com.productservice.mapper.ProductMapper;
 import com.productservice.services.ProductService;
+import com.productservice.services.ReservationService;
 import com.shopic.grpc.productservice.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.grpc.server.service.GrpcService;
 
 import java.util.List;
-
+import java.util.UUID;
 
 
 @GrpcService
 @RequiredArgsConstructor
 public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBase {
-
+    private final ReservationService reservationService;
     private final ProductService productService;
-    private final ReservationCreationService reservationCreationService;
     private final GrpcMapper grpcMapper;
+    private final ProductMapper productMapper;
 
     @Override
-    public void getProductInfo(ProductInfoRequest request, StreamObserver<ProductInfo> responseObserver) {
-        ProductBasicInfoDto productDto = productService.getActiveProductBasicInfo(request.getProductId());
-
-        ProductInfo response = grpcMapper.toProductInfo(productDto);
+    public void getProductById(GetProductRequest request, StreamObserver<Product> responseObserver) {
+        com.productservice.entity.Product product = productService.getActiveProductById(UUID.fromString(request.getProductId()));
+        Product response = productMapper.toGrpcProduct(product);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -37,19 +35,20 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     @Override
     public void reserveProducts(ReserveProductsRequest request, StreamObserver<Empty> responseObserver) {
         List<ItemForReservationDto> itemsForReservation = grpcMapper.toItemForReservationList(request.getReservationItemsList());
-        CreateReservationDto dto = new CreateReservationDto(itemsForReservation, request.getOrderId());
 
-        reservationCreationService.createReservation(dto);
+        reservationService.createReservation(itemsForReservation, UUID.fromString(request.getOrderId()));
 
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
 
     @Override
-    public void getProductInfoList(ProductInfoListRequest request, StreamObserver<ProductInfoList> responseObserver) {
-        List<ProductBasicInfoDto> productPrices = productService.getActiveProductBasicInfoList(request.getProductIdList());
-        List<ProductInfo> productInfoList = grpcMapper.toProductInfoList(productPrices);
-        ProductInfoList response = ProductInfoList.newBuilder()
+    public void getProductList(GetProductListRequest request, StreamObserver<ProductListResponse> responseObserver) {
+        List<UUID> mappedProductIds = request.getProductIdList().stream().map(UUID::fromString).toList();
+        List<com.productservice.entity.Product> products = productService.getActiveProductsByIds(mappedProductIds);
+        List<Product> productInfoList = productMapper.toGrpcProductList(products);
+
+        ProductListResponse response = ProductListResponse.newBuilder()
                 .addAllProducts(productInfoList)
                 .build();
 
@@ -59,10 +58,10 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
 
     @Override
     public void isProductExists(IsProductExistsRequest request, StreamObserver<IsProductExistsResponse> responseObserver) {
-        boolean isExists = productService.existsById(request.getProductId());
+        boolean isExists = productService.existsById(UUID.fromString(request.getProductId()));
 
         IsProductExistsResponse response = IsProductExistsResponse.newBuilder()
-                .setIsExists(isExists)
+                .setExists(isExists)
                 .build();
 
         responseObserver.onNext(response);

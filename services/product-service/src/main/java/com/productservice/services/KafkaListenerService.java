@@ -59,7 +59,7 @@ public class KafkaListenerService {
     public void listenPaymentUnpaid(String data, Acknowledgment ack) {
         try {
             log.info("listenPaymentUnpaid");
-            BasePaymentEvent event = objectMapper.readValue(data, BasePaymentEvent.class);
+            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
 
             reservationService.cancelReservation(event.orderId());
 
@@ -74,9 +74,9 @@ public class KafkaListenerService {
     public void listenOrderPaid(String data, Acknowledgment ack) {
         try {
             log.info("listenOrderPaid");
-            BasePaymentEvent event = objectMapper.readValue(data, BasePaymentEvent.class);
+            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
 
-            reservationService.updateReservationStatus(event.orderId(), ReservationStatusEnum.CONFIRMED);
+            reservationService.updateReservationStatus(event.orderId(), ReservationStatusEnum.COMPLETED);
             kafkaService.sendReservationConfirmed(event.orderId());
 
             ack.acknowledge();

@@ -11,9 +11,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
 
-    Product toProductInfo(ProductBasicInfoDto dto);
-
-    List<Product> toProductInfoList(List<ProductBasicInfoDto> dtoList);
 
     ItemForReservationDto toItemForReservation(ReservationItem reservationItem);
 

@@ -33,4 +33,8 @@ public interface ProductMapper {
     LikedProductDto toLikedProductDto(Product product);
 
     List<LikedProductDto> toLikedProductDtoList(List<Product> products);
+
+    com.shopic.grpc.productservice.Product toGrpcProduct(Product product);
+
+    List<com.shopic.grpc.productservice.Product> toGrpcProductList(List<Product> products);
 }

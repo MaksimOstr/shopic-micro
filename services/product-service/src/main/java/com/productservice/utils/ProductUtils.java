@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class ProductUtils {
 
     public static Specification<Product> buildUserProductSpec(UserProductParams params) {
         return SpecificationUtils.<Product>iLike("name", params.productName())
-                .and(equalsEnum("status", ProductStatusEnum.ACTIVE))
+                .and(equalsField("isDeleted", false))
                 .and(lte("price", params.toPrice()))
                 .and(gte("price", params.fromPrice()))
                 .and(hasChild("category", params.categoryId()))
@@ -30,14 +31,14 @@ public class ProductUtils {
 
     public static Specification<Product> buildAdminProductSpec(AdminProductParams params) {
         return SpecificationUtils.<Product>iLike("name", params.productName())
-                .and(equalsEnum("status", params.status()))
+                .and(equalsField("isDeleted", params.isDeleted()))
                 .and(lte("price", params.toPrice()))
                 .and(gte("price", params.fromPrice()))
                 .and(hasChild("category", params.categoryId()))
                 .and(hasChild("brand", params.brandId()));
     }
 
-    public static Map<Long, Product> toProductMap(List<Product> products) {
+    public static Map<UUID, Product> toProductMap(List<Product> products) {
         return products.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
     }
