@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 
 public record UpdateProductRequest(
@@ -18,9 +19,9 @@ public record UpdateProductRequest(
         @DecimalMin("0")
         BigDecimal price,
 
-        Integer categoryId,
+        UUID categoryId,
 
-        Integer brandId,
+        UUID brandId,
 
         @Min(0)
         Integer stockQuantity

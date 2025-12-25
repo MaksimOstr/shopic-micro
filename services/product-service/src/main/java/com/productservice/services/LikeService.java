@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.UUID;
 
 
 @Service
@@ -19,7 +20,7 @@ public class LikeService {
     private final EntityManager entityManager;
 
 
-    public void toggleLike(long productId, long userId) {
+    public void toggleLike(UUID productId, UUID userId) {
         boolean isExists = isProductLiked(productId, userId);
         if (isExists) {
             likeRepository.deleteByProduct_IdAndUserId(productId, userId);
@@ -28,7 +29,7 @@ public class LikeService {
         }
     }
 
-    private void createLike(long productId, long userId) {
+    private void createLike(UUID productId, UUID userId) {
         Like like = Like.builder()
                 .userId(userId)
                 .product(entityManager.getReference(Product.class, productId))
@@ -41,11 +42,11 @@ public class LikeService {
         }
     }
 
-    public Set<Long> getLikedProductIds(long userId) {
+    public Set<UUID> getLikedProductIds(UUID userId) {
         return likeRepository.findLikedProductIds(userId);
     }
 
-    public boolean isProductLiked(long productId, long userId) {
+    public boolean isProductLiked(UUID productId, UUID userId) {
         return likeRepository.existsByProduct_IdAndUserId(productId, userId);
     }
 }

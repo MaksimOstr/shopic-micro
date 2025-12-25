@@ -21,5 +21,5 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
     int deleteByProduct_IdAndUserId(UUID productId, UUID userId);
 
     @Query("SELECT l.product.id FROM Like l WHERE l.userId = :userId")
-    Set<Long> findLikedProductIds(UUID userId);
+    Set<UUID> findLikedProductIds(UUID userId);
 }

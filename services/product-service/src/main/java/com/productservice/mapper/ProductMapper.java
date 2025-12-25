@@ -1,6 +1,7 @@
 package com.productservice.mapper;
 
 import com.productservice.dto.AdminProductDto;
+import com.productservice.dto.LikedProductDto;
 import com.productservice.dto.ProductAdminPreviewDto;
 import com.productservice.dto.ProductUserPreviewDto;
 import com.productservice.dto.UserProductDto;
@@ -14,16 +15,22 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
-    ProductUserPreviewDto productToProductUserPreviewDto(Product product);
+    ProductUserPreviewDto toProductUserPreviewDto(Product product);
 
-    ProductAdminPreviewDto productToProductAdminPreviewDto(Product product);
+    ProductAdminPreviewDto toProductAdminPreviewDto(Product product);
 
-    List<ProductUserPreviewDto> productToProductUserPreviewDtoList(List<Product> products);
+    List<ProductUserPreviewDto> toProductUserPreviewDtoList(List<Product> products);
 
-    List<ProductAdminPreviewDto> productToProductAdminPreviewDtoList(List<Product> products);
+    List<ProductAdminPreviewDto> toProductAdminPreviewDtoList(List<Product> products);
 
     @Mapping(target = "brandName", source = "product.brand.name")
     @Mapping(target = "categoryName", source = "product.category.name")
     @Mapping(target = "productName", source = "product.name")
-    AdminProductDto productToAdminProductDto(Product product);
+    AdminProductDto toAdminProductDto(Product product);
+
+    UserProductDto toUserProductDto(Product product);
+
+    LikedProductDto toLikedProductDto(Product product);
+
+    List<LikedProductDto> toLikedProductDtoList(List<Product> products);
 }
