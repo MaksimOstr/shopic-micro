@@ -1,22 +1,33 @@
 package com.productservice.controller.advice;
 
 import com.productservice.dto.ErrorResponseDto;
-import com.productservice.exceptions.AlreadyExistsException;
-import com.productservice.exceptions.ExternalServiceUnavailableException;
-import com.productservice.exceptions.NotFoundException;
+import com.productservice.exceptions.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorResponseDto> handleApiException(ApiException e) {
+        return ResponseEntity.status(e.getStatus()).body(new ErrorResponseDto(
+                e.getStatus().getReasonPhrase(),
+                e.getStatus().value(),
+                e.getMessage()
+        ));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    private ResponseEntity<Map<String, String>> handleNotValidMethodArguments(MethodArgumentNotValidException e) {
+    public ResponseEntity<Map<String, String>> handleNotValidMethodArguments(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getFieldErrors().forEach(error -> {
             errors.put(error.getField(), error.getDefaultMessage());
@@ -24,36 +35,42 @@ public class GlobalControllerAdvice {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    private ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                HttpStatus.NOT_FOUND.value(),
-                e.getMessage()
-        ));
+    @ExceptionHandler(S3Exception.class)
+    public ResponseEntity<ErrorResponseDto> handleS3Exception(S3Exception ex) {
+
+        String errorCode = ex.awsErrorDetails().errorCode();
+        String message = ex.getMessage();
+        HttpStatus status = HttpStatus.valueOf(ex.statusCode());
+
+        ErrorResponseDto error = new ErrorResponseDto(errorCode, status.value(), message);
+        return new ResponseEntity<>(error, status);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
-    private ResponseEntity<ErrorResponseDto> handleBadRequest(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDto(
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+    @ExceptionHandler(AwsServiceException.class)
+    public ResponseEntity<ErrorResponseDto> handleAwsServiceException(AwsServiceException ex) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                "AWS_SERVICE_ERROR",
+                ex.statusCode(),
+                "AWS error: " + ex.getMessage()
+
+        );
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(SdkClientException.class)
+    public ResponseEntity<ErrorResponseDto> handleSdkClientException(SdkClientException ex) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                "CLIENT_ERROR",
                 HttpStatus.BAD_REQUEST.value(),
-                e.getMessage()
-        ));
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(AlreadyExistsException.class)
-    private ResponseEntity<ErrorResponseDto> handleAlreadyExists(AlreadyExistsException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDto(
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                HttpStatus.CONFLICT.value(),
-                e.getMessage()
-        ));
-    }
 
-    @ExceptionHandler(ExternalServiceUnavailableException.class)
-    public ResponseEntity<ErrorResponseDto> handleInternalException(ExternalServiceUnavailableException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponseDto(
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()

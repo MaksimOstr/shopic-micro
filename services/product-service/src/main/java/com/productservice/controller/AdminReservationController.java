@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admin/reservations")
@@ -23,7 +25,7 @@ public class AdminReservationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservationDto> getReservation(
-            @PathVariable long id
+            @PathVariable UUID id
     ) {
         ReservationDto reservation = reservationService.getReservationAdminDto(id);
 
@@ -32,7 +34,7 @@ public class AdminReservationController {
 
     @GetMapping("/by-order/{orderId}")
     public ResponseEntity<ReservationDto> getReservationByOrderId(
-            @PathVariable long orderId
+            @PathVariable UUID orderId
     ) {
         ReservationDto reservation = reservationService.getReservationAdminDtoByOrderId(orderId);
 
@@ -46,7 +48,6 @@ public class AdminReservationController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "CREATED_AT") ReservationAdminSortByEnum sortBy
-
     ) {
         Sort sort = Sort.by(
                 Sort.Direction.fromString(sortDirection),
