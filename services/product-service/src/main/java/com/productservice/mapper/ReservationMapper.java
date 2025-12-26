@@ -1,7 +1,7 @@
 package com.productservice.mapper;
 
-import com.productservice.dto.AdminReservationDto;
-import com.productservice.dto.AdminReservationPreviewDto;
+import com.productservice.dto.ReservationDto;
+import com.productservice.dto.ReservationPreviewDto;
 import com.productservice.entity.Reservation;
 import org.mapstruct.Mapper;
 
@@ -9,9 +9,9 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {ReservationItemMapper.class})
 public interface ReservationMapper {
-    AdminReservationDto toAdminReservationDto(Reservation reservation);
+    ReservationDto toAdminReservationDto(Reservation reservation);
 
-    AdminReservationPreviewDto toAdminReservationPreviewDto(Reservation reservation);
+    ReservationPreviewDto toAdminReservationPreviewDto(Reservation reservation);
 
-    List<AdminReservationPreviewDto> toAdminReservationPreviewDtoList(List<Reservation> reservationList);
+    List<ReservationPreviewDto> toAdminReservationPreviewDtoList(List<Reservation> reservationList);
 }

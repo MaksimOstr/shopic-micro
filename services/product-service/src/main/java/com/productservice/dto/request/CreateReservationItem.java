@@ -1,7 +1,9 @@
 package com.productservice.dto.request;
 
+import java.util.UUID;
+
 public record CreateReservationItem (
-        long productId,
+        UUID productId,
         int quantity,
-        long reservationId
+        UUID reservationId
 ) {}

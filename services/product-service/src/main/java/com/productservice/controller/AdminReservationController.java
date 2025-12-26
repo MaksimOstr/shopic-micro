@@ -1,7 +1,7 @@
 package com.productservice.controller;
 
-import com.productservice.dto.AdminReservationDto;
-import com.productservice.dto.AdminReservationPreviewDto;
+import com.productservice.dto.ReservationDto;
+import com.productservice.dto.ReservationPreviewDto;
 import com.productservice.entity.ReservationStatusEnum;
 import com.productservice.enums.ReservationAdminSortByEnum;
 import com.productservice.services.ReservationService;
@@ -22,25 +22,25 @@ public class AdminReservationController {
     private final ReservationService reservationService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<AdminReservationDto> getReservation(
+    public ResponseEntity<ReservationDto> getReservation(
             @PathVariable long id
     ) {
-        AdminReservationDto reservation = reservationService.getReservationAdminDto(id);
+        ReservationDto reservation = reservationService.getReservationAdminDto(id);
 
         return ResponseEntity.ok(reservation);
     }
 
     @GetMapping("/by-order/{orderId}")
-    public ResponseEntity<AdminReservationDto> getReservationByOrderId(
+    public ResponseEntity<ReservationDto> getReservationByOrderId(
             @PathVariable long orderId
     ) {
-        AdminReservationDto reservation = reservationService.getReservationAdminDtoByOrderId(orderId);
+        ReservationDto reservation = reservationService.getReservationAdminDtoByOrderId(orderId);
 
         return ResponseEntity.ok(reservation);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<AdminReservationPreviewDto>> getReservationPage(
+    public ResponseEntity<Page<ReservationPreviewDto>> getReservationPage(
             @RequestParam(required = false) ReservationStatusEnum status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -53,7 +53,7 @@ public class AdminReservationController {
                 sortBy.getField()
         );
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<AdminReservationPreviewDto> reservationPage = reservationService.getAdminReservationPreviewDtoList(pageable, status);
+        Page<ReservationPreviewDto> reservationPage = reservationService.getAdminReservationPreviewDtoList(pageable, status);
 
         return ResponseEntity.ok(reservationPage);
     }

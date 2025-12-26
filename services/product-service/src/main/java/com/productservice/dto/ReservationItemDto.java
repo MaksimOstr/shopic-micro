@@ -2,8 +2,9 @@ package com.productservice.dto;
 
 import java.util.UUID;
 
-public record UserBrandDto(
+public record ReservationItemDto(
         UUID id,
-        String name
+        UUID productId,
+        int quantity
 ) {
 }

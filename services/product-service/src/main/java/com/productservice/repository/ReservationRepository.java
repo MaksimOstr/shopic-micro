@@ -24,6 +24,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID>,
     @Query("SELECT r FROM Reservation r JOIN FETCH r.items WHERE r.orderId = :orderId")
     Optional<Reservation> findByOrderIdWithItems(UUID orderId);
 
+    Optional<Reservation> findByOrderId(UUID orderId);
+
     @Transactional
     @Modifying
     @Query("UPDATE Reservation r SET r.status = :status WHERE r.orderId = :orderId")
