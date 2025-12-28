@@ -1,6 +1,7 @@
 package com.productservice.repository;
 
 import com.productservice.entity.Like;
+import com.productservice.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,11 +15,8 @@ import java.util.UUID;
 public interface LikeRepository extends JpaRepository<Like, UUID> {
 
     boolean existsByProduct_IdAndUserId(UUID productId, UUID userId);
-
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM Like l WHERE l.product.id = :productId AND l.userId = :userId")
-    int deleteByProduct_IdAndUserId(UUID productId, UUID userId);
+    
+    int deleteByProductAndUserId(Product product, UUID userId);
 
     @Query("SELECT l.product.id FROM Like l WHERE l.userId = :userId")
     Set<UUID> findLikedProductIds(UUID userId);

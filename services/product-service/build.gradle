@@ -20,23 +20,25 @@ repositories {
 
 dependencies {
 	implementation project(':proto')
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-	annotationProcessor 'org.projectlombok:lombok'
-	implementation libs.bundles.business.service.additional
+	implementation libs.grpc
+	implementation(platform(libs.spring.grpc.dependencies))
+	implementation(platform(libs.spring.cloud.dependencies))
+	implementation(platform(libs.spring.aws.dependencies))
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+	implementation libs.kafka
+
+	annotationProcessor libs.lombok
+	compileOnly(libs.lombok)
+	implementation libs.bundles.db
 	annotationProcessor libs.mapstruct.processor
 	implementation libs.bundles.core
+	implementation libs.bundles.web
+	implementation libs.bundles.security
 	implementation libs.bundles.business.service
-	testImplementation 'org.springframework.security:spring-security-test'
-	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
-	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.2.0")
+	testImplementation libs.kafka.test
+	testImplementation libs.bundles.test.core
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.grpc:spring-grpc-dependencies:${libs.versions.grpc.version.get()}"
-		mavenBom("org.springframework.cloud:spring-cloud-dependencies:${libs.versions.spring.cloud.get()}")
-	}
-}
 
 jacocoTestReport {
 	reports {

@@ -17,36 +17,30 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
-    private final EntityManager entityManager;
 
-
-    public void toggleLike(UUID productId, UUID userId) {
-        boolean isExists = isProductLiked(productId, userId);
+    public void toggleLike(Product product, UUID userId) {
+        boolean isExists = existsByProductIdAndUserId(product.getId(), userId);
         if (isExists) {
-            likeRepository.deleteByProduct_IdAndUserId(productId, userId);
+            likeRepository.deleteByProductAndUserId(product, userId);
         } else {
-            createLike(productId, userId);
+            createLike(product, userId);
         }
     }
 
-    private void createLike(UUID productId, UUID userId) {
+    private void createLike(Product product, UUID userId) {
         Like like = Like.builder()
                 .userId(userId)
-                .product(entityManager.getReference(Product.class, productId))
+                .product(product)
                 .build();
 
-        try {
-            likeRepository.save(like);
-        } catch (DataIntegrityViolationException e) {
-            throw new NotFoundException("Product does not exist");
-        }
+        likeRepository.save(like);
     }
 
     public Set<UUID> getLikedProductIds(UUID userId) {
         return likeRepository.findLikedProductIds(userId);
     }
 
-    public boolean isProductLiked(UUID productId, UUID userId) {
+    public boolean existsByProductIdAndUserId(UUID productId, UUID userId) {
         return likeRepository.existsByProduct_IdAndUserId(productId, userId);
     }
 }

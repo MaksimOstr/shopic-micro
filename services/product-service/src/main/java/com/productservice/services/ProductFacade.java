@@ -91,7 +91,9 @@ public class ProductFacade {
     }
 
     public void toggleLike(UUID productId, UUID userId) {
-        likeService.toggleLike(productId, userId);
+        Product product = productService.getProductById(productId);
+
+        likeService.toggleLike(product, userId);
     }
 
     public Page<UserProductPreviewDto> getProductsByFilters(UserProductParams params, Pageable pageable, UUID userId) {
@@ -118,7 +120,7 @@ public class ProductFacade {
 
 
     private void enrichProduct(UserProductDto product, UUID userId) {
-        Boolean isLiked = likeService.isProductLiked(product.getId(), userId);
+        Boolean isLiked = likeService.existsByProductIdAndUserId(product.getId(), userId);
 
         product.setIsLiked(isLiked);
     }
