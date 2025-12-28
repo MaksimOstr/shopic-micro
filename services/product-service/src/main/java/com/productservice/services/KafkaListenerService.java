@@ -3,7 +3,6 @@ package com.productservice.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.productservice.dto.event.BaseOrderEvent;
-import com.productservice.dto.event.BasePaymentEvent;
 import com.productservice.entity.ReservationStatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class KafkaListenerService {
     private final ObjectMapper objectMapper;
     private final ReservationService reservationService;
-    private final KafkaService kafkaService;
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
     @KafkaListener(topics = {"order.returned", "order.canceled"}, groupId = "product-service")
@@ -77,7 +75,6 @@ public class KafkaListenerService {
             BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
 
             reservationService.updateReservationStatus(event.orderId(), ReservationStatusEnum.COMPLETED);
-            kafkaService.sendReservationConfirmed(event.orderId());
 
             ack.acknowledge();
         } catch (JsonProcessingException e) {

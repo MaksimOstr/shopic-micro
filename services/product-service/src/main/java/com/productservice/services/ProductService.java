@@ -38,7 +38,7 @@ public class ProductService {
     }
 
     public List<Product> getActiveProductsByIds(Collection<UUID> idList) {
-        return productRepository.findByIdInAndDeleted(idList, false);
+        return productRepository.findByIdInAndIsDeleted(idList, false);
     }
 
     public List<Product> getProductsByIdsWithLock(Collection<UUID> idList) {
@@ -79,7 +79,7 @@ public class ProductService {
     }
 
     public Product getActiveProductById(UUID id) {
-        return productRepository.findByDeletedAndId(false, id)
+        return productRepository.findByIsDeletedAndId(false, id)
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 

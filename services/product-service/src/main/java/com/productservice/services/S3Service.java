@@ -1,10 +1,10 @@
 package com.productservice.services;
 
-import com.productservice.dto.PutObjectDto;
-import com.productservice.exceptions.InternalException;
+import com.productservice.exceptions.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.protocol.types.Field;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -49,8 +49,8 @@ public class S3Service {
 
             return generateUrl(bucket, key);
         } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new InternalException(e.getMessage());
+            log.error("An unexpected exception occurred while uploading the file to S3.", e);
+            throw new ApiException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

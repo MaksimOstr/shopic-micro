@@ -6,7 +6,7 @@ import com.productservice.dto.request.AdminBrandParams;
 import com.productservice.dto.request.CreateBrandRequest;
 import com.productservice.dto.request.UpdateBrandRequest;
 import com.productservice.entity.Brand;
-import com.productservice.exceptions.AlreadyExistsException;
+import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.BrandMapper;
 import com.productservice.repository.BrandRepository;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class BrandService {
 
     public Brand create(CreateBrandRequest dto) {
         if(existsByName(dto.brandName())) {
-            throw new AlreadyExistsException("Brand name already exists");
+            throw new ApiException("Brand name already exists", HttpStatus.CONFLICT);
         }
 
         Brand brand = Brand.builder()
@@ -48,7 +49,7 @@ public class BrandService {
     @Transactional
     public AdminBrandDto updateBrand(UUID id, UpdateBrandRequest dto) {
         if(existsByName(dto.brandName())) {
-            throw new AlreadyExistsException("Brand with name " + dto.brandName() + " already exists");
+            throw new ApiException("Brand with name " + dto.brandName() + " already exists", HttpStatus.CONFLICT);
         }
 
         Brand brand = getBrandById(id);

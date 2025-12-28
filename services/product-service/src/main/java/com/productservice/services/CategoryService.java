@@ -6,7 +6,7 @@ import com.productservice.dto.request.AdminCategoryParams;
 import com.productservice.dto.request.CreateCategoryRequest;
 import com.productservice.dto.request.UpdateCategoryRequest;
 import com.productservice.entity.Category;
-import com.productservice.exceptions.AlreadyExistsException;
+import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.CategoryMapper;
 import com.productservice.repository.CategoryRepository;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,7 @@ public class CategoryService {
 
     public Category create(CreateCategoryRequest dto) {
         if(existsByName(dto.name())) {
-            throw new AlreadyExistsException("Category name already exists");
+            throw new ApiException("Category name already exists", HttpStatus.CONFLICT);
         }
 
         Category category = Category.builder()
@@ -48,7 +49,7 @@ public class CategoryService {
     @Transactional
     public AdminCategoryDto update(UUID categoryId, UpdateCategoryRequest dto) {
         if(existsByName(dto.name())) {
-            throw new AlreadyExistsException("Category already exists");
+            throw new ApiException("Category already exists", HttpStatus.CONFLICT);
         }
 
         Category category = getCategoryById(categoryId);
