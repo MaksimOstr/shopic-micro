@@ -1,4 +1,4 @@
-package com.paymentservice.dto.event;
+package com.paymentservice.dto;
 
 import java.util.UUID;
 
