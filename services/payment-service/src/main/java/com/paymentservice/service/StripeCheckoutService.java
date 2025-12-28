@@ -60,7 +60,7 @@ public class StripeCheckoutService {
             long amountInCents = session.getAmountTotal();
             BigDecimal amountInDollars = BigDecimal.valueOf(amountInCents).divide(BigDecimal.valueOf(100));
 
-            savePayment(dto.userId(), sessionId, dto.orderId(), session.getCurrency(), amountInCents, amountInDollars);
+            savePayment(dto.userId(), sessionId, dto.orderId(), amountInCents, amountInDollars);
 
             return session.getUrl();
         } catch (StripeException e) {
@@ -99,12 +99,11 @@ public class StripeCheckoutService {
         return lineItems;
     }
 
-    private void savePayment(UUID userId, String sessionId, UUID orderId, String currency, Long totalInSmallestUnit, BigDecimal amount) {
+    private void savePayment(UUID userId, String sessionId, UUID orderId, Long totalInSmallestUnit, BigDecimal amount) {
         CreatePaymentDto dto = new CreatePaymentDto(
                 userId,
                 orderId,
                 sessionId,
-                currency,
                 amount,
                 totalInSmallestUnit
         );

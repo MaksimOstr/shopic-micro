@@ -1,7 +1,6 @@
 package com.paymentservice.service;
 
 import com.paymentservice.entity.Payment;
-import com.paymentservice.entity.PaymentStatus;
 import com.paymentservice.exception.NotFoundException;
 import com.stripe.model.Event;
 import com.stripe.model.StripeObject;
@@ -37,18 +36,15 @@ public class WebhookService {
     public void handleCheckoutSuccess(Event event) {
         Session session = getSessionFromEvent(event);
         String sessionId = session.getId();
-        Payment payment = paymentService.getPaymentBySessionId(sessionId);
-        String intentId = session.getPaymentIntent();
-
-        payment.setStripePaymentId(intentId);
-        payment.setStatus(PaymentStatus.SUCCEEDED);
+        String stripePaymentId = session.getPaymentIntent();
+        Payment payment = paymentService.succeedPayment(sessionId, stripePaymentId);
         kafkaService.sendCheckoutSessionSuccess(payment.getOrderId());
     }
 
     private void handleChargeFailed(Event event) {
         Session session = getSessionFromEvent(event);
 
-        paymentService.changePaymentStatus(session.getId(), PaymentStatus.FAILED);
+        paymentService.failPayment(session.getId());
     }
 
     private Session getSessionFromEvent(Event event) {

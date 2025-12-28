@@ -13,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class PaymentController {
@@ -23,9 +25,9 @@ public class PaymentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PaymentDto> getPaymentById(
-            @PathVariable int id
+            @PathVariable UUID id
     ) {
-        PaymentDto refund = paymentService.getPayment(id);
+        PaymentDto refund = paymentService.getPaymentDtoById(id);
 
         return ResponseEntity.ok(refund);
     }

@@ -1,20 +1,28 @@
 package com.paymentservice.config;
 
-import com.paymentservice.exception.InternalException;
+import com.paymentservice.exception.ApiException;
 import io.grpc.Status;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.grpc.server.exception.GrpcExceptionHandler;
+import org.springframework.http.HttpStatus;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class GrpcExceptionHandlerConfig {
+
     @Bean
-    GrpcExceptionHandler exceptionHandler() {
-        return exception -> switch (exception) {
-            case DataIntegrityViolationException e -> Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asException();
-            case InternalException e -> Status.INTERNAL.withDescription(e.getMessage()).asException();
-            default -> null;
+    GrpcExceptionHandler userServiceExceptionHandler() {
+        return exception -> {
+            if(exception instanceof ApiException e) {
+                HttpStatus status = e.getStatus();
+
+                return switch(status) {
+                    case INTERNAL_SERVER_ERROR -> Status.INTERNAL.withDescription(e.getMessage()).asException();
+                    default -> Status.UNKNOWN.withDescription(exception.getMessage()).asException();
+                };
+            }
+
+            return Status.UNKNOWN.withDescription(exception.getMessage()).asException();
         };
     }
 }

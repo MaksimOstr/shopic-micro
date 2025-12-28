@@ -7,7 +7,6 @@ public record CreatePaymentDto(
         UUID userId,
         UUID orderId,
         String sessionId,
-        String currency,
         BigDecimal amount,
         Long totalInSmallestUnit
 ) {

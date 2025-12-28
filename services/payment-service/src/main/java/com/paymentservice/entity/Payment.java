@@ -34,8 +34,6 @@ public class Payment {
     @Column(name = "session_id", nullable = false, unique = true)
     private String sessionId;
 
-    private String currency;
-
     @Column(name = "total_in_smallest_unit", nullable = false)
     private Long totalInSmallestUnit;
 
