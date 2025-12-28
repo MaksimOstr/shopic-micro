@@ -1,7 +1,7 @@
 package com.paymentservice.mapper;
 
 import com.paymentservice.dto.CheckoutItem;
-import com.shopic.grpc.paymentservice.OrderLineItem;
+import com.shopic.grpc.paymentservice.OrderItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,7 +13,7 @@ public interface GrpcMapper {
     @Mapping(target = "name", source = "itemName")
     @Mapping(target = "imageUrl", source = "itemImage")
     @Mapping(target = "price", source = "priceForOne")
-    CheckoutItem toCheckoutItem(OrderLineItem item);
+    CheckoutItem toCheckoutItem(OrderItem item);
 
-    List<CheckoutItem> toCheckoutItemList(List<OrderLineItem> items);
+    List<CheckoutItem> toCheckoutItemList(List<OrderItem> items);
 }

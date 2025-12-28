@@ -1,4 +1,4 @@
-package com.paymentservice.config.grpc;
+package com.paymentservice.config;
 
 import com.paymentservice.exception.InternalException;
 import io.grpc.Status;

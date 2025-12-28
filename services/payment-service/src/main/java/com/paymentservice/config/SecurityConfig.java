@@ -1,4 +1,4 @@
-package com.paymentservice.config.security;
+package com.paymentservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

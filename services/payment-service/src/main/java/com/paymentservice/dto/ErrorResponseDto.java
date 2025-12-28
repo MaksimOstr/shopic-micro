@@ -1,4 +1,4 @@
-package com.paymentservice.dto.response;
+package com.paymentservice.dto;
 
 public record ErrorResponseDto(
         String code,

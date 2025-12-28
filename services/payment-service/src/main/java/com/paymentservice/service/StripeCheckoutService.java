@@ -3,7 +3,7 @@ package com.paymentservice.service;
 import com.paymentservice.dto.CheckoutItem;
 import com.paymentservice.dto.CreateCheckoutSessionDto;
 import com.paymentservice.dto.CreatePaymentDto;
-import com.paymentservice.exception.InternalException;
+import com.paymentservice.exception.ApiException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -12,12 +12,14 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.paymentservice.utils.Utils.toSmallestUnit;
 
@@ -62,8 +64,8 @@ public class StripeCheckoutService {
 
             return session.getUrl();
         } catch (StripeException e) {
-            log.error(e.getMessage());
-            throw new InternalException("Internal payment error");
+            log.error("Unexpected StripeException: ", e);
+            throw new ApiException("Internal server error, try again later", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -97,7 +99,7 @@ public class StripeCheckoutService {
         return lineItems;
     }
 
-    private void savePayment(long userId, String sessionId, long orderId, String currency, Long totalInSmallestUnit, BigDecimal amount) {
+    private void savePayment(UUID userId, String sessionId, UUID orderId, String currency, Long totalInSmallestUnit, BigDecimal amount) {
         CreatePaymentDto dto = new CreatePaymentDto(
                 userId,
                 orderId,

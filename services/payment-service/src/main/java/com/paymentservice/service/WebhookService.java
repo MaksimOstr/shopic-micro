@@ -2,10 +2,8 @@ package com.paymentservice.service;
 
 import com.paymentservice.entity.Payment;
 import com.paymentservice.entity.PaymentStatus;
-import com.paymentservice.entity.RefundStatus;
 import com.paymentservice.exception.NotFoundException;
 import com.stripe.model.Event;
-import com.stripe.model.Refund;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +12,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.Optional;
 
 @Slf4j
@@ -24,7 +20,6 @@ import java.util.Optional;
 public class WebhookService {
     private final KafkaService kafkaService;
     private final PaymentService paymentService;
-    private final RefundService refundService;
 
     @Async
     @Transactional
@@ -36,44 +31,7 @@ public class WebhookService {
             case "charge.failed":
                 handleChargeFailed(event);
                 break;
-            case "charge.refund.updated":
-                handleRefundUpdated(event);
         }
-    }
-
-
-    private void handleRefundUpdated(Event event) {
-        Refund refund = getRefundFromEvent(event);
-        log.info("RefundStatus: {}", refund.getStatus());
-        switch (refund.getStatus()) {
-            case "succeeded":
-                handleRefundSuccess(refund);
-            case "failed":
-                handleRefundFailed(refund);
-        }
-    }
-
-    private void handleRefundFailed(Refund refund) {
-        com.paymentservice.entity.Refund refundEntity = refundService.getRefundByStripeRefundId(refund.getId());
-
-        refundEntity.setStatus(RefundStatus.FAILED);
-        refundEntity.setFailureReason(refund.getFailureReason());
-    }
-
-    private void handleRefundSuccess(Refund refund) {
-        com.paymentservice.entity.Refund refundEntity = refundService.getRefundWithPaymentByStripeRefundId(refund.getId());
-        Payment payment = refundEntity.getPayment();
-
-        refundEntity.setStatus(RefundStatus.SUCCEEDED);
-        refundEntity.setRefundedAt(Instant.now());
-
-        if (payment.getAmount().subtract(payment.getTotalRefundedAmount()).compareTo(BigDecimal.ZERO) == 0) {
-            payment.setStatus(PaymentStatus.FULLY_REFUNDED);
-        } else {
-            payment.setStatus(PaymentStatus.PARTIALLY_REFUNDED);
-        }
-
-        kafkaService.sendRefundSuccessEvent(payment.getOrderId(), refundEntity.getAmount());
     }
 
     public void handleCheckoutSuccess(Event event) {
@@ -101,16 +59,6 @@ public class WebhookService {
         } else {
             log.error("Checkout session not found");
             throw new NotFoundException("Checkout session not found");
-        }
-    }
-
-    private Refund getRefundFromEvent(Event event) {
-        Optional<StripeObject> optionalSession = event.getDataObjectDeserializer().getObject();
-        if (optionalSession.isPresent()) {
-            return (Refund) optionalSession.get();
-        } else {
-            log.error("Refund not found");
-            throw new NotFoundException("Refund not found");
         }
     }
 }

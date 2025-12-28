@@ -1,10 +1,11 @@
 package com.paymentservice.dto;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record CreatePaymentDto(
-        long userId,
-        long orderId,
+        UUID userId,
+        UUID orderId,
         String sessionId,
         String currency,
         BigDecimal amount,

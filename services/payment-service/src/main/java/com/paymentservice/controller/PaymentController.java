@@ -2,7 +2,7 @@ package com.paymentservice.controller;
 
 import com.paymentservice.dto.PaymentDto;
 import com.paymentservice.dto.PaymentSummaryDto;
-import com.paymentservice.dto.request.PaymentParams;
+import com.paymentservice.dto.PaymentParams;
 import com.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

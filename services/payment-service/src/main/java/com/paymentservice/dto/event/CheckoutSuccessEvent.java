@@ -1,6 +1,8 @@
 package com.paymentservice.dto.event;
 
+import java.util.UUID;
+
 public record CheckoutSuccessEvent(
-        long orderId
+        UUID orderId
 ) {
 }

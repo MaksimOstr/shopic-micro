@@ -1,7 +1,7 @@
 package com.paymentservice.controller.advice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.paymentservice.dto.response.ErrorResponseDto;
+import com.paymentservice.dto.ErrorResponseDto;
 import com.paymentservice.exception.InternalException;
 import com.paymentservice.exception.NotFoundException;
 import org.springframework.http.HttpStatus;

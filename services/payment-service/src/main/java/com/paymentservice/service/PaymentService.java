@@ -3,7 +3,7 @@ package com.paymentservice.service;
 import com.paymentservice.dto.CreatePaymentDto;
 import com.paymentservice.dto.PaymentDto;
 import com.paymentservice.dto.PaymentSummaryDto;
-import com.paymentservice.dto.request.PaymentParams;
+import com.paymentservice.dto.PaymentParams;
 import com.paymentservice.entity.Payment;
 import com.paymentservice.entity.PaymentStatus;
 import com.paymentservice.entity.Refund;

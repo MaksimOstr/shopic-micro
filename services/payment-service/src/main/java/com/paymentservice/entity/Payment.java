@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "payments")
@@ -19,14 +19,14 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payments_seq")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "user_id", nullable = false)
-    private long userId;
+    private UUID userId;
 
     @Column(name = "order_id", nullable = false, unique = true)
-    private long orderId;
+    private UUID orderId;
 
     @Column(name = "stripe_payment_id", unique = true)
     private String stripePaymentId;
@@ -39,9 +39,6 @@ public class Payment {
     @Column(name = "total_in_smallest_unit", nullable = false)
     private Long totalInSmallestUnit;
 
-    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Refund> refunds;
-
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -50,8 +47,4 @@ public class Payment {
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
-
-    public BigDecimal getTotalRefundedAmount() {
-        return refunds.stream().map(Refund::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 }

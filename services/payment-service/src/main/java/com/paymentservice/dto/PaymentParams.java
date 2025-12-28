@@ -1,11 +1,12 @@
-package com.paymentservice.dto.request;
+package com.paymentservice.dto;
 
 import com.paymentservice.entity.PaymentStatus;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record PaymentParams(
-        Long userId,
+        UUID userId,
         String paymentMethod,
         String currency,
         BigDecimal amountTo,

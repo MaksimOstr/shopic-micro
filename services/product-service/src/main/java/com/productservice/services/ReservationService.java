@@ -44,7 +44,6 @@ public class ReservationService {
     private final ProductService productService;
     private final ReservationMapper reservationMapper;
     private final ReservationItemRepository reservationItemRepository;
-    private final ReservationItemMapper reservationItemMapper;
 
     @Transactional
     public void createReservation(List<ItemForReservationDto> reservationItems, UUID orderId) {
