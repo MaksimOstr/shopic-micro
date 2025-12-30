@@ -48,20 +48,11 @@ logging:
       hibernate:
         SQL: debug
 
-resilience4j:
-  circuitbreaker:
-    instances:
-      review-service:
-        sliding-window-type: COUNT_BASED
-        failure-rate-threshold: 50
-        minimum-number-of-calls: 10
-        automatic-transition-from-open-to-half-open-enabled: true
-        wait-duration-in-open-state: 30s
-        permitted-number-of-calls-in-half-open-state: 10
-        sliding-window-size: 50
-        register-health-indicator: true
-
 jwt:
   issuer: ${JWT_ISSUER:shopic}
   header-alg: ${JWT_HEADER_ALG}
   public-key-url: ${AUTH_SERVICE_URL}${JWK_PATH}
+
+products:
+  aws:
+    bucket-name: ${PRODUCTS_BUCKET_NAME}

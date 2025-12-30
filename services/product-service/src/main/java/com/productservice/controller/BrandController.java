@@ -10,13 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/public/brands")
+@RequestMapping("/api/v1/brands")
 @RequiredArgsConstructor
-public class PublicBrandController {
+public class BrandController {
     private final BrandService brandService;
 
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<UserBrandDto>> getAllBrands(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

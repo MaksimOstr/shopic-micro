@@ -19,8 +19,6 @@ import java.util.UUID;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
-    Optional<Product> findByIsDeletedAndId(boolean isDeleted, UUID id);
-
     @Query("SELECT p FROM Product p JOIN FETCH p.category c JOIN FETCH p.brand b WHERE p.id = :id")
     Optional<Product> getProductWithCategoryAndBrand(UUID id);
 
@@ -28,7 +26,24 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Product> findByIdInWithLock(@Param("ids") Collection<UUID> ids);
 
-    List<Product> findByIdInAndIsDeleted(Collection<UUID> ids, boolean isDeleted);
+    @Query("SELECT p FROM Product p " +
+            "LEFT JOIN p.brand b " +
+            "JOIN p.category c " +
+            "WHERE p.id IN :ids " +
+            "AND p.isDeleted = false " +
+            "AND (b IS NULL OR b.isActive = true)" +
+            "AND c.isActive = true")
+    List<Product> findAllActiveByIdList(Collection<UUID> ids);
+
+    @Query("SELECT p FROM Product p " +
+            "LEFT JOIN FETCH p.brand b " +
+            "JOIN FETCH p.category c " +
+            "WHERE p.id = :id " +
+            "AND p.isDeleted = false " +
+            "AND (b IS NULL OR b.isActive = true)" +
+            "AND c.isActive = true")
+    Optional<Product> findActiveWithCategoryAndBrandById(UUID id);
+
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

@@ -16,5 +16,7 @@ public class UserProductPreviewDto {
     private final String name;
     private final String imageUrl;
     private final BigDecimal price;
-    private Boolean isLiked;
+    private final String categoryName;
+    private final String brandName;
+    private boolean isLiked;
 }

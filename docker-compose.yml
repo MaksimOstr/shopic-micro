@@ -9,7 +9,7 @@ services:
   kafka:
     image: apache/kafka:latest
     restart: always
-    container_name: kafka
+    container_name: kafka-1
     hostname: kafka
     volumes:
       - /kafka/data

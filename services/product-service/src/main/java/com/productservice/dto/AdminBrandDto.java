@@ -5,6 +5,6 @@ import java.util.UUID;
 public record AdminBrandDto(
         UUID id,
         String name,
-        Boolean isActive
+        Boolean active
 ) {
 }

@@ -24,9 +24,8 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/admin/products")
+@RequestMapping("/api/v1/admin/products")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminProductController {
     private final ProductFacade productFacade;
 
@@ -40,7 +39,7 @@ public class AdminProductController {
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<AdminProductPreviewDto>> getPageOfProductsByFilter(
             AdminProductParams body,
             @RequestParam(defaultValue = "0") int page,

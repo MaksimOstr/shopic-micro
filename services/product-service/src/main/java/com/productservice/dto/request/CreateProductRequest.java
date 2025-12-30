@@ -21,7 +21,6 @@ public record CreateProductRequest(
         @NotNull
         UUID categoryId,
 
-        @NotNull
         UUID brandId,
 
         @NotNull

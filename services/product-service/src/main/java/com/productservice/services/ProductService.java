@@ -30,26 +30,34 @@ public class ProductService {
 
     @Transactional
     public Product create(CreateProductRequest dto, String imageUrl) {
-        Brand brand = brandService.getBrandById(dto.brandId());
+        Brand brand = Optional.ofNullable(dto.brandId())
+                .map(brandService::getBrandById)
+                .orElse(null);
         Category category = categoryService.getCategoryById(dto.categoryId());
         Product product = createProductEntity(dto, imageUrl, category, brand);
 
         return productRepository.save(product);
     }
 
+    public Product getActiveWithCategoryAndBrandById(UUID id) {
+        return productRepository.findActiveWithCategoryAndBrandById(id)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+    }
+
     public List<Product> getActiveProductsByIds(Collection<UUID> idList) {
-        return productRepository.findByIdInAndIsDeleted(idList, false);
+        return productRepository.findAllActiveByIdList(idList);
     }
 
     public List<Product> getProductsByIdsWithLock(Collection<UUID> idList) {
         return  productRepository.findByIdInWithLock(idList);
     }
 
-
+    @Transactional
     public Product updateProduct(UUID id, UpdateProductRequest dto) {
         Product product = getProductById(id);
 
         Optional.ofNullable(dto.name()).ifPresent(product::setName);
+        Optional.ofNullable(dto.deleted()).ifPresent(product::setDeleted);
         Optional.ofNullable(dto.description()).ifPresent(product::setDescription);
         Optional.ofNullable(dto.price()).ifPresent(product::setPrice);
         Optional.ofNullable(dto.stockQuantity()).ifPresent(product::setStockQuantity);
@@ -76,11 +84,6 @@ public class ProductService {
 
     public boolean existsById(UUID id) {
         return productRepository.existsById(id);
-    }
-
-    public Product getActiveProductById(UUID id) {
-        return productRepository.findByIsDeletedAndId(false, id)
-                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
     public Page<Product> getProductPageBySpec(Specification<Product> spec, Pageable pageable) {

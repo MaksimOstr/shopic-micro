@@ -13,8 +13,10 @@ public record AdminProductDto(
         String imageUrl,
         int stockQuantity,
         BigDecimal price,
-        String brandName,
+        UUID categoryId,
+        UUID brandId,
         String categoryName,
-        Boolean isDeleted,
+        String brandName,
+        Boolean deleted,
         Instant createdAt
 ) {}

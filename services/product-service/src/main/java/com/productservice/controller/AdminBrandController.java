@@ -22,13 +22,12 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/admin/brands")
+@RequestMapping("/api/v1/admin/brands")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminBrandController {
     private final BrandService brandService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<AdminBrandDto>> getAll(
             AdminBrandParams params,
             @RequestParam(defaultValue = "0") int page,

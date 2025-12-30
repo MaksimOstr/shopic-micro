@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
-@RequestMapping("/admin/reservations")
+@RequestMapping("/api/v1/admin/reservations")
 @RequiredArgsConstructor
 public class AdminReservationController {
     private final ReservationService reservationService;
@@ -41,7 +40,7 @@ public class AdminReservationController {
         return ResponseEntity.ok(reservation);
     }
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<ReservationPreviewDto>> getReservationPage(
             @RequestParam(required = false) ReservationStatusEnum status,
             @RequestParam(defaultValue = "0") int page,

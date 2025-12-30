@@ -6,6 +6,6 @@ public record AdminCategoryDto(
         UUID id,
         String name,
         String description,
-        Boolean isActive
+        Boolean active
 ) {
 }

@@ -35,8 +35,8 @@ public class Product {
     @DecimalMin(value = "0.0", message = "Price cannot be negative")
     private BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false, name = "brand_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
     private Brand brand;
 
     @Builder.Default

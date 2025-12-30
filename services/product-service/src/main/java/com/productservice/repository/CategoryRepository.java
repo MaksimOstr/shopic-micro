@@ -15,8 +15,5 @@ import java.util.UUID;
 public interface CategoryRepository extends JpaRepository<Category, UUID>, JpaSpecificationExecutor<Category> {
     boolean existsByName(String name);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Category c SET c.isActive = :active WHERE c.id = :id")
-    int changeIsActive(UUID id, boolean active);
+    boolean existsByNameAndIdNot(String name, UUID categoryId);
 }

@@ -48,7 +48,7 @@ public class CategoryService {
 
     @Transactional
     public AdminCategoryDto update(UUID categoryId, UpdateCategoryRequest dto) {
-        if(existsByName(dto.name())) {
+        if(categoryRepository.existsByNameAndIdNot(dto.name(), categoryId)) {
             throw new ApiException("Category already exists", HttpStatus.CONFLICT);
         }
 

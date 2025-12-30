@@ -15,8 +15,9 @@ import java.util.UUID;
 public interface LikeRepository extends JpaRepository<Like, UUID> {
 
     boolean existsByProduct_IdAndUserId(UUID productId, UUID userId);
-    
-    int deleteByProductAndUserId(Product product, UUID userId);
+
+    @Transactional
+    void deleteByProductAndUserId(Product product, UUID userId);
 
     @Query("SELECT l.product.id FROM Like l WHERE l.userId = :userId")
     Set<UUID> findLikedProductIds(UUID userId);

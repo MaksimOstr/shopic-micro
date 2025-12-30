@@ -21,5 +21,5 @@ public class UserProductDto {
     private final BigDecimal price;
     private final String brandName;
     private final String categoryName;
-    private Boolean isLiked;
+    private boolean isLiked;
 }

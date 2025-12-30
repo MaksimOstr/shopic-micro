@@ -23,6 +23,17 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final JwtProperties jwtProperties;
 
+    private static final String[] permittedURLs = {
+            "/actuator/**",
+            "/api/v1/categories/**",
+            "/api/v1/products/**",
+            "/api/v1/brands/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api-docs/**"
+    };
+
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -35,7 +46,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers( "/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/public/**").permitAll()
+                        .requestMatchers(permittedURLs).permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtConfigurer -> {

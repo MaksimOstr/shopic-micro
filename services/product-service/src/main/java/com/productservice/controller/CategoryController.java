@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/public/categories")
+@RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
-public class PublicCategoryController {
+public class CategoryController {
     private final CategoryService categoryService;
 
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<List<UserCategoryDto>> getAll(
             @RequestParam(required = false) String name
     ) {

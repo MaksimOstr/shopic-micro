@@ -1,6 +1,5 @@
 package com.productservice.dto.request;
 
-import com.productservice.entity.ProductStatusEnum;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -10,11 +9,12 @@ import java.util.UUID;
 
 
 public record UpdateProductRequest(
-        @Size(min = 3, max = 10)
         String name,
 
         @Size(max = 1000)
         String description,
+
+        Boolean deleted,
 
         @DecimalMin("0")
         BigDecimal price,

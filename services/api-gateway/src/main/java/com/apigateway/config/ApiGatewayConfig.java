@@ -29,8 +29,12 @@ public class ApiGatewayConfig {
 
     private static final String[] productServiceUrlPatterns = {
             "/api/v1/products/**",
-            "/brands/**",
-            "/categories/**"
+            "/api/v1/admin/products/**",
+            "/api/v1/admin/brands/**",
+            "/api/v1/brands/**",
+            "/api/v1/admin/reservations/**",
+            "/api/v1/admin/categories/**",
+            "/api/v1/categories/**"
     };
 
     private static final String[] orderServiceUrlPatterns = {
@@ -49,7 +53,6 @@ public class ApiGatewayConfig {
     public RouterFunction<ServerResponse> productRoute() {
         return route("product-service-route")
                 .route(path(productServiceUrlPatterns), http(servicesProperties.getProductUrl()))
-                .filter(circuitBreaker(""))
                 .build();
     }
 

@@ -38,7 +38,6 @@ public class S3Service {
                     .bucket(bucket)
                     .key(key)
                     .contentType(file.getContentType())
-                    .acl(ObjectCannedACL.PUBLIC_READ)
                     .build();
 
             s3Client.putObject(

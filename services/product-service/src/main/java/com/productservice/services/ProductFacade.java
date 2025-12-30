@@ -14,6 +14,7 @@ import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ProductMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,16 +38,18 @@ public class ProductFacade {
     private final S3Service s3Service;
     private final LikeService likeService;
 
-    private static final String PRODUCT_IMAGE_BUCKET = "shopic-product-image";
+    @Value("${products.aws.bucket-name}")
+    private String productsBucketName;
 
     @Transactional
     public AdminProductDto createProduct(CreateProductRequest dto, MultipartFile productImage) {
-        String imageUrl = s3Service.uploadFile(PRODUCT_IMAGE_BUCKET, productImage);
+        String imageUrl = s3Service.uploadFile(productsBucketName, productImage);
         Product product = productService.create(dto, imageUrl);
 
         return productMapper.toAdminProductDto(product);
     }
 
+    @Transactional
     public AdminProductDto updateProduct(UUID id, UpdateProductRequest dto) {
         Product product = productService.updateProduct(id, dto);
 
@@ -57,7 +60,7 @@ public class ProductFacade {
         if(!productService.existsById(id)) {
             throw new NotFoundException("Product not found");
         }
-        String imageUrl = s3Service.uploadFile(PRODUCT_IMAGE_BUCKET, productImage);
+        String imageUrl = s3Service.uploadFile(productsBucketName, productImage);
         String oldImageUrl = productService.updateProductImage(id,  imageUrl);
 
         if(oldImageUrl != null) {
@@ -66,7 +69,7 @@ public class ProductFacade {
     }
 
     public UserProductDto getUserProduct(UUID productId, UUID userId) {
-        Product product = productService.getActiveProductById(productId);
+        Product product = productService.getActiveWithCategoryAndBrandById(productId);
         UserProductDto productDto = productMapper.toUserProductDto(product);
 
         if(userId != null) {
@@ -120,16 +123,16 @@ public class ProductFacade {
 
 
     private void enrichProduct(UserProductDto product, UUID userId) {
-        Boolean isLiked = likeService.existsByProductIdAndUserId(product.getId(), userId);
+        boolean isLiked = likeService.existsByProductIdAndUserId(product.getId(), userId);
 
-        product.setIsLiked(isLiked);
+        product.setLiked(isLiked);
     }
 
     private void enrichProductList(List<UserProductPreviewDto> products, UUID userId) {
         Set<UUID> likesIds = likeService.getLikedProductIds(userId);
 
         for (UserProductPreviewDto product : products) {
-            product.setIsLiked(likesIds.contains(product.getId()));
+            product.setLiked(likesIds.contains(product.getId()));
         }
     }
 

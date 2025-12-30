@@ -48,7 +48,7 @@ public class BrandService {
 
     @Transactional
     public AdminBrandDto updateBrand(UUID id, UpdateBrandRequest dto) {
-        if(existsByName(dto.brandName())) {
+        if(brandRepository.existsByNameAndIdNot(dto.brandName(), id)) {
             throw new ApiException("Brand with name " + dto.brandName() + " already exists", HttpStatus.CONFLICT);
         }
 

@@ -20,13 +20,12 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/admin/categories")
-@PreAuthorize("hasRole('ADMIN')")
+@RequestMapping("/api/v1/admin/categories")
 @RequiredArgsConstructor
 public class AdminCategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<AdminCategoryDto>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
