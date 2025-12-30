@@ -70,7 +70,7 @@ public class UserController {
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid ChangePasswordRequest body
     ) {
-        userService.changeUserPassword(principal.id(), body);
+        userService.changePassword(principal.id(), body);
 
         return ResponseEntity.ok().build();
     }

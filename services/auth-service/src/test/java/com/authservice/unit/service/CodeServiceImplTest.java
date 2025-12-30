@@ -55,6 +55,7 @@ class CodeServiceImplTest {
 
         when(codeRepository.findByUserAndScope(user, CodeScopeEnum.EMAIL_VERIFICATION))
                 .thenReturn(Optional.of(existing));
+        when(codeRepository.save(any(Code.class))).thenReturn(existing);
 
         Instant before = Instant.now();
         Code result = codeService.create(user, CodeScopeEnum.EMAIL_VERIFICATION);

@@ -100,6 +100,6 @@ class ForgotPasswordServiceTest {
         forgotPasswordService.resetPassword(request);
 
         verify(codeService).validate(request.code(), CodeScopeEnum.RESET_PASSWORD);
-        verify(userService).changeUserPassword(user, request.newPassword());
+        verify(userService).resetPassword(user, request.newPassword());
     }
 }

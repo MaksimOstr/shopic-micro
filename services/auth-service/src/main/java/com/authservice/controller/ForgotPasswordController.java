@@ -2,6 +2,7 @@ package com.authservice.controller;
 
 import com.authservice.dto.ErrorResponseDto;
 import com.authservice.dto.ForgotPasswordRequest;
+import com.authservice.dto.MessageResponseDto;
 import com.authservice.dto.ResetPasswordRequest;
 import com.authservice.services.ForgotPasswordService;
 import jakarta.validation.Valid;
@@ -46,12 +47,13 @@ public class ForgotPasswordController {
             )
     })
     @PostMapping
-    public ResponseEntity<Void> forgotPasswordRequest(
+    public ResponseEntity<MessageResponseDto> forgotPasswordRequest(
             @RequestBody @Valid ForgotPasswordRequest body
     ) {
         forgotPasswordService.requestResetPassword(body);
+        String message = "Reset password instructions have been sent if applicable.";
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new MessageResponseDto(message));
     }
 
     @Operation(

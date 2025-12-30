@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -39,9 +41,21 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         ErrorResponseDto error = new ErrorResponseDto(
                 HttpStatus.UNAUTHORIZED.getReasonPhrase(),
                 HttpStatus.UNAUTHORIZED.value(),
-                "Authentication is required"
+                resolveMessage(authException)
         );
 
         objectMapper.writeValue(response.getOutputStream(), error);
+    }
+
+    private String resolveMessage(AuthenticationException ex) {
+        if (ex instanceof DisabledException) {
+            return ex.getMessage();
+        }
+
+        if(ex instanceof BadCredentialsException) {
+            return ex.getMessage();
+        }
+
+        return "Authentication is required";
     }
 }
