@@ -36,20 +36,6 @@ public class KafkaListenerService {
         }
     }
 
-    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
-    @KafkaListener(topics = "order.completed", groupId = "product-service")
-    @Transactional
-    public void listenCompletedOrder(String data, Acknowledgment ack) {
-        try {
-            log.info("listenCompletedOrder");
-            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
-
-            reservationService.updateReservationStatus(event.orderId(), ReservationStatusEnum.COMPLETED);
-            ack.acknowledge();
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-        }
-    }
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
     @KafkaListener(topics = {"payment.unpaid"}, groupId = "product-service")
@@ -74,7 +60,7 @@ public class KafkaListenerService {
             log.info("listenOrderPaid");
             BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
 
-            reservationService.updateReservationStatus(event.orderId(), ReservationStatusEnum.COMPLETED);
+            reservationService.completeReservation(event.orderId());
 
             ack.acknowledge();
         } catch (JsonProcessingException e) {

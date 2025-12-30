@@ -129,21 +129,12 @@ public class ReservationService {
     }
 
 
-    public Page<ReservationPreviewDto> getAdminReservationPreviewDtoList(Pageable pageable, ReservationStatusEnum status) {
+    public Page<ReservationPreviewDto> getReservationList(Pageable pageable, ReservationStatusEnum status) {
         Specification<Reservation> spec = SpecificationUtils.equalsField("status", status);
         Page<Reservation> reservationPage = reservationRepository.findAll(spec, pageable);
         List<Reservation> reservationList = reservationPage.getContent();
         List<ReservationPreviewDto> previewDtoList = reservationMapper.toAdminReservationPreviewDtoList(reservationList);
 
         return new PageImpl<>(previewDtoList, pageable, reservationPage.getTotalElements());
-    }
-
-    public void updateReservationStatus(UUID orderId, ReservationStatusEnum status) {
-        int updated = reservationRepository.updateStatus(orderId, status);
-
-        if(updated == 0) {
-            log.error("Failed to update reservation status for order with order id {}", orderId);
-            throw new NotFoundException("Reservation with order id " + orderId + " not found");
-        }
     }
 }

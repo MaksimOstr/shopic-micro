@@ -1,128 +1,299 @@
 package com.productservice.unit;
 
+import com.productservice.dto.ProductReservedQuantity;
+import com.productservice.dto.ReservationDto;
+import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
 import com.productservice.entity.ReservationStatusEnum;
+import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
+import com.productservice.mapper.ReservationMapper;
+import com.productservice.repository.ReservationItemRepository;
 import com.productservice.repository.ReservationRepository;
 import com.productservice.services.ProductService;
 import com.productservice.services.ReservationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
 @ExtendWith(MockitoExtension.class)
-public class ReservationServiceTest {
+class ReservationServiceTest {
+
+    @InjectMocks
+    private ReservationService reservationService;
 
     @Mock
     private ReservationRepository reservationRepository;
 
     @Mock
+    private ReservationItemRepository reservationItemRepository;
+
+    @Mock
     private ProductService productService;
 
-    @InjectMocks
-    private ReservationService reservationService;
+    @Mock
+    private ReservationMapper reservationMapper;
 
-    private static final long ORDER_ID = 1L;
-    private static final long PRODUCT_ID_1 = 2L;
-    private static final long PRODUCT_ID_2 = 3L;
-    private static final int PRODUCT_QUANTITY_1 = 5;
-    private static final int PRODUCT_QUANTITY_2 = 10;
-    private static final int RESERVATION_QUANTITY_1 = 15;
-    private static final int RESERVATION_QUANTITY_2 = 20;
-    private static final ReservationStatusEnum RESERVATION_STATUS_ENUM = ReservationStatusEnum.PENDING;
-    private Reservation reservation;
-    private ReservationItem reservationItem1;
-    private ReservationItem reservationItem2;
-    private Product product1;
-    private Product product2;
+    private UUID orderId;
+    private UUID productId;
+    private Product product;
 
     @BeforeEach
-    public void setup() {
-        product1 = Product.builder()
-                .id(PRODUCT_ID_1)
-                .stockQuantity(PRODUCT_QUANTITY_1)
-                .build();
+    void setUp() {
+        orderId = UUID.randomUUID();
+        productId = UUID.randomUUID();
 
-        product2 = Product.builder()
-                .id(PRODUCT_ID_2)
-                .stockQuantity(PRODUCT_QUANTITY_2)
-                .build();
-
-        reservationItem1 = ReservationItem.builder()
-                .product(product1)
-                .quantity(RESERVATION_QUANTITY_1)
-                .build();
-
-        reservationItem2 = ReservationItem.builder()
-                .product(product2)
-                .quantity(RESERVATION_QUANTITY_2)
-                .build();
-
-        reservation = Reservation.builder()
-                .status(RESERVATION_STATUS_ENUM)
-                .orderId(ORDER_ID)
-                .items(List.of(reservationItem1, reservationItem2))
-                .build();
+        product = new Product();
+        product.setId(productId);
+        product.setStockQuantity(10);
     }
 
+
     @Test
-    public void testCancelReservation_whenCalledWithNotExistingReservation_thenThrowException() {
-        when(reservationRepository.findByOrderIdWithItems(anyLong())).thenReturn(Optional.empty());
+    void cancelReservation_whenCalledWithNotExistingReservation_thenThrowException() {
+        when(reservationRepository.findByOrderId(orderId))
+                .thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> {
-           reservationService.cancelReservation(ORDER_ID);
-        });
+        assertThrows(
+                NotFoundException.class,
+                () -> reservationService.cancelReservation(orderId)
+        );
 
-        verify(reservationRepository).findByOrderIdWithItems(ORDER_ID);
-        verifyNoInteractions(productService);
+        verify(reservationRepository).findByOrderId(orderId);
         verifyNoMoreInteractions(reservationRepository);
-
-        assertEquals(PRODUCT_QUANTITY_1, product1.getStockQuantity());
-        assertEquals(PRODUCT_QUANTITY_2, product2.getStockQuantity());
-        assertEquals(RESERVATION_STATUS_ENUM, reservation.getStatus());
     }
 
     @Test
-    public void testCancelReservation_whenCalledWithExistingReservation_thenCancelReservationAndUpdateProductQuantity() {
-        when(reservationRepository.findByOrderIdWithItems(anyLong())).thenReturn(Optional.of(reservation));
-        when(productService.getProductsForUpdate(anyList())).thenReturn(List.of(product1, product2));
+    void cancelReservation_whenReservationIsCompleted_thenThrowException() {
+        Reservation reservation = Reservation.builder()
+                .orderId(orderId)
+                .status(ReservationStatusEnum.COMPLETED)
+                .build();
 
-        reservationService.cancelReservation(ORDER_ID);
+        when(reservationRepository.findByOrderId(orderId))
+                .thenReturn(Optional.of(reservation));
 
-        verify(reservationRepository).findByOrderIdWithItems(ORDER_ID);
-        verify(productService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
+        ApiException ex = assertThrows(
+                ApiException.class,
+                () -> reservationService.cancelReservation(orderId)
+        );
 
-        assertEquals(PRODUCT_QUANTITY_1 + RESERVATION_QUANTITY_1, product1.getStockQuantity());
-        assertEquals(PRODUCT_QUANTITY_2 + RESERVATION_QUANTITY_2, product2.getStockQuantity());
+        assertEquals("Cannot change status of a completed reservation", ex.getMessage());
+    }
+
+    @Test
+    void cancelReservation_whenReservationIsCancelled_thenThrowException() {
+        Reservation reservation = Reservation.builder()
+                .orderId(orderId)
+                .status(ReservationStatusEnum.CANCELLED)
+                .build();
+
+        when(reservationRepository.findByOrderId(orderId))
+                .thenReturn(Optional.of(reservation));
+
+        ApiException ex = assertThrows(
+                ApiException.class,
+                () -> reservationService.cancelReservation(orderId)
+        );
+
+        assertEquals("Cannot change status of a cancelled reservation", ex.getMessage());
+    }
+
+    @Test
+    void cancelReservation_whenReservationIsPending_thenChangeStatusToCancelled() {
+        Reservation reservation = Reservation.builder()
+                .orderId(orderId)
+                .status(ReservationStatusEnum.PENDING)
+                .build();
+
+        when(reservationRepository.findByOrderId(orderId))
+                .thenReturn(Optional.of(reservation));
+
+        reservationService.cancelReservation(orderId);
+
         assertEquals(ReservationStatusEnum.CANCELLED, reservation.getStatus());
     }
 
     @Test
-    public void testCancelReservation_whenCalledWithExistingReservationAndNotExistingProduct_thenThrowException() {
-        when(reservationRepository.findByOrderIdWithItems(anyLong())).thenReturn(Optional.of(reservation));
-        when(productService.getProductsForUpdate(anyList())).thenReturn(List.of(product1));
+    void completeReservation_whenReservationNotFound_thenThrowException() {
+        when(reservationRepository.findByOrderId(orderId))
+                .thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> {
-            reservationService.cancelReservation(ORDER_ID);
-        });
+        assertThrows(
+                NotFoundException.class,
+                () -> reservationService.completeReservation(orderId)
+        );
+    }
 
-        verify(reservationRepository).findByOrderIdWithItems(ORDER_ID);
-        verify(productService).getProductsForUpdate(List.of(PRODUCT_ID_1, PRODUCT_ID_2));
+    @Test
+    void completeReservation_whenReservationIsCancelled_thenThrowException() {
+        Reservation reservation = Reservation.builder()
+                .id(UUID.randomUUID())
+                .orderId(orderId)
+                .status(ReservationStatusEnum.CANCELLED)
+                .build();
 
-        assertEquals(RESERVATION_STATUS_ENUM, reservation.getStatus());
+        when(reservationRepository.findByOrderId(orderId))
+                .thenReturn(Optional.of(reservation));
+
+        assertThrows(
+                ApiException.class,
+                () -> reservationService.completeReservation(orderId)
+        );
+    }
+
+    @Test
+    void completeReservation_whenReservationIsPending_thenDecreaseStockAndComplete() {
+        Reservation reservation = Reservation.builder()
+                .id(UUID.randomUUID())
+                .orderId(orderId)
+                .status(ReservationStatusEnum.PENDING)
+                .build();
+
+        ReservationItem item = new ReservationItem();
+        item.setProduct(product);
+        item.setQuantity(3);
+
+        when(reservationRepository.findByOrderId(orderId))
+                .thenReturn(Optional.of(reservation));
+
+        when(reservationItemRepository.findByReservationIdWithProductsLocked(reservation.getId()))
+                .thenReturn(List.of(item));
+
+        reservationService.completeReservation(orderId);
+
+        assertEquals(ReservationStatusEnum.COMPLETED, reservation.getStatus());
+        assertEquals(7, product.getStockQuantity());
+
+        verify(reservationRepository).save(reservation);
+    }
+
+    @Test
+    void createReservation_whenInsufficientStock_thenThrowException() {
+        ItemForReservationDto itemDto =
+                new ItemForReservationDto(productId, 10);
+
+        when(reservationItemRepository
+                .findReservedQuantitiesByProductIdsAndStatus(
+                        List.of(productId),
+                        ReservationStatusEnum.PENDING))
+                .thenReturn(List.of(
+                        new ProductReservedQuantity(productId, 8)
+                ));
+
+        when(productService.getProductsByIdsWithLock(List.of(productId)))
+                .thenReturn(List.of(product));
+
+        assertThrows(
+                ApiException.class,
+                () -> reservationService.createReservation(List.of(itemDto), orderId)
+        );
+    }
+
+    @Test
+    void createReservation_whenStockIsEnough_thenSaveReservation() {
+        ItemForReservationDto itemDto =
+                new ItemForReservationDto(productId, 3);
+
+        when(reservationItemRepository
+                .findReservedQuantitiesByProductIdsAndStatus(
+                        List.of(productId),
+                        ReservationStatusEnum.PENDING))
+                .thenReturn(List.of());
+
+        when(productService.getProductsByIdsWithLock(List.of(productId)))
+                .thenReturn(List.of(product));
+
+        reservationService.createReservation(List.of(itemDto), orderId);
+
+        ArgumentCaptor<Reservation> captor =
+                ArgumentCaptor.forClass(Reservation.class);
+
+        verify(reservationRepository).save(captor.capture());
+
+        Reservation saved = captor.getValue();
+
+        assertEquals(orderId, saved.getOrderId());
+        assertEquals(ReservationStatusEnum.PENDING, saved.getStatus());
+        assertEquals(1, saved.getItems().size());
+    }
+
+    @Test
+    void getReservationAdminDtoByOrderId_whenReservationExists_thenReturnDto() {
+        Reservation reservation = Reservation.builder()
+                .orderId(orderId)
+                .status(ReservationStatusEnum.PENDING)
+                .build();
+
+        ReservationDto dto = mock(ReservationDto.class);
+
+        when(reservationRepository.findByOrderIdWithItems(orderId))
+                .thenReturn(Optional.of(reservation));
+        when(reservationMapper.toAdminReservationDto(reservation))
+                .thenReturn(dto);
+
+        ReservationDto result =
+                reservationService.getReservationAdminDtoByOrderId(orderId);
+
+        assertSame(dto, result);
+    }
+
+    @Test
+    void getReservationAdminDtoByOrderId_whenReservationNotFound_thenThrowException() {
+        when(reservationRepository.findByOrderIdWithItems(orderId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reservationService.getReservationAdminDtoByOrderId(orderId)
+        );
+    }
+
+    @Test
+    void getReservationAdminDto_whenReservationExists_thenReturnDto() {
+        UUID reservationId = UUID.randomUUID();
+
+        Reservation reservation = Reservation.builder()
+                .id(reservationId)
+                .status(ReservationStatusEnum.PENDING)
+                .build();
+
+        ReservationDto dto = mock(ReservationDto.class);
+
+        when(reservationRepository.findByIdWithItems(reservationId))
+                .thenReturn(Optional.of(reservation));
+        when(reservationMapper.toAdminReservationDto(reservation))
+                .thenReturn(dto);
+
+        ReservationDto result =
+                reservationService.getReservationAdminDto(reservationId);
+
+        assertSame(dto, result);
+    }
+
+    @Test
+    void getReservationAdminDto_whenReservationNotFound_thenThrowException() {
+        UUID reservationId = UUID.randomUUID();
+
+        when(reservationRepository.findByIdWithItems(reservationId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                NotFoundException.class,
+                () -> reservationService.getReservationAdminDto(reservationId)
+        );
     }
 }
+
+

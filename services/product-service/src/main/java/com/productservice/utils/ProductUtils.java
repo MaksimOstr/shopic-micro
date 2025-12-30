@@ -23,10 +23,12 @@ public class ProductUtils {
     public static Specification<Product> buildUserProductSpec(UserProductParams params) {
         return SpecificationUtils.<Product>iLike("name", params.productName())
                 .and(equalsField("isDeleted", false))
+                .and(hasChild("category", "isActive", true))
+                .and(hasChild("brand", "isActive", true))
                 .and(lte("price", params.toPrice()))
                 .and(gte("price", params.fromPrice()))
-                .and(hasChild("category", params.categoryId()))
-                .and(hasChild("brand", params.brandId()));
+                .and(hasChild("category", "id", params.categoryId()))
+                .and(hasChild("brand", "id", params.brandId()));
     }
 
     public static Specification<Product> buildAdminProductSpec(AdminProductParams params) {
@@ -34,8 +36,8 @@ public class ProductUtils {
                 .and(equalsField("isDeleted", params.isDeleted()))
                 .and(lte("price", params.toPrice()))
                 .and(gte("price", params.fromPrice()))
-                .and(hasChild("category", params.categoryId()))
-                .and(hasChild("brand", params.brandId()));
+                .and(hasChild("category", "id", params.categoryId()))
+                .and(hasChild("brand", "id", params.brandId()));
     }
 
     public static Map<UUID, Product> toProductMap(List<Product> products) {

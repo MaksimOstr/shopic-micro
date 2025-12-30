@@ -1,6 +1,8 @@
 package com.productservice.utils;
 
 import com.productservice.entity.Product;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -17,12 +19,24 @@ public class SpecificationUtils {
                 cb.like(cb.lower(root.get(field)), "%" + value.toLowerCase() + "%");
     }
 
-    public static <T> Specification<T> hasChild(String field, Number value) {
-        if (value == null) {
-            return Specification.where(null);
-        }
+    public static <T> Specification<T> hasChild(
+            String childField,
+            String field,
+            Object value
+    ) {
+        return (root, query, cb) -> {
+            if (value == null) {
+                return cb.conjunction();
+            }
 
-        return (root, query, cb) -> cb.equal(root.get(field).get("id"), value);
+            Join<Object, Object> join = root.join(childField, JoinType.LEFT);
+
+            if (query != null) {
+                query.distinct(true);
+            }
+
+            return cb.equal(join.get(field), value);
+        };
     }
 
     public static <T> Specification<T> equalsField(String fieldName, Object value) {
