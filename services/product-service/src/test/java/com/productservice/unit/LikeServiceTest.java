@@ -2,91 +2,118 @@ package com.productservice.unit;
 
 import com.productservice.entity.Like;
 import com.productservice.entity.Product;
-import com.productservice.exceptions.NotFoundException;
 import com.productservice.repository.LikeRepository;
 import com.productservice.services.LikeService;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class LikeServiceTest {
-    @Mock
-    private LikeRepository likeRepository;
+class LikeServiceTest {
 
     @Mock
-    private EntityManager entityManager;
+    private LikeRepository likeRepository;
 
     @InjectMocks
     private LikeService likeService;
 
-    private static final long USER_ID = 1L;
-    private static final long PRODUCT_ID = 1L;
-
+    private UUID userId;
+    private UUID productId;
     private Product product;
 
     @BeforeEach
-    public void setUp() {
-        product = Product.builder()
-                .id(PRODUCT_ID)
-                .build();
+    void setUp() {
+        userId = UUID.randomUUID();
+        productId = UUID.randomUUID();
+
+        product = new Product();
+        product.setId(productId);
     }
 
     @Test
-    public void testToggleLike_whenCalledWithNotExistingLike_thenCreateNewLike() {
-        ArgumentCaptor<Like> likeArgumentCaptor = ArgumentCaptor.forClass(Like.class);
+    void toggleLike_shouldDeleteLike_whenLikeExists() {
+        when(likeRepository.existsByProduct_IdAndUserId(productId, userId))
+                .thenReturn(true);
 
-        when(likeRepository.existsByProduct_IdAndUserId(anyLong(), anyLong())).thenReturn(false);
-        when(entityManager.getReference(any(), anyLong())).thenReturn(product);
+        likeService.toggleLike(product, userId);
 
-        likeService.toggleLike(PRODUCT_ID, USER_ID);
-
-        verify(likeRepository).existsByProduct_IdAndUserId(PRODUCT_ID, USER_ID);
-        verify(entityManager).getReference(Product.class, PRODUCT_ID);
-        verify(likeRepository).save(likeArgumentCaptor.capture());
-        verifyNoMoreInteractions(likeRepository);
-
-        Like capturedLike = likeArgumentCaptor.getValue();
-
-        assertEquals(USER_ID, capturedLike.getUserId());
-        assertEquals(product, capturedLike.getProduct());
+        verify(likeRepository).deleteByProductAndUserId(product, userId);
+        verify(likeRepository, never()).save(any());
     }
 
     @Test
-    public void testToggleLike_whenCalledWithExistingLike_thenRemoveLike() {
-        when(likeRepository.existsByProduct_IdAndUserId(anyLong(), anyLong())).thenReturn(true);
+    void toggleLike_shouldCreateLike_whenLikeDoesNotExist() {
+        when(likeRepository.existsByProduct_IdAndUserId(productId, userId))
+                .thenReturn(false);
 
-        likeService.toggleLike(PRODUCT_ID, USER_ID);
+        likeService.toggleLike(product, userId);
 
-        verify(likeRepository).existsByProduct_IdAndUserId(PRODUCT_ID, USER_ID);
-        verify(likeRepository).deleteByProduct_IdAndUserId(PRODUCT_ID, USER_ID);
-        verifyNoMoreInteractions(likeRepository);
-        verifyNoInteractions(entityManager);
+        verify(likeRepository).save(any(Like.class));
+        verify(likeRepository, never()).deleteByProductAndUserId(any(), any());
     }
 
     @Test
-    public void testToggleLike_whenCalledWithNotExistingLikeButWasCreatedDuringCompletion_thenThrowException() {
-        when(likeRepository.existsByProduct_IdAndUserId(anyLong(), anyLong())).thenReturn(false);
-        when(entityManager.getReference(any(), anyLong())).thenReturn(product);
-        when(likeRepository.save(any(Like.class))).thenThrow(DataIntegrityViolationException.class);
+    void toggleLike_shouldCheckExistenceOnce() {
+        when(likeRepository.existsByProduct_IdAndUserId(productId, userId))
+                .thenReturn(false);
 
-        assertThrows(NotFoundException.class, () -> {
-            likeService.toggleLike(PRODUCT_ID, USER_ID);
-        });
+        likeService.toggleLike(product, userId);
 
-        verify(likeRepository).existsByProduct_IdAndUserId(PRODUCT_ID, USER_ID);
-        verify(entityManager).getReference(Product.class, PRODUCT_ID);
-        verifyNoMoreInteractions(likeRepository);
+        verify(likeRepository, times(1))
+                .existsByProduct_IdAndUserId(productId, userId);
+    }
+
+    @Test
+    void getLikedProductIds_shouldReturnSetFromRepository() {
+        Set<UUID> likedProducts = Set.of(UUID.randomUUID(), UUID.randomUUID());
+        when(likeRepository.findLikedProductIds(userId))
+                .thenReturn(likedProducts);
+
+        Set<UUID> result = likeService.getLikedProductIds(userId);
+
+        assertThat(result).isEqualTo(likedProducts);
+        verify(likeRepository).findLikedProductIds(userId);
+    }
+
+    @Test
+    void getLikedProductIds_shouldReturnEmptySet_whenNoLikes() {
+        when(likeRepository.findLikedProductIds(userId))
+                .thenReturn(Set.of());
+
+        Set<UUID> result = likeService.getLikedProductIds(userId);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void existsByProductIdAndUserId_shouldReturnTrue() {
+        when(likeRepository.existsByProduct_IdAndUserId(productId, userId))
+                .thenReturn(true);
+
+        boolean result = likeService.existsByProductIdAndUserId(productId, userId);
+
+        assertThat(result).isTrue();
+        verify(likeRepository).existsByProduct_IdAndUserId(productId, userId);
+    }
+
+    @Test
+    void existsByProductIdAndUserId_shouldReturnFalse() {
+        when(likeRepository.existsByProduct_IdAndUserId(productId, userId))
+                .thenReturn(false);
+
+        boolean result = likeService.existsByProductIdAndUserId(productId, userId);
+
+        assertThat(result).isFalse();
     }
 }
+

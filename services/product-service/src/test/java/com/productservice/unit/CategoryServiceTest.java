@@ -1,133 +1,144 @@
 package com.productservice.unit;
 
+import com.productservice.dto.AdminCategoryDto;
+import com.productservice.dto.UserCategoryDto;
+import com.productservice.dto.request.AdminCategoryParams;
 import com.productservice.dto.request.CreateCategoryRequest;
 import com.productservice.dto.request.UpdateCategoryRequest;
 import com.productservice.entity.Category;
-import com.productservice.exceptions.AlreadyExistsException;
+import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
+import com.productservice.mapper.CategoryMapper;
 import com.productservice.repository.CategoryRepository;
 import com.productservice.services.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CategoryServiceTest {
+class CategoryServiceTest {
+
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private CategoryMapper categoryMapper;
 
     @InjectMocks
     private CategoryService categoryService;
 
-
-    private static final String REQUESTED_CATEGORY_NAME = "requestedCategoryName";
-    private static final boolean REQUESTED_ACTIVE_STATUS = true;
-    private static final String REQUESTED_DESCRIPTION = "requestedDescription";
-    private static final String CATEGORY_NAME = "categoryName";
-    private static final String CATEGORY_DESCRIPTION = "categoryDescription";
-    private static final int CATEGORY_ID = 1;
-    private static final CreateCategoryRequest CREATE_CATEGORY_REQUEST = new CreateCategoryRequest(
-            REQUESTED_CATEGORY_NAME,
-            REQUESTED_ACTIVE_STATUS,
-            REQUESTED_DESCRIPTION
-    );
-    private static final UpdateCategoryRequest UPDATE_CATEGORY_REQUEST = new UpdateCategoryRequest(
-            REQUESTED_CATEGORY_NAME,
-            REQUESTED_DESCRIPTION
-    );
-
-
+    private UUID categoryId;
     private Category category;
 
     @BeforeEach
-    public void setup() {
+    void setUp() {
+        categoryId = UUID.randomUUID();
         category = Category.builder()
-                .id(CATEGORY_ID)
-                .name(CATEGORY_NAME)
-                .description(CATEGORY_DESCRIPTION)
+                .id(categoryId)
+                .name("Electronics")
+                .description("Desc")
+                .isActive(true)
                 .build();
     }
 
-
     @Test
-    public void testCreate_whenCalledWithExistingCategory_thenThrowException() {
-        when(categoryRepository.existsByName(anyString())).thenReturn(true);
+    void create_shouldSaveCategory_whenNameDoesNotExist() {
+        CreateCategoryRequest request =
+                new CreateCategoryRequest("Books", true, "Books desc");
 
-        assertThrows(AlreadyExistsException.class, () -> {
-            categoryService.create(CREATE_CATEGORY_REQUEST);
-        });
+        when(categoryRepository.existsByName(request.name())).thenReturn(false);
+        when(categoryRepository.save(any(Category.class))).thenAnswer(i -> i.getArgument(0));
 
-        verify(categoryRepository).existsByName(REQUESTED_CATEGORY_NAME);
-        verifyNoMoreInteractions(categoryRepository);
+        Category result = categoryService.create(request);
+
+        assertThat(result.getName()).isEqualTo("Books");
+        assertThat(result.getDescription()).isEqualTo("Books desc");
+        assertThat(result.isActive()).isTrue();
+        verify(categoryRepository).save(any(Category.class));
     }
 
     @Test
-    public void testCreate_whenCalledWithNewCategory_thenCreateNewCategory() {
-        ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
+    void create_shouldThrowException_whenNameExists() {
+        CreateCategoryRequest request =
+                new CreateCategoryRequest("Books", true, "Books desc");
 
-        when(categoryRepository.existsByName(anyString())).thenReturn(false);
-        when(categoryRepository.save(any(Category.class))).thenReturn(category);
+        when(categoryRepository.existsByName(request.name())).thenReturn(true);
 
-        Category result = categoryService.create(CREATE_CATEGORY_REQUEST);
+        assertThatThrownBy(() -> categoryService.create(request))
+                .isInstanceOf(ApiException.class)
+                .hasMessage("Category name already exists");
 
-        verify(categoryRepository).existsByName(REQUESTED_CATEGORY_NAME);
-        verify(categoryRepository).save(categoryArgumentCaptor.capture());
-
-        Category capturedCategory = categoryArgumentCaptor.getValue();
-
-        assertEquals(REQUESTED_CATEGORY_NAME, capturedCategory.getName());
-        assertEquals(REQUESTED_ACTIVE_STATUS, capturedCategory.isActive());
-        assertEquals(REQUESTED_DESCRIPTION, capturedCategory.getDescription());
-        assertEquals(category, result);
-    }
-    
-    @Test
-    public void testUpdate_whenCalledWithExistingCategoryName_thenThrowException() {
-        when(categoryRepository.existsByName(anyString())).thenReturn(true);
-        
-        assertThrows(AlreadyExistsException.class, () -> {
-            categoryService.update(CATEGORY_ID, UPDATE_CATEGORY_REQUEST);
-        });
-
-        verify(categoryRepository).existsByName(REQUESTED_CATEGORY_NAME);
-        verifyNoMoreInteractions(categoryRepository);
+        verify(categoryRepository, never()).save(any());
     }
 
     @Test
-    public void testUpdate_whenCalledWithNotExistingCategoryEntity_thenThrowException() {
-        when(categoryRepository.existsByName(anyString())).thenReturn(false);
-        when(categoryRepository.findById(anyInt())).thenReturn(Optional.empty());
+    void update_shouldUpdateCategory_whenNameIsUnique() {
+        UpdateCategoryRequest request =
+                new UpdateCategoryRequest("New name", "New desc", false);
 
-        assertThrows(NotFoundException.class, () -> {
-            categoryService.update(CATEGORY_ID, UPDATE_CATEGORY_REQUEST);
-        });
+        when(categoryRepository.existsByNameAndIdNot(request.name(), categoryId))
+                .thenReturn(false);
+        when(categoryRepository.findById(categoryId))
+                .thenReturn(Optional.of(category));
 
-        verify(categoryRepository).existsByName(REQUESTED_CATEGORY_NAME);
-        verify(categoryRepository).findById(CATEGORY_ID);
+        AdminCategoryDto dto = new AdminCategoryDto(
+                categoryId,
+                "New name",
+                "New desc",
+                false
+        );
+
+        when(categoryMapper.toAdminCategoryDto(category)).thenReturn(dto);
+
+        AdminCategoryDto result = categoryService.update(categoryId, request);
+
+        assertThat(result).isEqualTo(dto);
+        assertThat(category.getName()).isEqualTo("New name");
+        assertThat(category.getDescription()).isEqualTo("New desc");
+        assertThat(category.isActive()).isFalse();
     }
 
     @Test
-    public void testUpdate_whenCalledWithNewCategoryName_thenUpdateExistingCategory() {
-        when(categoryRepository.existsByName(anyString())).thenReturn(false);
-        when(categoryRepository.findById(anyInt())).thenReturn(Optional.of(category));
+    void update_shouldThrowException_whenNameExists() {
+        UpdateCategoryRequest request =
+                new UpdateCategoryRequest("Books", "Desc", true);
 
-        Category result = categoryService.update(CATEGORY_ID, UPDATE_CATEGORY_REQUEST);
+        when(categoryRepository.existsByNameAndIdNot(request.name(), categoryId))
+                .thenReturn(true);
 
-        verify(categoryRepository).existsByName(REQUESTED_CATEGORY_NAME);
-        verify(categoryRepository).findById(CATEGORY_ID);
+        assertThatThrownBy(() -> categoryService.update(categoryId, request))
+                .isInstanceOf(ApiException.class)
+                .hasMessage("Category already exists");
+    }
 
-        assertEquals(REQUESTED_CATEGORY_NAME, result.getName());
-        assertEquals(REQUESTED_DESCRIPTION, result.getDescription());
+    @Test
+    void getCategoryById_shouldReturnCategory_whenExists() {
+        when(categoryRepository.findById(categoryId))
+                .thenReturn(Optional.of(category));
+
+        Category result = categoryService.getCategoryById(categoryId);
+
+        assertThat(result).isEqualTo(category);
+    }
+
+    @Test
+    void getCategoryById_shouldThrowException_whenNotFound() {
+        when(categoryRepository.findById(categoryId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> categoryService.getCategoryById(categoryId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Category not found");
     }
 }

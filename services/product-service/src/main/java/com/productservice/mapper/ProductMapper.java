@@ -15,6 +15,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
+    @Mapping(target = "liked", ignore = true)
     @Mapping(source = "brand.name", target = "brandName")
     @Mapping(source = "category.name", target = "categoryName")
     UserProductPreviewDto toProductUserPreviewDto(Product product);
@@ -34,8 +35,10 @@ public interface ProductMapper {
     @Mapping(target = "brandId", source = "product.brand.id")
     AdminProductDto toAdminProductDto(Product product);
 
+    @Mapping(target = "liked", ignore = true)
     @Mapping(source = "brand.name", target = "brandName")
     @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(target = "productName", source = "name")
     UserProductDto toUserProductDto(Product product);
 
     LikedProductDto toLikedProductDto(Product product);

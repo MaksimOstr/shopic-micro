@@ -75,9 +75,6 @@ class ProductServiceTest {
                 .build();
     }
 
-    // ------------------------------------------------------------------
-    // create
-    // ------------------------------------------------------------------
 
     @Test
     void create_whenBrandProvided_thenCreateProductWithBrand() {
