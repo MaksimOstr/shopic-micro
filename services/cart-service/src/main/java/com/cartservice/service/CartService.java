@@ -10,6 +10,7 @@ import com.cartservice.exception.ApiException;
 import com.cartservice.exception.NotFoundException;
 import com.cartservice.mapper.CartItemMapper;
 import com.cartservice.mapper.CartMapper;
+import com.cartservice.repository.CartItemRepository;
 import com.cartservice.repository.CartRepository;
 import com.cartservice.service.grpc.GrpcProductService;
 import com.shopic.grpc.productservice.Product;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,19 +30,28 @@ import java.util.UUID;
 public class CartService {
     private final CartRepository cartRepository;
     private final CartItemMapper cartItemMapper;
+    private final CartItemRepository cartItemRepository;
     private final GrpcProductService grpcProductService;
     private final CartMapper cartMapper;
 
     @Transactional
-    public CartItemDto addItemToCart(AddItemToCartRequest dto, UUID userId) {
+    public CartDto addItemToCart(AddItemToCartRequest dto, UUID userId) {
         Cart cart = cartRepository.findCartWithItemsByUserId(userId)
                 .orElseGet(() -> createCart(userId));
 
-        return cart.getCartItems().stream()
+        Optional<CartItem> existingItemOpt = cart.getCartItems().stream()
                 .filter(item -> item.getProductId().equals(dto.productId()))
-                .findFirst()
-                .map(existing -> updateExistingItem(dto, existing))
-                .orElseGet(() -> createNewItem(dto, cart));
+                .findFirst();
+
+        if (existingItemOpt.isPresent()) {
+            updateExistingItem(dto, existingItemOpt.get());
+        } else {
+            createNewItem(dto, cart);
+        }
+
+        cartRepository.save(cart);
+
+        return cartMapper.toDto(cart);
     }
 
     @Transactional(readOnly = true)
@@ -107,31 +118,28 @@ public class CartService {
     }
 
     private Cart createCart(UUID userId) {
-        Cart cart = Cart.builder()
+        return Cart.builder()
                 .userId(userId)
                 .build();
-
-        return cartRepository.save(cart);
     }
 
-    private CartItemDto createNewItem(AddItemToCartRequest dto, Cart cart) {
+    private void createNewItem(AddItemToCartRequest dto, Cart cart) {
         Product product = getProductByIdAndCheckQuantity(dto.productId(), dto.quantity());
         CartItem newCartItem = CartItem.builder()
                 .priceAtAdd(new BigDecimal(product.getPrice()))
-                .productName(product.getProductName())
+                .productName(product.getName())
                 .quantity(dto.quantity())
                 .productId(dto.productId())
                 .cart(cart)
-                .productImageUrl(product.getProductImageUrl())
+                .productImageUrl(product.getImageUrl())
                 .build();
 
-        return cartItemMapper.toDto(newCartItem);
+        cart.getCartItems().add(newCartItem);
     }
 
-    private CartItemDto updateExistingItem(AddItemToCartRequest dto, CartItem cartItem) {
+    private void updateExistingItem(AddItemToCartRequest dto, CartItem cartItem) {
         getProductByIdAndCheckQuantity(dto.productId(), dto.quantity() + cartItem.getQuantity());
         cartItem.setQuantity(cartItem.getQuantity() + dto.quantity());
-        return cartItemMapper.toDto(cartItem);
     }
 
     private Product getProductByIdAndCheckQuantity(UUID productId, int quantity) {

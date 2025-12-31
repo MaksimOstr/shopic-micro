@@ -42,7 +42,9 @@ public class CartItem {
     private int quantity;
 
     @Column(name = "price_at_add", nullable = false)
-    @DecimalMin(value = "0.0", message = "Price cannot be negative")
     private BigDecimal priceAtAdd;
 
+    public BigDecimal getLineTotal() {
+        return priceAtAdd.multiply(BigDecimal.valueOf(quantity));
+    }
 }

@@ -45,6 +45,7 @@ public interface ProductMapper {
 
     List<LikedProductDto> toLikedProductDtoList(List<Product> products);
 
+    @Mapping(source = "stockQuantity", target = "availableQuantity")
     com.shopic.grpc.productservice.Product toGrpcProduct(Product product);
 
     List<com.shopic.grpc.productservice.Product> toGrpcProductList(List<Product> products);

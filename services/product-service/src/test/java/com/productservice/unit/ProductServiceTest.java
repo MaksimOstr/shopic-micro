@@ -82,6 +82,7 @@ class ProductServiceTest {
                 "Product",
                 "desc",
                 BigDecimal.TEN,
+                false,
                 categoryId,
                 brandId,
                 5
@@ -110,6 +111,7 @@ class ProductServiceTest {
                 "Product",
                 "desc",
                 BigDecimal.TEN,
+                false,
                 categoryId,
                 null,
                 5

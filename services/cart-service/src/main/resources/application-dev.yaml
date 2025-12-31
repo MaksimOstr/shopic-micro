@@ -15,7 +15,7 @@ spring:
     client:
       channels:
         product-service:
-          address: 0.0.0.0:1013
+          address: 0.0.0.0:${PRODUCT_GRPC_PORT}
 
 logging:
   level:

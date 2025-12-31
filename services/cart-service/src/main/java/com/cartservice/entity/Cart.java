@@ -31,8 +31,9 @@ public class Cart {
     @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;
 
-    @OneToMany(mappedBy = "cart", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cart", cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
+    @Builder.Default
     private List<CartItem> cartItems = new ArrayList<>();
 
     @CreatedDate
@@ -40,6 +41,8 @@ public class Cart {
     private Instant createdAt;
 
     public BigDecimal calculateTotal() {
-        return cartItems.stream().map(cartItem -> cartItem.getPriceAtAdd().multiply(BigDecimal.valueOf(cartItem.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return cartItems.stream()
+                .map(CartItem::getLineTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

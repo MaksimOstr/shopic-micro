@@ -111,11 +111,11 @@ public class CartController {
             )
     })
     @PostMapping("/items")
-    public ResponseEntity<CartItemDto> addCartItem(
+    public ResponseEntity<CartDto> addCartItem(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid AddItemToCartRequest body
     ) {
-        CartItemDto cartItem = cartService.addItemToCart(body, principal.id());
+        CartDto cartItem = cartService.addItemToCart(body, principal.id());
 
         return ResponseEntity.ok(cartItem);
     }

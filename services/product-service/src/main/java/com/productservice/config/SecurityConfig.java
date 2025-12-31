@@ -3,9 +3,12 @@ package com.productservice.config;
 import com.productservice.config.properties.JwtProperties;
 import com.productservice.security.CustomAuthenticationEntryPoint;
 import com.productservice.security.CustomJwtAuthenticationConverter;
+import com.shopic.grpc.productservice.ProductServiceGrpc;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.grpc.server.security.AuthenticationProcessInterceptor;
+import org.springframework.grpc.server.security.GrpcSecurity;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,7 +21,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtProperties jwtProperties;
@@ -33,6 +35,16 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/api-docs/**"
     };
+
+
+    @Bean
+    AuthenticationProcessInterceptor grpcFilterChain(GrpcSecurity security) throws Exception {
+        return security.authorizeRequests(auth -> auth
+                        .allRequests().permitAll()
+                )
+                .build();
+
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(

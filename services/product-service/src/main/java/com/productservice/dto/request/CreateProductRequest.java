@@ -18,6 +18,8 @@ public record CreateProductRequest(
         @DecimalMin("0")
         BigDecimal price,
 
+        boolean isDeleted,
+
         @NotNull
         UUID categoryId,
 

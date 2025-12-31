@@ -23,7 +23,7 @@ spring:
         review-service:
           address: 0.0.0.0:1016
     server:
-      port: 1013
+      port: ${PRODUCT_GRPC_PORT}
 
   servlet:
     multipart:

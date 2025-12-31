@@ -101,6 +101,7 @@ public class ProductService {
                 .name(dto.name())
                 .description(dto.description())
                 .price(dto.price())
+                .isDeleted(dto.isDeleted())
                 .imageUrl(url)
                 .category(category)
                 .stockQuantity(dto.stockQuantity())
