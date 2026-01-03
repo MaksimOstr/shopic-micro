@@ -19,9 +19,6 @@ import java.util.UUID;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
-    @Query("SELECT p FROM Product p JOIN FETCH p.category c JOIN FETCH p.brand b WHERE p.id = :id")
-    Optional<Product> getProductWithCategoryAndBrand(UUID id);
-
     @Query("SELECT p FROM Product p WHERE p.id IN :ids")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Product> findByIdInWithLock(@Param("ids") Collection<UUID> ids);

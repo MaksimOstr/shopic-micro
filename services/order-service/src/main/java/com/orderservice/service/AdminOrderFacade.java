@@ -55,7 +55,7 @@ public class AdminOrderFacade {
     }
 
     public AdminOrderDto updateOrderStatus(UUID orderId, UpdateOrderStatusRequest dto) {
-        Order updatedOrder = orderService.updateOrderStatus(orderId, dto);
+        Order updatedOrder = orderService.updateOrderStatus(orderId, dto.targetStatus());
 
         return orderMapper.toAdminOrderDto(updatedOrder);
     }

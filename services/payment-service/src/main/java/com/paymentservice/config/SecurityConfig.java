@@ -6,6 +6,8 @@ import com.paymentservice.security.CustomJwtAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.grpc.server.security.AuthenticationProcessInterceptor;
+import org.springframework.grpc.server.security.GrpcSecurity;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -25,6 +27,16 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final JwtProperties jwtProperties;
+
+
+    @Bean
+    AuthenticationProcessInterceptor grpcFilterChain(GrpcSecurity security) throws Exception {
+        return security.authorizeRequests(auth -> auth
+                        .allRequests().permitAll()
+                )
+                .build();
+    }
+
 
     @Bean
     SecurityFilterChain securityFilterChain(

@@ -71,10 +71,10 @@ public class ReservationService {
             Product product = productMap.get(reservationItem.productId());
             ProductReservedQuantity reservationInfo = reservedMap.get(reservationItem.productId());
 
-            int reservedQty = reservationInfo != null ? reservationInfo.reservedQuantity() : 0;
-            int available = product.getStockQuantity() - reservedQty;
+            long reservedQty = reservationInfo != null ? reservationInfo.reservedQuantity() : 0;
+            long available = product.getStockQuantity() - reservedQty;
 
-            if(available < reservationItem.quantity()){
+            if(available < reservationItem.quantity()) {
                 throw new ApiException("Insufficient stock for product with id: " + product.getId(), HttpStatus.CONFLICT);
             }
 

@@ -54,7 +54,8 @@ public class Order {
     private OrderDeliveryTypeEnum deliveryType;
 
     @Column(name = "delivery_price", nullable = false)
-    private BigDecimal deliveryPrice = BigDecimal.ZERO;;
+    @Builder.Default
+    private BigDecimal deliveryPrice = BigDecimal.ZERO;
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
@@ -62,6 +63,7 @@ public class Order {
     private String comment;
 
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)

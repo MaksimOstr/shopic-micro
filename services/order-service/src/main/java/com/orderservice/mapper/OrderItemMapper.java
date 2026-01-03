@@ -11,21 +11,11 @@ import java.util.Map;
 
 @Mapper(componentModel = "spring")
 public interface OrderItemMapper {
+
+    @Mapping(target = "priceForOne", source = "priceAtPurchase")
+    @Mapping(target = "itemImage", source = "productImageUrl")
+    @Mapping(target = "itemName", source = "productName")
+    com.shopic.grpc.paymentservice.OrderItem toGrpcOrderItem(OrderItem orderItem);
+
     List<com.shopic.grpc.paymentservice.OrderItem> toGrpcOrderItems(List<OrderItem> orderItemList);
-
-    default List<OrderItem> toOrderItemList(
-            List<Product> productInfoList,
-            Map<String, Integer> productQuantityMap
-    ) {
-        return productInfoList.stream()
-                .map(productInfo -> toOrderItem(productInfo, productQuantityMap))
-                .toList();
-    }
-
-    @Mapping(target = "priceAtPurchase", source = "productInfo.price")
-    @Mapping(target = "quantity", expression = "java(productQuantityMap.get(productInfo.getProductId()))")
-    OrderItem toOrderItem(
-            Product productInfo,
-            @Context Map<String, Integer> productQuantityMap
-    );
 }

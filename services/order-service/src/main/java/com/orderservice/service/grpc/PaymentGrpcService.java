@@ -3,6 +3,7 @@ package com.orderservice.service.grpc;
 
 import com.orderservice.entity.Order;
 import com.orderservice.exception.ApiException;
+import com.orderservice.exception.ExternalServiceBusinessException;
 import com.orderservice.mapper.GrpcMapper;
 import com.orderservice.mapper.OrderItemMapper;
 import com.shopic.grpc.paymentservice.CreatePaymentRequest;
@@ -28,43 +29,40 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaymentGrpcService {
     private final PaymentServiceGrpc.PaymentServiceBlockingStub paymentGrpcService;
-    private final GrpcMapper grpcMapper;
     private final OrderItemMapper orderItemMapper;
 
     @CircuitBreaker(name = "payment-service", fallbackMethod = "createPaymentFallback")
     public CreatePaymentResponse createPayment(UUID userId, Order order) {
-        log.info("Create payment gRpc request");
+        try {
+            log.info("Create payment gRpc request");
 
-        List<OrderItem> orderItems = orderItemMapper.toGrpcOrderItems(order.getOrderItems());
+            List<OrderItem> orderItems = orderItemMapper.toGrpcOrderItems(order.getOrderItems());
 
-        OrderItem deliveryLineItem = OrderItem.newBuilder()
-                .setQuantity(1)
-                .setPriceForOne(order.getDeliveryPrice().toString())
-                .setItemName("Delivery")
-                .setItemImage("")
-                .build();
+            OrderItem deliveryLineItem = OrderItem.newBuilder()
+                    .setQuantity(1)
+                    .setPriceForOne(order.getDeliveryPrice().toString())
+                    .setItemName("Delivery")
+                    .setItemImage("")
+                    .build();
 
-        CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
-                .setOrderId(order.getId().toString())
-                .setUserId(userId.toString())
-                .addAllOrderItems(orderItems)
-                .addOrderItems(deliveryLineItem)
-                .build();
+            CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
+                    .setOrderId(order.getId().toString())
+                    .setUserId(userId.toString())
+                    .addAllOrderItems(orderItems)
+                    .addOrderItems(deliveryLineItem)
+                    .build();
 
-        return paymentGrpcService.createPayment(request);
+            return paymentGrpcService.createPayment(request);
+        } catch (StatusRuntimeException e) {
+            switch (e.getStatus().getCode()) {
+                case FAILED_PRECONDITION: throw new ExternalServiceBusinessException(e.getMessage(), HttpStatus.CONFLICT);
+                default: throw e;
+            }
+        }
     }
 
-    public CreatePaymentResponse createPaymentFallback(UUID orderId, UUID userId, List<Product> productInfoList, Map<Long, Integer> productQuantityMap, Throwable exception) {
-        log.error(exception.getMessage(), exception);
-        if (exception instanceof StatusRuntimeException e) {
-            switch (e.getStatus().getCode()) {
-                case INTERNAL, FAILED_PRECONDITION:
-                    throw new ApiException("Something went wrong. Try again later", HttpStatus.INTERNAL_SERVER_ERROR);
-                default:
-                    throw e;
-            }
-        } else {
-            throw new ApiException("Something went wrong. Try again later", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public CreatePaymentResponse createPaymentFallback(UUID userId, Order order, Throwable exception) {
+        log.error("Payment service fallback for orderId={} userId={}", order.getId(), userId, exception);
+        throw new ApiException("Something went wrong, try again later", HttpStatus.SERVICE_UNAVAILABLE);
     }
 }

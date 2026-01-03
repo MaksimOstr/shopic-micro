@@ -19,7 +19,9 @@ import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 @Repository
 public interface ReservationItemRepository extends JpaRepository<ReservationItem, UUID> {
     @Query("""
-                SELECT ri.product.id AS productId, SUM(ri.quantity) AS reservedQuantity
+                SELECT new com.productservice.dto.ProductReservedQuantity(
+                    ri.product.id, SUM(ri.quantity)
+                )
                 FROM ReservationItem ri
                 JOIN ri.reservation r
                 WHERE ri.product.id IN :productIds

@@ -9,7 +9,7 @@ spring:
     client:
       channels:
         product-service:
-          address: 0.0.0.0:1013
+          address: 0.0.0.0:${PRODUCT_GRPC_PORT}
         cart-service:
           address: 0.0.0.0:1014
         payment-service:
@@ -56,6 +56,9 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 10
         sliding-window-size: 50
         register-health-indicator: true
+        ignore-exceptions:
+          - com.orderservice.exception.ExternalServiceBusinessException
+
       payment-service:
         sliding-window-type: COUNT_BASED
         failure-rate-threshold: 50
@@ -65,6 +68,8 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 10
         sliding-window-size: 50
         register-health-indicator: true
+        ignore-exceptions:
+          - com.orderservice.exception.ExternalServiceBusinessException
       product-service:
         sliding-window-type: COUNT_BASED
         failure-rate-threshold: 50
@@ -74,6 +79,9 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 10
         sliding-window-size: 50
         register-health-indicator: true
+        ignore-exceptions:
+          - com.orderservice.exception.ExternalServiceBusinessException
+
 
 jwt:
   issuer: ${JWT_ISSUER:shopic}

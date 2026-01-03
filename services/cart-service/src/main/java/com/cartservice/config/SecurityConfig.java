@@ -6,6 +6,8 @@ import com.cartservice.security.CustomJwtAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.grpc.server.security.AuthenticationProcessInterceptor;
+import org.springframework.grpc.server.security.GrpcSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,6 +31,16 @@ public class SecurityConfig {
     };
 
     private final JwtProperties jwtProperties;
+
+
+    @Bean
+    AuthenticationProcessInterceptor grpcFilterChain(GrpcSecurity security) throws Exception {
+        return security.authorizeRequests(auth -> auth
+                        .allRequests().permitAll()
+                )
+                .build();
+    }
+
 
     @Bean
     SecurityFilterChain securityFilterChain(

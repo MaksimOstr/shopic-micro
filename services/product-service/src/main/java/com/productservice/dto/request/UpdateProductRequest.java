@@ -3,6 +3,7 @@ package com.productservice.dto.request;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
+import lombok.extern.java.Log;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -24,5 +25,5 @@ public record UpdateProductRequest(
         UUID brandId,
 
         @Min(0)
-        Integer stockQuantity
+        Long stockQuantity
 ) {}

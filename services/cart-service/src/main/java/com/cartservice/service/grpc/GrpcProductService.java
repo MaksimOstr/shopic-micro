@@ -1,6 +1,7 @@
 package com.cartservice.service.grpc;
 
 import com.cartservice.exception.ApiException;
+import com.cartservice.exception.ExternalServiceBusinessException;
 import com.cartservice.exception.NotFoundException;
 import com.shopic.grpc.productservice.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -22,26 +23,23 @@ public class GrpcProductService {
 
     @CircuitBreaker(name = "product-service", fallbackMethod = "getProductByIdFallback")
     public Product getProductById(UUID productId) {
-        GetProductRequest request = GetProductRequest.newBuilder()
-                .setProductId(productId.toString())
-                .build();
+        try {
+            GetProductRequest request = GetProductRequest.newBuilder()
+                    .setProductId(productId.toString())
+                    .build();
 
-        return productServiceGrpc.getProductById(request);
+            return productServiceGrpc.getProductById(request);
+        } catch (StatusRuntimeException e) {
+            switch (e.getStatus().getCode()) {
+                case NOT_FOUND -> throw new ExternalServiceBusinessException(e.getMessage(), HttpStatus.NOT_FOUND);
+
+                default -> throw e;
+            }
+        }
     }
 
     public Product getProductByIdFallback(UUID productId, Throwable e) {
-        if (e instanceof StatusRuntimeException exception) {
-            Status.Code code = exception.getStatus().getCode();
-
-            switch (code) {
-                case NOT_FOUND -> throw new NotFoundException(exception.getStatus().getDescription());
-                case FAILED_PRECONDITION ->
-                        throw new ApiException(exception.getStatus().getDescription(), HttpStatus.BAD_REQUEST);
-                default -> throw exception;
-            }
-        } else {
-            log.error("product-service fall back, breaker is open", e);
-            throw new ApiException("Something went wrong. Try again later", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        log.error("Product service unavailable for productId: {}", productId, e);
+        throw new ApiException("Something went wrong. Try again later", HttpStatus.SERVICE_UNAVAILABLE);
     }
 }

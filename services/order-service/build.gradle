@@ -27,11 +27,11 @@ dependencies {
     annotationProcessor libs.lombok
     compileOnly(libs.lombok)
     implementation libs.bundles.db
+    implementation libs.bundles.business.service
     annotationProcessor libs.mapstruct.processor
     implementation libs.bundles.core
     implementation libs.bundles.web
     implementation libs.bundles.security
-    implementation libs.bundles.business.service
     testImplementation libs.kafka.test
     testImplementation libs.bundles.test.core
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"

@@ -52,7 +52,7 @@ public class Product {
 
     @Column(name = "stock_quantity", nullable = false)
     @Min(value = 0)
-    private Integer stockQuantity;
+    private Long stockQuantity;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

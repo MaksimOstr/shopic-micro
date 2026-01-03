@@ -35,7 +35,10 @@ public class SpecificationUtils {
                 query.distinct(true);
             }
 
-            return cb.equal(join.get(field), value);
+            return cb.or(
+                    cb.isNull(join.get("id")),
+                    cb.equal(join.get(field), value)
+            );
         };
     }
 

@@ -1,26 +1,27 @@
-package com.productservice.config;
+package com.paymentservice.config;
 
-import com.productservice.exceptions.ApiException;
+import com.paymentservice.exception.ApiException;
 import io.grpc.Status;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.grpc.server.exception.GrpcExceptionHandler;
 import org.springframework.http.HttpStatus;
 
-
+@Slf4j
 @Configuration
-public class GrpcExceptionHandlerConfig {
+public class GrpcConfig {
 
     @Bean
-    GrpcExceptionHandler userServiceExceptionHandler() {
+    GrpcExceptionHandler grpcExceptionHandler() {
         return exception -> {
+            log.error("GrpcExceptionHandlerConfig", exception);
             if(exception instanceof ApiException e) {
                 HttpStatus status = e.getStatus();
 
                 return switch(status) {
-                    case NOT_FOUND -> Status.NOT_FOUND.withDescription(e.getMessage()).asException();
-                    case CONFLICT -> Status.FAILED_PRECONDITION.asException();
-                    default -> Status.INTERNAL.withDescription(e.getMessage()).asException();
+                    case INTERNAL_SERVER_ERROR -> Status.INTERNAL.withDescription(e.getMessage()).asException();
+                    default -> Status.UNKNOWN.withDescription(exception.getMessage()).asException();
                 };
             }
 

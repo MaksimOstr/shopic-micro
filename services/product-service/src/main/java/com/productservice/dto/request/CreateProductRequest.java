@@ -27,5 +27,5 @@ public record CreateProductRequest(
 
         @NotNull
         @Min(0)
-        Integer stockQuantity
+        Long stockQuantity
 ) {}

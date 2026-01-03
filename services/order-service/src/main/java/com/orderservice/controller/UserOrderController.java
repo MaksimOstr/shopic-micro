@@ -47,7 +47,7 @@ public class UserOrderController {
         return ResponseEntity.ok().body(order);
     }
 
-    @GetMapping("/me")
+    @GetMapping
     public ResponseEntity<Page<UserOrderPreviewDto>> getOrderPage(
             @AuthenticationPrincipal CustomPrincipal principal,
             OrderParams body,

@@ -1,7 +1,7 @@
 package com.orderservice.mapper;
 
+import com.orderservice.entity.OrderItem;
 import com.shopic.grpc.cartservice.CartItem;
-import com.shopic.grpc.paymentservice.OrderItem;
 import com.shopic.grpc.productservice.Product;
 import com.shopic.grpc.productservice.ReservationItem;
 import org.mapstruct.Context;
@@ -15,18 +15,6 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface GrpcMapper {
-
-    @Mapping(target = "allFields", ignore = true)
-    @Mapping(target = "priceForOne", source = "price")
-    @Mapping(target = "itemImage", source = "productImageUrl")
-    @Mapping(target = "itemName", source = "productName")
-    @Mapping(target = "quantity", expression = "java(productQuantityMap.get(product.getProductId()))")
-    OrderItem toOrderLineItem(
-            Product product,
-            @Context Map<UUID, Integer> productQuantityMap
-    );
-
-
     @Mapping(target = "allFields", ignore = true)
     ReservationItem toReservationItem(CartItem cartItem);
 
@@ -40,4 +28,20 @@ public interface GrpcMapper {
                 ));
     }
 
+    default List<com.orderservice.entity.OrderItem> toOrderItemList(
+            List<Product> productInfoList,
+            Map<String, Integer> productQuantityMap
+    ) {
+        return productInfoList.stream()
+                .map(productInfo -> toOrderItem(productInfo, productQuantityMap))
+                .toList();
+    }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "priceAtPurchase", source = "product.price")
+    @Mapping(target = "quantity", expression = "java(productQuantityMap.get(product.getId()))")
+    OrderItem toOrderItem(
+            Product product,
+            @Context Map<String, Integer> productQuantityMap
+    );
 }

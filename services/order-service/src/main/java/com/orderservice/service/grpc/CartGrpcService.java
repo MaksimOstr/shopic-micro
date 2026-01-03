@@ -1,6 +1,7 @@
 package com.orderservice.service.grpc;
 
 import com.orderservice.exception.ApiException;
+import com.orderservice.exception.ExternalServiceBusinessException;
 import com.orderservice.exception.NotFoundException;
 import com.shopic.grpc.cartservice.CartServiceGrpc;
 import com.shopic.grpc.cartservice.GetCartRequest;
@@ -9,33 +10,40 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 import org.springframework.http.HttpStatus;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @GrpcService
+@Slf4j
 @RequiredArgsConstructor
 public class CartGrpcService {
     private final CartServiceGrpc.CartServiceBlockingStub cartGrpcService;
 
     @CircuitBreaker(name = "cart-service", fallbackMethod = "getCartFallback")
     public CartResponse getCart(UUID userId) {
-        GetCartRequest request = GetCartRequest.newBuilder()
-                .setUserId(userId.toString())
-                .build();
+        try {
+            GetCartRequest request = GetCartRequest.newBuilder()
+                    .setUserId(userId.toString())
+                    .build();
 
-        return cartGrpcService.getCart(request);
+            return cartGrpcService.getCart(request);
+        } catch (StatusRuntimeException e) {
+            switch (e.getStatus().getCode()) {
+                case NOT_FOUND: throw new ExternalServiceBusinessException(e.getMessage(), HttpStatus.NOT_FOUND);
+
+                default: throw e;
+            }
+        }
     }
 
-    public CartResponse getCartFallback(long userId, Throwable exception) {
-        if (exception instanceof StatusRuntimeException e) {
-            if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {
-                throw new NotFoundException(e.getStatus().getDescription());
-            }
-            throw e;
-        } else {
-            throw new ApiException("Something went wrong. Please try again later", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public CartResponse getCartFallback(UUID userId, Throwable exception) {
+        log.error("Cart service unavailable for userId: {}", userId, exception);
+        return CartResponse.newBuilder()
+                .addAllCartItems(Collections.emptyList())
+                .build();
     }
 }

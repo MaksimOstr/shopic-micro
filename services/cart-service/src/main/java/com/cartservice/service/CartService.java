@@ -10,7 +10,6 @@ import com.cartservice.exception.ApiException;
 import com.cartservice.exception.NotFoundException;
 import com.cartservice.mapper.CartItemMapper;
 import com.cartservice.mapper.CartMapper;
-import com.cartservice.repository.CartItemRepository;
 import com.cartservice.repository.CartRepository;
 import com.cartservice.service.grpc.GrpcProductService;
 import com.shopic.grpc.productservice.Product;
@@ -30,7 +29,6 @@ import java.util.UUID;
 public class CartService {
     private final CartRepository cartRepository;
     private final CartItemMapper cartItemMapper;
-    private final CartItemRepository cartItemRepository;
     private final GrpcProductService grpcProductService;
     private final CartMapper cartMapper;
 
@@ -103,7 +101,11 @@ public class CartService {
     }
 
     public void deleteCartByUserId(UUID userId) {
-        cartRepository.deleteCartByUserId(userId);
+        int deleted = cartRepository.deleteCartByUserId(userId);
+
+        if(deleted == 0) {
+            throw new ApiException("Cart not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     private Cart getCartWithItemsByUserId(UUID userId) {

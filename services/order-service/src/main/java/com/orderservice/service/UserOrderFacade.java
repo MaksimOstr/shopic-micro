@@ -6,6 +6,8 @@ import com.orderservice.dto.UserOrderDto;
 import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderItem;
+import com.orderservice.entity.OrderStatusEnum;
+import com.orderservice.exception.ApiException;
 import com.orderservice.mapper.GrpcMapper;
 import com.orderservice.mapper.OrderItemMapper;
 import com.orderservice.mapper.OrderMapper;
@@ -43,6 +45,7 @@ public class UserOrderFacade {
     private final GrpcMapper grpcMapper;
     private final OrderItemMapper orderItemMapper;
     private final OrderMapper orderMapper;
+    private final KafkaService kafkaService;
 
 
     @Transactional
@@ -54,11 +57,17 @@ public class UserOrderFacade {
         );
         Map<String, Integer> productQuantityMap = grpcMapper.getProductQuantityMap(cartItems);
         List<Product> productList = productListResponse.getProductsList();
-        List<OrderItem> orderItems = orderItemMapper.toOrderItemList(productList, productQuantityMap);
+        List<OrderItem> orderItems = grpcMapper.toOrderItemList(productList, productQuantityMap);
         Order order = orderService.createOrder(dto, userId, orderItems);
 
         productGrpcService.reserveProduct(cartItems, order.getId());
-        return paymentGrpcService.createPayment(userId, order).getCheckoutUrl();
+        try {
+            return paymentGrpcService.createPayment(userId, order).getCheckoutUrl();
+        } catch (ApiException e) {
+            kafkaService.sendOrderFailedEvent(order.getId());
+
+            throw e;
+        }
     }
 
 

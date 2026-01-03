@@ -34,16 +34,16 @@ public class OrderService {
 
     private static final String ORDER_NOT_FOUND = "Order not found";
 
+    @Transactional
     public Order createOrder(CreateOrderRequest dto, UUID userId, List<OrderItem> orderItemList) {
         Order order = Order.builder()
+                .orderItems(orderItemList)
                 .deliveryType(dto.deliveryType())
                 .comment(dto.comment())
                 .status(OrderStatusEnum.PENDING)
                 .userId(userId)
                 .address(dto.address())
                 .build();
-
-        order.addNewOrderItems(orderItemList);
 
         DeliveryPriceCalculator deliveryPriceCalculator = getDeliveryPriceCalculator(dto.deliveryType());
         order.setDeliveryPrice(deliveryPriceCalculator.calculateDeliveryPrice(dto, order.calculateTotalPrice()));
@@ -61,10 +61,10 @@ public class OrderService {
         return order;
     }
 
-    public Order updateOrderStatus(UUID orderId, UpdateOrderStatusRequest dto) {
+    public Order updateOrderStatus(UUID orderId, OrderStatusEnum targetStatus) {
         Order order = getOrderById(orderId);
 
-        order.changeOrderStatus(dto.targetStatus());
+        order.changeOrderStatus(targetStatus);
 
         return orderRepository.save(order);
     }

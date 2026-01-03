@@ -22,7 +22,7 @@ public class KafkaListenerService {
     private final ReservationService reservationService;
 
     @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
-    @KafkaListener(topics = {"order.returned", "order.canceled"}, groupId = "product-service")
+    @KafkaListener(topics = {"order.canceled"}, groupId = "product-service")
     @Transactional
     public void listenReturnedOrder(String data, Acknowledgment ack) {
         try {
@@ -46,7 +46,20 @@ public class KafkaListenerService {
             BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
 
             reservationService.cancelReservation(event.orderId());
+            ack.acknowledge();
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+    }
 
+    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
+    @KafkaListener(topics = {"order.failed"}, groupId = "product-service")
+    public void listenOrderFailed(String data, Acknowledgment ack) {
+        try {
+            log.info("listenOrderFailed");
+            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
+
+            reservationService.cancelReservation(event.orderId());
             ack.acknowledge();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
@@ -61,7 +74,6 @@ public class KafkaListenerService {
             BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
 
             reservationService.completeReservation(event.orderId());
-
             ack.acknowledge();
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
