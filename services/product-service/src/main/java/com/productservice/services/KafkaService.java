@@ -20,11 +20,11 @@ public class KafkaService {
     private final KafkaTemplate<String, String> atLeastOnceBatchTemplate;
     private final ObjectMapper objectMapper;
 
-    public void sendReservationConfirmed(UUID orderId) {
+    public void sendReservationCancelled(UUID orderId, UUID reservationId) {
         try {
-            BaseReservationEvent event = new BaseReservationEvent(orderId);
+            BaseReservationEvent event = new BaseReservationEvent(reservationId, orderId);
 
-            atLeastOnceBatchTemplate.send("reservation.confirmed", objectMapper.writeValueAsString(event));
+            atLeastOnceBatchTemplate.send("reservation.cancelled", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
             log.error(e.getMessage(), e);
             throw new ApiException("Something went wrong. Please try again later", HttpStatus.INTERNAL_SERVER_ERROR);

@@ -25,9 +25,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +50,7 @@ public class ReservationService {
     private final ProductService productService;
     private final ReservationMapper reservationMapper;
     private final ReservationItemRepository reservationItemRepository;
+    private final KafkaService kafkaService;
 
     @Transactional
     public ReservationResult createReservation(List<ItemForReservationDto> items, UUID orderId) {
@@ -207,4 +211,26 @@ public class ReservationService {
 
         return result;
     }
+
+    @Scheduled(fixedRate = 5 * 60 * 1000)
+    public void expirePendingReservations() {
+        Instant expiryTime = Instant.now().minus(Duration.ofMinutes(30));
+
+        List<Reservation> pendingReservations = reservationRepository.findByStatusAndCreatedAtBefore(ReservationStatusEnum.PENDING, expiryTime);
+
+        if (pendingReservations.isEmpty()) {
+            log.info("No pending reservations to expire");
+            return;
+        }
+
+        pendingReservations.forEach(reservation -> {
+            reservation.setStatus(ReservationStatusEnum.CANCELLED);
+            kafkaService.sendReservationCancelled(reservation.getOrderId(), reservation.getId());
+        });
+
+        reservationRepository.saveAll(pendingReservations);
+
+        log.info("Expired {} reservations", pendingReservations.size());
+    }
+
 }

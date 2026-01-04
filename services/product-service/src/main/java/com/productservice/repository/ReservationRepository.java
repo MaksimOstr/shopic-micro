@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,8 +26,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID>,
 
     Optional<Reservation> findByOrderId(UUID orderId);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Reservation r SET r.status = :status WHERE r.orderId = :orderId")
-    int updateStatus(@Param("orderId") UUID orderId, @Param("status") ReservationStatusEnum status);
+    List<Reservation> findByStatusAndCreatedAtBefore(ReservationStatusEnum status, Instant before);
 }
