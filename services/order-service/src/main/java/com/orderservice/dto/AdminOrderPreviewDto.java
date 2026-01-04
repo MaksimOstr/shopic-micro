@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public record AdminOrderPreviewDto(
         UUID orderId,
+        UUID userId,
         OrderStatusEnum status,
         BigDecimal totalPrice,
         Instant createdAt,

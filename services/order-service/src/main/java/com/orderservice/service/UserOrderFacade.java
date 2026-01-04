@@ -18,6 +18,8 @@ import com.shopic.grpc.cartservice.CartItem;
 import com.shopic.grpc.cartservice.CartResponse;
 import com.shopic.grpc.productservice.Product;
 import com.shopic.grpc.productservice.ProductListResponse;
+import com.shopic.grpc.productservice.ReserveProductsResponse;
+import com.shopic.grpc.productservice.ReservedProduct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -52,15 +54,17 @@ public class UserOrderFacade {
     public String placeOrder(CreateOrderRequest dto, UUID userId) {
         CartResponse cartInfo = cartGrpcService.getCart(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
-        ProductListResponse productListResponse = productGrpcService.getProductList(
-                cartItems.stream().map(CartItem::getProductId).toList()
+        Order order = orderService.createOrder(dto, userId);
+        Map<String, CartItem> cartItemMap = grpcMapper.getCartItemMap(cartItems);
+        ReserveProductsResponse reservedProducts = productGrpcService.reserveProducts(
+                cartItems,
+                cartItemMap,
+                order.getId()
         );
-        Map<String, Integer> productQuantityMap = grpcMapper.getProductQuantityMap(cartItems);
-        List<Product> productList = productListResponse.getProductsList();
-        List<OrderItem> orderItems = grpcMapper.toOrderItemList(productList, productQuantityMap);
-        Order order = orderService.createOrder(dto, userId, orderItems);
+        List<ReservedProduct> productList = reservedProducts.getProductsList();
+        List<OrderItem> orderItems = grpcMapper.toOrderItemList(productList, cartItemMap);
+        order.addNewOrderItems(orderItems);
 
-        productGrpcService.reserveProduct(cartItems, order.getId());
         try {
             return paymentGrpcService.createPayment(userId, order).getCheckoutUrl();
         } catch (ApiException e) {

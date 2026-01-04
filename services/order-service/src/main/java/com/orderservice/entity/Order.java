@@ -62,7 +62,7 @@ public class Order {
 
     private String comment;
 
-    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
@@ -91,6 +91,8 @@ public class Order {
     public void addNewOrderItems(List<OrderItem> orderItems) {
         orderItems.forEach(orderItem -> orderItem.setOrder(this));
         this.orderItems.addAll(orderItems);
+
+        totalPrice = calculateTotalPrice();
     }
 
     public void changeOrderStatus(OrderStatusEnum target) {

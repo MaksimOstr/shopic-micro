@@ -35,9 +35,10 @@ public class OrderService {
     private static final String ORDER_NOT_FOUND = "Order not found";
 
     @Transactional
-    public Order createOrder(CreateOrderRequest dto, UUID userId, List<OrderItem> orderItemList) {
+    public Order createOrder(CreateOrderRequest dto, UUID userId) {
         Order order = Order.builder()
-                .orderItems(orderItemList)
+                .customerName(dto.name())
+                .customerPhoneNumber(dto.phoneNumber())
                 .deliveryType(dto.deliveryType())
                 .comment(dto.comment())
                 .status(OrderStatusEnum.PENDING)

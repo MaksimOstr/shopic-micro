@@ -1,5 +1,6 @@
 package com.orderservice.mapper;
 
+import com.orderservice.dto.OrderItemDto;
 import com.orderservice.entity.OrderItem;
 import com.shopic.grpc.productservice.Product;
 import org.mapstruct.Context;
@@ -18,4 +19,7 @@ public interface OrderItemMapper {
     com.shopic.grpc.paymentservice.OrderItem toGrpcOrderItem(OrderItem orderItem);
 
     List<com.shopic.grpc.paymentservice.OrderItem> toGrpcOrderItems(List<OrderItem> orderItemList);
+
+    @Mapping(target = "name", source = "productName")
+    OrderItemDto toDto(OrderItem orderItem);
 }

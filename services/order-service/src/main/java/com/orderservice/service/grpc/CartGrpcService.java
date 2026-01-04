@@ -26,12 +26,15 @@ public class CartGrpcService {
     @CircuitBreaker(name = "cart-service", fallbackMethod = "getCartFallback")
     public CartResponse getCart(UUID userId) {
         try {
+            log.info("Sending gRPC request to get cart for userId={}", userId);
+
             GetCartRequest request = GetCartRequest.newBuilder()
                     .setUserId(userId.toString())
                     .build();
 
             return cartGrpcService.getCart(request);
         } catch (StatusRuntimeException e) {
+            log.error("gRPC error while fetching cart for userId={}", userId, e);
             switch (e.getStatus().getCode()) {
                 case NOT_FOUND: throw new ExternalServiceBusinessException(e.getMessage(), HttpStatus.NOT_FOUND);
 
@@ -42,6 +45,11 @@ public class CartGrpcService {
 
     public CartResponse getCartFallback(UUID userId, Throwable exception) {
         log.error("Cart service unavailable for userId: {}", userId, exception);
+
+        if(exception instanceof ExternalServiceBusinessException e) {
+            throw e;
+        }
+
         return CartResponse.newBuilder()
                 .addAllCartItems(Collections.emptyList())
                 .build();
