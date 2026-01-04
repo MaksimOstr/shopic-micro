@@ -2,7 +2,7 @@ package com.productservice.controller;
 
 import com.productservice.dto.ReservationDto;
 import com.productservice.dto.ReservationPreviewDto;
-import com.productservice.entity.ReservationStatusEnum;
+import com.productservice.enums.ReservationStatusEnum;
 import com.productservice.enums.ReservationAdminSortByEnum;
 import com.productservice.services.ReservationService;
 import lombok.RequiredArgsConstructor;

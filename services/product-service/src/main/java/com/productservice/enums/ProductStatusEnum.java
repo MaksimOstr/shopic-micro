@@ -1,4 +1,4 @@
-package com.productservice.entity;
+package com.productservice.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.productservice.exceptions.NotFoundException;

@@ -3,7 +3,6 @@ package com.productservice.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.productservice.dto.event.BaseOrderEvent;
-import com.productservice.entity.ReservationStatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

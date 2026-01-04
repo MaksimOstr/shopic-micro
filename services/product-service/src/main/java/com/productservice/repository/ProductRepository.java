@@ -1,7 +1,6 @@
 package com.productservice.repository;
 
 import com.productservice.entity.Product;
-import com.productservice.entity.ProductStatusEnum;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +18,18 @@ import java.util.UUID;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
-    @Query("SELECT p FROM Product p WHERE p.id IN :ids")
+    @Query("""
+                SELECT p
+                FROM Product p
+                LEFT JOIN FETCH p.brand b
+                JOIN FETCH p.category c
+                WHERE p.id IN :ids
+                  AND p.isDeleted = false
+                  AND (b IS NULL OR b.isActive = true)
+                  AND c.isActive = true
+            """)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<Product> findByIdInWithLock(@Param("ids") Collection<UUID> ids);
+    List<Product> findActiveByIdInWithLock(@Param("ids") Collection<UUID> ids);
 
     @Query("SELECT p FROM Product p " +
             "LEFT JOIN p.brand b " +

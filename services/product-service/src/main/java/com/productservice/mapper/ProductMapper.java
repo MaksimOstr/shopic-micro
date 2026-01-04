@@ -6,6 +6,7 @@ import com.productservice.dto.AdminProductPreviewDto;
 import com.productservice.dto.UserProductPreviewDto;
 import com.productservice.dto.UserProductDto;
 import com.productservice.entity.Product;
+import com.shopic.grpc.productservice.ReservedProduct;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -45,8 +46,9 @@ public interface ProductMapper {
 
     List<LikedProductDto> toLikedProductDtoList(List<Product> products);
 
-    @Mapping(source = "stockQuantity", target = "availableQuantity")
-    com.shopic.grpc.productservice.Product toGrpcProduct(Product product);
+    ReservedProduct toReservedProduct(Product product);
 
-    List<com.shopic.grpc.productservice.Product> toGrpcProductList(List<Product> products);
+    List<ReservedProduct> toReservedProductList(List<Product> products);
+
+    com.shopic.grpc.productservice.Product toGrpcProduct(Product product, long availableQuantity);
 }

@@ -1,4 +1,4 @@
-package com.productservice.entity;
+package com.productservice.enums;
 
 public enum ReservationStatusEnum {
     PENDING, CANCELLED, COMPLETED

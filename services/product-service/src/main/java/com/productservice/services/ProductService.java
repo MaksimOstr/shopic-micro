@@ -48,8 +48,8 @@ public class ProductService {
         return productRepository.findAllActiveByIdList(idList);
     }
 
-    public List<Product> getProductsByIdsWithLock(Collection<UUID> idList) {
-        return  productRepository.findByIdInWithLock(idList);
+    public List<Product> getActiveProductsByIdsWithLock(Collection<UUID> idList) {
+        return productRepository.findActiveByIdInWithLock(idList);
     }
 
     @Transactional

@@ -6,7 +6,7 @@ import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
-import com.productservice.entity.ReservationStatusEnum;
+import com.productservice.enums.ReservationStatusEnum;
 import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ReservationMapper;

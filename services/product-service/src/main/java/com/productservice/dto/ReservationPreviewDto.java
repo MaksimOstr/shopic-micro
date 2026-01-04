@@ -1,6 +1,6 @@
 package com.productservice.dto;
 
-import com.productservice.entity.ReservationStatusEnum;
+import com.productservice.enums.ReservationStatusEnum;
 
 import java.time.Instant;
 import java.util.UUID;

@@ -1,5 +1,6 @@
 package com.productservice.entity;
 
+import com.productservice.enums.ReservationStatusEnum;
 import com.productservice.exceptions.ApiException;
 import jakarta.persistence.*;
 import lombok.*;

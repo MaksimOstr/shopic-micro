@@ -1,16 +1,19 @@
 package com.productservice.services;
 
+import com.productservice.dto.ReservationContext;
 import com.productservice.dto.ReservationDto;
+import com.productservice.dto.ReservationError;
 import com.productservice.dto.ReservationPreviewDto;
 import com.productservice.dto.ProductReservedQuantity;
+import com.productservice.dto.ReservationResult;
 import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
-import com.productservice.entity.ReservationStatusEnum;
+import com.productservice.enums.ReservationErrorType;
+import com.productservice.enums.ReservationStatusEnum;
 import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
-import com.productservice.mapper.ReservationItemMapper;
 import com.productservice.mapper.ReservationMapper;
 import com.productservice.repository.ReservationItemRepository;
 import com.productservice.repository.ReservationRepository;
@@ -46,49 +49,29 @@ public class ReservationService {
     private final ReservationItemRepository reservationItemRepository;
 
     @Transactional
-    public void createReservation(List<ItemForReservationDto> reservationItems, UUID orderId) {
+    public ReservationResult createReservation(List<ItemForReservationDto> items, UUID orderId) {
         Reservation reservation = Reservation.builder()
                 .status(ReservationStatusEnum.PENDING)
                 .orderId(orderId)
                 .build();
-        List<ReservationItem> reservationItemList = createReservationItems(reservationItems, reservation);
 
-        reservation.setItems(reservationItemList);
+        ReservationContext context = loadContext(items);
+        List<ReservationError> errors = validateReservationItems(items, context);
 
-        reservationRepository.save(reservation);
-    }
-
-    private List<ReservationItem> createReservationItems(List<ItemForReservationDto> reservationItems, Reservation reservation) {
-        List<UUID> productIds = extractIds(reservationItems);
-        List<ProductReservedQuantity> productReservedQuantityList = reservationItemRepository.findReservedQuantitiesByProductIdsAndStatus(productIds, ReservationStatusEnum.PENDING);
-        List<Product> products = productService.getProductsByIdsWithLock(productIds);
-        Map<UUID, ProductReservedQuantity> reservedMap = productReservedQuantityList.stream()
-                .collect(Collectors.toMap(ProductReservedQuantity::productId, Function.identity()));
-        Map<UUID, Product> productMap = toProductMap(products);
-        List<ReservationItem> reservationItemList = new ArrayList<>();
-
-        for (ItemForReservationDto reservationItem : reservationItems) {
-            Product product = productMap.get(reservationItem.productId());
-            ProductReservedQuantity reservationInfo = reservedMap.get(reservationItem.productId());
-
-            long reservedQty = reservationInfo != null ? reservationInfo.reservedQuantity() : 0;
-            long available = product.getStockQuantity() - reservedQty;
-
-            if(available < reservationItem.quantity()) {
-                throw new ApiException("Insufficient stock for product with id: " + product.getId(), HttpStatus.CONFLICT);
-            }
-
-            ReservationItem reservationItemEntity = new ReservationItem();
-            reservationItemEntity.setProduct(product);
-            reservationItemEntity.setReservation(reservation);
-            reservationItemEntity.setQuantity(reservationItem.quantity());
-
-            reservationItemList.add(reservationItemEntity);
+        if (!errors.isEmpty()) {
+            return new ReservationResult(List.of(), errors);
         }
 
-        return reservationItemList;
-    }
+        List<ReservationItem> reservationItems = buildReservationItems(items, context, reservation);
 
+        reservation.setItems(reservationItems);
+        reservationRepository.save(reservation);
+
+        return new ReservationResult(
+                context.productMap().values().stream().toList(),
+                List.of()
+        );
+    }
 
     @Transactional
     public void cancelReservation(UUID orderId) {
@@ -105,7 +88,7 @@ public class ReservationService {
         reservation.changeStatus(ReservationStatusEnum.COMPLETED);
         List<ReservationItem> items = reservationItemRepository.findByReservationIdWithProductsLocked(reservation.getId());
 
-        for(ReservationItem item : items){
+        for (ReservationItem item : items) {
             Product product = item.getProduct();
 
             product.decreaseStock(item.getQuantity());
@@ -128,6 +111,10 @@ public class ReservationService {
         return reservationMapper.toAdminReservationDto(reservation);
     }
 
+    public long getAvailableQuantityByProductId(UUID productId) {
+        return reservationItemRepository.findReservedQuantityByProductIdAndStatus(productId, ReservationStatusEnum.PENDING);
+    }
+
 
     public Page<ReservationPreviewDto> getReservationList(Pageable pageable, ReservationStatusEnum status) {
         Specification<Reservation> spec = SpecificationUtils.equalsField("status", status);
@@ -136,5 +123,88 @@ public class ReservationService {
         List<ReservationPreviewDto> previewDtoList = reservationMapper.toAdminReservationPreviewDtoList(reservationList);
 
         return new PageImpl<>(previewDtoList, pageable, reservationPage.getTotalElements());
+    }
+
+
+    private ReservationContext loadContext(
+            List<ItemForReservationDto> items
+    ) {
+        List<UUID> productIds = extractIds(items);
+
+        List<Product> products =
+                productService.getActiveProductsByIdsWithLock(productIds);
+
+        Map<UUID, Product> productMap = toProductMap(products);
+
+        Map<UUID, Long> reservedMap = reservationItemRepository.findReservedQuantitiesByProductIdsAndStatus(
+                        productIds,
+                        ReservationStatusEnum.PENDING
+                )
+                .stream()
+                .collect(Collectors.toMap(
+                        ProductReservedQuantity::productId,
+                        ProductReservedQuantity::reservedQuantity
+                ));
+
+        return new ReservationContext(productMap, reservedMap);
+    }
+
+    private List<ReservationError> validateReservationItems(
+            List<ItemForReservationDto> items,
+            ReservationContext context
+    ) {
+        List<ReservationError> errors = new ArrayList<>();
+
+        for (ItemForReservationDto dto : items) {
+            Product product = context.productMap().get(dto.productId());
+
+            if (product == null) {
+                log.warn("Reservation failed: Product not found in DB. ProductId: {}", dto.productId());
+                errors.add(new ReservationError(
+                        dto.productId(),
+                        ReservationErrorType.NOT_FOUND,
+                        0,
+                        0
+                ));
+                continue;
+            }
+
+            long reserved = context.reservedMap().getOrDefault(product.getId(), 0L);
+            long available = product.getStockQuantity() - reserved;
+
+            if (available < dto.quantity()) {
+                log.warn("Reservation failed: Insufficient stock for Product {}. Requested: {}, Available: {})",
+                        product.getId(), dto.quantity(), available);
+                errors.add(new ReservationError(
+                        dto.productId(),
+                        ReservationErrorType.INSUFFICIENT_STOCK,
+                        dto.quantity(),
+                        available
+                ));
+            }
+        }
+
+        return errors;
+    }
+
+    private List<ReservationItem> buildReservationItems(
+            List<ItemForReservationDto> items,
+            ReservationContext context,
+            Reservation reservation
+    ) {
+        List<ReservationItem> result = new ArrayList<>();
+
+        for (ItemForReservationDto dto : items) {
+            Product product = context.productMap().get(dto.productId());
+
+            ReservationItem item = new ReservationItem();
+            item.setProduct(product);
+            item.setReservation(reservation);
+            item.setQuantity(dto.quantity());
+
+            result.add(item);
+        }
+
+        return result;
     }
 }

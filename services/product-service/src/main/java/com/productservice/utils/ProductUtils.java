@@ -3,7 +3,6 @@ package com.productservice.utils;
 import com.productservice.dto.request.AdminProductParams;
 import com.productservice.dto.request.UserProductParams;
 import com.productservice.entity.Product;
-import com.productservice.entity.ProductStatusEnum;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
 
