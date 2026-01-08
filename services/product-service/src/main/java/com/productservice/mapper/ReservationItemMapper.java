@@ -17,13 +17,8 @@ public interface ReservationItemMapper {
     @Mapping(target = "reservation.id", source = "reservationId")
     ReservationItem toReservationItem(CreateReservationItem item);
 
-    List<ReservationItem> toReservationItemList(List<CreateReservationItem> item);
-
+    @Mapping(target = "productId", source = "product.id")
     ReservationItemDto toAdminReservationItemDto(ReservationItem reservation);
 
     List<ReservationItemDto> toAdminReservationItemDtoList(List<ReservationItem> itemList);
-
-    default List<UUID> mapToProductIds(List<ReservationItem> items) {
-        return items.stream().map(item -> item.getProduct().getId()).collect(Collectors.toList());
-    }
 }

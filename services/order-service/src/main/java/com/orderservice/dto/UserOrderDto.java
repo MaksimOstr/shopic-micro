@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public record UserOrderDto(
         UUID orderId,
+        String customerName,
+        String address,
         OrderStatusEnum status,
         BigDecimal totalPrice,
         Instant createdAt,

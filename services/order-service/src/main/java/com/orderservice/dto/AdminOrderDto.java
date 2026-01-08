@@ -15,6 +15,8 @@ import java.util.UUID;
 public class AdminOrderDto {
     private UUID orderId;
     private UUID userId;
+    private String customerName;
+    private String address;
     private OrderStatusEnum status;
     private BigDecimal totalPrice;
     private Instant createdAt;

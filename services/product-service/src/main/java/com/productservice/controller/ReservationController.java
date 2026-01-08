@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/reservations")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-public class AdminReservationController {
+public class ReservationController {
     private final ReservationService reservationService;
 
     @GetMapping("/{id}")

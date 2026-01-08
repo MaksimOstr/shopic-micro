@@ -97,7 +97,7 @@ public class Order {
 
     public void changeOrderStatus(OrderStatusEnum target) {
         if(!canTransitionTo(target)) {
-            throw new ApiException("Cannot transition from" + this.status + " to " + target, HttpStatus.BAD_REQUEST);
+            throw new ApiException("Cannot transition from " + this.status + " to " + target, HttpStatus.BAD_REQUEST);
         }
 
         status = target;
