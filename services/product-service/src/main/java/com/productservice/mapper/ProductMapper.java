@@ -50,5 +50,6 @@ public interface ProductMapper {
 
     List<ReservedProduct> toReservedProductList(List<Product> products);
 
-    com.shopic.grpc.productservice.Product toGrpcProduct(Product product, long availableQuantity);
+    @Mapping(target = "availableQuantity", source = "stockQuantity")
+    com.shopic.grpc.productservice.Product toGrpcProduct(Product product);
 }

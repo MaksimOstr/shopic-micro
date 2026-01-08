@@ -7,7 +7,7 @@ include:
 
 services:
   kafka:
-    image: apache/kafka:latest
+    image: apache/kafka:4.1.1
     restart: always
     container_name: kafka-1
     hostname: kafka

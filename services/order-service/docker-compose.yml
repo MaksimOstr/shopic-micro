@@ -1,6 +1,6 @@
 services:
   order-service-db:
-    image: postgres:latest
+    image: postgres:18
     restart: always
     ports:
       - "${ORDER_DB_PORT}:5432"

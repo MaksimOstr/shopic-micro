@@ -91,7 +91,6 @@ public class CartService {
                 .findFirst()
                 .orElseThrow(() -> new ApiException("Cart item not found", HttpStatus.NOT_FOUND));
 
-
         if (dto.amount() <= 0) {
             cartItems.remove(selectedItem);
             deleteCartIfEmpty(cart);

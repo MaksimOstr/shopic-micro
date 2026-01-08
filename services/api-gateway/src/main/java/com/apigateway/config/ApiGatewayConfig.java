@@ -32,9 +32,9 @@ public class ApiGatewayConfig {
             "/api/v1/admin/products/**",
             "/api/v1/admin/brands/**",
             "/api/v1/brands/**",
-            "/api/v1/admin/reservations/**",
             "/api/v1/admin/categories/**",
-            "/api/v1/categories/**"
+            "/api/v1/categories/**",
+            "/api/v1/reservations/**"
     };
 
     private static final String[] orderServiceUrlPatterns = {

@@ -28,8 +28,7 @@ public class GrpcProductService extends ProductServiceGrpc.ProductServiceImplBas
     @Override
     public void getProductById(GetProductRequest request, StreamObserver<Product> responseObserver) {
         com.productservice.entity.Product product = productService.getActiveWithCategoryAndBrandById(UUID.fromString(request.getProductId()));
-        long availableQuantity = reservationService.getAvailableQuantityByProductId(product.getId());
-        Product response = productMapper.toGrpcProduct(product, availableQuantity);
+        Product response = productMapper.toGrpcProduct(product);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();

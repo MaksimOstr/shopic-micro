@@ -39,6 +39,10 @@ public class GrpcProductService {
     }
 
     public Product getProductByIdFallback(UUID productId, Throwable e) {
+        if(e instanceof ExternalServiceBusinessException exception) {
+            throw exception;
+        }
+
         log.error("Product service unavailable for productId: {}", productId, e);
         throw new ApiException("Something went wrong. Try again later", HttpStatus.SERVICE_UNAVAILABLE);
     }

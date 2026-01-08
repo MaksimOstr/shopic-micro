@@ -115,11 +115,6 @@ public class ReservationService {
         return reservationMapper.toAdminReservationDto(reservation);
     }
 
-    public long getAvailableQuantityByProductId(UUID productId) {
-        return reservationItemRepository.findReservedQuantityByProductIdAndStatus(productId, ReservationStatusEnum.PENDING);
-    }
-
-
     public Page<ReservationPreviewDto> getReservationList(Pageable pageable, ReservationStatusEnum status) {
         Specification<Reservation> spec = SpecificationUtils.equalsField("status", status);
         Page<Reservation> reservationPage = reservationRepository.findAll(spec, pageable);
