@@ -43,7 +43,6 @@ public class StripeCheckoutService {
         Stripe.apiKey = stripeSecretKey;
     }
 
-    @Transactional
     public String createCheckoutSession(CreateCheckoutSessionDto dto) {
         try {
             List<SessionCreateParams.LineItem> lineItems = getLineItems(dto.checkoutItems());
@@ -57,10 +56,10 @@ public class StripeCheckoutService {
                     .build();
             Session session = Session.create(params);
             String sessionId = session.getId();
-            long amountInCents = session.getAmountTotal();
-            BigDecimal amountInDollars = BigDecimal.valueOf(amountInCents).divide(BigDecimal.valueOf(100));
+            long totalInSmallestUnits = session.getAmountTotal();
+            BigDecimal total = BigDecimal.valueOf(totalInSmallestUnits).divide(BigDecimal.valueOf(100));
 
-            savePayment(dto.userId(), sessionId, dto.orderId(), amountInCents, amountInDollars);
+            paymentService.createPayment(dto.userId(), sessionId, dto.orderId(), total);
 
             return session.getUrl();
         } catch (StripeException e) {
@@ -97,17 +96,5 @@ public class StripeCheckoutService {
         }
 
         return lineItems;
-    }
-
-    private void savePayment(UUID userId, String sessionId, UUID orderId, Long totalInSmallestUnit, BigDecimal amount) {
-        CreatePaymentDto dto = new CreatePaymentDto(
-                userId,
-                orderId,
-                sessionId,
-                amount,
-                totalInSmallestUnit
-        );
-
-        paymentService.createPayment(dto);
     }
 }

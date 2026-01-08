@@ -28,16 +28,10 @@ public class Payment {
     @Column(name = "order_id", nullable = false, unique = true)
     private UUID orderId;
 
-    @Column(name = "stripe_payment_id", unique = true)
-    private String stripePaymentId;
-
     @Column(name = "session_id", nullable = false, unique = true)
     private String sessionId;
 
-    @Column(name = "total_in_smallest_unit", nullable = false)
-    private Long totalInSmallestUnit;
-
-    private BigDecimal amount;
+    private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;

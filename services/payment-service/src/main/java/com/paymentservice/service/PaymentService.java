@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -36,13 +37,12 @@ public class PaymentService {
     private final KafkaService kafkaService;
     private final PaymentMapper paymentMapper;
 
-    public void createPayment(CreatePaymentDto dto) {
+    public void createPayment(UUID userId, String sessionId, UUID orderId, BigDecimal total) {
         Payment payment = Payment.builder()
-                .userId(dto.userId())
-                .sessionId(dto.sessionId())
-                .orderId(dto.orderId())
-                .amount(dto.amount())
-                .totalInSmallestUnit(dto.totalInSmallestUnit())
+                .userId(userId)
+                .sessionId(sessionId)
+                .orderId(orderId)
+                .total(total)
                 .status(PaymentStatus.PENDING)
                 .build();
 
@@ -56,10 +56,9 @@ public class PaymentService {
         return paymentMapper.toDto(payment);
     }
 
-    public Payment succeedPayment(String sessionId, String stripePaymentId) {
+    public Payment succeedPayment(String sessionId) {
         Payment payment = getBySessionId(sessionId);
-        payment.setStatus(PaymentStatus.PENDING);
-        payment.setStripePaymentId(stripePaymentId);
+        payment.setStatus(PaymentStatus.SUCCEEDED);
 
         return paymentRepository.save(payment);
     }
