@@ -74,7 +74,6 @@ public class UserOrderFacade {
         }
     }
 
-
     public Page<UserOrderPreviewDto> getOrdersByUserId(UUID userId, Pageable pageable, OrderParams params) {
         Specification<Order> spec = equalsEnum("status", params.status())
                 .and(hasId("userId", userId))
