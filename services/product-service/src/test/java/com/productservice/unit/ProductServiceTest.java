@@ -67,7 +67,7 @@ class ProductServiceTest {
                 .name("Old name")
                 .description("Old desc")
                 .price(BigDecimal.TEN)
-                .stockQuantity(10)
+                .stockQuantity(10L)
                 .imageUrl("old.png")
                 .category(category)
                 .brand(brand)
@@ -85,7 +85,7 @@ class ProductServiceTest {
                 false,
                 categoryId,
                 brandId,
-                5
+                5L
         );
 
         when(categoryService.getCategoryById(categoryId)).thenReturn(category);
@@ -114,7 +114,7 @@ class ProductServiceTest {
                 false,
                 categoryId,
                 null,
-                5
+                5L
         );
 
         when(categoryService.getCategoryById(categoryId)).thenReturn(category);
@@ -164,11 +164,11 @@ class ProductServiceTest {
 
     @Test
     void getProductsByIdsWithLock_whenCalled_thenReturnProducts() {
-        when(productRepository.findByIdInWithLock(List.of(productId)))
+        when(productRepository.findActiveByIdInWithLock(List.of(productId)))
                 .thenReturn(List.of(product));
 
         List<Product> result =
-                productService.getProductsByIdsWithLock(List.of(productId));
+                productService.getActiveProductsByIdsWithLock(List.of(productId));
 
         assertEquals(1, result.size());
     }
@@ -183,7 +183,7 @@ class ProductServiceTest {
                 BigDecimal.ONE,
                 categoryId,
                 brandId,
-                20
+                20L
         );
 
         when(productRepository.findById(productId))

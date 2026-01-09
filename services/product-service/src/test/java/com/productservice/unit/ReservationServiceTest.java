@@ -2,10 +2,13 @@ package com.productservice.unit;
 
 import com.productservice.dto.ProductReservedQuantity;
 import com.productservice.dto.ReservationDto;
+import com.productservice.dto.ReservationError;
+import com.productservice.dto.ReservationResult;
 import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
+import com.productservice.enums.ReservationErrorType;
 import com.productservice.enums.ReservationStatusEnum;
 import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
@@ -56,7 +59,7 @@ class ReservationServiceTest {
 
         product = new Product();
         product.setId(productId);
-        product.setStockQuantity(10);
+        product.setStockQuantity(10L);
     }
 
 
@@ -180,7 +183,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    void createReservation_whenInsufficientStock_thenThrowException() {
+    void createReservation_whenInsufficientStock_thenReturnsResultWithErrors() {
         ItemForReservationDto itemDto =
                 new ItemForReservationDto(productId, 10);
 
@@ -189,16 +192,22 @@ class ReservationServiceTest {
                         List.of(productId),
                         ReservationStatusEnum.PENDING))
                 .thenReturn(List.of(
-                        new ProductReservedQuantity(productId, 8)
+                        new ProductReservedQuantity(productId, 12L)
                 ));
 
-        when(productService.getProductsByIdsWithLock(List.of(productId)))
+        when(productService.getActiveProductsByIdsWithLock(List.of(productId)))
                 .thenReturn(List.of(product));
 
-        assertThrows(
-                ApiException.class,
-                () -> reservationService.createReservation(List.of(itemDto), orderId)
-        );
+        ReservationResult result = reservationService.createReservation(List.of(itemDto), orderId);
+
+        assertFalse(result.errors().isEmpty(), "Errors list should not be empty");
+        assertEquals(1, result.errors().size());
+        ReservationError error = result.errors().get(0);
+        assertEquals(ReservationErrorType.INSUFFICIENT_STOCK, error.type());
+        assertEquals(productId, error.productId());
+        assertTrue(result.reservedProducts().isEmpty());
+
+        verify(reservationRepository, never()).save(any());
     }
 
     @Test
@@ -212,7 +221,7 @@ class ReservationServiceTest {
                         ReservationStatusEnum.PENDING))
                 .thenReturn(List.of());
 
-        when(productService.getProductsByIdsWithLock(List.of(productId)))
+        when(productService.getActiveProductsByIdsWithLock(List.of(productId)))
                 .thenReturn(List.of(product));
 
         reservationService.createReservation(List.of(itemDto), orderId);

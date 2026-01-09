@@ -32,7 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductFacadeTest {
+class ProductFacadeTest {
 
     @Mock
     private ProductMapper productMapper;
@@ -74,9 +74,10 @@ public class ProductFacadeTest {
                 "Product",
                 "Desc",
                 BigDecimal.TEN,
+                false,
                 UUID.randomUUID(),
                 UUID.randomUUID(),
-                10
+                10L
         );
 
         when(s3Service.uploadFile(any(), eq(multipartFile)))
@@ -116,7 +117,7 @@ public class ProductFacadeTest {
                 BigDecimal.ONE,
                 null,
                 null,
-                5
+                5L
         );
 
         when(productService.updateProduct(productId, request))
