@@ -45,7 +45,6 @@ public class UserOrderFacade {
     private final ProductGrpcService productGrpcService;
     private final PaymentGrpcService paymentGrpcService;
     private final GrpcMapper grpcMapper;
-    private final OrderItemMapper orderItemMapper;
     private final OrderMapper orderMapper;
     private final KafkaService kafkaService;
 
