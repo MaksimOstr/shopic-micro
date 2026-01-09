@@ -89,6 +89,6 @@ public class ProductGrpcService {
                 .toList();
 
         String finalMessage = String.join("; ", errorMessages);
-        throw new ExternalServiceBusinessException(finalMessage, HttpStatus.CONFLICT);
+        throw new ExternalServiceBusinessException(finalMessage, HttpStatus.BAD_REQUEST);
     }
 }

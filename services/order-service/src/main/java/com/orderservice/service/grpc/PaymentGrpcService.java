@@ -33,41 +33,29 @@ public class PaymentGrpcService {
 
     @CircuitBreaker(name = "payment-service", fallbackMethod = "createPaymentFallback")
     public CreatePaymentResponse createPayment(UUID userId, Order order) {
-        try {
-            log.info("Create payment gRpc request");
+        log.info("Create payment gRpc request");
 
-            List<OrderItem> orderItems = orderItemMapper.toGrpcOrderItems(order.getOrderItems());
+        List<OrderItem> orderItems = orderItemMapper.toGrpcOrderItems(order.getOrderItems());
 
-            OrderItem deliveryLineItem = OrderItem.newBuilder()
-                    .setQuantity(1)
-                    .setPriceForOne(order.getDeliveryPrice().toString())
-                    .setItemName("Delivery")
-                    .setItemImage("")
-                    .build();
+        OrderItem deliveryLineItem = OrderItem.newBuilder()
+                .setQuantity(1)
+                .setPriceForOne(order.getDeliveryPrice().toString())
+                .setItemName("Delivery")
+                .setItemImage("")
+                .build();
 
-            CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
-                    .setOrderId(order.getId().toString())
-                    .setUserId(userId.toString())
-                    .addAllOrderItems(orderItems)
-                    .addOrderItems(deliveryLineItem)
-                    .build();
+        CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
+                .setOrderId(order.getId().toString())
+                .setUserId(userId.toString())
+                .addAllOrderItems(orderItems)
+                .addOrderItems(deliveryLineItem)
+                .build();
 
-            return paymentGrpcService.createPayment(request);
-        } catch (StatusRuntimeException e) {
-            log.warn("Payment failed due to business rule: orderId={}, userId={}", order.getId(), userId, e);
-            switch (e.getStatus().getCode()) {
-                case FAILED_PRECONDITION: throw new ExternalServiceBusinessException(e.getMessage(), HttpStatus.CONFLICT);
-                default: throw e;
-            }
-        }
+        return paymentGrpcService.createPayment(request);
     }
 
     public CreatePaymentResponse createPaymentFallback(UUID userId, Order order, Throwable exception) {
         log.error("Payment service fallback for orderId={} userId={}", order.getId(), userId, exception);
-
-        if(exception instanceof ExternalServiceBusinessException e) {
-            throw e;
-        }
 
         throw new ApiException("Something went wrong, try again later", HttpStatus.SERVICE_UNAVAILABLE);
     }

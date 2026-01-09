@@ -1,11 +1,18 @@
 package com.orderservice.controller;
 
+import com.orderservice.dto.ErrorResponseDto;
 import com.orderservice.security.CustomPrincipal;
 import com.orderservice.dto.UserOrderDto;
 import com.orderservice.dto.UserOrderPreviewDto;
 import com.orderservice.dto.CreateOrderRequest;
 import com.orderservice.dto.OrderParams;
 import com.orderservice.service.UserOrderFacade;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +34,59 @@ import java.util.UUID;
 public class UserOrderController {
     private final UserOrderFacade userOrderFacade;
 
-
+    @Operation(
+            summary = "Place new order",
+            description = "Creates new order and returns payment session link"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Order successfully created"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Invalid input data",
+                                            value = """
+                                                    {
+                                                        "phoneNumber": "must not be blank"
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Reservation failed because of insufficient stock or product was disabled.",
+                                            value = """
+                                                    {
+                                                        "code": "Bad request",
+                                                        "status": 400,
+                                                        "message": "Product car is not available or inactive"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User does not have a cart.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+    })
     @PostMapping
     public ResponseEntity<String> createOrder(
             @AuthenticationPrincipal CustomPrincipal principal,
@@ -38,6 +97,37 @@ public class UserOrderController {
         return ResponseEntity.ok(redirectUrl);
     }
 
+
+    @Operation(
+            summary = "Get order by id",
+            description = "Returns order dto by id"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Order successfully found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserOrderDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Order not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+    })
     @GetMapping("/{id}")
     public ResponseEntity<UserOrderDto> getOrder(
             @PathVariable UUID id
@@ -47,6 +137,28 @@ public class UserOrderController {
         return ResponseEntity.ok().body(order);
     }
 
+    @Operation(
+            summary = "Search orders by parameters",
+            description = "Returns a page of found orders"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "The page of found offers",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<Page<UserOrderPreviewDto>> getOrderPage(
             @AuthenticationPrincipal CustomPrincipal principal,
