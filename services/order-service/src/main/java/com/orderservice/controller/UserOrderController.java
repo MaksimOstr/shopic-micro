@@ -45,7 +45,6 @@ public class UserOrderController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid input data",
                     content = @Content(
                             mediaType = "application/json",
                             examples = {

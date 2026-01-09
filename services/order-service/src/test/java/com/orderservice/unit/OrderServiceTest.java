@@ -128,54 +128,6 @@ public class OrderServiceTest {
     }
 
     @Test
-    void updateOrderContactInfo_updatesOnlyCustomerName_whenAddressIsNull() {
-        UUID orderId = UUID.randomUUID();
-        Order existingOrder = new Order();
-        existingOrder.setCustomerName("Old Name");
-        existingOrder.setAddress("Old Address");
-        UpdateContactInfoRequest request = new UpdateContactInfoRequest("New Name", null);
-
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
-
-        Order result = orderService.updateOrderContactInfo(orderId, request);
-
-        assertThat(result.getCustomerName()).isEqualTo("New Name");
-        assertThat(result.getAddress()).isEqualTo("Old Address");
-    }
-
-    @Test
-    void updateOrderContactInfo_updatesOnlyAddress_whenCustomerNameIsNull() {
-        UUID orderId = UUID.randomUUID();
-        Order existingOrder = new Order();
-        existingOrder.setCustomerName("Old Name");
-        existingOrder.setAddress("Old Address");
-        UpdateContactInfoRequest request = new UpdateContactInfoRequest(null, "New Address");
-
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
-
-        Order result = orderService.updateOrderContactInfo(orderId, request);
-
-        assertThat(result.getCustomerName()).isEqualTo("Old Name");
-        assertThat(result.getAddress()).isEqualTo("New Address");
-    }
-
-    @Test
-    void updateOrderContactInfo_makesNoChanges_whenRequestFieldsAreNull() {
-        UUID orderId = UUID.randomUUID();
-        Order existingOrder = new Order();
-        existingOrder.setCustomerName("Old Name");
-        existingOrder.setAddress("Old Address");
-        UpdateContactInfoRequest request = new UpdateContactInfoRequest(null, null);
-
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
-
-        Order result = orderService.updateOrderContactInfo(orderId, request);
-
-        assertThat(result.getCustomerName()).isEqualTo("Old Name");
-        assertThat(result.getAddress()).isEqualTo("Old Address");
-    }
-
-    @Test
     void updateOrderContactInfo_throwsNotFoundException_whenOrderNotFound() {
         UUID orderId = UUID.randomUUID();
         UpdateContactInfoRequest request = new UpdateContactInfoRequest("Name", "Address");

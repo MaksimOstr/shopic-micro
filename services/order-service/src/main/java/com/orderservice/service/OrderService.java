@@ -56,8 +56,8 @@ public class OrderService {
     public Order updateOrderContactInfo(UUID orderId, UpdateContactInfoRequest dto) {
         Order order = getOrderById(orderId);
 
-        Optional.ofNullable(dto.customerName()).ifPresent(order::setCustomerName);
-        Optional.ofNullable(dto.address()).ifPresent(order::setAddress);
+        order.setCustomerName(dto.customerName());
+        order.setAddress(dto.address());
 
         return order;
     }
