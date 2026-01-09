@@ -1,9 +1,15 @@
 package com.paymentservice.controller;
 
+import com.paymentservice.dto.ErrorResponseDto;
 import com.paymentservice.dto.PaymentDto;
 import com.paymentservice.dto.PaymentSummaryDto;
 import com.paymentservice.dto.PaymentParams;
 import com.paymentservice.service.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +29,36 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    @Operation(
+            summary = "Find payments by id",
+            description = "Returns found product dto"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Payment successfully found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PaymentDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Payment not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+    })
     @GetMapping("/{id}")
     public ResponseEntity<PaymentDto> getPaymentById(
             @PathVariable UUID id
@@ -32,6 +68,24 @@ public class PaymentController {
         return ResponseEntity.ok(refund);
     }
 
+    @Operation(
+            summary = "Search payments by params",
+            description = "Returns a page of payments"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Found payments"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+    })
     @GetMapping
     public ResponseEntity<Page<PaymentSummaryDto>> getPayments(
             @RequestParam(defaultValue = "0") int page,
