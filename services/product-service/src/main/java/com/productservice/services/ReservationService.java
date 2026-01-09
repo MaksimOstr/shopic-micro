@@ -6,6 +6,7 @@ import com.productservice.dto.ReservationError;
 import com.productservice.dto.ReservationPreviewDto;
 import com.productservice.dto.ProductReservedQuantity;
 import com.productservice.dto.ReservationResult;
+import com.productservice.dto.request.AdminReservationParams;
 import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
@@ -39,6 +40,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.productservice.utils.ProductUtils.toProductMap;
+import static com.productservice.utils.SpecificationUtils.equalsField;
 import static com.productservice.utils.Utils.extractIds;
 
 
@@ -115,8 +117,9 @@ public class ReservationService {
         return reservationMapper.toAdminReservationDto(reservation);
     }
 
-    public Page<ReservationPreviewDto> getReservationList(Pageable pageable, ReservationStatusEnum status) {
-        Specification<Reservation> spec = SpecificationUtils.equalsField("status", status);
+    public Page<ReservationPreviewDto> getReservationList(Pageable pageable, AdminReservationParams params) {
+        Specification<Reservation> spec = SpecificationUtils.<Reservation>equalsField("status", params.orderId())
+                .and(equalsField("orderId", params.orderId()));
         Page<Reservation> reservationPage = reservationRepository.findAll(spec, pageable);
         List<Reservation> reservationList = reservationPage.getContent();
         List<ReservationPreviewDto> previewDtoList = reservationMapper.toAdminReservationPreviewDtoList(reservationList);
