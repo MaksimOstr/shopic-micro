@@ -33,7 +33,7 @@ public class BrandService {
     private final BrandMapper brandMapper;
 
 
-    public Brand create(CreateBrandRequest dto) {
+    public AdminBrandDto create(CreateBrandRequest dto) {
         if(existsByName(dto.brandName())) {
             throw new ApiException("Brand name already exists", HttpStatus.CONFLICT);
         }
@@ -43,7 +43,9 @@ public class BrandService {
                 .isActive(dto.isActive())
                 .build();
 
-        return brandRepository.save(brand);
+        brandRepository.save(brand);
+
+        return brandMapper.toAdminBrandDto(brand);
     }
 
     @Transactional

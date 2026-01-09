@@ -32,7 +32,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    public Category create(CreateCategoryRequest dto) {
+    public AdminCategoryDto create(CreateCategoryRequest dto) {
         if(existsByName(dto.name())) {
             throw new ApiException("Category name already exists", HttpStatus.CONFLICT);
         }
@@ -43,7 +43,9 @@ public class CategoryService {
                 .isActive(dto.isActive())
                 .build();
 
-        return categoryRepository.save(category);
+        categoryRepository.save(category);
+
+        return categoryMapper.toAdminCategoryDto(category);
     }
 
     @Transactional

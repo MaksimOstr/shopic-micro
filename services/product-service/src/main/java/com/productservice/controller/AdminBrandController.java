@@ -1,12 +1,19 @@
 package com.productservice.controller;
 
 import com.productservice.dto.AdminBrandDto;
+import com.productservice.dto.ErrorResponseDto;
 import com.productservice.dto.request.AdminBrandParams;
 import com.productservice.dto.request.CreateBrandRequest;
 import com.productservice.dto.request.UpdateBrandRequest;
 import com.productservice.entity.Brand;
 import com.productservice.enums.BrandAdminSortByEnum;
 import com.productservice.services.BrandService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +34,24 @@ import java.util.UUID;
 public class AdminBrandController {
     private final BrandService brandService;
 
+    @Operation(
+            summary = "Search brands",
+            description = "Returns a page of brands"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Found brands"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+    })
     @GetMapping
     public ResponseEntity<Page<AdminBrandDto>> getAll(
             AdminBrandParams params,
@@ -45,15 +70,115 @@ public class AdminBrandController {
         return ResponseEntity.ok().body(brands);
     }
 
+    @Operation(
+            summary = "Create new brand",
+            description = "Creates new brand and returns its dto"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Brand successfully created",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = AdminBrandDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Invalid input data",
+                                            value = """
+                                                    {
+                                                        "isActive": "must not be provided"
+                                                    }
+                                                    """
+                                    ),
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Brand with the same name already exists",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+    })
     @PostMapping
-    public ResponseEntity<Brand> create(
+    public ResponseEntity<AdminBrandDto> create(
             @RequestBody @Valid CreateBrandRequest body
     ) {
-        Brand brand = brandService.create(body);
+        AdminBrandDto brand = brandService.create(body);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(brand);
     }
 
+    @Operation(
+            summary = "Update brand",
+            description = "Updates brand and returns updated brand dto"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Brand successfully updated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = AdminBrandDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Invalid input data",
+                                            value = """
+                                                    {
+                                                        "isActive": "must not be provided"
+                                                    }
+                                                    """
+                                    ),
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "User is not authenticated.",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Brand with provided id was not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Brand with the same name already exists",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    })
     @PutMapping("/{id}")
     public ResponseEntity<AdminBrandDto> update(
             @PathVariable UUID id,
@@ -63,5 +188,4 @@ public class AdminBrandController {
 
         return ResponseEntity.ok(brand);
     }
-
 }
