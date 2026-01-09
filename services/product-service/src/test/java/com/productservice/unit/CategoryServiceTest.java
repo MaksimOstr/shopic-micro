@@ -14,6 +14,7 @@ import com.productservice.services.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,18 +55,24 @@ class CategoryServiceTest {
 
     @Test
     void create_shouldSaveCategory_whenNameDoesNotExist() {
-        CreateCategoryRequest request =
-                new CreateCategoryRequest("Books", true, "Books desc");
+        CreateCategoryRequest request = new CreateCategoryRequest("Books", true, "Books desc");
+        AdminCategoryDto expectedDto = new AdminCategoryDto(UUID.randomUUID(), "Books", "Books desc", true);
 
         when(categoryRepository.existsByName(request.name())).thenReturn(false);
         when(categoryRepository.save(any(Category.class))).thenAnswer(i -> i.getArgument(0));
+        when(categoryMapper.toAdminCategoryDto(any(Category.class))).thenReturn(expectedDto);
 
-        Category result = categoryService.create(request);
+        AdminCategoryDto result = categoryService.create(request);
 
-        assertThat(result.getName()).isEqualTo("Books");
-        assertThat(result.getDescription()).isEqualTo("Books desc");
-        assertThat(result.isActive()).isTrue();
-        verify(categoryRepository).save(any(Category.class));
+        assertThat(result).isEqualTo(expectedDto);
+
+        ArgumentCaptor<Category> categoryCaptor = ArgumentCaptor.forClass(Category.class);
+        verify(categoryRepository).save(categoryCaptor.capture());
+        Category savedCategory = categoryCaptor.getValue();
+
+        assertThat(savedCategory.getName()).isEqualTo(request.name());
+        assertThat(savedCategory.getDescription()).isEqualTo(request.description());
+        assertThat(savedCategory.isActive()).isTrue();
     }
 
     @Test

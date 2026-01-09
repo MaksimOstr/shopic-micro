@@ -12,6 +12,7 @@ import com.productservice.services.BrandService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -52,19 +53,23 @@ class BrandServiceTest {
 
     @Test
     void create_shouldSaveBrand_whenNameDoesNotExist() {
-        CreateBrandRequest request =
-                new CreateBrandRequest("Adidas", true);
+        CreateBrandRequest request = new CreateBrandRequest("Adidas", true);
+        AdminBrandDto expectedDto = new AdminBrandDto(UUID.randomUUID(), "Adidas", true);
 
-        when(brandRepository.existsBrandByName(request.brandName()))
-                .thenReturn(false);
-        when(brandRepository.save(any(Brand.class)))
-                .thenAnswer(i -> i.getArgument(0));
+        when(brandRepository.existsBrandByName(request.brandName())).thenReturn(false);
+        when(brandRepository.save(any(Brand.class))).thenAnswer(i -> i.getArgument(0));
+        when(brandMapper.toAdminBrandDto(any(Brand.class))).thenReturn(expectedDto);
 
-        Brand result = brandService.create(request);
+        AdminBrandDto result = brandService.create(request);
 
-        assertThat(result.getName()).isEqualTo("Adidas");
-        assertThat(result.isActive()).isTrue();
-        verify(brandRepository).save(any(Brand.class));
+        assertThat(result).isEqualTo(expectedDto);
+
+        ArgumentCaptor<Brand> brandCaptor = ArgumentCaptor.forClass(Brand.class);
+        verify(brandRepository).save(brandCaptor.capture());
+        Brand savedBrand = brandCaptor.getValue();
+
+        assertThat(savedBrand.getName()).isEqualTo("Adidas");
+        assertThat(savedBrand.isActive()).isTrue();
     }
 
     @Test
