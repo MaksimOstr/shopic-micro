@@ -11,7 +11,7 @@ spring:
 
   grpc:
     server:
-      port: 1014
+      port: ${CART_GRPC_PORT}
     client:
       channels:
         product-service:
