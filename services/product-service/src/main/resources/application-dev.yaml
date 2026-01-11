@@ -8,7 +8,7 @@ spring:
         static: ${AWS_REGION}
 
   datasource:
-    url: jdbc:postgresql://${PRODUCT_DB_HOST}:${PRODUCT_DB_PORT}/${PRODUCT_DB_NAME}
+    url: ${PRODUCT_DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -18,10 +18,6 @@ spring:
     open-in-view: false
 
   grpc:
-    client:
-      channels:
-        review-service:
-          address: 0.0.0.0:1016
     server:
       port: ${PRODUCT_GRPC_PORT}
 
@@ -30,7 +26,7 @@ spring:
       max-file-size: 10MB
 
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
     consumer:
       auto-offset-reset: latest
       enable-auto-commit: false

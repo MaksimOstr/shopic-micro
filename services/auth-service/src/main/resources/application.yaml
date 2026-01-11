@@ -2,7 +2,7 @@ spring:
   application:
     name: auth-service
   profiles:
-    active: dev
+    active: ${AUTH_SERVICE_PROFILE}
 
 server:
   port: ${AUTH_SERVICE_PORT}

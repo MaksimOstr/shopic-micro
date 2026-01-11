@@ -26,7 +26,7 @@ spring:
         generate_statistics: true
 
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
     consumer:
       auto-offset-reset: latest
       enable-auto-commit: false

@@ -2,7 +2,7 @@ spring:
   application:
     name: product-service
   profiles:
-    active: dev
+    active: ${PRODUCT_SERVICE_PROFILE}
 
 server:
   port: ${PRODUCT_SERVICE_PORT}

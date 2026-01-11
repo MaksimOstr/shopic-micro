@@ -2,7 +2,7 @@ spring:
   application:
     name: order-service
   profiles:
-    active: dev
+    active: ${ORDER_SERVICE_PROFILE}
 
 server:
   port: ${ORDER_SERVICE_PORT}

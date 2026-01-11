@@ -15,7 +15,7 @@ services:
       - /kafka/data
     ports:
       - "9092:9092"
-      - "9094:9094"
+      - "${KAFKA_PORT}:9094"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_KRAFT_MODE: "true"
@@ -32,12 +32,3 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_NUM_PARTITIONS: 1
-
-  redis:
-    image: redis:latest
-    restart: always
-    ports:
-      - '6379:6379'
-    volumes:
-      - /redis/data
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]

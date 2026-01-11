@@ -2,7 +2,7 @@ spring:
   application:
     name: payment-service
   profiles:
-    active: dev
+    active: ${PAYMENT_SERVICE_PROFILE}
 
 server:
   port: ${PAYMENT_SERVICE_PORT}

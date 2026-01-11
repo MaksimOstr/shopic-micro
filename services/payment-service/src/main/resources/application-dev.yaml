@@ -19,11 +19,15 @@ spring:
           batch_size: 20
         generate_statistics: true
 
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
+
 logging:
   level:
     org:
       hibernate:
         SQL: debug
+
 
 jwt:
   issuer: ${JWT_ISSUER:shopic}
