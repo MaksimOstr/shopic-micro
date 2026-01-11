@@ -2,7 +2,6 @@ plugins {
     id 'java'
     alias(libs.plugins.spring.framework.boot)
     alias(libs.plugins.spring.dependency.management)
-    id 'org.jetbrains.kotlin.jvm'
 }
 
 group = 'com'
@@ -10,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        libs.versions.java.get().toInteger()
     }
 }
 
@@ -34,7 +33,6 @@ dependencies {
     implementation libs.bundles.security
     testImplementation libs.kafka.test
     testImplementation libs.bundles.test.core
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 

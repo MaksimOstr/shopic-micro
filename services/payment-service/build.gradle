@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	alias(libs.plugins.spring.framework.boot)
-	alias(libs.plugins.spring.dependency.management)
+	alias(libs.plugins.spring.framework.boot) apply true
+	alias(libs.plugins.spring.dependency.management) apply true
 }
 
 group = 'com'
@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		libs.versions.java.get().toInteger()
 	}
 }
 

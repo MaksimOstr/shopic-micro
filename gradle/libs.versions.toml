@@ -8,6 +8,7 @@ protobuf = "0.9.5"
 openapi = "2.8.14"
 cloud-aws = "3.2.0"
 stripe = "29.2.0"
+java = "24"
 
 
 
