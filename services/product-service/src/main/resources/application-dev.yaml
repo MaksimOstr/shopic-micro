@@ -6,7 +6,6 @@ spring:
         secret-key: ${AWS_SECRET_ACCESS_KEY}
       region:
         static: ${AWS_REGION}
-
   datasource:
     url: ${PRODUCT_DB_URL}
     username: ${DB_USER}
@@ -16,6 +15,12 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+
+  data:
+    redis:
+      url: ${PRODUCT_REDIS_URL}
+      repositories:
+        enabled: false
 
   grpc:
     server:
@@ -34,6 +39,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     listener:
       ack-mode: manual_immediate
+      auto-startup: ${KAFKA_LISTENER_AUTO_STARTUP:true}
   pulsar:
     consumer:
       retry-enable: true

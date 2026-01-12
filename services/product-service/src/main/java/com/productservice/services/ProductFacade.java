@@ -15,6 +15,8 @@ import com.productservice.mapper.ProductMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -50,12 +52,14 @@ public class ProductFacade {
     }
 
     @Transactional
+    @CacheEvict(value = "admin-products", key = "#id")
     public AdminProductDto updateProduct(UUID id, UpdateProductRequest dto) {
         Product product = productService.updateProduct(id, dto);
 
         return productMapper.toAdminProductDto(product);
     }
 
+    @CacheEvict(value = "admin-products", key = "#id")
     public void changeProductImage(UUID id, MultipartFile productImage) {
         if(!productService.existsById(id)) {
             throw new NotFoundException("Product not found");
@@ -80,6 +84,7 @@ public class ProductFacade {
     }
 
     @Transactional
+    @Cacheable(value = "admin-products", key = "#productId")
     public AdminProductDto getAdminProduct(UUID productId) {
         Product product = productService.getProductById(productId);
         return productMapper.toAdminProductDto(product);

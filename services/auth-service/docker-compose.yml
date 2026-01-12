@@ -1,6 +1,6 @@
 services:
   auth-service-db:
-    image: postgres:18
+    image: postgres:16
     restart: always
     ports:
       - "${AUTH_DB_PORT}:5432"

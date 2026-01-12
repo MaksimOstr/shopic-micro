@@ -12,6 +12,8 @@ import com.productservice.mapper.CategoryMapper;
 import com.productservice.repository.CategoryRepository;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +51,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @CacheEvict(value = "categories", key = "#categoryId")
     public AdminCategoryDto update(UUID categoryId, UpdateCategoryRequest dto) {
         if(categoryRepository.existsByNameAndIdNot(dto.name(), categoryId)) {
             throw new ApiException("Category already exists", HttpStatus.CONFLICT);
@@ -63,6 +66,7 @@ public class CategoryService {
         return categoryMapper.toAdminCategoryDto(category);
     }
 
+    @Cacheable(value = "categories", key = "#id")
     public Category getCategoryById(UUID id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));

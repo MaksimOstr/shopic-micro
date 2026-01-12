@@ -1,6 +1,6 @@
 services:
   cart-service-db:
-    image: postgres:18
+    image: postgres:16
     restart: always
     ports:
       - "${CART_DB_PORT}:5432"

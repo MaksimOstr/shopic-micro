@@ -1,21 +1,20 @@
 services:
   product-service-db:
-    image: postgres:18
+    image: postgres:16
     restart: always
     ports:
       - "1115:5432"
-    volumes:
-      - postgres_data:/data
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: masterkey
       POSTGRES_DB: product-service-db
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d product-service-db" ]
       interval: 20s
       timeout: 5s
       retries: 5
-
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 
   product-service-redis:
     image: redis:8.4
@@ -42,6 +41,7 @@ services:
     ports:
       - "1003:1003"
     environment:
+      PRODUCT_SERVICE_PROFILE: dev
       DB_USER: admin
       DB_PASSWORD: masterkey
       PRODUCT_DB_URL: jdbc:postgresql://product-service-db:5432/product-service-db
@@ -52,10 +52,12 @@ services:
       AWS_REGION: ${AWS_REGION}
       PRODUCTS_BUCKET_NAME: ${PRODUCTS_BUCKET_NAME}
       JWT_ISSUER: shopic
+      KAFKA_LISTENER_AUTO_STARTUP: true
       JWT_HEADER_ALG: RS256
       JWK_PATH: /api/v1/public-keys
+      PRODUCT_REDIS_URL: redis://:masterkey@product-service-redis:6379
 
 volumes:
-  postgres_data:
+  pg_data:
   redis_data:
 
