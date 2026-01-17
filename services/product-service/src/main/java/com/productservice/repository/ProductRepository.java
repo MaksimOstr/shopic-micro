@@ -49,6 +49,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
             "AND c.isActive = true")
     Optional<Product> findActiveWithCategoryAndBrandById(UUID id);
 
+    @Query("SELECT p FROM Product p JOIN FETCH p.category LEFT JOIN FETCH p.brand WHERE p.id = :id")
+    Optional<Product> findWithBrandAndCategoryById(UUID id);
+
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findAll(@Nullable Specification<Product> spec, Pageable pageable);

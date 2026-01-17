@@ -51,7 +51,6 @@ public class BrandService {
     }
 
     @Transactional
-    @CacheEvict(value = "brands", key = "#id")
     public AdminBrandDto updateBrand(UUID id, UpdateBrandRequest dto) {
         if(brandRepository.existsByNameAndIdNot(dto.brandName(), id)) {
             throw new ApiException("Brand with name " + dto.brandName() + " already exists", HttpStatus.CONFLICT);
@@ -86,7 +85,6 @@ public class BrandService {
         return new PageImpl<>(dtoList, pageable, brandPage.getTotalElements());
     }
 
-    @Cacheable(value = "brands", key = "#id")
     public Brand getBrandById(UUID id) {
         return brandRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Brand not found"));

@@ -196,14 +196,16 @@ class ProductFacadeTest {
 
     @Test
     void getAdminProduct_shouldReturnAdminDto() {
-        when(productService.getProductById(productId))
+        UUID productId = UUID.randomUUID();
+        Product product = mock(Product.class);
+
+        when(productService.getProductWithBrandAndCategoryById(productId))
                 .thenReturn(product);
 
         AdminProductDto dto = mock(AdminProductDto.class);
         when(productMapper.toAdminProductDto(product)).thenReturn(dto);
 
-        AdminProductDto result =
-                productFacade.getAdminProduct(productId);
+        AdminProductDto result = productFacade.getAdminProduct(productId);
 
         assertThat(result).isEqualTo(dto);
     }

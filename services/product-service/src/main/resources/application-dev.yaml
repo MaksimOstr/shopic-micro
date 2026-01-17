@@ -16,12 +16,6 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
-  data:
-    redis:
-      url: ${PRODUCT_REDIS_URL}
-      repositories:
-        enabled: false
-
   grpc:
     server:
       port: ${PRODUCT_GRPC_PORT}

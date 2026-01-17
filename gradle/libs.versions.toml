@@ -13,6 +13,7 @@ java = "24"
 
 
 [libraries]
+spring-cloud-bootstrap = { module = "org.springframework.cloud:spring-cloud-starter-bootstrap" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
@@ -45,7 +46,7 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 [bundles]
 db = ["liquidBase", "liquidBase", "data-jpa", "postgreSQL-driver"]
 test-core = [ "spring-boot-starter-test", "junit" ]
-core = [ "actuator" ]
+core = [ "actuator", "spring-cloud-bootstrap" ]
 business-service = [ "mapstruct", "bean-validation" ]
 web = [ "spring-boot-starter", "spring-boot-starter-web", "openapi-starter", "circuit-breaker" ]
 security = [ "spring-security", "oauth2-resource-server" ]

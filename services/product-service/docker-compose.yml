@@ -16,17 +16,6 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
-  product-service-redis:
-    image: redis:8.4
-    restart: always
-    ports:
-      - '6030:6379'
-    command: [ "redis-server", "--requirepass", "masterkey", "--appendonly", "yes" ]
-    healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "masterkey", "ping" ]
-    volumes:
-      - redis_data:/data
-
   product-service:
     build: .
     restart: always
@@ -41,21 +30,8 @@ services:
     ports:
       - "1003:1003"
     environment:
-      PRODUCT_SERVICE_PROFILE: dev
-      DB_USER: admin
-      DB_PASSWORD: masterkey
       PRODUCT_DB_URL: jdbc:postgresql://product-service-db:5432/product-service-db
-      PRODUCT_SERVICE_PORT: 1003
-      PRODUCT_GRPC_PORT: 1013
-      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_REGION: ${AWS_REGION}
-      PRODUCTS_BUCKET_NAME: ${PRODUCTS_BUCKET_NAME}
-      JWT_ISSUER: shopic
       KAFKA_LISTENER_AUTO_STARTUP: true
-      JWT_HEADER_ALG: RS256
-      JWK_PATH: /api/v1/public-keys
-      PRODUCT_REDIS_URL: redis://:masterkey@product-service-redis:6379
 
 volumes:
   pg_data:

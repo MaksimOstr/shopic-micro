@@ -52,14 +52,12 @@ public class ProductFacade {
     }
 
     @Transactional
-    @CacheEvict(value = "admin-products", key = "#id")
     public AdminProductDto updateProduct(UUID id, UpdateProductRequest dto) {
         Product product = productService.updateProduct(id, dto);
 
         return productMapper.toAdminProductDto(product);
     }
 
-    @CacheEvict(value = "admin-products", key = "#id")
     public void changeProductImage(UUID id, MultipartFile productImage) {
         if(!productService.existsById(id)) {
             throw new NotFoundException("Product not found");
@@ -83,10 +81,8 @@ public class ProductFacade {
         return productDto;
     }
 
-    @Transactional
-    @Cacheable(value = "admin-products", key = "#productId")
     public AdminProductDto getAdminProduct(UUID productId) {
-        Product product = productService.getProductById(productId);
+        Product product = productService.getProductWithBrandAndCategoryById(productId);
         return productMapper.toAdminProductDto(product);
     }
 

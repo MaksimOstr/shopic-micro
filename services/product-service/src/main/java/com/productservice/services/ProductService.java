@@ -95,6 +95,11 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
     }
 
+    public Product getProductWithBrandAndCategoryById(UUID id) {
+        return productRepository.findWithBrandAndCategoryById(id)
+                .orElseThrow(() -> new NotFoundException(PRODUCT_NOT_FOUND));
+    }
+
 
     private Product createProductEntity(CreateProductRequest dto, String url, Category category, Brand brand) {
         return Product.builder()
