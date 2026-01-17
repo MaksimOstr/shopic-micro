@@ -1,0 +1,14 @@
+services:
+  api-gateway:
+    build: .
+    restart: always
+    env_file:
+      - ./../../.env #shared env file
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:1001
+      CART_SERVICE_URL: http://cart-service:1002
+      PAYMENT_SERVICE_URL: http://payment-service:1005
+      PRODUCT_SERVICE_URL: http://product-service:1003
+      ORDER_SERVICE_URL: http://order-service:1004

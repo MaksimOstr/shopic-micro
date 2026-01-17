@@ -3,10 +3,32 @@ services:
     image: postgres:16
     restart: always
     ports:
-      - "${PAYMENT_DB_PORT}:5432"
-    volumes:
-      - /postgres/payment-service/
+      - "1114:5432"
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${PAYMENT_DB_NAME}
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: payment-service-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d payment-service-db" ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+
+  payment-service:
+    build: .
+    restart: always
+    depends_on:
+      payment-service-db:
+        condition: service_healthy
+    env_file:
+      - ./../../.env #shared env file
+    ports:
+      - "${PAYMENT_SERVICE_PORT}:${PAYMENT_SERVICE_PORT}"
+    environment:
+      PAYMENT_DB_URL: jdbc:postgresql://payment-service-db:5432/payment-service-db
+      KAFKA_URL: kafka:9092
+
+volumes:
+  payment_db_data:

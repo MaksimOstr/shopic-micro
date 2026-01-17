@@ -25,7 +25,7 @@ spring:
       max-file-size: 10MB
 
   kafka:
-    bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
+    bootstrap-servers: ${KAFKA_URL}
     consumer:
       auto-offset-reset: latest
       enable-auto-commit: false

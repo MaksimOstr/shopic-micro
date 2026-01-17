@@ -14,7 +14,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - product_db_data:/var/lib/postgresql/data
 
   product-service:
     build: .
@@ -22,18 +22,15 @@ services:
     depends_on:
       product-service-db:
         condition: service_healthy
-      product-service-redis:
-        condition: service_healthy
     env_file:
-      - .env
-      - ./../../.env #shared env file
+      - ./../../.env
     ports:
-      - "1003:1003"
+      - "${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}"
     environment:
       PRODUCT_DB_URL: jdbc:postgresql://product-service-db:5432/product-service-db
-      KAFKA_LISTENER_AUTO_STARTUP: true
+      KAFKA_URL: kafka:9092
+
 
 volumes:
-  pg_data:
-  redis_data:
+  product_db_data:
 

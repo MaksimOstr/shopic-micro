@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${PAYMENT_DB_HOST}:${PAYMENT_DB_PORT}/${PAYMENT_DB_NAME}
+    url: ${PAYMENT_DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -20,7 +20,7 @@ spring:
         generate_statistics: true
 
   kafka:
-    bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
+    bootstrap-servers: ${KAFKA_URL}
 
 logging:
   level:

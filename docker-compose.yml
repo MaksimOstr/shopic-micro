@@ -4,6 +4,7 @@ include:
   - ./services/order-service/docker-compose.yml
   - ./services/payment-service/docker-compose.yml
   - ./services/product-service/docker-compose.yml
+  - ./services/api-gateway/docker-compose.yml
 
 services:
   kafka:
@@ -15,7 +16,7 @@ services:
       - /kafka/data
     ports:
       - "9092:9092"
-      - "${KAFKA_PORT}:9094"
+      - "9094:9094"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_KRAFT_MODE: "true"
