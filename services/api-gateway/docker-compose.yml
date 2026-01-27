@@ -5,8 +5,11 @@ services:
     env_file:
       - ./../../.env #shared env file
     ports:
-      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+      - "3030:3030"
     environment:
+      API_GATEWAY_PROFILE: dev
+      API_GATEWAY_PORT: 3030
+      JWT_PATH: /api/v1/public-keys
       AUTH_SERVICE_URL: http://auth-service:1001
       CART_SERVICE_URL: http://cart-service:1002
       PAYMENT_SERVICE_URL: http://payment-service:1005

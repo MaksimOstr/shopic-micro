@@ -25,8 +25,14 @@ services:
     env_file:
       - ./../../.env #shared env file
     ports:
-      - "${PAYMENT_SERVICE_PORT}:${PAYMENT_SERVICE_PORT}"
+      - "1005:1005"
     environment:
+      PAYMENT_SERVICE_PROFILE: dev
+      PAYMENT_SERVICE_PORT: 1005
+      AUTH_SERVICE_URL: http://auth-service:1001
+      DB_USER: admin
+      DB_PASSWORD: masterkey
+      PAYMENT_GRPC_PORT: 1015
       PAYMENT_DB_URL: jdbc:postgresql://payment-service-db:5432/payment-service-db
       KAFKA_URL: kafka:9092
 

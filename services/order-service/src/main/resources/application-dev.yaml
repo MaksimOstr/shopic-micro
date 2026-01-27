@@ -11,9 +11,9 @@ spring:
         product-service:
           address: 0.0.0.0:${PRODUCT_GRPC_PORT}
         cart-service:
-          address: 0.0.0.0:1014
+          address: 0.0.0.0:${CART_GRPC_PORT}
         payment-service:
-          address: 0.0.0.0:1015
+          address: 0.0.0.0:${PAYMENT_GRPC_PORT}
 
   jpa:
     open-in-view: false
@@ -86,4 +86,4 @@ resilience4j:
 jwt:
   issuer: ${JWT_ISSUER:shopic}
   header-alg: ${JWT_HEADER_ALG}
-  public-key-url: ${AUTH_SERVICE_URL}${JWK_PATH}
+  public-key-url: ${AUTH_SERVICE_URL}/api/v1/public-keys

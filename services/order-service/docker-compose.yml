@@ -25,8 +25,16 @@ services:
     env_file:
       - ./../../.env #shared env file
     ports:
-      - "${ORDER_SERVICE_PORT}:${ORDER_SERVICE_PORT}"
+      - "1004:1004"
     environment:
+      ORDER_SERVICE_PORT: 1004
+      ORDER_SERVICE_PROFILE: dev
+      PRODUCT_GRPC_PORT: 1013
+      PAYMENT_GRPC_PORT: 1015
+      CART_GRPC_PORT: 1014
+      AUTH_SERVICE_URL: http://auth-service:1001
+      DB_USER: admin
+      DB_PASSWORD: masterkey
       ORDER_DB_URL: jdbc:postgresql://order-service-db:5432/order-service-db
       KAFKA_URL: kafka:9092
 

@@ -25,8 +25,14 @@ services:
     env_file:
       - ./../../.env
     ports:
-      - "${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}"
+      - "1003:1003"
     environment:
+      DB_USER: admin
+      DB_PASSWORD: masterkey
+      PRODUCT_GRPC_PORT: 1013
+      PRODUCT_SERVICE_PROFILE: dev
+      PRODUCT_SERVICE_PORT: 1003
+      AUTH_SERVICE_URL: http://auth-service:1001
       PRODUCT_DB_URL: jdbc:postgresql://product-service-db:5432/product-service-db
       KAFKA_URL: kafka:9092
 

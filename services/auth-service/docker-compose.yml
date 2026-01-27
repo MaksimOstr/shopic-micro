@@ -1,7 +1,7 @@
 services:
   auth-service-db:
     image: postgres:16
-    restart: always
+    restart: unless-stopped
     ports:
       - "1111:5432"
     environment:
@@ -18,15 +18,20 @@ services:
 
   auth-service:
     build: .
-    restart: always
+    restart: unless-stopped
     depends_on:
       auth-service-db:
         condition: service_healthy
     env_file:
       - ./../../.env #shared env file
     ports:
-      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
+      - "1001:1001"
     environment:
+      DB_USER: admin
+      DB_PASSWORD: masterkey
+      AUTH_SERVICE_PORT: 1001
+      AUTH_SERVICE_URL: http://auth-service:1001
+      AUTH_SERVICE_PROFILE: dev
       AUTH_DB_URL: jdbc:postgresql://auth-service-db:5432/auth-service-db
 
 volumes:
