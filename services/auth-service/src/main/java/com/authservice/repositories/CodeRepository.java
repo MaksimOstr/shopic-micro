@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public interface CodeRepository extends JpaRepository<Code, Long> {
@@ -19,8 +18,6 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
     @Modifying
     @Query("DELETE FROM Code c WHERE c.expiresAt < CURRENT_TIMESTAMP")
     void deleteExpiredCodes();
-
-    void deleteByUser_IdAndScope(UUID userId, CodeScopeEnum scope);
 
     Optional<Code> findByUserAndScope(User user, CodeScopeEnum scope);
 

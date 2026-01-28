@@ -1,29 +1,25 @@
 package com.productservice.dto;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 
+
 @Getter
-public class UserProductDto extends BaseProductDto {
-
-    @Setter
+@Setter
+@RequiredArgsConstructor
+public class UserProductDto {
+    private final UUID id;
+    private final String productName;
+    private final String description;
+    private final String imageUrl;
+    private final int stockQuantity;
+    private final BigDecimal price;
+    private final String brandName;
+    private final String categoryName;
     private boolean isLiked;
-
-    public UserProductDto(
-            long id,
-            String productName,
-            String description,
-            String imageUrl,
-            UUID sku,
-            BigDecimal price,
-            String brandName,
-            String categoryName,
-            int stockQuantity
-    ) {
-        super(id, productName, description, imageUrl, sku, stockQuantity, price, brandName, categoryName);
-    }
 }

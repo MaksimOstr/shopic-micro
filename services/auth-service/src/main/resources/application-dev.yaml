@@ -1,12 +1,6 @@
 spring:
-  cloud:
-    config:
-      import-check:
-        enabled: false
-
-
   datasource:
-    url: jdbc:postgresql://localhost:${AUTH_DB_PORT}/${AUTH_DB_NAME}
+    url: ${AUTH_DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -36,19 +30,6 @@ spring:
     username: ${EMAIL_SENDER_USERNAME}
     password: ${EMAIL_SENDER_PASSWORD}
 
-  kafka:
-    bootstrap-servers: localhost:9094
-    consumer:
-      auto-offset-reset: latest
-      enable-auto-commit: false
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    listener:
-      ack-mode: manual_immediate
-  pulsar:
-    consumer:
-      retry-enable: true
-
 logging:
   level:
     org:
@@ -71,24 +52,11 @@ management:
     circuitbreakers:
       enabled: true
 
-resilience4j:
-  retry:
-    instances:
-          codeGenerationRetry:
-            max-attempts: 3
-            wait-duration: 100ms
-            retry-exceptions:
-              - org.springframework.dao.DataIntegrityViolationException
-
-eureka:
-  client:
-    enabled: false
-
 jwt:
   expires-at: ${JWT_EXPIRE_TIME}
   issuer: ${JWT_ISSUER:shopic}
-  header-alg: ${JWT_HEADER_ALG:RSA256}
-  public-key-url: ${AUTH_SERVICE_URL}${JWK_PATH}
+  header-alg: ${JWT_HEADER_ALG}
+  public-key-url: ${AUTH_SERVICE_URL}/api/v1/public-keys
 
 
 public-key:
@@ -102,7 +70,6 @@ refresh-token:
 verification-code:
   expires-at : ${CODE_EXPIRATION:900}
 
-signature-secret: ${SIGNATURE_SECRET}
 
 
 

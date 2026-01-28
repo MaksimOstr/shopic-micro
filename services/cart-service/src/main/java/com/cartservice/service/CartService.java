@@ -2,7 +2,6 @@ package com.cartservice.service;
 
 import com.cartservice.dto.CartDto;
 import com.cartservice.dto.CartItemDto;
-import com.cartservice.dto.CartItemDtoForOrder;
 import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.dto.request.ChangeCartItemQuantityRequest;
 import com.cartservice.entity.Cart;
@@ -13,7 +12,7 @@ import com.cartservice.mapper.CartItemMapper;
 import com.cartservice.mapper.CartMapper;
 import com.cartservice.repository.CartRepository;
 import com.cartservice.service.grpc.GrpcProductService;
-import com.shopic.grpc.productservice.ProductInfo;
+import com.shopic.grpc.productservice.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,15 +33,23 @@ public class CartService {
     private final CartMapper cartMapper;
 
     @Transactional
-    public CartItemDto addItemToCart(AddItemToCartRequest dto, UUID userId) {
+    public CartDto addItemToCart(AddItemToCartRequest dto, UUID userId) {
         Cart cart = cartRepository.findCartWithItemsByUserId(userId)
                 .orElseGet(() -> createCart(userId));
 
-        return cart.getCartItems().stream()
+        Optional<CartItem> existingItemOpt = cart.getCartItems().stream()
                 .filter(item -> item.getProductId().equals(dto.productId()))
-                .findFirst()
-                .map(existing -> updateExistingItem(dto, existing))
-                .orElseGet(() -> createNewItem(dto, cart));
+                .findFirst();
+
+        if (existingItemOpt.isPresent()) {
+            updateExistingItem(dto, existingItemOpt.get());
+        } else {
+            createNewItem(dto, cart);
+        }
+
+        cartRepository.save(cart);
+
+        return cartMapper.toDto(cart);
     }
 
     @Transactional(readOnly = true)
@@ -83,7 +91,6 @@ public class CartService {
                 .findFirst()
                 .orElseThrow(() -> new ApiException("Cart item not found", HttpStatus.NOT_FOUND));
 
-
         if (dto.amount() <= 0) {
             cartItems.remove(selectedItem);
             deleteCartIfEmpty(cart);
@@ -93,7 +100,11 @@ public class CartService {
     }
 
     public void deleteCartByUserId(UUID userId) {
-        cartRepository.deleteCartByUserId(userId);
+        int deleted = cartRepository.deleteCartByUserId(userId);
+
+        if(deleted == 0) {
+            throw new ApiException("Cart not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     private Cart getCartWithItemsByUserId(UUID userId) {
@@ -108,44 +119,41 @@ public class CartService {
     }
 
     private Cart createCart(UUID userId) {
-        Cart cart = Cart.builder()
+        return Cart.builder()
                 .userId(userId)
                 .build();
-
-        return cartRepository.save(cart);
     }
 
-    private CartItemDto createNewItem(AddItemToCartRequest dto, Cart cart) {
-        ProductInfo response = getProductInfoAndCheckQuantity(dto.productId(), dto.quantity());
+    private void createNewItem(AddItemToCartRequest dto, Cart cart) {
+        Product product = getProductByIdAndCheckQuantity(dto.productId(), dto.quantity());
         CartItem newCartItem = CartItem.builder()
-                .priceAtAdd(new BigDecimal(response.getPrice()))
-                .productName(response.getProductName())
+                .priceAtAdd(new BigDecimal(product.getPrice()))
+                .productName(product.getName())
                 .quantity(dto.quantity())
                 .productId(dto.productId())
                 .cart(cart)
-                .productImageUrl(response.getProductImageUrl())
+                .productImageUrl(product.getImageUrl())
                 .build();
 
-        return cartItemMapper.toDto(newCartItem);
+        cart.getCartItems().add(newCartItem);
     }
 
-    private CartItemDto updateExistingItem(AddItemToCartRequest dto, CartItem cartItem) {
-        getProductInfoAndCheckQuantity(dto.productId(), dto.quantity() + cartItem.getQuantity());
+    private void updateExistingItem(AddItemToCartRequest dto, CartItem cartItem) {
+        getProductByIdAndCheckQuantity(dto.productId(), dto.quantity() + cartItem.getQuantity());
         cartItem.setQuantity(cartItem.getQuantity() + dto.quantity());
-        return cartItemMapper.toDto(cartItem);
     }
 
-    private ProductInfo getProductInfoAndCheckQuantity(UUID productId, int quantity) {
-        ProductInfo productInfo = grpcProductService.getProductInfo(productId);
+    private Product getProductByIdAndCheckQuantity(UUID productId, int quantity) {
+        Product product = grpcProductService.getProductById(productId);
 
-        if (productInfo.getAvailableQuantity() < quantity) {
+        if (product.getAvailableQuantity() < quantity) {
             throw new ApiException(
                     "Insufficient stock for product. Requested: %d, Available: %d"
-                            .formatted(quantity, productInfo.getAvailableQuantity()),
+                            .formatted(quantity, product.getAvailableQuantity()),
                     HttpStatus.BAD_REQUEST
             );
         }
 
-        return productInfo;
+        return product;
     }
 }

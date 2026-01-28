@@ -1,12 +1,13 @@
 package com.orderservice.dto;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record OrderItemDto (
-        long id,
+        UUID id,
         int quantity,
         String name,
         String productImageUrl,
-        long productId,
+        UUID productId,
         BigDecimal priceAtPurchase
 ) {}

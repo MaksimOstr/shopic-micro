@@ -1,6 +1,7 @@
 package com.authservice.config.security;
 
 import com.authservice.security.CustomAuthenticationEntryPoint;
+import com.authservice.security.CustomJwtAuthenticationConverter;
 import com.authservice.security.OAuthSuccessHandler;
 import com.authservice.security.OauthFailureHandler;
 import com.authservice.security.CustomOidcUserService;
@@ -21,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
     private static final String[] permittedURLs = {
             "/actuator/**",
@@ -63,7 +65,8 @@ public class SecurityConfig {
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
             CustomOidcUserService customOidcUserService,
             OAuthSuccessHandler oAuthSuccessHandler,
-            OauthFailureHandler oauthFailureHandler
+            OauthFailureHandler oauthFailureHandler,
+            CustomJwtAuthenticationConverter customJwtAuthenticationConverter
     ) throws Exception {
         return http
                 .authenticationProvider(daoAuthenticationProvider)
@@ -72,9 +75,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(permittedURLs).permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {
-                    jwtConfigurer.decoder(jwtDecoder);
-                }))
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwtConfigurer -> {
+                            jwtConfigurer
+                                    .jwtAuthenticationConverter(customJwtAuthenticationConverter)
+                                    .decoder(jwtDecoder);
+                        }))
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(customOidcUserService))

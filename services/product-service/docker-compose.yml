@@ -1,12 +1,42 @@
 services:
   product-service-db:
-    image: postgres:latest
+    image: postgres:16
     restart: always
     ports:
-      - "${PRODUCT_DB_PORT}:5432"
-    volumes:
-      - /postgres/product-service/
+      - "1115:5432"
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${PRODUCT_DB_NAME}
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: product-service-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d product-service-db" ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+
+  product-service:
+    build: .
+    restart: always
+    depends_on:
+      product-service-db:
+        condition: service_healthy
+    env_file:
+      - ./../../.env
+    ports:
+      - "1003:1003"
+    environment:
+      DB_USER: admin
+      DB_PASSWORD: masterkey
+      PRODUCT_GRPC_PORT: 1013
+      PRODUCT_SERVICE_PROFILE: dev
+      PRODUCT_SERVICE_PORT: 1003
+      AUTH_SERVICE_URL: http://auth-service:1001
+      PRODUCT_DB_URL: jdbc:postgresql://product-service-db:5432/product-service-db
+      KAFKA_URL: kafka:9092
+
+
+volumes:
+  product_db_data:
+

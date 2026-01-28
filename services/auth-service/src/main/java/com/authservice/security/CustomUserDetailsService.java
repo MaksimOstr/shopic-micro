@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             return new CustomUserDetails(user);
         } catch (NotFoundException e) {
             log.error("User with email {} not found", email);
-            throw new UsernameNotFoundException("test");
+            throw new UsernameNotFoundException("User with email " + email + " not found");
         }
     }
 }

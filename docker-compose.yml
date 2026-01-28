@@ -4,12 +4,13 @@ include:
   - ./services/order-service/docker-compose.yml
   - ./services/payment-service/docker-compose.yml
   - ./services/product-service/docker-compose.yml
+  - ./services/api-gateway/docker-compose.yml
 
 services:
   kafka:
-    image: apache/kafka:latest
+    image: apache/kafka:4.1.1
     restart: always
-    container_name: kafka
+    container_name: kafka-1
     hostname: kafka
     volumes:
       - /kafka/data
@@ -31,22 +32,4 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_NUM_PARTITIONS: 3
-
-  redis:
-    image: redis:latest
-    restart: always
-    ports:
-      - '6379:6379'
-    volumes:
-      - /redis/data
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]
-
-  pg-admin:
-    image: dpage/pgadmin4
-    restart: always
-    ports:
-      - '4040:80'
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PG_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PG_PASSWORD}
+      KAFKA_NUM_PARTITIONS: 1

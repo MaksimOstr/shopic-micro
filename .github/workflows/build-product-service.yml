@@ -1,0 +1,25 @@
+name: Build Product Service
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v.*.*.*'
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-product-service.yml'
+      - 'services/product-service/**'
+
+permissions:
+  contents: read
+  packages: write
+
+
+jobs:
+  build:
+    name: Build Service
+    uses: ./.github/workflows/build.yml
+    with:
+      context: 'product-service'
+      service: 'product-service'

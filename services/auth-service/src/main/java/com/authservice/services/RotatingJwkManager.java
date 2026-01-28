@@ -32,14 +32,14 @@ public class RotatingJwkManager {
     private void rotateKeys() throws JOSEException {
         RSAKey newKey = new RSAKeyGenerator(2048)
                 .keyID(UUID.randomUUID().toString()).generate();
-        publicKeyService.savePublicKey(newKey);
-        keys.addFirst(newKey);
+        publicKeyService.savePublicKey(newKey.toPublicJWK());
+        keys.add(0, newKey);
         if (keys.size() > 2) {
-            keys.removeLast();
+            keys.remove(keys.size() - 1);
         }
     }
 
     public RSAKey getActivePrivateKey() {
-        return keys.getFirst();
+        return keys.get(0);
     }
 }

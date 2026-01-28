@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.grpc.server.service.GrpcService;
 
+import java.util.UUID;
+
 @Slf4j
 @GrpcService
 @RequiredArgsConstructor
@@ -20,13 +22,13 @@ public class GrpcPaymentService extends PaymentServiceGrpc.PaymentServiceImplBas
     private final GrpcMapper grpcMapper;
 
     @Override
-    public void createPaymentForOrder(CreatePaymentRequest request, StreamObserver<CreatePaymentResponse> responseObserver) {
-        log.info("Create payment for order {}", request);
+    public void createPayment(CreatePaymentRequest request, StreamObserver<CreatePaymentResponse> responseObserver) {
+        log.info("Create payment request {}", request);
 
         CreateCheckoutSessionDto dto = new CreateCheckoutSessionDto(
-                request.getOrderId(),
-                request.getCustomerId(),
-                grpcMapper.toCheckoutItemList(request.getLineItemsList())
+                UUID.fromString(request.getOrderId()),
+                UUID.fromString(request.getUserId()),
+                grpcMapper.toCheckoutItemList(request.getOrderItemsList())
         );
 
         String redirectUrl = stripeService.createCheckoutSession(dto);

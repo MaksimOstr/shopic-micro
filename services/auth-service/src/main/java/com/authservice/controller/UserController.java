@@ -3,12 +3,12 @@ package com.authservice.controller;
 import com.authservice.dto.ChangePasswordRequest;
 import com.authservice.dto.ErrorResponseDto;
 import com.authservice.dto.UserDto;
+import com.authservice.security.CustomPrincipal;
 import com.authservice.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,8 +20,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -69,10 +67,10 @@ public class UserController {
     })
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
-            @AuthenticationPrincipal Jwt jwt,
+            @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid ChangePasswordRequest body
     ) {
-        userService.changeUserPassword(UUID.fromString(jwt.getSubject()), body);
+        userService.changePassword(principal.id(), body);
 
         return ResponseEntity.ok().build();
     }
@@ -109,9 +107,9 @@ public class UserController {
     })
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUserInfo(
-            @AuthenticationPrincipal Jwt jwt
+            @AuthenticationPrincipal CustomPrincipal principal
     ) {
-        UserDto userDto = userService.getUserDto(UUID.fromString(jwt.getId()));
+        UserDto userDto = userService.getUserDto(principal.id());
 
         return ResponseEntity.ok(userDto);
     }

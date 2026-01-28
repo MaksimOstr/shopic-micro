@@ -9,13 +9,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Integer>, JpaSpecificationExecutor<Category> {
+public interface CategoryRepository extends JpaRepository<Category, UUID>, JpaSpecificationExecutor<Category> {
     boolean existsByName(String name);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Category c SET c.isActive = :active WHERE c.id = :id")
-    int changeIsActive(int id, boolean active);
+    boolean existsByNameAndIdNot(String name, UUID categoryId);
 }

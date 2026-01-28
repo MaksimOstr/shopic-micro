@@ -1,33 +1,24 @@
 package com.productservice.dto;
 
 
-import com.productservice.entity.ProductStatusEnum;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-public class AdminProductDto extends BaseProductDto {
-    private final ProductStatusEnum status;
-    private final Instant createdAt;
 
-    public AdminProductDto(
-            long id,
-            String productName,
-            String description,
-            String imageUrl,
-            UUID sku,
-            BigDecimal price,
-            String brandName,
-            String categoryName,
-            ProductStatusEnum status,
-            int stockQuantity,
-            Instant createdAt
-    ) {
-        super(id, productName, description, imageUrl, sku, stockQuantity, price, brandName, categoryName);
-        this.status = status;
-        this.createdAt = createdAt;
-    }
-}
+public record AdminProductDto(
+        UUID id,
+        String productName,
+        String description,
+        String imageUrl,
+        int stockQuantity,
+        BigDecimal price,
+        UUID categoryId,
+        UUID brandId,
+        String categoryName,
+        String brandName,
+        Boolean deleted,
+        Instant createdAt
+) {}

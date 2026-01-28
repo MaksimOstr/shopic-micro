@@ -1,9 +1,16 @@
 package com.orderservice.service;
 
-import com.orderservice.dto.request.UpdateContactInfoRequest;
+import com.orderservice.dto.CreateOrderRequest;
+import com.orderservice.dto.UpdateContactInfoRequest;
+import com.orderservice.dto.UpdateOrderStatusRequest;
 import com.orderservice.entity.Order;
+import com.orderservice.entity.OrderDeliveryTypeEnum;
+import com.orderservice.entity.OrderItem;
+import com.orderservice.entity.OrderStatusEnum;
 import com.orderservice.exception.NotFoundException;
 import com.orderservice.repository.OrderRepository;
+import com.orderservice.service.calculator.DeliveryPriceCalculator;
+import com.shopic.grpc.productservice.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,8 +19,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
+import java.util.UUID;
 
 
 @Slf4j
@@ -21,49 +30,62 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final List<DeliveryPriceCalculator> deliveryPriceCalculatorList;
 
     private static final String ORDER_NOT_FOUND = "Order not found";
 
     @Transactional
-    public Order updateOrderContactInfo(long orderId, UpdateContactInfoRequest dto) {
-        Order order = getOrderById(orderId);
+    public Order createOrder(CreateOrderRequest dto, UUID userId) {
+        Order order = Order.builder()
+                .customerName(dto.name())
+                .customerPhoneNumber(dto.phoneNumber())
+                .deliveryType(dto.deliveryType())
+                .comment(dto.comment())
+                .status(OrderStatusEnum.PENDING)
+                .userId(userId)
+                .address(dto.address())
+                .build();
 
-        Optional.ofNullable(dto.city()).ifPresent(city -> order.getAddress().setCity(city));
-        Optional.ofNullable(dto.country()).ifPresent(country -> order.getAddress().setCountry(country));
-        Optional.ofNullable(dto.street()).ifPresent(street -> order.getAddress().setStreet(street));
-        Optional.ofNullable(dto.postalCode()).ifPresent(postalCode -> order.getAddress().setPostalCode(postalCode));
-        Optional.ofNullable(dto.houseNumber()).ifPresent(houseNumber -> order.getAddress().setHouseNumber(houseNumber));
-        Optional.ofNullable(dto.firstName()).ifPresent(firstName -> order.getCustomer().setFirstName(firstName));
-        Optional.ofNullable(dto.lastName()).ifPresent(lastName -> order.getCustomer().setLastName(lastName));
-        Optional.ofNullable(dto.phoneNumber()).ifPresent(phoneNumber -> order.getCustomer().setPhoneNumber(phoneNumber));
+        DeliveryPriceCalculator deliveryPriceCalculator = getDeliveryPriceCalculator(dto.deliveryType());
+        order.setDeliveryPrice(deliveryPriceCalculator.calculateDeliveryPrice(dto, order.calculateTotalPrice()));
 
-        return order;
-    }
-
-    public Order save(Order order) {
         return orderRepository.save(order);
     }
 
     @Transactional
-    public void changeRefundStatus(long orderId, boolean isRefunded) {
-        int updated = orderRepository.updateIsRefunded(orderId, isRefunded);
+    public Order updateOrderContactInfo(UUID orderId, UpdateContactInfoRequest dto) {
+        Order order = getOrderById(orderId);
 
-        if(updated == 0) {
-            throw new NotFoundException(ORDER_NOT_FOUND);
-        }
+        order.setCustomerName(dto.customerName());
+        order.setAddress(dto.address());
+
+        return order;
     }
 
-    public Order getOrderWithItems(long orderId) {
+    public Order updateOrderStatus(UUID orderId, OrderStatusEnum targetStatus) {
+        Order order = getOrderById(orderId);
+
+        order.changeOrderStatus(targetStatus);
+
+        return orderRepository.save(order);
+    }
+
+    public Order getOrderWithItems(UUID orderId) {
         return orderRepository.findByIdWithItems(orderId)
                 .orElseThrow(() -> new NotFoundException(ORDER_NOT_FOUND));
     }
 
-    public Order getOrderById(long orderId) {
+    public Order getOrderById(UUID orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ORDER_NOT_FOUND));
     }
 
     public Page<Order> getOrdersBySpec(Specification<Order> spec, Pageable pageable) {
         return orderRepository.findAll(spec, pageable);
+    }
+
+    private DeliveryPriceCalculator getDeliveryPriceCalculator(OrderDeliveryTypeEnum type) {
+        return deliveryPriceCalculatorList.stream().filter(calculator -> calculator.getDeliveryType() == type).findFirst()
+                .orElseThrow(() -> new NotFoundException("Provided delivery type is not supported"));
     }
 }

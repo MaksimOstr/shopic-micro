@@ -1,5 +1,8 @@
 package com.productservice.dto.event;
 
+import java.util.UUID;
+
 public record BaseReservationEvent(
-        long orderId
+        UUID id,
+        UUID orderId
 ) {}

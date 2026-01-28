@@ -59,6 +59,7 @@ public class UserService {
                             .email(email)
                             .role(UserRolesEnum.ROLE_USER)
                             .authProvider(provider)
+                            .isVerified(true)
                             .build();
 
                     return userRepository.save(user);
@@ -66,7 +67,7 @@ public class UserService {
     }
 
     @Transactional
-    public void changeUserPassword(User user, String newPassword) {
+    public void resetPassword(User user, String newPassword) {
         if(passwordEncoder.matches(newPassword, user.getPassword())) {
             throw new ApiException("Password is the same", HttpStatus.BAD_REQUEST);
         }
@@ -76,12 +77,16 @@ public class UserService {
     }
 
     @Transactional
-    public void changeUserPassword(UUID id, ChangePasswordRequest dto) {
+    public void changePassword(UUID id, ChangePasswordRequest dto) {
         User user = findById(id);
         boolean isEqual = passwordEncoder.matches(dto.oldPassword(), user.getPassword());
 
         if(!isEqual) {
             throw new ApiException("Password does not match", HttpStatus.BAD_REQUEST);
+        }
+
+        if(passwordEncoder.matches(dto.newPassword(), user.getPassword())) {
+            throw new ApiException("New password is the same as the old one", HttpStatus.BAD_REQUEST);
         }
 
         String encodedNewPassword = passwordEncoder.encode(dto.newPassword());

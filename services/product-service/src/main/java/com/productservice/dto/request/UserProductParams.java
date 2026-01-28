@@ -2,12 +2,13 @@ package com.productservice.dto.request;
 
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record UserProductParams(
         String productName,
         BigDecimal toPrice,
         BigDecimal fromPrice,
-        Long categoryId,
-        Long brandId
+        UUID categoryId,
+        UUID brandId
 ) {
 }

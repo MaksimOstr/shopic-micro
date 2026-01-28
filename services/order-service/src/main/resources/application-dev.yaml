@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:${ORDER_DB_PORT}/${ORDER_DB_NAME}
+    url: ${ORDER_DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -9,11 +9,11 @@ spring:
     client:
       channels:
         product-service:
-          address: 0.0.0.0:1013
+          address: ${PRODUCT_GRPC_CHANNEL}
         cart-service:
-          address: 0.0.0.0:1014
+          address: ${CART_GRPC_CHANNEL}
         payment-service:
-          address: 0.0.0.0:1015
+          address: ${PAYMENT_GRPC_CHANNEL}
 
   jpa:
     open-in-view: false
@@ -26,7 +26,7 @@ spring:
         generate_statistics: true
 
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_URL}
     consumer:
       auto-offset-reset: latest
       enable-auto-commit: false
@@ -56,6 +56,9 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 10
         sliding-window-size: 50
         register-health-indicator: true
+        ignore-exceptions:
+          - com.orderservice.exception.ExternalServiceBusinessException
+
       payment-service:
         sliding-window-type: COUNT_BASED
         failure-rate-threshold: 50
@@ -65,6 +68,8 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 10
         sliding-window-size: 50
         register-health-indicator: true
+        ignore-exceptions:
+          - com.orderservice.exception.ExternalServiceBusinessException
       product-service:
         sliding-window-type: COUNT_BASED
         failure-rate-threshold: 50
@@ -74,3 +79,11 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 10
         sliding-window-size: 50
         register-health-indicator: true
+        ignore-exceptions:
+          - com.orderservice.exception.ExternalServiceBusinessException
+
+
+jwt:
+  issuer: ${JWT_ISSUER:shopic}
+  header-alg: ${JWT_HEADER_ALG}
+  public-key-url: ${AUTH_SERVICE_URL}/api/v1/public-keys

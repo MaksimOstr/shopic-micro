@@ -1,0 +1,25 @@
+name: Build Auth Service
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v.*.*.*'
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-auth-service.yml'
+      - 'services/auth-service/**'
+
+permissions:
+  contents: read
+  packages: write
+
+
+jobs:
+  build:
+    name: Build Service
+    uses: ./.github/workflows/build.yml
+    with:
+      context: 'auth-service'
+      service: 'auth-service'

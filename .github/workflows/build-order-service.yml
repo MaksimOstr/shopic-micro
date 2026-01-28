@@ -1,0 +1,25 @@
+name: Build Order Service
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v.*.*.*'
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-order-service.yml'
+      - 'services/order-service/**'
+
+permissions:
+  contents: read
+  packages: write
+
+
+jobs:
+  build:
+    name: Build Service
+    uses: ./.github/workflows/build.yml
+    with:
+      context: 'order-service'
+      service: 'order-service'

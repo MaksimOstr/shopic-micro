@@ -1,0 +1,25 @@
+name: Build Api Gateway
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v.*.*.*'
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-api-gateway.yml'
+      - 'services/api-gateway/**'
+
+permissions:
+  contents: read
+  packages: write
+
+
+jobs:
+  build:
+    name: Build Service
+    uses: ./.github/workflows/build.yml
+    with:
+      context: 'api-gateway'
+      service: 'api-gateway'

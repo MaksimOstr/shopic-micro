@@ -7,11 +7,13 @@ import com.authservice.exception.ApiException;
 import com.authservice.repositories.CodeRepository;
 import com.authservice.services.CodeService;
 import io.github.resilience4j.retry.MaxRetriesExceededException;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +30,12 @@ public class CodeServiceImpl implements CodeService {
     @Value("${verification-code.expires-at}")
     private int expiresAt;
 
-    @Transactional
+    @Retryable(retryFor = DataIntegrityViolationException.class, backoff = @Backoff(delay = 100))
     public Code create(User user, CodeScopeEnum scope) {
         try {
+            log.info("Creating code for user {} with scope {}", user, scope);
             return codeRepository.findByUserAndScope(user, scope)
-                    .map(this::update)
+                    .map((this::update))
                     .orElseGet(() -> createAndSave(user, scope));
         } catch (MaxRetriesExceededException e) {
             log.error("Max retries exceeded", e);
@@ -67,10 +70,9 @@ public class CodeServiceImpl implements CodeService {
         code.setExpiresAt(Instant.now().plusSeconds(expiresAt));
         code.setCode(generatedCode);
 
-        return code;
+        return codeRepository.save(code);
     }
 
-    @Retry(name = "codeGenerationRetry")
     private Code createAndSave(User user, CodeScopeEnum scope) {
         String generatedCode = generateAlphanumericCode();
         Code code = Code.builder()
@@ -83,7 +85,7 @@ public class CodeServiceImpl implements CodeService {
         return codeRepository.save(code);
     }
 
-    @Scheduled(fixedDelay = 900 * 1000)
+    @Scheduled(fixedDelay = 1000 * 60 * 5)
     public void clearExpiredCodes() {
         log.info("Clearing expired codes");
         codeRepository.deleteExpiredCodes();

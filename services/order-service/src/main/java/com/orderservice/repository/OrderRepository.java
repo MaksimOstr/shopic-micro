@@ -9,23 +9,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
+public interface OrderRepository extends JpaRepository<Order, UUID>, JpaSpecificationExecutor<Order> {
     @EntityGraph(attributePaths = { "orderItems" })
-    List<Order> findOrdersByUserId(long userId);
+    List<Order> findOrdersByUserId(UUID userId);
 
     @Transactional
     @Modifying
     @Query("UPDATE Order o SET o.status = :status WHERE o.id = :id")
-    int changeOrderStatus(long id, OrderStatusEnum status);
+    int changeOrderStatus(UUID id, OrderStatusEnum status);
 
     @Query("SELECT o FROM Order o JOIN FETCH o.orderItems oi WHERE o.id = :id")
-    Optional<Order> findByIdWithItems(long id);
-
-    @Modifying
-    @Query("UPDATE Order o SET o.refunded = :value WHERE o.id = :id")
-    int updateIsRefunded(long id, boolean value);
+    Optional<Order> findByIdWithItems(UUID id);
 
     List<Order> findByStatusAndCreatedAtBefore(OrderStatusEnum status, Instant date);
 }

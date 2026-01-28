@@ -1,10 +1,12 @@
 package com.productservice.unit;
 
+import com.productservice.dto.AdminBrandDto;
 import com.productservice.dto.request.CreateBrandRequest;
 import com.productservice.dto.request.UpdateBrandRequest;
 import com.productservice.entity.Brand;
-import com.productservice.exceptions.AlreadyExistsException;
+import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
+import com.productservice.mapper.BrandMapper;
 import com.productservice.repository.BrandRepository;
 import com.productservice.services.BrandService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,120 +16,134 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BrandServiceTest {
+class BrandServiceTest {
+
     @Mock
     private BrandRepository brandRepository;
+
+    @Mock
+    private BrandMapper brandMapper;
 
     @InjectMocks
     private BrandService brandService;
 
-
-    private static final String BRAND_NAME = "brandNameTest";
-    private static final String REQUESTED_BRAND_NAME = "requestedBrandName";
-    private static final int BRAND_ID = 1;
-    private static final boolean ACTIVE = true;
-    private static final UpdateBrandRequest UPDATE_BRAND_REQUEST = new UpdateBrandRequest(
-            REQUESTED_BRAND_NAME
-    );
-    private static final CreateBrandRequest CREATE_BRAND_REQUEST = new CreateBrandRequest(
-            REQUESTED_BRAND_NAME,
-            ACTIVE
-    );
-
-
+    private UUID brandId;
     private Brand brand;
 
     @BeforeEach
-    public void setup() {
+    void setUp() {
+        brandId = UUID.randomUUID();
         brand = Brand.builder()
-                .id(BRAND_ID)
-                .name(BRAND_NAME)
+                .id(brandId)
+                .name("Nike")
+                .isActive(true)
                 .build();
     }
 
     @Test
-    public void testUpdateBrand_whenCalledWithExistingBrand_thenThrowException() {
-        when(brandRepository.existsBrandByName(anyString())).thenReturn(true);
+    void create_shouldSaveBrand_whenNameDoesNotExist() {
+        CreateBrandRequest request = new CreateBrandRequest("Adidas", true);
+        AdminBrandDto expectedDto = new AdminBrandDto(UUID.randomUUID(), "Adidas", true);
 
-        assertThrows(AlreadyExistsException.class, () -> {
-            brandService.updateBrand(BRAND_ID, UPDATE_BRAND_REQUEST);
-        });
+        when(brandRepository.existsBrandByName(request.brandName())).thenReturn(false);
+        when(brandRepository.save(any(Brand.class))).thenAnswer(i -> i.getArgument(0));
+        when(brandMapper.toAdminBrandDto(any(Brand.class))).thenReturn(expectedDto);
 
+        AdminBrandDto result = brandService.create(request);
 
-        verify(brandRepository).existsBrandByName(REQUESTED_BRAND_NAME);
-        verifyNoMoreInteractions(brandRepository);
+        assertThat(result).isEqualTo(expectedDto);
 
-        assertEquals(BRAND_NAME, brand.getName());
-    }
-
-    @Test
-    public void testUpdateBrand_whenCalledWithNewBrandName_thenUpdateBrand() {
-        when(brandRepository.existsBrandByName(anyString())).thenReturn(false);
-        when(brandRepository.findById(anyInt())).thenReturn(Optional.of(brand));
-
-        Brand result = brandService.updateBrand(BRAND_ID, UPDATE_BRAND_REQUEST);
-
-        verify(brandRepository).existsBrandByName(REQUESTED_BRAND_NAME);
-        verify(brandRepository).findById(BRAND_ID);
-
-        assertEquals(REQUESTED_BRAND_NAME, brand.getName());
-        assertEquals(brand, result);
-    }
-
-    @Test
-    public void testUpdateBrand_whenCalledWithNonExistingBrandEntity_thenThrowException() {
-        when(brandRepository.existsBrandByName(anyString())).thenReturn(false);
-        when(brandRepository.findById(anyInt())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> {
-            brandService.updateBrand(BRAND_ID, UPDATE_BRAND_REQUEST);
-        });
-
-        verify(brandRepository).existsBrandByName(REQUESTED_BRAND_NAME);
-        verify(brandRepository).findById(BRAND_ID);
-
-        assertEquals(BRAND_NAME, brand.getName());
-    }
-
-    @Test
-    public void testCreate_whenCalledWithExistingBrandName_thenThrowException() {
-        when(brandRepository.existsBrandByName(anyString())).thenReturn(true);
-
-        assertThrows(AlreadyExistsException.class, () -> {
-            brandService.create(CREATE_BRAND_REQUEST);
-        });
-
-        verify(brandRepository).existsBrandByName(REQUESTED_BRAND_NAME);
-        verifyNoMoreInteractions(brandRepository);
-    }
-
-    @Test
-    public void testCreate_whenCalledWithNewBrandName_thenCreateNewBrand() {
         ArgumentCaptor<Brand> brandCaptor = ArgumentCaptor.forClass(Brand.class);
-
-        when(brandRepository.existsBrandByName(anyString())).thenReturn(false);
-        when(brandRepository.save(any(Brand.class))).thenReturn(brand);
-
-        Brand result = brandService.create(CREATE_BRAND_REQUEST);
-
-        verify(brandRepository).existsBrandByName(REQUESTED_BRAND_NAME);
         verify(brandRepository).save(brandCaptor.capture());
+        Brand savedBrand = brandCaptor.getValue();
 
-        Brand capturedBrand = brandCaptor.getValue();
-
-        assertEquals(REQUESTED_BRAND_NAME, capturedBrand.getName());
-        assertEquals(ACTIVE, capturedBrand.isActive());
-        assertEquals(brand, result);
+        assertThat(savedBrand.getName()).isEqualTo("Adidas");
+        assertThat(savedBrand.isActive()).isTrue();
     }
 
+    @Test
+    void create_shouldThrowException_whenNameExists() {
+        CreateBrandRequest request =
+                new CreateBrandRequest("Nike", true);
 
+        when(brandRepository.existsBrandByName(request.brandName()))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> brandService.create(request))
+                .isInstanceOf(ApiException.class)
+                .hasMessage("Brand name already exists")
+                .extracting("status")
+                .isEqualTo(HttpStatus.CONFLICT);
+
+        verify(brandRepository, never()).save(any());
+    }
+
+    @Test
+    void updateBrand_shouldUpdateBrand_whenNameIsUnique() {
+        UpdateBrandRequest request =
+                new UpdateBrandRequest("Puma", false);
+
+        when(brandRepository.existsByNameAndIdNot(request.brandName(), brandId))
+                .thenReturn(false);
+        when(brandRepository.findById(brandId))
+                .thenReturn(Optional.of(brand));
+
+        AdminBrandDto dto =
+                new AdminBrandDto(brandId, "Puma", false);
+
+        when(brandMapper.toAdminBrandDto(brand))
+                .thenReturn(dto);
+
+        AdminBrandDto result = brandService.updateBrand(brandId, request);
+
+        assertThat(result).isEqualTo(dto);
+        assertThat(brand.getName()).isEqualTo("Puma");
+        assertThat(brand.isActive()).isFalse();
+    }
+
+    @Test
+    void updateBrand_shouldThrowException_whenNameExists() {
+        UpdateBrandRequest request =
+                new UpdateBrandRequest("Nike", true);
+
+        when(brandRepository.existsByNameAndIdNot(request.brandName(), brandId))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> brandService.updateBrand(brandId, request))
+                .isInstanceOf(ApiException.class)
+                .hasMessage("Brand with name Nike already exists")
+                .extracting("status")
+                .isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void getBrandById_shouldReturnBrand_whenExists() {
+        when(brandRepository.findById(brandId))
+                .thenReturn(Optional.of(brand));
+
+        Brand result = brandService.getBrandById(brandId);
+
+        assertThat(result).isEqualTo(brand);
+    }
+
+    @Test
+    void getBrandById_shouldThrowException_whenNotFound() {
+        when(brandRepository.findById(brandId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> brandService.getBrandById(brandId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Brand not found");
+    }
 }

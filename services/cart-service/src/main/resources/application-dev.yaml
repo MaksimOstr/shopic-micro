@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:${CART_DB_PORT}/${CART_DB_NAME}
+    url: ${CART_DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -11,17 +11,22 @@ spring:
 
   grpc:
     server:
-      port: 1014
+      port: ${CART_GRPC_PORT}
     client:
       channels:
         product-service:
-          address: 0.0.0.0:1013
+          address: ${PRODUCT_GRPC_CHANNEL}
 
 logging:
   level:
     org:
       hibernate:
         SQL: debug
+
+jwt:
+  issuer: ${JWT_ISSUER:shopic}
+  header-alg: ${JWT_HEADER_ALG}
+  public-key-url: ${AUTH_SERVICE_URL}/api/v1/public-keys
 
 
 

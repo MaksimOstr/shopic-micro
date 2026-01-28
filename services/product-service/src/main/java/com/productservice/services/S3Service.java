@@ -1,10 +1,9 @@
 package com.productservice.services;
 
-import com.productservice.dto.PutObjectDto;
-import com.productservice.exceptions.InternalException;
+import com.productservice.exceptions.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -21,6 +20,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 
+import static com.productservice.utils.Utils.getUUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -30,25 +31,24 @@ public class S3Service {
     private final S3Client s3Client;
 
 
-    public String uploadFile(PutObjectDto dto) {
+    public String uploadFile(String bucket, MultipartFile file) {
         try {
-            MultipartFile file = dto.file();
+            String key = getUUID().toString();
             PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(dto.bucket())
-                    .key(dto.key())
+                    .bucket(bucket)
+                    .key(key)
                     .contentType(file.getContentType())
-                    .acl(ObjectCannedACL.PUBLIC_READ)
                     .build();
 
             s3Client.putObject(
                     request,
-                    RequestBody.fromInputStream(dto.file().getInputStream(), file.getSize())
+                    RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
 
-            return generateUrl(dto.bucket(), dto.key());
+            return generateUrl(bucket, key);
         } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new InternalException(e.getMessage());
+            log.error("An unexpected exception occurred while uploading the file to S3.", e);
+            throw new ApiException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

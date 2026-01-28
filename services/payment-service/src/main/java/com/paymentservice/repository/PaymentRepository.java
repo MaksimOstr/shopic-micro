@@ -12,21 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpecificationExecutor<Payment> {
+public interface PaymentRepository extends JpaRepository<Payment, UUID>, JpaSpecificationExecutor<Payment> {
     Optional<Payment> findBySessionId(String sessionId);
 
     @Transactional
     @Modifying
     @Query("UPDATE Payment p SET p.status = :paymentStatus WHERE p.sessionId = :sessionId")
     int updatePaymentStatus(String sessionId, PaymentStatus paymentStatus);
-
-    @Query("SELECT p FROM Payment p LEFT JOIN FETCH p.refunds WHERE  p.orderId = :orderId")
-    Optional<Payment> findByOrderIdWithRefunds(long orderId);
-
-    @Query("SELECT p FROM Payment p LEFT JOIN FETCH p.refunds WHERE  p.id = :id")
-    Optional<Payment> findByIdWithRefunds(long id);
 
     List<Payment> findByStatusAndCreatedAtBefore(PaymentStatus status, Instant date);
 }

@@ -1,12 +1,42 @@
 services:
   order-service-db:
-    image: postgres:latest
+    image: postgres:16
     restart: always
     ports:
-      - "${ORDER_DB_PORT}:5432"
-    volumes:
-      - /postgres/order-service/
+      - "1113:5432"
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${ORDER_DB_NAME}
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: order-service-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d order-service-db" ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+
+  order-service:
+    build: .
+    restart: always
+    depends_on:
+      order-service-db:
+        condition: service_healthy
+    env_file:
+      - ./../../.env #shared env file
+    ports:
+      - "1004:1004"
+    environment:
+      ORDER_SERVICE_PORT: 1004
+      ORDER_SERVICE_PROFILE: dev
+      PRODUCT_GRPC_CHANNEL: product-service:1013
+      CART_GRPC_CHANNEL: cart-service:1014
+      PAYMENT_GRPC_CHANNEL: payment-service:1015
+      AUTH_SERVICE_URL: http://auth-service:1001
+      DB_USER: admin
+      DB_PASSWORD: masterkey
+      ORDER_DB_URL: jdbc:postgresql://order-service-db:5432/order-service-db
+      KAFKA_URL: kafka:9092
+
+volumes:
+  order_db_data:

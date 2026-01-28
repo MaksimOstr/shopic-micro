@@ -2,9 +2,7 @@ spring:
   application:
     name: cart-service
   profiles:
-    active: dev
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+    active: ${CART_SERVICE_PROFILE}
 
 server:
   port: ${CART_SERVICE_PORT}

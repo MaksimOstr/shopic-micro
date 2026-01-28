@@ -12,7 +12,7 @@ public class Utils {
         return UUID.randomUUID();
     }
 
-    public static List<Long> extractIds(List<ItemForReservationDto> items) {
+    public static List<UUID> extractIds(List<ItemForReservationDto> items) {
         return items.stream().map(ItemForReservationDto::productId).toList();
     }
 }

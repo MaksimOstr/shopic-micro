@@ -1,23 +1,27 @@
 package com.orderservice.service.grpc;
 
 
-import com.orderservice.exception.ExternalServiceUnavailableException;
-import com.orderservice.exception.InternalException;
+import com.orderservice.entity.Order;
+import com.orderservice.exception.ApiException;
+import com.orderservice.exception.ExternalServiceBusinessException;
 import com.orderservice.mapper.GrpcMapper;
+import com.orderservice.mapper.OrderItemMapper;
 import com.shopic.grpc.paymentservice.CreatePaymentRequest;
 import com.shopic.grpc.paymentservice.CreatePaymentResponse;
-import com.shopic.grpc.paymentservice.OrderLineItem;
+import com.shopic.grpc.paymentservice.OrderItem;
 import com.shopic.grpc.paymentservice.PaymentServiceGrpc;
-import com.shopic.grpc.productservice.ProductInfo;
+import com.shopic.grpc.productservice.Product;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Slf4j
@@ -25,44 +29,34 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentGrpcService {
     private final PaymentServiceGrpc.PaymentServiceBlockingStub paymentGrpcService;
-    private final GrpcMapper grpcMapper;
+    private final OrderItemMapper orderItemMapper;
 
     @CircuitBreaker(name = "payment-service", fallbackMethod = "createPaymentFallback")
-    public CreatePaymentResponse createPayment(long orderId, long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap, BigDecimal deliveryPrice) {
+    public CreatePaymentResponse createPayment(UUID userId, Order order) {
         log.info("Create payment gRpc request");
 
-        List<OrderLineItem> orderLineItemList = grpcMapper.toOrderLineItemList(productInfoList, productQuantityMap);
+        List<OrderItem> orderItems = orderItemMapper.toGrpcOrderItems(order.getOrderItems());
 
-        OrderLineItem deliveryLineItem = OrderLineItem.newBuilder()
+        OrderItem deliveryLineItem = OrderItem.newBuilder()
                 .setQuantity(1)
-                .setPriceForOne(deliveryPrice.toString())
+                .setPriceForOne(order.getDeliveryPrice().toString())
                 .setItemName("Delivery")
                 .setItemImage("")
                 .build();
 
         CreatePaymentRequest request = CreatePaymentRequest.newBuilder()
-                .setOrderId(orderId)
-                .setCustomerId(userId)
-                .addAllLineItems(orderLineItemList)
-                .addLineItems(deliveryLineItem)
+                .setOrderId(order.getId().toString())
+                .setUserId(userId.toString())
+                .addAllOrderItems(orderItems)
+                .addOrderItems(deliveryLineItem)
                 .build();
 
-        System.out.println(request.getLineItemsList());
-
-        return paymentGrpcService.createPaymentForOrder(request);
+        return paymentGrpcService.createPayment(request);
     }
 
-    public CreatePaymentResponse createPaymentFallback(long orderId, long userId, List<ProductInfo> productInfoList, Map<Long, Integer> productQuantityMap, Throwable exception) {
-        log.error(exception.getMessage(), exception);
-        if (exception instanceof StatusRuntimeException e) {
-            switch (e.getStatus().getCode()) {
-                case INTERNAL, FAILED_PRECONDITION:
-                    throw new InternalException(e.getStatus().getDescription());
-                default:
-                    throw e;
-            }
-        } else {
-            throw new ExternalServiceUnavailableException("Something went wrong. Please try again later");
-        }
+    public CreatePaymentResponse createPaymentFallback(UUID userId, Order order, Throwable exception) {
+        log.error("Payment service fallback for orderId={} userId={}", order.getId(), userId, exception);
+
+        throw new ApiException("Something went wrong, try again later", HttpStatus.SERVICE_UNAVAILABLE);
     }
 }

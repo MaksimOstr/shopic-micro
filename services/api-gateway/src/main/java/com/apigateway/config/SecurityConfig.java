@@ -31,7 +31,10 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api-docs/**",
-
+            "/api/v1/categories/**",
+            "/api/v1/brands/**",
+            "/api/v1/products/**",
+            "/actuator/**"
     };
 
     private final JwtProperties jwtProperties;
@@ -49,9 +52,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/logout").authenticated()
                         .requestMatchers(permittedURLs).permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> {
-                    jwtConfigurer.decoder(jwtDecoder());
-                }))
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwtConfigurer -> {
+                            jwtConfigurer.decoder(jwtDecoder());
+                        }))
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .build();
     }

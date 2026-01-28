@@ -9,7 +9,8 @@ option java_multiple_files = true;
 option java_package = "com.shopic.grpc.productservice";
 
 
-message ProductInfoRequest {
+
+message GetProductRequest {
   string product_id = 1;
 }
 
@@ -18,48 +19,65 @@ message ReserveProductsRequest {
   repeated ReservationItem reservation_items = 3;
 }
 
-message ReservationItem {
-  string product_id = 1;
-  int32 quantity = 2;
+message ReserveProductsResponse {
+  repeated ReservedProduct products = 1;
+  repeated ReservationError errors = 2;
 }
 
-
-message ProductInfo {
-  string product_id = 1;
-  string product_name = 2;
-  string product_image_url = 3;
-  string price = 4;
-  int32 available_quantity = 5;
-}
-
-
-
-message ProductInfoListRequest {
-  repeated int64 product_id = 1;
-}
-
-message ProductInfoList {
-  repeated ProductInfo products = 2;
+message GetProductListRequest {
+  repeated string product_id = 1;
 }
 
 message IsProductExistsRequest {
   string product_id = 1;
 }
 
+message ReservationItem {
+  string product_id = 1;
+  int64 quantity = 2;
+}
+
+message ReservationError {
+  string product_id = 1;
+  int64 requested_quantity = 2;
+  int64 available_quantity = 3;
+  ErrorType type = 4;
+}
+
+enum ErrorType {
+  INSUFFICIENT_STOCK = 0;
+  NOT_FOUND = 1;
+}
+
+message ReservedProduct {
+  string id = 1;
+  string name = 2;
+  string image_url = 3;
+  string price = 4;
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string image_url = 3;
+  string price = 4;
+  int64 available_quantity = 5;
+}
+
+message ProductListResponse {
+  repeated Product products = 2;
+}
+
 message IsProductExistsResponse {
-  bool isExists = 1;
+  bool exists = 1;
 }
 
 
-
-
 service ProductService {
-  rpc getProductInfo(ProductInfoRequest) returns (ProductInfo);
+  rpc GetProductById(GetProductRequest) returns (Product);
 
-  rpc reserveProducts(ReserveProductsRequest) returns (google.protobuf.Empty);
+  rpc ReserveProducts(ReserveProductsRequest) returns (ReserveProductsResponse);
 
-  rpc getProductInfoList(ProductInfoListRequest) returns (ProductInfoList);
-
-  rpc isProductExists(IsProductExistsRequest) returns (IsProductExistsResponse);
+  rpc IsProductExists(IsProductExistsRequest) returns (IsProductExistsResponse);
 }
 

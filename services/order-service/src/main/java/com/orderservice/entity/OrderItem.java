@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "order_items")
@@ -16,11 +17,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_items_seq")
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "product_id", nullable = false)
-    private long productId;
+    private UUID productId;
 
     @Min(value = 0)
     private int quantity;

@@ -7,12 +7,12 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {RefundMapper.class})
+@Mapper(componentModel = "spring")
 public interface PaymentMapper {
 
-    PaymentDto toPaymentDto(Payment payment);
+    PaymentDto toDto(Payment payment);
 
-    PaymentSummaryDto toPaymentSummaryDto(Payment payment);
+    PaymentSummaryDto toSummaryDto(Payment payment);
 
-    List<PaymentSummaryDto> toPaymentSummaryDtoList(List<Payment> payments);
+    List<PaymentSummaryDto> toSummaryDtoList(List<Payment> payments);
 }

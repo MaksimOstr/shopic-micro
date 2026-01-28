@@ -1,7 +1,9 @@
 package com.productservice.dto;
 
+import java.util.UUID;
+
 public record UserBrandDto(
-        long id,
+        UUID id,
         String name
 ) {
 }

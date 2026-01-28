@@ -2,64 +2,41 @@ package com.paymentservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.paymentservice.dto.event.CheckoutSuccessEvent;
-import com.paymentservice.dto.event.BasePaymentEvent;
-import com.paymentservice.dto.event.RefundEvent;
-import com.paymentservice.exception.InternalException;
+import com.paymentservice.dto.BasePaymentEvent;
+import com.paymentservice.exception.ApiException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class KafkaService {
 
-    private final KafkaTemplate<String, String> atLeastOnceBatchTemplate;
+    private final KafkaTemplate<String, String> reliableKafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String SOMETHING_WENT_WRONG = "Something went wrong. Please try again later";
-
-    public KafkaService (
-            @Qualifier("atLeastOnceBatchTemplate") KafkaTemplate<String, String> atLeastOnceBatchTemplate,
-            ObjectMapper objectMapper
-    ) {
-        this.atLeastOnceBatchTemplate = atLeastOnceBatchTemplate;
-        this.objectMapper = objectMapper;
-    }
-
-    public void sendCheckoutSessionSuccess(long orderId) {
-        try {
-            CheckoutSuccessEvent event = new CheckoutSuccessEvent(orderId);
-
-            atLeastOnceBatchTemplate.send("payment.paid", objectMapper.writeValueAsString(event));
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            throw new InternalException(SOMETHING_WENT_WRONG);
-        }
-    }
-
-    public void sendUnpaidPaymentEvent(long orderId) {
+    public void sendCheckoutSessionSuccess(UUID orderId) {
         try {
             BasePaymentEvent event = new BasePaymentEvent(orderId);
-
-            atLeastOnceBatchTemplate.send("payment.unpaid", objectMapper.writeValueAsString(event));
+            reliableKafkaTemplate.send("payment.paid", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            throw new InternalException(SOMETHING_WENT_WRONG);
+            log.error("Failed to send payment.paid event for orderId {}: {}", orderId, e.getMessage(), e);
+            throw new ApiException("Failed to send payment event, try again later", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public void sendRefundSuccessEvent(long orderId, BigDecimal refundAmount) {
+    public void sendUnpaidPaymentEvent(UUID orderId) {
         try {
-            RefundEvent event = new RefundEvent(orderId, refundAmount);
-
-            atLeastOnceBatchTemplate.send("refund.success", objectMapper.writeValueAsString(event));
+            BasePaymentEvent event = new BasePaymentEvent(orderId);
+            reliableKafkaTemplate.send("payment.unpaid", objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            throw new InternalException(SOMETHING_WENT_WRONG);
+            log.error("Failed to send payment.unpaid event for orderId {}: {}", orderId, e.getMessage(), e);
+            throw new ApiException("Failed to send payment event, try again later", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

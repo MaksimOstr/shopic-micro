@@ -1,13 +1,22 @@
 package com.productservice.services;
 
-import com.productservice.dto.AdminReservationDto;
-import com.productservice.dto.AdminReservationPreviewDto;
+import com.productservice.dto.ReservationContext;
+import com.productservice.dto.ReservationDto;
+import com.productservice.dto.ReservationError;
+import com.productservice.dto.ReservationPreviewDto;
+import com.productservice.dto.ProductReservedQuantity;
+import com.productservice.dto.ReservationResult;
+import com.productservice.dto.request.AdminReservationParams;
+import com.productservice.dto.request.ItemForReservationDto;
 import com.productservice.entity.Product;
 import com.productservice.entity.Reservation;
 import com.productservice.entity.ReservationItem;
-import com.productservice.entity.ReservationStatusEnum;
+import com.productservice.enums.ReservationErrorType;
+import com.productservice.enums.ReservationStatusEnum;
+import com.productservice.exceptions.ApiException;
 import com.productservice.exceptions.NotFoundException;
 import com.productservice.mapper.ReservationMapper;
+import com.productservice.repository.ReservationItemRepository;
 import com.productservice.repository.ReservationRepository;
 import com.productservice.utils.SpecificationUtils;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +25,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.productservice.utils.ProductUtils.toProductMap;
+import static com.productservice.utils.SpecificationUtils.equalsField;
+import static com.productservice.utils.Utils.extractIds;
 
 
 @Slf4j
@@ -32,71 +51,184 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ProductService productService;
     private final ReservationMapper reservationMapper;
+    private final ReservationItemRepository reservationItemRepository;
+    private final KafkaService kafkaService;
 
     @Transactional
-    public void cancelReservation(long orderId) {
-        Reservation reservation = reservationRepository.findByOrderIdWithItems(orderId)
-                .orElseThrow(() -> new NotFoundException("Reservation with id " + orderId + " not found"));
+    public ReservationResult createReservation(List<ItemForReservationDto> items, UUID orderId) {
+        Reservation reservation = Reservation.builder()
+                .status(ReservationStatusEnum.PENDING)
+                .orderId(orderId)
+                .build();
 
-        if(reservation.getStatus().equals(ReservationStatusEnum.CANCELLED)) {
-            log.info("Reservation already cancelled for order: {}", orderId);
-            return;
+        ReservationContext context = loadContext(items);
+        List<ReservationError> errors = validateReservationItems(items, context);
+
+        if (!errors.isEmpty()) {
+            return new ReservationResult(List.of(), errors);
         }
 
-        List<ReservationItem> reservationItemList = reservation.getItems();
-        List<Long> productIds = reservationItemList.stream().map(item -> item.getProduct().getId()).toList();
-        List<Product> productList = productService.getProductsForUpdate(productIds);
+        List<ReservationItem> reservationItems = buildReservationItems(items, context, reservation);
 
-        updateProductQuantity(productList, reservationItemList);
-        reservation.setStatus(ReservationStatusEnum.CANCELLED);
+        reservation.setItems(reservationItems);
+        reservationRepository.save(reservation);
+
+        return new ReservationResult(
+                context.productMap().values().stream().toList(),
+                List.of()
+        );
     }
 
-    public AdminReservationDto getReservationAdminDto(long id) {
+    @Transactional
+    public void cancelReservation(UUID orderId) {
+        Reservation reservation = reservationRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new NotFoundException("Reservation not found"));
+
+        reservation.changeStatus(ReservationStatusEnum.CANCELLED);
+    }
+
+    @Transactional
+    public void completeReservation(UUID orderId) {
+        Reservation reservation = reservationRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new NotFoundException("Reservation not found"));
+        reservation.changeStatus(ReservationStatusEnum.COMPLETED);
+        List<ReservationItem> items = reservationItemRepository.findByReservationIdWithProductsLocked(reservation.getId());
+
+        for (ReservationItem item : items) {
+            Product product = item.getProduct();
+
+            product.decreaseStock(item.getQuantity());
+        }
+
+        reservationRepository.save(reservation);
+    }
+
+    public ReservationDto getReservationAdminDto(UUID id) {
         Reservation reservation = reservationRepository.findByIdWithItems(id)
                 .orElseThrow(() -> new NotFoundException("Reservation with id " + id + " not found"));
 
         return reservationMapper.toAdminReservationDto(reservation);
     }
 
-    public AdminReservationDto getReservationAdminDtoByOrderId(long orderId) {
+    public ReservationDto getReservationAdminDtoByOrderId(UUID orderId) {
         Reservation reservation = reservationRepository.findByOrderIdWithItems(orderId)
                 .orElseThrow(() -> new NotFoundException("Reservation with order id " + orderId + " not found"));
 
         return reservationMapper.toAdminReservationDto(reservation);
     }
 
-
-    public Page<AdminReservationPreviewDto> getAdminReservationPreviewDtoList(Pageable pageable, ReservationStatusEnum status) {
-        Specification<Reservation> spec = SpecificationUtils.equalsEnum("status", status);
+    public Page<ReservationPreviewDto> getReservationList(Pageable pageable, AdminReservationParams params) {
+        Specification<Reservation> spec = SpecificationUtils.<Reservation>equalsField("status", params.orderId())
+                .and(equalsField("orderId", params.orderId()));
         Page<Reservation> reservationPage = reservationRepository.findAll(spec, pageable);
         List<Reservation> reservationList = reservationPage.getContent();
-        List<AdminReservationPreviewDto> previewDtoList = reservationMapper.toAdminReservationPreviewDtoList(reservationList);
+        List<ReservationPreviewDto> previewDtoList = reservationMapper.toAdminReservationPreviewDtoList(reservationList);
 
         return new PageImpl<>(previewDtoList, pageable, reservationPage.getTotalElements());
     }
 
-    public void updateReservationStatus(long orderId, ReservationStatusEnum status) {
-        int updated = reservationRepository.updateStatus(orderId, status);
 
-        if(updated == 0) {
-            log.error("Failed to update reservation status for order with order id {}", orderId);
-            throw new NotFoundException("Reservation with order id " + orderId + " not found");
-        }
+    private ReservationContext loadContext(
+            List<ItemForReservationDto> items
+    ) {
+        List<UUID> productIds = extractIds(items);
+
+        List<Product> products =
+                productService.getActiveProductsByIdsWithLock(productIds);
+
+        Map<UUID, Product> productMap = toProductMap(products);
+
+        Map<UUID, Long> reservedMap = reservationItemRepository.findReservedQuantitiesByProductIdsAndStatus(
+                        productIds,
+                        ReservationStatusEnum.PENDING
+                )
+                .stream()
+                .collect(Collectors.toMap(
+                        ProductReservedQuantity::productId,
+                        ProductReservedQuantity::reservedQuantity
+                ));
+
+        return new ReservationContext(productMap, reservedMap);
     }
 
-    private void updateProductQuantity(List<Product> productList, List<ReservationItem> reservationItemList) {
-        Map<Long, Product> productMap = toProductMap(productList);
-        System.out.println(productMap);
-        for (ReservationItem item : reservationItemList) {
-            System.out.println(item);
-            Product product = productMap.get(item.getProduct().getId());
-            System.out.println(product);
-            if(product == null) {
-                log.error("Product with id {} not found", item.getProduct().getId());
-                throw new  NotFoundException("Product with id " + item.getProduct().getId() + " not found");
+    private List<ReservationError> validateReservationItems(
+            List<ItemForReservationDto> items,
+            ReservationContext context
+    ) {
+        List<ReservationError> errors = new ArrayList<>();
+
+        for (ItemForReservationDto dto : items) {
+            Product product = context.productMap().get(dto.productId());
+
+            if (product == null) {
+                log.warn("Reservation failed: Product not found in DB. ProductId: {}", dto.productId());
+                errors.add(new ReservationError(
+                        dto.productId(),
+                        ReservationErrorType.NOT_FOUND,
+                        0,
+                        0
+                ));
+                continue;
             }
-            System.out.println(product.getStockQuantity() + item.getQuantity());
-            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+
+            long reserved = context.reservedMap().getOrDefault(product.getId(), 0L);
+            long available = product.getStockQuantity() - reserved;
+
+            if (available < dto.quantity()) {
+                log.warn("Reservation failed: Insufficient stock for Product {}. Requested: {}, Available: {})",
+                        product.getId(), dto.quantity(), available);
+                errors.add(new ReservationError(
+                        dto.productId(),
+                        ReservationErrorType.INSUFFICIENT_STOCK,
+                        dto.quantity(),
+                        available
+                ));
+            }
         }
+
+        return errors;
     }
+
+    private List<ReservationItem> buildReservationItems(
+            List<ItemForReservationDto> items,
+            ReservationContext context,
+            Reservation reservation
+    ) {
+        List<ReservationItem> result = new ArrayList<>();
+
+        for (ItemForReservationDto dto : items) {
+            Product product = context.productMap().get(dto.productId());
+
+            ReservationItem item = new ReservationItem();
+            item.setProduct(product);
+            item.setReservation(reservation);
+            item.setQuantity(dto.quantity());
+
+            result.add(item);
+        }
+
+        return result;
+    }
+
+    @Scheduled(fixedRate = 5 * 60 * 1000)
+    public void expirePendingReservations() {
+        Instant expiryTime = Instant.now().minus(Duration.ofMinutes(30));
+
+        List<Reservation> pendingReservations = reservationRepository.findByStatusAndCreatedAtBefore(ReservationStatusEnum.PENDING, expiryTime);
+
+        if (pendingReservations.isEmpty()) {
+            log.info("No pending reservations to expire");
+            return;
+        }
+
+        pendingReservations.forEach(reservation -> {
+            reservation.setStatus(ReservationStatusEnum.CANCELLED);
+            kafkaService.sendReservationCancelled(reservation.getOrderId(), reservation.getId());
+        });
+
+        reservationRepository.saveAll(pendingReservations);
+
+        log.info("Expired {} reservations", pendingReservations.size());
+    }
+
 }

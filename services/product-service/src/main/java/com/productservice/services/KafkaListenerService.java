@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.productservice.dto.event.BaseOrderEvent;
 import com.productservice.dto.event.BasePaymentEvent;
-import com.productservice.entity.ReservationStatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,67 +20,44 @@ import org.springframework.transaction.annotation.Transactional;
 public class KafkaListenerService {
     private final ObjectMapper objectMapper;
     private final ReservationService reservationService;
-    private final KafkaService kafkaService;
 
-    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
-    @KafkaListener(topics = {"order.returned", "order.canceled"}, groupId = "product-service")
-    @Transactional
-    public void listenReturnedOrder(String data, Acknowledgment ack) {
-        try {
-            log.info("listenReturnedOrCanceledOrder");
-            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
-
-            reservationService.cancelReservation(event.orderId());
-            ack.acknowledge();
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
-    @KafkaListener(topics = "order.completed", groupId = "product-service")
-    @Transactional
-    public void listenCompletedOrder(String data, Acknowledgment ack) {
-        try {
-            log.info("listenCompletedOrder");
-            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
-
-            reservationService.updateReservationStatus(event.orderId(), ReservationStatusEnum.COMPLETED);
-            ack.acknowledge();
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
     @KafkaListener(topics = {"payment.unpaid"}, groupId = "product-service")
     @Transactional
     public void listenPaymentUnpaid(String data, Acknowledgment ack) {
         try {
-            log.info("listenPaymentUnpaid");
             BasePaymentEvent event = objectMapper.readValue(data, BasePaymentEvent.class);
+            log.info("listenPaymentUnpaid for orderId: {} and paymentId: {}", event.orderId(), event.paymentId());
 
             reservationService.cancelReservation(event.orderId());
-
             ack.acknowledge();
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
+            log.error("Failed to deserialize order.failed event: {}", data, e);
         }
     }
 
-    @RetryableTopic(attempts = "2", backoff = @Backoff(delay = 5000))
+    @KafkaListener(topics = {"order.failed"}, groupId = "product-service")
+    public void listenOrderFailed(String data, Acknowledgment ack) {
+        try {
+            BaseOrderEvent event = objectMapper.readValue(data, BaseOrderEvent.class);
+            log.info("listenOrderFailed for orderId: {}", event.orderId());
+
+            reservationService.cancelReservation(event.orderId());
+            ack.acknowledge();
+        } catch (JsonProcessingException e) {
+            log.error("Failed to deserialize order.failed event: {}", data, e);
+        }
+    }
+
     @KafkaListener(topics = {"payment.paid"}, groupId = "product-service")
     public void listenOrderPaid(String data, Acknowledgment ack) {
         try {
-            log.info("listenOrderPaid");
             BasePaymentEvent event = objectMapper.readValue(data, BasePaymentEvent.class);
+            log.info("listenOrderPaid for orderId: {} and paymentId: {}", event.orderId(), event.paymentId());
 
-            reservationService.updateReservationStatus(event.orderId(), ReservationStatusEnum.CONFIRMED);
-            kafkaService.sendReservationConfirmed(event.orderId());
-
+            reservationService.completeReservation(event.orderId());
             ack.acknowledge();
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
+            log.error("Failed to deserialize order.failed event: {}", data, e);
         }
     }
 }

@@ -4,11 +4,12 @@ import com.paymentservice.entity.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 public record PaymentSummaryDto(
-        long id,
-        long userId,
-        long orderId,
+        UUID id,
+        UUID userId,
+        UUID orderId,
         String stripePaymentId,
         String paymentMethod,
         String currency,

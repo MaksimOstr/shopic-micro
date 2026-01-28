@@ -34,6 +34,6 @@ public class ForgotPasswordService {
     @Transactional
     public void resetPassword(ResetPasswordRequest dto) {
         Code code = codeService.validate(dto.code(), CodeScopeEnum.RESET_PASSWORD);
-        userService.changeUserPassword(code.getUser(), dto.newPassword());
+        userService.resetPassword(code.getUser(), dto.newPassword());
     }
 }

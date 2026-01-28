@@ -4,12 +4,13 @@ import com.orderservice.entity.OrderStatusEnum;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 public record AdminOrderPreviewDto(
-        Long orderId,
+        UUID orderId,
+        UUID userId,
         OrderStatusEnum status,
         BigDecimal totalPrice,
         Instant createdAt,
-        String firstName,
-        String lastName
+        String customerName
 ) {}

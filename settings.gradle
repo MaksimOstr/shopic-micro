@@ -1,7 +1,6 @@
 rootProject.name = 'shopic'
 
 
-
 include ':api-gateway'
 project(':api-gateway').projectDir = new File('services/api-gateway')
 

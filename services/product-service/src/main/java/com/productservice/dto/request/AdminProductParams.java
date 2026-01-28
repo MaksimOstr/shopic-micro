@@ -1,16 +1,14 @@
 package com.productservice.dto.request;
 
-import com.productservice.entity.ProductStatusEnum;
-import lombok.*;
-
 import java.math.BigDecimal;
+import java.util.UUID;
 
 
 public record AdminProductParams(
         String productName,
         BigDecimal fromPrice,
         BigDecimal toPrice,
-        Integer brandId,
-        Integer categoryId,
-        ProductStatusEnum status
+        UUID brandId,
+        UUID categoryId,
+        Boolean isDeleted
 ) {}

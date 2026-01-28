@@ -1,12 +1,41 @@
 services:
   cart-service-db:
-    image: postgres:latest
+    image: postgres:16
     restart: always
     ports:
-      - "${CART_DB_PORT}:5432"
-    volumes:
-      - /postgres/cart-service/
+      - "1112:5432"
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${CART_DB_NAME}
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: cart-service-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d cart-service-db" ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - cart_db_data:/var/lib/postgresql/data
+
+  cart-service:
+    build: .
+    restart: always
+    depends_on:
+      cart-service-db:
+        condition: service_healthy
+    env_file:
+      - ./../../.env #shared env file
+    ports:
+      - "1002:1002"
+    environment:
+      CART_SERVICE_PORT: 1002
+      CART_SERVICE_PROFILE: dev
+      AUTH_SERVICE_URL: http://auth-service:1001
+      DB_USER: admin
+      PRODUCT_GRPC_CHANNEL: product-service:1013
+      CART_GRPC_PORT: 1014
+      DB_PASSWORD: masterkey
+      CART_DB_URL: jdbc:postgresql://cart-service-db:5432/cart-service-db
+
+
+volumes:
+  cart_db_data:

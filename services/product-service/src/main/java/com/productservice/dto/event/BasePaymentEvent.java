@@ -1,6 +1,9 @@
 package com.productservice.dto.event;
 
+import java.util.UUID;
+
 public record BasePaymentEvent(
-        long orderId
+        UUID paymentId,
+        UUID orderId
 ) {
 }

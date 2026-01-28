@@ -1,12 +1,38 @@
 services:
   auth-service-db:
-    image: postgres:latest
-    restart: always
+    image: postgres:16
+    restart: unless-stopped
     ports:
-      - "${AUTH_DB_PORT}:5432"
-    volumes:
-      - /postgres/auth-service/
+      - "1111:5432"
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: auth-service-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d auth-service-db" ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+
+  auth-service:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      auth-service-db:
+        condition: service_healthy
+    env_file:
+      - ./../../.env #shared env file
+    ports:
+      - "1001:1001"
+    environment:
+      DB_USER: admin
+      DB_PASSWORD: masterkey
+      AUTH_SERVICE_PORT: 1001
+      AUTH_SERVICE_URL: http://auth-service:1001
+      AUTH_SERVICE_PROFILE: dev
+      AUTH_DB_URL: jdbc:postgresql://auth-service-db:5432/auth-service-db
+
+volumes:
+  auth_db_data:

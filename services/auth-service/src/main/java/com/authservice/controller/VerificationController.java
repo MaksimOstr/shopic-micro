@@ -2,6 +2,7 @@ package com.authservice.controller;
 
 import com.authservice.dto.EmailVerifyRequestDto;
 import com.authservice.dto.ErrorResponseDto;
+import com.authservice.dto.MessageResponseDto;
 import com.authservice.dto.VerifyUserRequestDto;
 import com.authservice.services.VerificationService;
 import jakarta.validation.Valid;
@@ -45,7 +46,7 @@ public class VerificationController {
             )
     })
     @PatchMapping
-    public ResponseEntity<String> verifyUser(
+    public ResponseEntity<Void> verifyUser(
             @RequestBody @Valid VerifyUserRequestDto body
     ) {
         verificationService.verifyUser(body.code());
@@ -71,10 +72,12 @@ public class VerificationController {
             )
     })
     @PostMapping
-    public ResponseEntity<Void> requestVerificationCode(
+    public ResponseEntity<MessageResponseDto> requestVerificationCode(
             @RequestBody @Valid EmailVerifyRequestDto body
     ) {
         verificationService.requestVerifyEmail(body.email());
-        return ResponseEntity.ok().build();
+        String message = "Verification email has been sent if applicable.";
+
+        return ResponseEntity.ok(new MessageResponseDto(message));
     }
 }

@@ -6,12 +6,12 @@ option java_package = "com.shopic.grpc.paymentservice";
 option java_multiple_files = true;
 
 message CreatePaymentRequest {
-  int64 order_id = 1;
-  int64 customer_id = 2;
-  repeated OrderLineItem line_items = 4;
+  string order_id = 1;
+  string user_id = 2;
+  repeated OrderItem order_items = 4;
 }
 
-message OrderLineItem {
+message OrderItem {
   string item_name = 1;
   string item_image = 2;
   int64 quantity = 3;
@@ -24,5 +24,5 @@ message CreatePaymentResponse {
 
 
 service PaymentService {
-  rpc createPaymentForOrder(CreatePaymentRequest) returns (CreatePaymentResponse);
+  rpc CreatePayment(CreatePaymentRequest) returns (CreatePaymentResponse);
 }

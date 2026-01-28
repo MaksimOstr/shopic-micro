@@ -1,10 +1,8 @@
 package com.authservice.unit.service;
 
-import com.authservice.services.KafkaEventProducer;
 import com.authservice.services.PublicKeyService;
 import com.authservice.services.RotatingJwkManager;
 import com.nimbusds.jose.jwk.RSAKey;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,9 +24,6 @@ class RotatingJwkManagerTest {
     @Mock
     private PublicKeyService publicKeyService;
 
-    @Mock
-    private KafkaEventProducer kafkaEventProducer;
-
     @InjectMocks
     private RotatingJwkManager rotatingJwkManager;
 
@@ -39,7 +34,6 @@ class RotatingJwkManagerTest {
 
         ArgumentCaptor<RSAKey> captor = ArgumentCaptor.forClass(RSAKey.class);
         verify(publicKeyService).savePublicKey(captor.capture());
-        verify(kafkaEventProducer).sendJwkSetInvalidationEvent();
 
         RSAKey savedKey = captor.getValue();
         assertNotNull(savedKey.getKeyID());
@@ -54,7 +48,6 @@ class RotatingJwkManagerTest {
 
         ArgumentCaptor<RSAKey> captor = ArgumentCaptor.forClass(RSAKey.class);
         verify(publicKeyService, times(3)).savePublicKey(captor.capture());
-        verify(kafkaEventProducer, times(3)).sendJwkSetInvalidationEvent();
 
         @SuppressWarnings("unchecked")
         List<RSAKey> keys = (List<RSAKey>) ReflectionTestUtils.getField(rotatingJwkManager, "keys");

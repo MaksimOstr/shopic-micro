@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	alias(libs.plugins.spring.framework.boot)
-	alias(libs.plugins.spring.dependency.management)
+	alias(libs.plugins.spring.framework.boot) apply true
+	alias(libs.plugins.spring.dependency.management) apply true
 }
 
 group = 'com'
@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		libs.versions.java.get().toInteger()
 	}
 }
 
@@ -19,20 +19,23 @@ repositories {
 
 dependencies {
 	implementation project(":proto")
-	annotationProcessor 'org.projectlombok:lombok'
-	implementation'com.stripe:stripe-java:29.2.0'
+	implementation(platform(libs.spring.grpc.dependencies))
+	implementation(platform(libs.spring.cloud.dependencies))
+	implementation libs.stripe
+	implementation libs.grpc
+	implementation libs.kafka
+	annotationProcessor libs.lombok
+	compileOnly(libs.lombok)
+	implementation libs.bundles.db
 	annotationProcessor libs.mapstruct.processor
 	implementation libs.bundles.core
+	implementation libs.bundles.web
+	implementation libs.bundles.security
 	implementation libs.bundles.business.service
-	implementation libs.bundles.business.service.additional
+	testImplementation libs.kafka.test
+	testImplementation libs.bundles.test.core
 }
 
-dependencyManagement {
-	imports {
-		mavenBom("org.springframework.cloud:spring-cloud-dependencies:${libs.versions.spring.cloud.get()}")
-		mavenBom "org.springframework.grpc:spring-grpc-dependencies:${libs.versions.grpc.version.get()}"
-	}
-}
 
 tasks.named('test') {
 	useJUnitPlatform()

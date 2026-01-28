@@ -68,7 +68,7 @@ class PublicKeyServiceTest {
         List<JWK> keys = publicKeyService.getPublicKeys();
 
         assertEquals(1, keys.size());
-        assertEquals("kid-2", keys.getFirst().getKeyID());
+        assertEquals("kid-2", keys.get(0).getKeyID());
     }
 
     @Test

@@ -5,7 +5,6 @@ import com.cartservice.dto.CartItemDtoForOrder;
 import com.cartservice.dto.request.AddItemToCartRequest;
 import com.cartservice.entity.Cart;
 import com.cartservice.entity.CartItem;
-import com.shopic.grpc.productservice.ProductInfo;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

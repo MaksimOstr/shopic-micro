@@ -6,9 +6,8 @@ spring:
         secret-key: ${AWS_SECRET_ACCESS_KEY}
       region:
         static: ${AWS_REGION}
-
   datasource:
-    url: jdbc:postgresql://localhost:${PRODUCT_DB_PORT}/${PRODUCT_DB_NAME}
+    url: ${PRODUCT_DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -18,19 +17,15 @@ spring:
     open-in-view: false
 
   grpc:
-    client:
-      channels:
-        review-service:
-          address: 0.0.0.0:1016
     server:
-      port: 1013
+      port: ${PRODUCT_GRPC_PORT}
 
   servlet:
     multipart:
       max-file-size: 10MB
 
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_URL}
     consumer:
       auto-offset-reset: latest
       enable-auto-commit: false
@@ -38,6 +33,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     listener:
       ack-mode: manual_immediate
+      auto-startup: ${KAFKA_LISTENER_AUTO_STARTUP:true}
   pulsar:
     consumer:
       retry-enable: true
@@ -48,15 +44,11 @@ logging:
       hibernate:
         SQL: debug
 
-resilience4j:
-  circuitbreaker:
-    instances:
-      review-service:
-        sliding-window-type: COUNT_BASED
-        failure-rate-threshold: 50
-        minimum-number-of-calls: 10
-        automatic-transition-from-open-to-half-open-enabled: true
-        wait-duration-in-open-state: 30s
-        permitted-number-of-calls-in-half-open-state: 10
-        sliding-window-size: 50
-        register-health-indicator: true
+jwt:
+  issuer: ${JWT_ISSUER:shopic}
+  header-alg: ${JWT_HEADER_ALG}
+  public-key-url: ${AUTH_SERVICE_URL}/api/v1/public-keys
+
+products:
+  aws:
+    bucket-name: ${PRODUCTS_BUCKET_NAME}

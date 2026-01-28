@@ -1,9 +1,9 @@
 package com.productservice.dto.request;
 
-import com.productservice.entity.ProductStatusEnum;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record CreateProductRequest(
         @NotBlank
@@ -15,19 +15,17 @@ public record CreateProductRequest(
         String description,
 
         @NotNull
-        ProductStatusEnum status,
-
-        @NotNull
         @DecimalMin("0")
         BigDecimal price,
 
-        @NotNull
-        Integer categoryId,
+        boolean isDeleted,
 
         @NotNull
-        Integer brandId,
+        UUID categoryId,
+
+        UUID brandId,
 
         @NotNull
         @Min(0)
-        Integer stockQuantity
+        Long stockQuantity
 ) {}

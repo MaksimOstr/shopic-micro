@@ -1,12 +1,14 @@
 package com.productservice.mapper;
 
-import com.productservice.dto.AdminReservationItemDto;
+import com.productservice.dto.ReservationItemDto;
 import com.productservice.dto.request.CreateReservationItem;
 import com.productservice.entity.ReservationItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ReservationItemMapper {
@@ -15,9 +17,8 @@ public interface ReservationItemMapper {
     @Mapping(target = "reservation.id", source = "reservationId")
     ReservationItem toReservationItem(CreateReservationItem item);
 
-    List<ReservationItem> toReservationItemList(List<CreateReservationItem> item);
+    @Mapping(target = "productId", source = "product.id")
+    ReservationItemDto toAdminReservationItemDto(ReservationItem reservation);
 
-    AdminReservationItemDto toAdminReservationItemDto(ReservationItem reservation);
-
-    List<AdminReservationItemDto> toAdminReservationItemDtoList(List<ReservationItem> itemList);
+    List<ReservationItemDto> toAdminReservationItemDtoList(List<ReservationItem> itemList);
 }

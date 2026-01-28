@@ -20,13 +20,14 @@ public class KafkaProducerConfig {
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.ACKS_CONFIG, "all");
-        config.put(ProducerConfig.LINGER_MS_CONFIG, 50);
+        config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+        config.put(ProducerConfig.LINGER_MS_CONFIG, 20);
         config.put(ProducerConfig.RETRIES_CONFIG, 3);
         return new DefaultKafkaProducerFactory<>(config);
     }
 
-    @Bean("atLeastOnceBatchTemplate")
-    public KafkaTemplate<String, String> kafkaTemplate1() {
+    @Bean
+    public KafkaTemplate<String, String> reliableKafkaTemplate() {
         return new KafkaTemplate<>(producerFactory1());
     }
 }

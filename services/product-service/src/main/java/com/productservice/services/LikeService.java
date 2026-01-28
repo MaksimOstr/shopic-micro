@@ -10,42 +10,37 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.UUID;
 
 
 @Service
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
-    private final EntityManager entityManager;
 
-
-    public void toggleLike(long productId, long userId) {
-        boolean isExists = isProductLiked(productId, userId);
+    public void toggleLike(Product product, UUID userId) {
+        boolean isExists = existsByProductIdAndUserId(product.getId(), userId);
         if (isExists) {
-            likeRepository.deleteByProduct_IdAndUserId(productId, userId);
+            likeRepository.deleteByProductAndUserId(product, userId);
         } else {
-            createLike(productId, userId);
+            createLike(product, userId);
         }
     }
 
-    private void createLike(long productId, long userId) {
+    private void createLike(Product product, UUID userId) {
         Like like = Like.builder()
                 .userId(userId)
-                .product(entityManager.getReference(Product.class, productId))
+                .product(product)
                 .build();
 
-        try {
-            likeRepository.save(like);
-        } catch (DataIntegrityViolationException e) {
-            throw new NotFoundException("Product does not exist");
-        }
+        likeRepository.save(like);
     }
 
-    public Set<Long> getLikedProductIds(long userId) {
+    public Set<UUID> getLikedProductIds(UUID userId) {
         return likeRepository.findLikedProductIds(userId);
     }
 
-    public boolean isProductLiked(long productId, long userId) {
+    public boolean existsByProductIdAndUserId(UUID productId, UUID userId) {
         return likeRepository.existsByProduct_IdAndUserId(productId, userId);
     }
 }
