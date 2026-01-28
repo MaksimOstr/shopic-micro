@@ -21,5 +21,5 @@ jobs:
     name: Build Service
     uses: ./.github/workflows/build.yml
     with:
-      context: 'product-service'
-      service: 'product-service'
+      context: 'services/product-service'
+      service: 'services/product-service'
