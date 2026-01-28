@@ -29,9 +29,9 @@ services:
     environment:
       ORDER_SERVICE_PORT: 1004
       ORDER_SERVICE_PROFILE: dev
-      PRODUCT_GRPC_PORT: 1013
-      PAYMENT_GRPC_PORT: 1015
-      CART_GRPC_PORT: 1014
+      PRODUCT_GRPC_CHANNEL: product-service:1013
+      CART_GRPC_CHANNEL: cart-service:1014
+      PAYMENT_GRPC_CHANNEL: payment-service:1015
       AUTH_SERVICE_URL: http://auth-service:1001
       DB_USER: admin
       DB_PASSWORD: masterkey

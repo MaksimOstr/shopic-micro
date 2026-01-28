@@ -31,7 +31,7 @@ services:
       CART_SERVICE_PROFILE: dev
       AUTH_SERVICE_URL: http://auth-service:1001
       DB_USER: admin
-      PRODUCT_GRPC_PORT: 1013
+      PRODUCT_GRPC_CHANNEL: product-service:1013
       CART_GRPC_PORT: 1014
       DB_PASSWORD: masterkey
       CART_DB_URL: jdbc:postgresql://cart-service-db:5432/cart-service-db

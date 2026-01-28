@@ -9,11 +9,11 @@ spring:
     client:
       channels:
         product-service:
-          address: 0.0.0.0:${PRODUCT_GRPC_PORT}
+          address: ${PRODUCT_GRPC_CHANNEL}
         cart-service:
-          address: 0.0.0.0:${CART_GRPC_PORT}
+          address: ${CART_GRPC_CHANNEL}
         payment-service:
-          address: 0.0.0.0:${PAYMENT_GRPC_PORT}
+          address: ${PAYMENT_GRPC_CHANNEL}
 
   jpa:
     open-in-view: false

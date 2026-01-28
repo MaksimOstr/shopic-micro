@@ -34,7 +34,7 @@ public class SecurityConfig {
             "/api/v1/categories/**",
             "/api/v1/brands/**",
             "/api/v1/products/**",
-
+            "/actuator/**"
     };
 
     private final JwtProperties jwtProperties;
