@@ -34,10 +34,10 @@ jobs:
             cache: gradle
 
         - name: Run tests
-          run: ./gradlew -p ${{ inputs.service }} test
+          run: ./gradlew ${{ inputs.service }}:test
 
         - name: Build JAR
-          run: ./gradlew -p ${{ inputs.service }} clean build
+          run: ./gradlew ${{ inputs.service }}:clean ${{ inputs.service }}:build
 
         - name: Login to GitHub Container Registry
           if: github.event_name != 'pull_request'
@@ -64,7 +64,7 @@ jobs:
           uses: docker/build-push-action@v6
           with:
             context: ${{ inputs.context }}
-            file: ${{ inputs.service }}/Dockerfile
+            file: ${{ inputs.context }}/Dockerfile
             platforms: linux/arm64,linux/amd64
             push: ${{ github.event_name != 'pull_request' }}
             tags:

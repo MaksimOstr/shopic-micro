@@ -22,4 +22,4 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       context: 'services/product-service'
-      service: 'services/product-service'
+      service: 'product-service'

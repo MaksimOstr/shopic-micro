@@ -22,4 +22,4 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       context: 'services/api-gateway'
-      service: 'services/api-gateway'
+      service: 'api-gateway'

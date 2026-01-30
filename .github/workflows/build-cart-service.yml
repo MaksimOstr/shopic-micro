@@ -22,4 +22,4 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       context: 'services/cart-service'
-      service: 'services/cart-service'
+      service: 'cart-service'
