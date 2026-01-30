@@ -21,6 +21,7 @@ import com.shopic.grpc.productservice.ProductListResponse;
 import com.shopic.grpc.productservice.ReserveProductsResponse;
 import com.shopic.grpc.productservice.ReservedProduct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,7 @@ import static com.orderservice.utils.SpecificationUtils.gte;
 import static com.orderservice.utils.SpecificationUtils.hasId;
 import static com.orderservice.utils.SpecificationUtils.lte;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserOrderFacade {
@@ -51,22 +53,28 @@ public class UserOrderFacade {
 
     @Transactional
     public String placeOrder(CreateOrderRequest dto, UUID userId) {
+        log.info("Initiating order placement for User ID: {}", userId);
         CartResponse cartInfo = cartGrpcService.getCart(userId);
         List<CartItem> cartItems = cartInfo.getCartItemsList();
         Order order = orderService.createOrder(dto, userId);
+        log.info("Order initialized. Order ID: {}, User ID: {}", order.getId(), userId);
         Map<String, CartItem> cartItemMap = grpcMapper.getCartItemMap(cartItems);
         ReserveProductsResponse reservedProducts = productGrpcService.reserveProducts(
                 cartItems,
                 cartItemMap,
                 order.getId()
         );
+        log.debug("Requesting product reservation via gRPC. Order ID: {}, Items count: {}", order.getId(), cartItems.size());
         List<ReservedProduct> productList = reservedProducts.getProductsList();
         List<OrderItem> orderItems = grpcMapper.toOrderItemList(productList, cartItemMap);
         order.addNewOrderItems(orderItems);
 
         try {
-            return paymentGrpcService.createPayment(userId, order).getCheckoutUrl();
+            String checkoutUrl =  paymentGrpcService.createPayment(userId, order).getCheckoutUrl();
+            log.info("UserOrderFacade: order created successfully");
+            return checkoutUrl;
         } catch (ApiException e) {
+            log.error("UserOrderFacade: place order failed", e);
             kafkaService.sendOrderFailedEvent(order.getId());
 
             throw e;

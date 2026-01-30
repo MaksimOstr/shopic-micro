@@ -42,6 +42,7 @@ public class PublicKeyService {
                     try {
                         return JWK.parse(entity.getPublicKey());
                     } catch (ParseException e) {
+                        log.error("Error parsing public key", e);
                         throw new RuntimeException("Failed to parse JWK: " + e.getMessage(), e);
                     }
                 })

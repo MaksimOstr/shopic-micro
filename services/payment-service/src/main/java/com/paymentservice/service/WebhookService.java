@@ -20,7 +20,6 @@ public class WebhookService {
     private final KafkaService kafkaService;
     private final PaymentService paymentService;
 
-    @Async
     @Transactional
     public void handleWebhookEvent(Event event) {
         switch (event.getType()) {
@@ -30,16 +29,20 @@ public class WebhookService {
             case "charge.failed":
                 handleChargeFailed(event);
                 break;
+            default:
+                log.debug("Unhandled event type: {}", event.getType());
         }
     }
 
     public void handleCheckoutSuccess(Event event) {
+        log.info("WebhookService: handle checkout success: {}", event);
         Session session = getSessionFromEvent(event);
         Payment payment = paymentService.succeedPayment(session.getId());
         kafkaService.sendCheckoutSessionSuccess(payment.getOrderId());
     }
 
     private void handleChargeFailed(Event event) {
+        log.info("WebhookService: handle charge failed: {}", event);
         Session session = getSessionFromEvent(event);
 
         paymentService.failPayment(session.getId());

@@ -27,16 +27,9 @@ public class KafkaService {
         this.objectMapper = objectMapper;
     }
 
-    public void sendOrderCompletedEvent(UUID orderId) {
-        sendEvent("order.completed", orderId);
-    }
 
     public void sendOrderFailedEvent(UUID orderId) {
         sendEvent("order.failed", orderId);
-    }
-
-    public void sendOrderReturnEvent(UUID orderId) {
-        sendEvent("order.returned", orderId);
     }
 
     private void sendEvent(String topic, UUID orderId) {

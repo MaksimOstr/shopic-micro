@@ -27,7 +27,7 @@ public class ForgotPasswordService {
                         mailService.sendForgotPasswordChange(user.getEmail(), code.getCode());
                         return;
                     }
-                    log.info("User is not present, skipping...");
+                    log.info("ForgotPasswordService: User registered via non local provider, actual Provider: ${}, skipping...",  user.getAuthProvider());
                 });
     }
 

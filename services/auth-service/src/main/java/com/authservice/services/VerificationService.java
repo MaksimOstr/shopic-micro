@@ -26,6 +26,7 @@ public class VerificationService {
                     }
                     log.info("User already verified, skipping verification email");
                 });
+
     }
 
     public void verifyUser(String providedCode) {

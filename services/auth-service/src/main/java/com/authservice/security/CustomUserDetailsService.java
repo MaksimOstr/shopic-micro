@@ -25,6 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             User user = userQueryService.findByEmail(email);
 
             if(user.getAuthProvider() != AuthProviderEnum.LOCAL) {
+                log.warn("Login attempt via LOCAL for non-local user {}. Actual provider: {}", email, user.getAuthProvider());
                 throw new UsernameNotFoundException("User was registered with another provider");
             }
 

@@ -44,6 +44,8 @@ public class StripeCheckoutService {
     }
 
     public String createCheckoutSession(CreateCheckoutSessionDto dto) {
+        log.info("Initiating Stripe checkout creation for Order ID: {}, User ID: {}", dto.orderId(), dto.userId());
+
         try {
             List<SessionCreateParams.LineItem> lineItems = getLineItems(dto.checkoutItems());
             SessionCreateParams params = SessionCreateParams.builder()
@@ -61,10 +63,17 @@ public class StripeCheckoutService {
 
             paymentService.createPayment(dto.userId(), sessionId, dto.orderId(), total);
 
+            log.info("Stripe session created successfully. Session ID: {}, Order ID: {}, Amount: {} {}",
+                    sessionId, dto.orderId(), total, params.getCurrency());
+
             return session.getUrl();
         } catch (StripeException e) {
-            log.error("Unexpected StripeException: ", e);
+            log.error("Failed to create Stripe session for Order ID: {}. Stripe Error: {}",
+                    dto.orderId(), e.getMessage(), e);
             throw new ApiException("Internal server error, try again later", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            log.error("Unexpected error during checkout creation for Order ID: {}", dto.orderId(), e);
+            throw new ApiException("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
