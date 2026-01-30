@@ -38,7 +38,7 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
         );
         Cookie refreshTokenCookie = cookieService.createRefreshTokenCookie(newRefreshToken);
 
-        log.info("Successfully authenticated user with id {} via OAuth 2", user.getId());
+        log.info("Successfully authenticated user with id {} via OAuth provider: ${}", user.getId(), user.getAuthProvider());
 
         response.addCookie(refreshTokenCookie);
         response.setStatus(HttpStatus.OK.value());
