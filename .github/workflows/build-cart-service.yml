@@ -10,6 +10,11 @@ on:
       - '.github/workflows/build.yml'
       - './.github/workflows/build-cart-service.yml'
       - 'services/cart-service/**'
+  pull_request:
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-cart-service.yml'
+      - 'services/cart-service/**'
 
 permissions:
   contents: read

@@ -10,6 +10,11 @@ on:
       - '.github/workflows/build.yml'
       - './.github/workflows/build-api-gateway.yml'
       - 'services/api-gateway/**'
+  pull_request:
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-api-gateway.yml'
+      - 'services/api-gateway/**'
 
 permissions:
   contents: read

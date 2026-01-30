@@ -10,6 +10,11 @@ on:
       - '.github/workflows/build.yml'
       - './.github/workflows/build-payment-service.yml'
       - 'services/payment-service/**'
+  pull_request:
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-payment-service.yml'
+      - 'services/payment-service/**'
 
 permissions:
   contents: read

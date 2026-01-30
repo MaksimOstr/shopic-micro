@@ -10,6 +10,11 @@ on:
       - '.github/workflows/build.yml'
       - './.github/workflows/build-auth-service.yml'
       - 'services/auth-service/**'
+  pull_request:
+    paths:
+      - '.github/workflows/build.yml'
+      - './.github/workflows/build-auth-service.yml'
+      - 'services/auth-service/**'
 
 permissions:
   contents: read
