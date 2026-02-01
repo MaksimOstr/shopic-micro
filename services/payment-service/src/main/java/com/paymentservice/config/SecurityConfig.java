@@ -74,7 +74,7 @@ public class SecurityConfig {
     public JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
                 .withJwkSetUri(jwtProperties.getPublicKeyUrl())
-                .jwsAlgorithm(SignatureAlgorithm.from(jwtProperties.getHeaderAlg()))
+                .jwsAlgorithm(SignatureAlgorithm.RS256)
                 .build();
 
         jwtDecoder.setJwtValidator(
