@@ -41,6 +41,14 @@ A modular **Spring Boot** system designed for seamless online retail operations.
 * Routes requests to appropriate microservices.
 * Centralized security management
 
+## Architectural Decisions
+
+- gRPC used for internal communication to ensure strict contract-based interaction and better performance compared to REST.
+- Kafka used for eventual consistency and compensation logic (Saga pattern).
+- JWT signed with RSA to allow public key distribution across services.
+- Zero Trust model applied even inside internal network.
+- Database per service pattern enforced.
+
 ## 🛡️ Security Architecture
 
 We utilize a **Zero Trust** approach, handling security at two distinct levels to ensure maximum protection.
