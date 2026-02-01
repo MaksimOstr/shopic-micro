@@ -1,5 +1,8 @@
 ### E-commerce Platform Backend — Microservices Architecture
 A modular **Spring Boot** system designed for seamless online retail operations. This project implements a scalable microservices architecture with a **Hybrid Communication Strategy**: **REST** for external client interactions, **gRPC** for high-performance inter-service communication, and **Apache Kafka** for asynchronous, event-driven consistency.
+
+
+**All critical business logic is fully covered by unit tests to ensure reliability and prevent regressions.**
 ## Tech Stack
 * Java 21, Spring(Boot, Data JPA, Security, Cloud)
 * REST, gRPC, Apache Kafka
