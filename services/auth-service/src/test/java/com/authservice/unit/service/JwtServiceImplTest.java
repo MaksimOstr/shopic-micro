@@ -31,7 +31,6 @@ class JwtServiceImplTest {
         JwtProperties properties = new JwtProperties();
         properties.setExpiresAt(3600);
         properties.setIssuer("auth-service");
-        properties.setHeaderAlg("RS256");
         jwtService = new JwtServiceImpl(properties, jwtEncoder);
     }
 

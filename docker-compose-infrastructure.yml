@@ -1,0 +1,98 @@
+version: "3.9"
+
+services:
+  auth-service-db:
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "1111:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: auth-service-db
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+
+
+  cart-service-db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "1112:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: cart-service-db
+    volumes:
+      - cart_db_data:/var/lib/postgresql/data
+
+
+  order-service-db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "1113:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: order-service-db
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+
+  payment-service-db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "1114:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: payment-service-db
+    volumes:
+      - payment_db_data:/var/lib/postgresql/data
+
+  product-service-db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "1115:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: masterkey
+      POSTGRES_DB: product-service-db
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+
+  kafka:
+    image: apache/kafka:4.1.1
+    restart: always
+    container_name: kafka-1
+    volumes:
+      - kafka_data:/bitnami/kafka
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_KRAFT_MODE: "true"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_NUM_PARTITIONS: 1
+
+volumes:
+  auth_db_data:
+  cart_db_data:
+  order_db_data:
+  payment_db_data:
+  product_db_data:
+  kafka_data:

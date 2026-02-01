@@ -12,6 +12,5 @@ import org.springframework.stereotype.Component;
 @Setter
 public class JwtProperties {
     private String issuer;
-    private String headerAlg;
     private String publicKeyUrl;
 }

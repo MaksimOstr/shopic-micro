@@ -25,7 +25,6 @@ logging:
 
 jwt:
   issuer: ${JWT_ISSUER:shopic}
-  header-alg: ${JWT_HEADER_ALG}
   public-key-url: ${AUTH_SERVICE_URL}/api/v1/public-keys
 
 

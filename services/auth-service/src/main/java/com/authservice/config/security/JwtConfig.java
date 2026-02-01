@@ -29,7 +29,7 @@ public class JwtConfig {
     public JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
                 .withJwkSetUri(properties.getPublicKeyUrl())
-                .jwsAlgorithm(SignatureAlgorithm.from(properties.getHeaderAlg()))
+                .jwsAlgorithm(SignatureAlgorithm.RS256)
                 .build();
 
         jwtDecoder.setJwtValidator(
